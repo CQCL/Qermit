@@ -1018,10 +1018,18 @@ def gen_PEC_learning_based_MitEx(
     :type device_backend: Backend
     :param simulator_backend: Ideal state vector simulator used for simulating Clifford Circuits.
     :type simulator_backend: Backend
+
+    :key simulator_mitex: MitEx object ideal state simulations are run on, default simulator_backend.
+    :key device_mitex: MitEx object observable experiments are run on, default device_backend.
+    :key seed: Seed for np.random, default None.
+    :key optimisation_level: Optimisation level for initial compilation, default 0.
+    :key num_cliff: The number of random Clifford circuits generated for each primary circuit, default 10.
+
     :raises RuntimeError: Raised if the backend gate set does not include CX or CZ gates.
     :return: MitEx object implementing error-mitigation via learning based PEC.
     :rtype: MitEx
     """
+
     # Disallow backends that do not have 2 qubit clifford gates
     if not (
         (OpType.CX in device_backend._gate_set)  # type: ignore
@@ -1035,9 +1043,6 @@ def gen_PEC_learning_based_MitEx(
     _optimisation_level = kwargs.get("optimisation_level", 0)
     # TODO: Change to a number of clifford circuits which varies with the size of the circuit
     num_cliff_circ = kwargs.get("num_cliff", 10)
-    random_seed = kwargs.get("seed", 0)
-
-    np.random.seed(random_seed)
 
     sim_mitex = copy.copy(
         kwargs.get(

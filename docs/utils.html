@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -171,40 +174,40 @@
   <div class="section" id="qermit-utils">
 <h1>qermit.utils<a class="headerlink" href="#qermit-utils" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="qermit.taskgraph.utils.SymbolsDict">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">qermit.taskgraph.utils.</span></code><code class="sig-name descname"><span class="pre">SymbolsDict</span></code><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qermit.taskgraph.utils.</span></span><span class="sig-name descname"><span class="pre">SymbolsDict</span></span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>A helper class for standardising interfacing with Circuit Symbolics in qermit.
 Methods take different containers that hold some kind of symbols representation
 and return a SymbolsDict object.
 Methods access self._symbolic_map or use other accessors to modify or add new
 symbols.</p>
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.SymbolsDict.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default constructor, creates an empty OrderedDict() object for future symbols to be added to.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.SymbolsDict.__repr__">
-<code class="sig-name descname"><span class="pre">__repr__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.__repr__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return repr(self).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.SymbolsDict.__str__">
-<code class="sig-name descname"><span class="pre">__str__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.__str__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.__str__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return str(self).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="qermit.taskgraph.utils.SymbolsDict.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.SymbolsDict.add_symbol">
-<code class="sig-name descname"><span class="pre">add_symbol</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">sympy.core.symbol.Symbol</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.add_symbol" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.add_symbol">
+<span class="sig-name descname"><span class="pre">add_symbol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">sympy.core.symbol.Symbol</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.add_symbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds any passed Symbol (in string form or sympy Symbol type) as a key to dictionary with None value assigned.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -214,8 +217,8 @@ symbols.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.SymbolsDict.add_value">
-<code class="sig-name descname"><span class="pre">add_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">sympy.core.symbol.Symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.add_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.add_value">
+<span class="sig-name descname"><span class="pre">add_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">sympy.core.symbol.Symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.add_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assigns value to self._symbolic_map[symbol]. If symbol not in object then throws an error.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -228,8 +231,8 @@ symbols.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.SymbolsDict.get_symbolic_map">
-<code class="sig-name descname"><span class="pre">get_symbolic_map</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol_values</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">sympy.core.symbol.Symbol</span><span class="p"><span class="pre">,</span> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.get_symbolic_map" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.get_symbolic_map">
+<span class="sig-name descname"><span class="pre">get_symbolic_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol_values</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">sympy.core.symbol.Symbol</span><span class="p"><span class="pre">,</span> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.get_symbolic_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assigns given values in parameters to keys in self._symbolic_map in order, for a new
 dictionary object. Returns just this dictionary type.</p>
 <dl class="field-list simple">
@@ -246,8 +249,8 @@ dictionary object. Returns just this dictionary type.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.SymbolsDict.set_values">
-<code class="sig-name descname"><span class="pre">set_values</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol_values</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.set_values" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.set_values">
+<span class="sig-name descname"><span class="pre">set_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol_values</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.set_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assigns given values in parameters to keys in self._symbolic_map in order, for a new
 dictionary object.</p>
 <dl class="field-list simple">
@@ -264,8 +267,8 @@ dictionary object.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.SymbolsDict.symbols_from_circuit">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">symbols_from_circuit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.circuit.Circuit</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">qermit.taskgraph.utils.SymbolsDict</span></a><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_from_circuit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.symbols_from_circuit">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">symbols_from_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.circuit.Circuit</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">qermit.taskgraph.utils.SymbolsDict</span></a><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_from_circuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a pytket Circuit, returns a SymbolsDict object capturing
 given circuits free symbols.</p>
 <dl class="field-list simple">
@@ -276,8 +279,8 @@ given circuits free symbols.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.SymbolsDict.symbols_from_dict">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">symbols_from_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">sympy.core.symbol.Symbol</span><span class="p"><span class="pre">,</span> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">qermit.taskgraph.utils.SymbolsDict</span></a><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_from_dict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.symbols_from_dict">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">symbols_from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">sympy.core.symbol.Symbol</span><span class="p"><span class="pre">,</span> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">qermit.taskgraph.utils.SymbolsDict</span></a><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_from_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assigns to mit_symbols attribute _symbolic_map straight from passed dictionary
 of Symbol to None/float.</p>
 <dl class="field-list simple">
@@ -288,8 +291,8 @@ of Symbol to None/float.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.SymbolsDict.symbols_from_list">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">symbols_from_list</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbols_list</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">sympy.core.symbol.Symbol</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">qermit.taskgraph.utils.SymbolsDict</span></a><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_from_list" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.symbols_from_list">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">symbols_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbols_list</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">sympy.core.symbol.Symbol</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">qermit.taskgraph.utils.SymbolsDict</span></a><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_from_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds all symbols (or string representing Symbol) as dict entries with no value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -298,9 +301,9 @@ of Symbol to None/float.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="qermit.taskgraph.utils.SymbolsDict.symbols_list">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">symbols_list</span></code><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_list" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.symbols_list">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">symbols_list</span></span><em class="property"><span class="pre">:</span> <span class="pre">Iterable[sympy.core.symbol.Symbol]</span></em><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all symbols held in dictionary of symbols in SymbolsDict object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -315,13 +318,13 @@ of Symbol to None/float.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="qermit.taskgraph.utils.MeasurementCircuit">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">qermit.taskgraph.utils.</span></code><code class="sig-name descname"><span class="pre">MeasurementCircuit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbolic_circuit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.circuit.Circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbols</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">qermit.taskgraph.utils.SymbolsDict</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.MeasurementCircuit">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qermit.taskgraph.utils.</span></span><span class="sig-name descname"><span class="pre">MeasurementCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbolic_circuit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.circuit.Circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbols</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">qermit.taskgraph.utils.SymbolsDict</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stores a single measurement circuit that captures one or multiple observable estimations
 for some Ansatz Circuit.</p>
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.MeasurementCircuit.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbolic_circuit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.circuit.Circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbols</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">qermit.taskgraph.utils.SymbolsDict</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.MeasurementCircuit.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbolic_circuit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.circuit.Circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbols</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">qermit.taskgraph.utils.SymbolsDict</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stores information required to instantiate any MeasurementCircuit with parameterised symbols.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -334,14 +337,14 @@ for some Ansatz Circuit.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="qermit.taskgraph.utils.MeasurementCircuit.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.MeasurementCircuit.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="qermit.taskgraph.utils.MeasurementCircuit.circuit">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">circuit</span></code><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.circuit" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.MeasurementCircuit.circuit">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">circuit</span></span><em class="property"><span class="pre">:</span> <span class="pre">pytket._tket.circuit.Circuit</span></em><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.circuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns measurement circuit stored in oracle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -354,8 +357,8 @@ for some Ansatz Circuit.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.MeasurementCircuit.get_parametric_circuit">
-<code class="sig-name descname"><span class="pre">get_parametric_circuit</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">pytket._tket.circuit.Circuit</span><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.get_parametric_circuit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.MeasurementCircuit.get_parametric_circuit">
+<span class="sig-name descname"><span class="pre">get_parametric_circuit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">pytket._tket.circuit.Circuit</span><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.get_parametric_circuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Substitutes parameters held in SymbolDict into copy of circuit and returns.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -367,9 +370,9 @@ for some Ansatz Circuit.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="qermit.taskgraph.utils.MeasurementCircuit.symbols">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">symbols</span></code><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.symbols" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.MeasurementCircuit.symbols">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">symbols</span></span><em class="property"><span class="pre">:</span> <span class="pre">Tuple[sympy.core.symbol.Symbol,</span> <span class="pre">...]</span></em><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.symbols" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts symbols_list property held in SymbolsDict to a tuple and returns it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -384,13 +387,13 @@ for some Ansatz Circuit.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="qermit.taskgraph.utils.ObservableTracker">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">qermit.taskgraph.utils.</span></code><code class="sig-name descname"><span class="pre">ObservableTracker</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit_pauli_operator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket.utils.operators.QubitPauliOperator</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qermit.taskgraph.utils.</span></span><span class="sig-name descname"><span class="pre">ObservableTracker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit_pauli_operator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket.utils.operators.QubitPauliOperator</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stores all measurement circuits required to get observable expectations for each
 QubitPauliString in a given QubitPauliOperator.</p>
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit_pauli_operator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket.utils.operators.QubitPauliOperator</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit_pauli_operator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket.utils.operators.QubitPauliOperator</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default constructor, creates an empty dict object for mapping QubitPauliStrings to measurement circuits
 and the qubits measured to get expectation, along with an empty list for storing measurement circuits and
 a list for storing partitions.</p>
@@ -403,26 +406,26 @@ to retain measurement circuits all QubitPauliString keys for before any Backend 
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.__repr__">
-<code class="sig-name descname"><span class="pre">__repr__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.__repr__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return repr(self).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.__str__">
-<code class="sig-name descname"><span class="pre">__str__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.__str__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.__str__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return str(self).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="qermit.taskgraph.utils.ObservableTracker.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.add_measurement_circuit">
-<code class="sig-name descname"><span class="pre">add_measurement_circuit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#qermit.taskgraph.utils.MeasurementCircuit" title="qermit.taskgraph.utils.MeasurementCircuit"><span class="pre">qermit.taskgraph.utils.MeasurementCircuit</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">measurement_info</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.pauli.QubitPauliString</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Bit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.add_measurement_circuit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.add_measurement_circuit">
+<span class="sig-name descname"><span class="pre">add_measurement_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#qermit.taskgraph.utils.MeasurementCircuit" title="qermit.taskgraph.utils.MeasurementCircuit"><span class="pre">qermit.taskgraph.utils.MeasurementCircuit</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">measurement_info</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.pauli.QubitPauliString</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Bit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.add_measurement_circuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds given measurement circuit to stored _measurement_circuits attribute and for each qubit pauli string and qubits in associated
 strings, updates dictionary between string and its measurement circuit + bit to measure and whether result should be inverted.</p>
 <dl class="field-list simple">
@@ -437,8 +440,8 @@ and a bool signifying whether expectation should be inverted when taking result.
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.check_string">
-<code class="sig-name descname"><span class="pre">check_string</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.pauli.QubitPauliString</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.check_string" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.check_string">
+<span class="sig-name descname"><span class="pre">check_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.pauli.QubitPauliString</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.check_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns true if given QubitPauliString has a measurement circuit stored in self._measurement_circuits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -454,8 +457,8 @@ and a bool signifying whether expectation should be inverted when taking result.
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.extend_operator">
-<code class="sig-name descname"><span class="pre">extend_operator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_operator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket.utils.operators.QubitPauliOperator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.extend_operator" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.extend_operator">
+<span class="sig-name descname"><span class="pre">extend_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_operator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket.utils.operators.QubitPauliOperator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.extend_operator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extends self._qubit_pauli_operator to include tuples in passed operator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -465,8 +468,8 @@ and a bool signifying whether expectation should be inverted when taking result.
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.from_ObservableTracker">
-<code class="sig-name descname"><span class="pre">from_ObservableTracker</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#qermit.taskgraph.utils.ObservableTracker" title="qermit.taskgraph.utils.ObservableTracker"><span class="pre">qermit.taskgraph.utils.ObservableTracker</span></a><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.from_ObservableTracker" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.from_ObservableTracker">
+<span class="sig-name descname"><span class="pre">from_ObservableTracker</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#qermit.taskgraph.utils.ObservableTracker" title="qermit.taskgraph.utils.ObservableTracker"><span class="pre">qermit.taskgraph.utils.ObservableTracker</span></a><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.from_ObservableTracker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copies each class attribute from to_copy to self. Returns self.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -479,8 +482,8 @@ and a bool signifying whether expectation should be inverted when taking result.
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.get_empty_strings">
-<code class="sig-name descname"><span class="pre">get_empty_strings</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.pauli.QubitPauliString</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.get_empty_strings" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.get_empty_strings">
+<span class="sig-name descname"><span class="pre">get_empty_strings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.pauli.QubitPauliString</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.get_empty_strings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all strings in operator that don’t have some assigned MeasurementCircuit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -493,8 +496,8 @@ and a bool signifying whether expectation should be inverted when taking result.
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.get_expectations">
-<code class="sig-name descname"><span class="pre">get_expectations</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket.backends.backendresult.BackendResult</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pytket.utils.operators.QubitPauliOperator</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.get_expectations" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.get_expectations">
+<span class="sig-name descname"><span class="pre">get_expectations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket.backends.backendresult.BackendResult</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pytket.utils.operators.QubitPauliOperator</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.get_expectations" title="Permalink to this definition">¶</a></dt>
 <dd><p>For given list of results, returns a QubitPauliOperator giving an expectation for each QubitPauliString
 held in self._qps_to_indices. Expectation derived by taking parity of counts.</p>
 <dl class="field-list simple">
@@ -511,8 +514,8 @@ held in self._qps_to_indices. Expectation derived by taking parity of counts.</p
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.get_measurement_circuits">
-<code class="sig-name descname"><span class="pre">get_measurement_circuits</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.pauli.QubitPauliString</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qermit.taskgraph.utils.MeasurementCircuit" title="qermit.taskgraph.utils.MeasurementCircuit"><span class="pre">qermit.taskgraph.utils.MeasurementCircuit</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.get_measurement_circuits" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.get_measurement_circuits">
+<span class="sig-name descname"><span class="pre">get_measurement_circuits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.pauli.QubitPauliString</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qermit.taskgraph.utils.MeasurementCircuit" title="qermit.taskgraph.utils.MeasurementCircuit"><span class="pre">qermit.taskgraph.utils.MeasurementCircuit</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.get_measurement_circuits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the measurements required to be run for a single QubitPauliString’s expectation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -527,9 +530,9 @@ held in self._qps_to_indices. Expectation derived by taking parity of counts.</p
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.measurement_circuits">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">measurement_circuits</span></code><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.measurement_circuits" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.measurement_circuits">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">measurement_circuits</span></span><em class="property"><span class="pre">:</span> <span class="pre">List[qermit.taskgraph.utils.MeasurementCircuit]</span></em><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.measurement_circuits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all measurement circuits aded to ObservableTracker via get_measurement_circuit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -542,8 +545,8 @@ held in self._qps_to_indices. Expectation derived by taking parity of counts.</p
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.modify_coefficients">
-<code class="sig-name descname"><span class="pre">modify_coefficients</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_coefficients</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.pauli.QubitPauliString</span><span class="p"><span class="pre">,</span> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.modify_coefficients" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.modify_coefficients">
+<span class="sig-name descname"><span class="pre">modify_coefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_coefficients</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.pauli.QubitPauliString</span><span class="p"><span class="pre">,</span> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.modify_coefficients" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates coefficients in held QubitPauliOperator with new coefficients. Each QubitPauliString
 must already be in self._qubit_pauli_operator</p>
 <dl class="field-list simple">
@@ -553,9 +556,9 @@ must already be in self._qubit_pauli_operator</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.qubit_pauli_operator">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">qubit_pauli_operator</span></code><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.qubit_pauli_operator" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.qubit_pauli_operator">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">qubit_pauli_operator</span></span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.qubit_pauli_operator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns stored qubit pauli operator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -568,8 +571,8 @@ must already be in self._qubit_pauli_operator</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.utils.ObservableTracker.remove_strings">
-<code class="sig-name descname"><span class="pre">remove_strings</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strings</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.pauli.QubitPauliString</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.remove_strings" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.utils.ObservableTracker.remove_strings">
+<span class="sig-name descname"><span class="pre">remove_strings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strings</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.pauli.QubitPauliString</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.remove_strings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes passed qubit pauli strings from held QubitPauliOperator and dict from string to index.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

@@ -319,7 +319,7 @@ def gen_DFSC_MitEx(backend: Backend, **kwargs) -> MitEx:
     :param backend: Backend experiments are run through.
     :type backend: Backend
     :key experiment_mitex: MitEx object observable experiments are run through
-    :key characterisation_mitex: MitEX object characteriastion experiments are runt hrough.
+    :key characterisation_mitex: MitEX object characteriastion experiments are run through.
 
     :return: MitEx object for automatic DFSC correction of circuits.
     :rtype: MitEx
