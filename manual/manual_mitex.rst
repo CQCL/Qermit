@@ -382,8 +382,6 @@ It is on this approach that the implementation of PEC in ``qermit`` is based.
 
 .. image:: PEC_taskgraph.png
 
-
-
 Zero-Noise-Extrapolation in ``qermit``
 --------------------------------------
 
@@ -397,14 +395,16 @@ when performing ZNE:
 - The means by which the effective noise levels will be varied.
 - The method of extrapolation to use to recover the zero noise limit. 
 
-Several options exist in both cases. Here we will focus on digital ZNE, as discussed 
-in [Giurgica-Tiron2020]_, as a means to vary the noise level. Digital ZNE is based on the ability 
+
+Several options exist in both case. 
+Here we will focus on digital ZNE, as discussed in [Giurgica-Tiron2020]_, 
+as a means to vary the noise level. Digital ZNE is based on the ability 
 to increase noise levels by increasing the number of gates executed. This contrasts with 'analog' 
 approaches, which might, for example, alter noise levels by stretching or otherwise changing the 
 pulses acted on superconducting qubits. More specifically we increase 
 the effective noise by performing a folding operation on the circuit, which increases the 
 number of gates without affecting the unitary it implements. At their core these folding 
-methods use that, for a gate :math:``G, :math:`G = G G^{-1} G`, and assume that making this 
+methods use that, for a gate :math:``G``, :math:`G = G G^{-1} G`, and assume that making this 
 substitution has the affect of tripling the noise.
 
 Extrapolation aims to recover an estimate of the expectation value of some observable, 
