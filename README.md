@@ -11,9 +11,9 @@ To install, ensure that you have `pip` version 19 or above, and run
 
 ``pip install qermit``
 
-**Documentation** can be found at [cqcl.github.io/qermit](https://cqcl.github.io/qermit)
+**Documentation** can be found at [cqcl.github.io/qermit](https://cqcl.github.io/qermit).
 
-A **User Manual** can be found at TODO fill:
+A **User Manual** can be found at [cqcl.github.io/qermit/manual](https://cqcl.github.io/qermit/manual/).
 
 
 ## Bugs and feature requests

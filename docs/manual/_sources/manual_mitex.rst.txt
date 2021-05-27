@@ -12,7 +12,7 @@ on a device, calculates their expectation values,
 and then modifies them by some coefficients, leaving an estimation of the expectation value of the observable.
 
 
-In its basic capacity, the ``MitEx.run`` method (TODO: Link to documentation)  will run each of these
+In its basic capacity, the ``MitEx.run`` `method <https://cqcl.github.io/qermit/mitex.html>`_ will run each of these
 tasks sequentially, automating the procedure.
 
 ::
@@ -25,8 +25,6 @@ tasks sequentially, automating the procedure.
 
 
 .. image:: mitex_taskgraph.png
-
-TODO Add docs link for all types when available.
 
 While the arguments to ``MitRes`` will be intuitive to anyone who has used ``pytket`` before, the arguments
 to ``MitEx`` may require more consideration (though hopefully sensical to someone who has run an experiment estimating
@@ -380,6 +378,10 @@ primary circuit. The expectation of these Clifford circuits can be calculated ef
 using a classical simulator, and so can be compared to the results from noisy runs. 
 It is on this approach that the implementation of PEC in ``qermit`` is based.
 
+Generators for Probabilistic-Error-Cancellation ``MitEx`` objects are available in 
+the ` ``qermit.probabilistic_error_cancellation`` module <https://cqcl.github.io/qermit/probabilistic_error_cancellation.html>`_.
+ 
+
 .. image:: PEC_taskgraph.png
 
 Zero-Noise-Extrapolation in ``qermit``
@@ -414,6 +416,9 @@ collections of values, and an anzats for the relation between the two, this redu
 regression problem. There are several ansatz provided by ``qermit``. Each may have its 
 advantages depending on: the device, dominant noise channel, etc.
 
+Generators for Zero-Noise-Extrapolation ``MitEx`` objects are available in 
+the ` ``qermit.zero_noise_extrapolation`` module <https://cqcl.github.io/qermit/zero_noise_extrapolation.html>`_.
+ 
 ::
 
     from qermit.zero_noise_extrapolation import gen_ZNE_MitEx
@@ -493,7 +498,7 @@ In this sense, "Clifford-Circuit-Learning" refers to the general noise character
 efficiently simulated classically Clifford circuits and "Clifford-Data-Regression" refers to the noise correction
 technique used here.
 
-Generators for Clifford-Data-Regression ``MitEx`` objects are available in the ``qermit.clifford_noise_characteisation`` module.
+Generators for Clifford-Data-Regression ``MitEx`` objects are available in the ` ``qermit.clifford_noise_characterisation`` module <https://cqcl.github.io/qermit/clifford_noise_characterisation.html>`_.
 
 ::
 
@@ -636,6 +641,10 @@ The DFSC method will be most useful when the accumulation of errors through a ci
 purity in the state preparation and incoherent errors dominate. It may be used, for example, in a 
 variational algorithm to adaptively account for these types of errors within the optimisation loop using 
 minimal additional quantum compute time.
+
+Generators for Depolarisation-Factor-Supression-For-Nearest-Clifford ``MitEx`` objects are available 
+in the ``qermit.clifford_noise_characterisation`` `module <https://cqcl.github.io/qermit/clifford_noise_characterisation.html>`_.
+
 
 ::
 

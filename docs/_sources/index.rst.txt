@@ -102,9 +102,9 @@ the ``pytket`` ``Backend`` the ``MitEx`` object is defined by.
 
 .. image:: mitexgraph.png
 
-.. TODO: add user manual link ....
 
-See the Qermit User Manual page for an extended tutorial on using ``qermit``, including
+
+See the Qermit `user manual <https://cqcl.github.io/qermit/manual/>`_ for an extended tutorial on using ``qermit``, including
 pre-defined error-mitigation methods and composing error-mitigation methods.
 
 ``qermit`` currently provides the following error-mitigation schemes (under their commonly known names):
@@ -116,10 +116,6 @@ pre-defined error-mitigation methods and composing error-mitigation methods.
 * Clifford Data Regression
 * Depolarisation-Factor-Supression-For-Nearest-Clifford 
 
-.. How to cite
-.. ~~~~~~~~~~~
-.. If you wish to cite qermit in any academic pulibcations, we generally recommend 
-.. citing our paper TODO: add paper link.
 
 User Support
 ~~~~~~~~~~~~

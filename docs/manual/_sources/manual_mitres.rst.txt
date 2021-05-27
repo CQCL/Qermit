@@ -9,9 +9,7 @@ being sent to the device via the hardware manufacturers language of choice. Fina
 results are returned, typically as a sequence of *Shots*, each shot being a single set of bit
 corresponding to the measurement result of each qubit.
 
-TODO: Link methods to documentation when public and possible.
-
-In its basic capacity the ``MitRes.run`` method will run
+In its basic capacity the ``MitRes.run`` `method <https://cqcl.github.io/qermit/mitres.html>`_ will run
 each of these tasks sequentially. 
 
 ::
@@ -424,7 +422,7 @@ basis states, a transition matrix can be derived that describes the noisy SPAM p
 the inverse of this transition matrix to the distribution of a quantum state from some desired quantum computation 
 can effectively uncompute the errors caused by SPAM noise.
 
-Generators for SPAM ``MitRes`` objects are available in the ``qermit.spam`` module.
+Generators for SPAM ``MitRes`` objects are available in the ` ``qermit.spam`` module <https://cqcl.github.io/qermit/spam.html>`_.
 
 ::
 
@@ -586,7 +584,7 @@ For example, averaging a noise channel over the n-qubit Pauli group has the effe
 
 In this manner, an n-qubit coherent noise channel can be tailored into an n-qubit stochastic Pauli noise channel. For Pauli channels, the worst case error rate is similar to the average error rate, whilst for coherent noise the worst case error rate scales as a square root of the average error rate.
 
-Generator functions in the ``qermit.frame_randomisation`` return ``MitRes`` objects for automatically using randomised protocols
+Generator functions in the ``qermit.frame_randomisation`` `module <https://cqcl.github.io/qermit/frame_randomisation.html>`_ return ``MitRes`` objects for automatically using randomised protocols
 when running experiments.
 
 Randomised compilation [Wallman2015]_ is a well known example of such a procedure.
@@ -602,7 +600,7 @@ Randomised compilation [Wallman2015]_ is a well known example of such a procedur
 .. image:: frame_randomisation_taskgraph.png
 
 The returned ``MitRes`` object uses ``FrameRandomisation`` methods as available
-in the ``pytket.tailoring`` `module <https://cqcl.github.io/pytket/build/html/tailoring.html>`_.
+in the ` ``pytket.tailoring`` module <https://cqcl.github.io/pytket/build/html/tailoring.html>`_.
 
 The frame randomisation method used can be changed with the ``frame_randomisation`` keyword argument,
 which accepts methods defined in the ``FrameRandomisation`` enum class, supporting ``PauliFrameRandomisation``

@@ -176,8 +176,7 @@ the quantum device of choice (such as the connectivity graph or set of gate prim
 being sent to the device via the hardware manufacturers language of choice. Finally
 results are returned, typically as a sequence of <em>Shots</em>, each shot being a single set of bit
 corresponding to the measurement result of each qubit.</p>
-<p>TODO: Link methods to documentation when public and possible.</p>
-<p>In its basic capacity the <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code> method will run
+<p>In its basic capacity the <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/mitres.html">method</a> will run
 each of these tasks sequentially.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit</span> <span class="kn">import</span> <span class="n">MitRes</span><span class="p">,</span> <span class="n">CircuitShots</span>
 <span class="kn">from</span> <span class="nn">pytket</span> <span class="kn">import</span> <span class="n">Circuit</span>
@@ -502,7 +501,7 @@ prone to SPAM noise this distribution is perturbed and other basis states may be
 basis states, a transition matrix can be derived that describes the noisy SPAM process. Simply applying
 the inverse of this transition matrix to the distribution of a quantum state from some desired quantum computation
 can effectively uncompute the errors caused by SPAM noise.</p>
-<p>Generators for SPAM <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects are available in the <code class="docutils literal notranslate"><span class="pre">qermit.spam</span></code> module.</p>
+<p>Generators for SPAM <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects are available in the ` <code class="docutils literal notranslate"><span class="pre">qermit.spam</span></code> module &lt;<a class="reference external" href="https://cqcl.github.io/qermit/spam.html">https://cqcl.github.io/qermit/spam.html</a>&gt;`_.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.spam</span> <span class="kn">import</span> <span class="n">gen_UnCorrelated_SPAM_MitRes</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQEmulatorBackend</span>
 
@@ -625,7 +624,7 @@ is an artifact of the correction procedure, but importantly we can see that the 
 <p>Randomisation protocols can be used to tailor the form of the noise profile. By averaging the n-qubit noise channel over all elements from a group (specifically some subgroup of the full unitary group on n qubits), the resulting noise is invariant under the action of any element from this group.</p>
 <p>For example, averaging a noise channel over the n-qubit Pauli group has the effect of producing an n-qubit stochastic Pauli channel – this is a probabilistic linear combination of n-qubit Pauli unitary errors.</p>
 <p>In this manner, an n-qubit coherent noise channel can be tailored into an n-qubit stochastic Pauli noise channel. For Pauli channels, the worst case error rate is similar to the average error rate, whilst for coherent noise the worst case error rate scales as a square root of the average error rate.</p>
-<p>Generator functions in the <code class="docutils literal notranslate"><span class="pre">qermit.frame_randomisation</span></code> return <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects for automatically using randomised protocols
+<p>Generator functions in the <code class="docutils literal notranslate"><span class="pre">qermit.frame_randomisation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/frame_randomisation.html">module</a> return <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects for automatically using randomised protocols
 when running experiments.</p>
 <p>Randomised compilation <a class="reference internal" href="#wallman2015" id="id1"><span>[Wallman2015]</span></a> is a well known example of such a procedure.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.frame_randomisation</span> <span class="kn">import</span> <span class="n">gen_Frame_Randomisation_MitRes</span>
@@ -637,7 +636,7 @@ when running experiments.</p>
 </div>
 <img alt="_images/frame_randomisation_taskgraph.png" src="_images/frame_randomisation_taskgraph.png" />
 <p>The returned <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object uses <code class="docutils literal notranslate"><span class="pre">FrameRandomisation</span></code> methods as available
-in the <code class="docutils literal notranslate"><span class="pre">pytket.tailoring</span></code> <a class="reference external" href="https://cqcl.github.io/pytket/build/html/tailoring.html">module</a>.</p>
+in the ` <code class="docutils literal notranslate"><span class="pre">pytket.tailoring</span></code> module &lt;<a class="reference external" href="https://cqcl.github.io/pytket/build/html/tailoring.html">https://cqcl.github.io/pytket/build/html/tailoring.html</a>&gt;`_.</p>
 <p>The frame randomisation method used can be changed with the <code class="docutils literal notranslate"><span class="pre">frame_randomisation</span></code> keyword argument,
 which accepts methods defined in the <code class="docutils literal notranslate"><span class="pre">FrameRandomisation</span></code> enum class, supporting <code class="docutils literal notranslate"><span class="pre">PauliFrameRandomisation</span></code>
 and <code class="docutils literal notranslate"><span class="pre">UniversalFrameRandomisation</span></code> as defined in <code class="docutils literal notranslate"><span class="pre">pytket</span></code>. Without specification, the
