@@ -14,7 +14,7 @@
 
 
 """
-qermit provides tools for running and composing error mitigation methods. Error 
+qermit provides tools for running and composing error-mitigation methods. Error 
 mitigation methods are split into two types, those which in some manner modify the set 
 of shots returned when running quantum circuits on quantum devices (MitRes), and those which
 modify the expectation value of some observable (MitEx).

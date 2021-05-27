@@ -5,11 +5,11 @@ qermit
    :width: 120px
    :align: right
 
-``qermit`` is a python module for running error mitigation protocols on quantum computers using ``pytket``, 
+``qermit`` is a python module for running error-mitigation protocols on quantum computers using ``pytket``, 
 CQC's python module for interfacing with `CQC <https://cambridgequantum.com/>`_ tket, a set of quantum programming tools. 
 ``qermit`` functions using the ``pytket`` :py:class:`Backend` class, meaning ``qermit`` supports any of the 
 `numerous providers <https://github.com/CQCL/pytket-extensions>`_ ``pytket`` does.
-``qermit`` also provides easy composability of error mitigation methods, meaning 
+``qermit`` also provides easy composability of error-mitigation methods, meaning 
 it is practically straightforward to run an experiment with multiple forms of error-mitigation 
 where appropriate.
 
@@ -26,7 +26,7 @@ that result in a modification of a distribution of counts  retrieved from some
 quantum computer, and ``MitEx`` methods that result in the modification of the 
 expectation value of some observable.
 
-In their basic capacity, ``MitRes`` and ``MitEx`` objects will run experiments without error mitigation.
+In their basic capacity, ``MitRes`` and ``MitEx`` objects will run experiments without error-mitigation.
 
 ::
 
@@ -102,12 +102,12 @@ the ``pytket`` ``Backend`` the ``MitEx`` object is defined by.
 
 .. image:: mitexgraph.png
 
-.. TODO: add user manual link ....
 
-See the Qermit User Manual page for an extended tutorial on using ``qermit``, including
-pre-defined error mitigation methods and composing error mitigation methods.
 
-``qermit`` currently provides the following error mitigation schemes (under their commonly known names):
+See the Qermit `user manual <https://cqcl.github.io/qermit/manual/>`_ for an extended tutorial on using ``qermit``, including
+pre-defined error-mitigation methods and composing error-mitigation methods.
+
+``qermit`` currently provides the following error-mitigation schemes (under their commonly known names):
 
 * SPAM Correction
 * Frame Randomisation
@@ -116,10 +116,6 @@ pre-defined error mitigation methods and composing error mitigation methods.
 * Clifford Data Regression
 * Depolarisation-Factor-Supression-For-Nearest-Clifford 
 
-.. How to cite
-.. ~~~~~~~~~~~
-.. If you wish to cite qermit in any academic pulibcations, we generally recommend 
-.. citing our paper TODO: add paper link.
 
 User Support
 ~~~~~~~~~~~~

@@ -1,0 +1,7 @@
+.vscode
+*.ipynb
+*.pyc
+*.egg-info/
+.idea/
+.dmypy.json
+.DS_Store

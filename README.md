@@ -1,6 +1,6 @@
 # qermit
 
-`qermit` is a python module for running error mitigation protocols on quantum processors using [`pytket`](https://github.com/CQCL/pytket), CQC's python module for interfacing with [CQC](https://cambridgequantum.com/) tket, a set of quantum programming tools.
+`qermit` is a python module for running error-mitigation protocols on quantum processors using [`pytket`](https://github.com/CQCL/pytket), CQC's python module for interfacing with [CQC](https://cambridgequantum.com/) tket, a set of quantum programming tools.
 
 This repo containts API documentation, a user manual for getting started with `qermit` and source code.
 
@@ -11,9 +11,9 @@ To install, ensure that you have `pip` version 19 or above, and run
 
 ``pip install qermit``
 
-**Documentation** can be found at [cqcl.github.io/qermit](https://cqcl.github.io/qermit)
+**Documentation** can be found at [cqcl.github.io/qermit](https://cqcl.github.io/qermit).
 
-A **User Manual** can be found at TODO fill:
+A **User Manual** can be found at [cqcl.github.io/qermit/manual](https://cqcl.github.io/qermit/manual/).
 
 
 ## Bugs and feature requests

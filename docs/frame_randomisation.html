@@ -1,0 +1,311 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qermit.frame_randomisation &mdash; qermit 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qermit.clifford_noise_characterisation" href="clifford_noise_characterisation.html" />
+    <link rel="prev" title="qermit.spam" href="spam.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> qermit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">API Reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="taskgraph.html">qermit.taskgraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mitres.html">qermit.mitres</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mitex.html">qermit.mitex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">qermit.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mittask.html">qermit.mittask</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measurement_reduction.html">qermit.measurement_reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spam.html">qermit.spam</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">qermit.frame_randomisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clifford_noise_characterisation.html">qermit.clifford_noise_characterisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zero_noise_extrapolation.html">qermit.zero_noise_extrapolation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="probabilistic_error_cancellation.html">qermit.probabilistic_error_cancellation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qermit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>qermit.frame_randomisation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/frame_randomisation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="qermit-frame-randomisation">
+<h1>qermit.frame_randomisation<a class="headerlink" href="#qermit-frame-randomisation" title="Permalink to this headline">¶</a></h1>
+<dl class="py method">
+<dt id="qermit.frame_randomisation.frame_randomisation.gen_Frame_Randomisation_MitRes">
+<code class="sig-prename descclassname"><span class="pre">frame_randomisation.</span></code><code class="sig-name descname"><span class="pre">gen_Frame_Randomisation_MitRes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes"><span class="pre">qermit.taskgraph.mitres.MitRes</span></a><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.gen_Frame_Randomisation_MitRes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces a MitRes object that applies FrameRandomisation techniques to experiment circuits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>backend</strong> (<em>Backend</em>) – Backend which experiments are default run through.</p></li>
+<li><p><strong>samples</strong> (<em>int</em>) – Number of Frame Randomisation instances sampled in Frame Randomisation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Key mitres</dt>
+<dd class="field-even"><p>MitRes object FrameRandomisation MitRes built around if given.</p>
+</dd>
+<dt class="field-odd">Key frame_randomisation</dt>
+<dd class="field-odd"><p>FrameRandomisation Enum passed to specify method used.
+Default set to FrameRandomisation.UniversalFrameRandomisation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="qermit.frame_randomisation.frame_randomisation.FrameRandomisation">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">qermit.frame_randomisation.frame_randomisation.</span></code><code class="sig-name descname"><span class="pre">FrameRandomisation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation" title="Permalink to this definition">¶</a></dt>
+<dd><p>An enumeration.</p>
+<dl class="py method">
+<dt id="qermit.frame_randomisation.frame_randomisation.FrameRandomisation.PauliFrameRandomisation">
+<code class="sig-name descname"><span class="pre">PauliFrameRandomisation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation.PauliFrameRandomisation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the pytket.tailoring method PauliFrameRandomisation  to return a list of
+circuits corresponding to instances of frame randomisation for the input circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> (<em>Circuit</em>) – Circuit to have frame randomisation applied.</p></li>
+<li><p><strong>shots</strong> (<em>int</em>) – Number of shots of each frame randomisation circuit to take.</p></li>
+<li><p><strong>samples</strong> (<em>int</em>) – Number of frame randomisation instances to sample.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qermit.frame_randomisation.frame_randomisation.FrameRandomisation.UniversalFrameRandomisation">
+<code class="sig-name descname"><span class="pre">UniversalFrameRandomisation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation.UniversalFrameRandomisation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the pytket.tailoring method UniversalFrameRandomisation  to return a list of
+circuits corresponding to instances of frame randomisation for the input circuit.
+UniversalFrameRandomisation rebases the circuit to a gate set such that
+the whole circuit is a single cycle for frame randomisation. This is possible with
+the additional noise assumption on top of the regular Frame Randomisation assumptions
+that Rz(-x) and Rz(x) incur similar noise for any angle x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> (<em>Circuit</em>) – Circuit to have frame randomisation applied.</p></li>
+<li><p><strong>shots</strong> (<em>int</em>) – Number of shots of each frame randomisation circuit to take.</p></li>
+<li><p><strong>samples</strong> (<em>int</em>) – Number of frame randomisation instances to sample.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt id="qermit.frame_randomisation.frame_randomisation.frame_randomisation_circuits_task_gen">
+<code class="sig-prename descclassname"><span class="pre">frame_randomisation.</span></code><code class="sig-name descname"><span class="pre">frame_randomisation_circuits_task_gen</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_fr_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation" title="qermit.frame_randomisation.frame_randomisation.FrameRandomisation"><span class="pre">qermit.frame_randomisation.frame_randomisation.FrameRandomisation</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.frame_randomisation_circuits_task_gen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a MitTask object that produces Frame Randomisation circuits for some wire of experiment circuits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>samples</strong> (<em>int</em>) – Number of samples of frame randomisation circuits to take for each circuit in wire.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qermit.frame_randomisation.frame_randomisation.frame_randomisation_result_task_gen">
+<code class="sig-prename descclassname"><span class="pre">frame_randomisation.</span></code><code class="sig-name descname"><span class="pre">frame_randomisation_result_task_gen</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.frame_randomisation_result_task_gen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a MitTask object that sequentially collates samples number of BackendResult objects into single
+BackendResult object. These collated BackendResult objects should include all frame experiments for a single
+original circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>samples</strong> (<em>int</em>) – Number of frame randomisation instances created in the first place, used to suitably
+collate results.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="clifford_noise_characterisation.html" class="btn btn-neutral float-right" title="qermit.clifford_noise_characterisation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="spam.html" class="btn btn-neutral float-left" title="qermit.spam" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Cambridge Quantum Computing Ltd.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
