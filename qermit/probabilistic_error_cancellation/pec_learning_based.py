@@ -129,7 +129,6 @@ def random_commuting_clifford(
         # Check if the expectation of the given Pauli string is non-zero on the Clifford
         # circuit. Leave while loop if so.
 
-        # TODO: all the below is a hack, please make nicer
         n_q_map = dict()
         cc_qns = rand_cliff_circ.qubits
         for i in range(len(cc_qns)):
