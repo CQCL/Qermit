@@ -33,7 +33,8 @@ from pytket.passes import RebaseIBM, DecomposeBoxes  # type: ignore
 from pytket.utils import QubitPauliOperator, get_pauli_expectation_value
 from pytket.backends import Backend
 from pytket.transform import Transform  # type: ignore
-from pytket.circuit import Op, CircBox, OpType, Circuit  # type: ignore
+from pytket.circuit import Op, CircBox, OpType, Circuit, Node  # type: ignore
+from pytket.routing import place_with_map  # type: ignore
 
 from pytket.pauli import QubitPauliString  # type: ignore
 from pytket.predicates import CliffordCircuitPredicate  # type: ignore
@@ -127,10 +128,28 @@ def random_commuting_clifford(
 
         # Check if the expectation of the given Pauli string is non-zero on the Clifford
         # circuit. Leave while loop if so.
-        expect_val = get_pauli_expectation_value(
-            rand_cliff_circ, qps, simulator_backend
-        )
 
+        # TODO: all the below is a hack, please make nicer
+        n_q_map = dict()
+        cc_qns = rand_cliff_circ.qubits
+        for i in range(len(cc_qns)):
+            n_q_map[cc_qns[i]] = Node("q", i)
+
+        new_qps_qbs = []
+        qps_paulis = []
+        qps_dict = qps.to_dict()
+        for x in qps_dict:
+            new_qps_qbs.append(n_q_map[x])
+            qps_paulis.append(qps_dict[x])
+
+        new_qps = QubitPauliString(new_qps_qbs, qps_paulis)
+
+        rand_cliff_circ_copy = rand_cliff_circ.copy()
+        place_with_map(rand_cliff_circ_copy, n_q_map)
+
+        expect_val = get_pauli_expectation_value(
+            rand_cliff_circ_copy, new_qps, simulator_backend
+        )
         # TODO: Better management of the case that there are no circuits with expectation value not equal to 0.
 
         # Check if the number of attempts at finding a circuit with non-zero expectation exceeds the maximum.
@@ -585,14 +604,12 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
 
 
 def gen_get_clifford_training_set(
-    device_backend: Backend, simulator_backend: Backend, num_rand_cliff: int
+    simulator_backend: Backend, num_rand_cliff: int
 ) -> MitTask:
     """
     Generates task which creates characterisation Clifford circuits. These circuits are
     constructed from an initial circuit by replacing all Computing gates with random Clifford gates.
 
-    :param device_backend: Noisy backend on which circuits are to be run.
-    :type device_backend: Backend
     :param simulator_backend: Ideal simulator backend on which Clifford circuits are to be run.
     :type simulator_backend: Backend
     :param num_rand_cliff: Number of random Clifford circuits for each fixed ObservableExperiment.
@@ -633,9 +650,6 @@ def gen_get_clifford_training_set(
                 ]
 
                 for training_circuit_num, training_circuit in enumerate(training_circs):
-                    device_backend.compile_circuit(
-                        training_circuit, optimisation_level=0
-                    )
                     cliff_ansatz_circuit = AnsatzCircuit(
                         Circuit=training_circuit,
                         Shots=ansatz_circuit.Shots,
@@ -927,7 +941,7 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
     wrapped around one Frame gate, by a Pauli gate. Note that there will be a new circuit for each
     possible Pauli error.
 
-    :param backend: Noisy backend on which circuits will be run. Required for compilation.
+    :param backend: Backend on which circuits will be run. Required for compilation.
     :type backend: Backend
     :return: MitTask produsing noisy gates.
     :rtype: MitTask
@@ -1048,7 +1062,7 @@ def gen_PEC_learning_based_MitEx(
     _experiment_taskgraph.add_wire()
 
     get_clifford_training_set = gen_get_clifford_training_set(
-        device_backend, simulator_backend, num_cliff_circ
+        simulator_backend, num_cliff_circ
     )
     _experiment_taskgraph.prepend(get_clifford_training_set)
 

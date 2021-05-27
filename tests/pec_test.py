@@ -244,7 +244,7 @@ def test_gen_get_clifford_training_set():
     num_rand_cliff = 4
 
     task = gen_get_clifford_training_set(
-        device_backend=be, simulator_backend=be, num_rand_cliff=num_rand_cliff
+        simulator_backend=be, num_rand_cliff=num_rand_cliff
     )
     assert task.n_in_wires == 1
     assert task.n_out_wires == 2
