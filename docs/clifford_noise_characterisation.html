@@ -1,0 +1,450 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qermit.clifford_noise_characterisation &mdash; qermit 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qermit.zero_noise_extrapolation" href="zero_noise_extrapolation.html" />
+    <link rel="prev" title="qermit.frame_randomisation" href="frame_randomisation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> qermit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">API Reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="taskgraph.html">qermit.taskgraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mitres.html">qermit.mitres</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mitex.html">qermit.mitex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">qermit.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mittask.html">qermit.mittask</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measurement_reduction.html">qermit.measurement_reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spam.html">qermit.spam</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frame_randomisation.html">qermit.frame_randomisation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">qermit.clifford_noise_characterisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zero_noise_extrapolation.html">qermit.zero_noise_extrapolation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="probabilistic_error_cancellation.html">qermit.probabilistic_error_cancellation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qermit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>qermit.clifford_noise_characterisation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/clifford_noise_characterisation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="qermit-clifford-noise-characterisation">
+<h1>qermit.clifford_noise_characterisation<a class="headerlink" href="#qermit-clifford-noise-characterisation" title="Permalink to this headline">¶</a></h1>
+<dl class="py method">
+<dt id="qermit.clifford_noise_characterisation.ccl.gen_CDR_MitEx">
+<code class="sig-prename descclassname"><span class="pre">ccl.</span></code><code class="sig-name descname"><span class="pre">gen_CDR_MitEx</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulator_backend</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket.backends.backend.Backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_non_cliffords</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_pairs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_state_circuits</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx"><span class="pre">qermit.taskgraph.mitex.MitEx</span></a><a class="headerlink" href="#qermit.clifford_noise_characterisation.ccl.gen_CDR_MitEx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces a MitEx object for applying Clifford Circuit Learning &amp; Clifford Data Regression
+mitigation methods when calculating expectation values of observables. Implementation as
+in arXiv:2005.10189.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>device_backend</strong> (<em>Backend</em>) – Backend object device experiments are default run through.</p></li>
+<li><p><strong>simulator_backend</strong> (<em>Backend</em>) – Backend object simulated characterisation experiments are
+default run through.</p></li>
+<li><p><strong>n_non_cliffords</strong> (<em>int</em>) – Number of gates in Ansatz Circuit left as non-Clifford gates when
+producing characterisation circuits.</p></li>
+<li><p><strong>n_pairs</strong> (<em>int</em>) – Number of non-Clifford gates sampled to become Clifford and vice versa
+each time a new state circuit is generated.</p></li>
+<li><p><strong>total_state_circuits</strong> (<em>int</em>) – Total number of state circuits produced for characterisation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Key StatesSimulatorMitex</dt>
+<dd class="field-even"><p>MitEx object noiseless characterisation simulations are executed on, default
+simulator_backend with basic compilation of circuit.</p>
+</dd>
+<dt class="field-odd">Key StatesDeviceMitex</dt>
+<dd class="field-odd"><p>MitEx object noisy characterisation circuit are executed on, default
+device_backend with basic compilation of circuit.</p>
+</dd>
+<dt class="field-even">Key ExperimentMitex</dt>
+<dd class="field-even"><p>MitEx object that actual experiment circuits are executed on, default
+backend with some compilation of circuit.</p>
+</dd>
+<dt class="field-odd">Key model</dt>
+<dd class="field-odd"><p>Model characterised by state circuits, default _PolyCDRCorrect(1) (see cdr_post.py for other options).</p>
+</dd>
+<dt class="field-even">Key likelihood_function</dt>
+<dd class="field-even"><p>LikelihoodFunction used to filter state circuit results, given by a LikelihoodFunction Enum,
+default set to none.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="qermit.clifford_noise_characterisation.ccl.LikelihoodFunction">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">qermit.clifford_noise_characterisation.ccl.</span></code><code class="sig-name descname"><span class="pre">LikelihoodFunction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.clifford_noise_characterisation.ccl.LikelihoodFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>An enumeration.</p>
+<dl class="py method">
+<dt id="qermit.clifford_noise_characterisation.ccl.LikelihoodFunction.none">
+<code class="sig-name descname"><span class="pre">none</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qpo_noisy</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket.utils.operators.QubitPauliOperator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qpo_exact</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket.utils.operators.QubitPauliOperator</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">float</span><a class="headerlink" href="#qermit.clifford_noise_characterisation.ccl.LikelihoodFunction.none" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns probability 1 of accepting returned results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qpo_noisy</strong> (<em>QubitPauliOperators</em>) – Results calculated from device of choice.</p></li>
+<li><p><strong>qpo_exact</strong> (<em>QubitPauliOperator</em>) – Results calculated from noiseless simulator of choice.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Always 1, meaning any result is accepted.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt id="qermit.clifford_noise_characterisation.dfsc.gen_DFSC_MitEx">
+<code class="sig-prename descclassname"><span class="pre">dfsc.</span></code><code class="sig-name descname"><span class="pre">gen_DFSC_MitEx</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx"><span class="pre">qermit.taskgraph.mitex.MitEx</span></a><a class="headerlink" href="#qermit.clifford_noise_characterisation.dfsc.gen_DFSC_MitEx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces a MitEx object that applies DFSC characteriastion to all experiment results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>backend</strong> (<em>Backend</em>) – Backend experiments are run through.</p>
+</dd>
+<dt class="field-even">Key experiment_mitex</dt>
+<dd class="field-even"><p>MitEx object observable experiments are run through</p>
+</dd>
+<dt class="field-odd">Key characterisation_mitex</dt>
+<dd class="field-odd"><p>MitEX object characteriastion experiments are runt hrough.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>MitEx object for automatic DFSC correction of circuits.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx">MitEx</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qermit.clifford_noise_characterisation.ccl.ccl_state_task_gen">
+<code class="sig-prename descclassname"><span class="pre">ccl.</span></code><code class="sig-name descname"><span class="pre">ccl_state_task_gen</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_pairs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_state_circuits</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.clifford_noise_characterisation.ccl.ccl_state_task_gen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a MitTask object for which given some set of experiments,
+for each experiment prepares a set of state circuits for Clifford Circuit Learning characterisation.
+The original experiment is returned on the first wire, state circuits for running on backend on second wire,
+and state circuits for noiseless simulation on the third wire.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_non_cliffords</strong> (<em>int</em>) – Number of remaining non-Clifford gates in generated State Circuits.</p></li>
+<li><p><strong>n_pairs</strong> – Parameter used for guiding properties of State Circuits generated.</p></li>
+<li><p><strong>total_state_circuits</strong> (<em>int</em>) – Number of state circuits prepared for characterisation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>MitTask object for preparing and returning state circuits for characterisation.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qermit.clifford_noise_characterisation.ccl.ccl_result_batching_task_gen">
+<code class="sig-prename descclassname"><span class="pre">ccl.</span></code><code class="sig-name descname"><span class="pre">ccl_result_batching_task_gen</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.clifford_noise_characterisation.ccl.ccl_result_batching_task_gen" title="Permalink to this definition">¶</a></dt>
+<dd><p>For each experiment run through MitEx, pairs up noisy and noiseless expectation values
+from state circuits for that experiments CCL calibration and then returns results for a single
+calibration in a single list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n_state_circuits</strong> (<em>int</em>) – Number of state circuits initially prepared for each
+experiment characterisation.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>MitTask obect that organises QubitPauliOperator objects required for
+characterisation.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>MitTask.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qermit.clifford_noise_characterisation.ccl.ccl_likelihood_filtering_task_gen">
+<code class="sig-prename descclassname"><span class="pre">ccl.</span></code><code class="sig-name descname"><span class="pre">ccl_likelihood_filtering_task_gen</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.clifford_noise_characterisation.ccl.ccl_likelihood_filtering_task_gen" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>likelihood_function</strong> (<a class="reference internal" href="#qermit.clifford_noise_characterisation.ccl.LikelihoodFunction" title="qermit.clifford_noise_characterisation.ccl.LikelihoodFunction"><em>LikelihoodFunction</em></a>) – LikelihoodFunction enum used to accept or reject some pair of noisy and noiseless expectation.
+Function must take two QubitPauliOperator as parametrer, and return a single float between 0 and 1 as answer.</p>
+</dd>
+<dt class="field-even">Key seed</dt>
+<dd class="field-even"><p>Seed value for sampling probability for likelihood function</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>MitTask object that removes some characterisation results under some
+condition set by the likelihood_function option.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qermit.clifford_noise_characterisation.dfsc.DFSC_circuit_task_gen">
+<code class="sig-prename descclassname"><span class="pre">dfsc.</span></code><code class="sig-name descname"><span class="pre">DFSC_circuit_task_gen</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.clifford_noise_characterisation.dfsc.DFSC_circuit_task_gen" title="Permalink to this definition">¶</a></dt>
+<dd><p>For each experiment, the ansatz circuit has all symbolic gates substituted for Clifford angles (in this case, all 0’s).
+If any non symbolic gates are non Clifford, an error is thrown.
+For each Clifford ansatz circuit, a new ObservableTracke is forme with new measurement circuits
+added for each Qubit Pauli String in the operator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>MitTask object that produces characterisation circuits for DFSC on a new wire as new experiments</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qermit.clifford_noise_characterisation.dfsc.DFSC_collater_task_gen">
+<code class="sig-prename descclassname"><span class="pre">dfsc.</span></code><code class="sig-name descname"><span class="pre">DFSC_collater_task_gen</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.clifford_noise_characterisation.dfsc.DFSC_collater_task_gen" title="Permalink to this definition">¶</a></dt>
+<dd><p>For each experiment passed to MitEx, DFSC characterisation produces an ObservableTracker
+of a single Measurement Circuit for each combination of Clifford circuit produced, eigenstates preparation
+and QubitPauliString in operator, via several nested Lists.
+This task unpackages these Lists into a single List as suitable for input to MitEx objects.
+It also stores information required to produce characterisation from resulting QubitPauliOperators out of
+MitEx object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>MitTask object that collates many BackendResult objects for a single
+frame randomisation instance and converts them into a single
+BackendResult object.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qermit.clifford_noise_characterisation.dfsc.DFSC_characterisation_task_gen">
+<code class="sig-prename descclassname"><span class="pre">dfsc.</span></code><code class="sig-name descname"><span class="pre">DFSC_characterisation_task_gen</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.clifford_noise_characterisation.dfsc.DFSC_characterisation_task_gen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given characterisation results for all experiments, Clifford circuits and QubitPauliStrings, produces
+a characterisation result for each Experiment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>MitTask object for organising and calculating characterisation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qermit.clifford_noise_characterisation.dfsc.DFSC_correction_task_gen">
+<code class="sig-prename descclassname"><span class="pre">dfsc.</span></code><code class="sig-name descname"><span class="pre">DFSC_correction_task_gen</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.clifford_noise_characterisation.dfsc.DFSC_correction_task_gen" title="Permalink to this definition">¶</a></dt>
+<dd><p>For each experiment expectation, if characterisation value greater than threshold, divide experiment expectation
+by characteriastion value to correct for depolaring noise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>zero_threshold</strong> (<em>float</em>) – Method does not correct for zero characteriastion expectation values, threshold for this zero limit.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Function for DFSC correctoin.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="zero_noise_extrapolation.html" class="btn btn-neutral float-right" title="qermit.zero_noise_extrapolation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="frame_randomisation.html" class="btn btn-neutral float-left" title="qermit.frame_randomisation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Cambridge Quantum Computing Ltd.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
