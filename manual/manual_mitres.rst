@@ -411,7 +411,7 @@ SPAM Mitigation in ``qermit``
 
 A prominent source of noise is that occurring during State Preparation and Measurement (SPAM).
 
-SPAM error mitigation methods can correct for such noise through a post-processing step that modifies the output 
+SPAM error-mitigation methods can correct for such noise through a post-processing step that modifies the output 
 distribution measured from repeatedly sampling shots. This is possible given the assumption that SPAM noise is not 
 dependent on the quantum computation run.
 

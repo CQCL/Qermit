@@ -60,7 +60,7 @@ meaning they are not only useful for improvung results, but there is a wide and 
 dedicated to designing mitigation schemes that fit to these archetypes.
 
 In this manner, often the use of a ``MitRes`` or ``MitEx`` object may be able to replace code performing the fiddly aspect 
-of running and processing experiments, with or without error mitigation. Furthermore, as they are written using the 
+of running and processing experiments, with or without error-mitigation. Furthermore, as they are written using the 
 ``pytket`` `Backend <https://cqcl.github.io/pytket/build/html/backends.html>`_ class, 
 any hardware supported by ``pytket`` via the Backends available in the `pytket-extensions <https://github.com/CQCL/pytket-extensions>`_ 
 can be used in conjunction with ``qermit``.

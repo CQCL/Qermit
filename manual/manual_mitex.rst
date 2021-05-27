@@ -616,7 +616,7 @@ Depolarisation-Factor-Supression-For-Nearest-Clifford in ``qermit``
 This method estimates the averaged incoherent noise component affecting the entire circuit structure
 and reduces its effect on computing expectation values. The main advantage of DFSC is that it does 
 not require significant quantum resource overhead (no additional ancillas and no increased depth) 
-and relies on efficient classical processing. This error mitigation technique trades-off a finer-grained 
+and relies on efficient classical processing. This error-mitigation technique trades-off a finer-grained 
 noise characterisation for scalability (i.e reduced computational resources).
 
 The effect of an incoherent Pauli noise channel when computing expectation values of Pauli operators 
@@ -696,9 +696,9 @@ The ``MitEx`` the experiment is completed with can be specified with the ``Exper
 
 
 .. [Bonet-Monroig2018] Bonet-Monroig, X., Sagastizabal, R., Singh, M., O'Brien, T.E., 2018. Low-cost error mitigation by symmetry verification. Phys. Rev. A 98, 062339 (2018).
-.. [Temme2016] Temme, K., Bravyi, S., Gambetta, J.M., 2016. Error mitigation for short-depth quantum circuits. 	Phys. Rev. Lett. 119, 180509 (2017).
+.. [Temme2016] Temme, K., Bravyi, S., Gambetta, J.M., 2016. error mitigation for short-depth quantum circuits. 	Phys. Rev. Lett. 119, 180509 (2017).
 .. [Giurgica-Tiron2020] Giurgica-Tiron, T., Hindy, Y., LaRose, Ryan., Mari, A., Zeng, W.J., 2020, Digital zero noise extrapolation for quantum error mitigation. 2020 IEEE International Conference on Quantum Computing and Engineering (QCE), Denver, CO, USA, 2020.
-.. [Czarnik2020] Czarnik, P., Arrasmith, A., Coles, P.J., Cincio, L., 2020. Error mitigation with Clifford quantum-circuit data. arXiv:2005.10189.
+.. [Czarnik2020] Czarnik, P., Arrasmith, A., Coles, P.J., Cincio, L., 2020. error mitigation with Clifford quantum-circuit data. arXiv:2005.10189.
 .. [Li2017] Li, Y., & Benjamin, S. C. (2017). Efficient variational quantum simulator incorporating active error minimization. Physical Review X, 7(2), 021050.
 .. [Endo2018] Endo, S., Benjamin, S. C., & Li, Y. (2018). Practical quantum error mitigation for near-future applications. Physical Review X, 8(3), 031027.
 .. [Strikis2020] Strikis, A., Qin, D., Chen, Y., Benjamin, S. C., & Li, Y. (2020). Learning-based quantum error mitigation. arXiv preprint arXiv:2005.07601.
