@@ -325,7 +325,7 @@ def gen_run_with_quasi_prob() -> MitTask:
     ) -> Tuple[List[QubitPauliOperator]]:
         """Converts list of quasi probabilities and noisy circuit results into error mitigated results.
 
-        :param prob_list: List of quasi probabilities for error mitigation. Note that the outer
+        :param prob_list: List of quasi probabilities for error-mitigation. Note that the outer
             most list corresponds to circuits, the second level list corresponds to qubit pauli strings,
             and the inner most list contains the quasi probabilities.
         :type prob_list: List[List[QuasiProbabilities]], OuterList all experiments, second level list
@@ -1019,7 +1019,7 @@ def gen_PEC_learning_based_MitEx(
     :param simulator_backend: Ideal state vector simulator used for simulating Clifford Circuits.
     :type simulator_backend: Backend
     :raises RuntimeError: Raised if the backend gate set does not include CX or CZ gates.
-    :return: MitEx object implementing error mitigation via learning based PEC.
+    :return: MitEx object implementing error-mitigation via learning based PEC.
     :rtype: MitEx
     """
     # Disallow backends that do not have 2 qubit clifford gates

@@ -8,7 +8,7 @@ setup(
     name="qermit",
     version=version["__version__"],
     python_requires=">=3.6",
-    description="Error Mitigation framework, an extension to pytket",
+    description="error-mitigation framework, an extension to pytket",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     license="CQC Non-Commercial Use Software Licence",
