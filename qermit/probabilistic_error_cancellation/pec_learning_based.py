@@ -1039,10 +1039,16 @@ def gen_PEC_learning_based_MitEx(
 
     np.random.seed(random_seed)
 
-    device_mitex = MitEx(device_backend, _label="NoisyCliffordMitEx")
-    sim_mitex = MitEx(simulator_backend, _label="IdealCliffordMitEx")
+    sim_mitex = copy.copy(
+        kwargs.get(
+            "simulator_mitex", MitEx(simulator_backend, _label="IdealCliffordMitEx")
+        )
+    )
 
-    # culprit
+    device_mitex = copy.copy(
+        kwargs.get("device_mitex", MitEx(device_backend, _label="NoisyMitex"))
+    )
+
     _experiment_taskgraph = TaskGraph().from_TaskGraph(device_mitex)
 
     _experiment_taskgraph.add_wire()
@@ -1052,7 +1058,6 @@ def gen_PEC_learning_based_MitEx(
     )
     _experiment_taskgraph.prepend(get_noisy_clifford_circuits)
 
-    # culprit
     _experiment_taskgraph.parallel(sim_mitex)
 
     _experiment_taskgraph.prepend(gen_duplication_task(2, _label="DuplicateClifford"))
@@ -1070,10 +1075,7 @@ def gen_PEC_learning_based_MitEx(
     learn_dist = learn_quasi_probs_task_gen(num_cliff_circ)
     _experiment_taskgraph.append(learn_dist)
 
-    _circuit_experiment_mitex = MitEx(device_backend, _label="NoisyCircuitMitEx")
-    _circuit_experiment_taskgraph = TaskGraph().from_TaskGraph(
-        device_mitex
-    )
+    _circuit_experiment_taskgraph = TaskGraph().from_TaskGraph(device_mitex)
     _circuit_experiment_taskgraph.add_wire()
     get_noisy_circuits = gen_get_noisy_circuits(
         device_backend, _label="GetNoisyCircuits"
