@@ -422,7 +422,7 @@ basis states, a transition matrix can be derived that describes the noisy SPAM p
 the inverse of this transition matrix to the distribution of a quantum state from some desired quantum computation 
 can effectively uncompute the errors caused by SPAM noise.
 
-Generators for SPAM ``MitRes`` objects are available in the ` ``qermit.spam`` module <https://cqcl.github.io/qermit/spam.html>`_.
+Generators for SPAM ``MitRes`` objects are available in the ``qermit.spam`` `module <https://cqcl.github.io/qermit/spam.html>`_.
 
 ::
 
@@ -600,7 +600,7 @@ Randomised compilation [Wallman2015]_ is a well known example of such a procedur
 .. image:: frame_randomisation_taskgraph.png
 
 The returned ``MitRes`` object uses ``FrameRandomisation`` methods as available
-in the ` ``pytket.tailoring`` module <https://cqcl.github.io/pytket/build/html/tailoring.html>`_.
+in the ``pytket.tailoring`` `module <https://cqcl.github.io/pytket/build/html/tailoring.html>`_.
 
 The frame randomisation method used can be changed with the ``frame_randomisation`` keyword argument,
 which accepts methods defined in the ``FrameRandomisation`` enum class, supporting ``PauliFrameRandomisation``

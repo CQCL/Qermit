@@ -474,7 +474,7 @@ primary circuit. The expectation of these Clifford circuits can be calculated ef
 using a classical simulator, and so can be compared to the results from noisy runs.
 It is on this approach that the implementation of PEC in <code class="docutils literal notranslate"><span class="pre">qermit</span></code> is based.</p>
 <p>Generators for Probabilistic-Error-Cancellation <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in
-the ` <code class="docutils literal notranslate"><span class="pre">qermit.probabilistic_error_cancellation</span></code> module &lt;<a class="reference external" href="https://cqcl.github.io/qermit/probabilistic_error_cancellation.html">https://cqcl.github.io/qermit/probabilistic_error_cancellation.html</a>&gt;`_.</p>
+the  <code class="docutils literal notranslate"><span class="pre">qermit.probabilistic_error_cancellation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/probabilistic_error_cancellation.html">module</a>.</p>
 <img alt="_images/PEC_taskgraph.png" src="_images/PEC_taskgraph.png" />
 </div>
 <div class="section" id="zero-noise-extrapolation-in-qermit">
@@ -506,7 +506,7 @@ collections of values, and an anzats for the relation between the two, this redu
 regression problem. There are several ansatz provided by <code class="docutils literal notranslate"><span class="pre">qermit</span></code>. Each may have its
 advantages depending on: the device, dominant noise channel, etc.</p>
 <p>Generators for Zero-Noise-Extrapolation <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in
-the ` <code class="docutils literal notranslate"><span class="pre">qermit.zero_noise_extrapolation</span></code> module &lt;<a class="reference external" href="https://cqcl.github.io/qermit/zero_noise_extrapolation.html">https://cqcl.github.io/qermit/zero_noise_extrapolation.html</a>&gt;`_.</p>
+the <code class="docutils literal notranslate"><span class="pre">qermit.zero_noise_extrapolation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/zero_noise_extrapolation.html">module</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.zero_noise_extrapolation</span> <span class="kn">import</span> <span class="n">gen_ZNE_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQEmulatorBackend</span>
 
@@ -573,7 +573,7 @@ circuit is then run on the device and its observable estimate corrected by the m
 <p>In this sense, “Clifford-Circuit-Learning” refers to the general noise characterisation approach defined by
 efficiently simulated classically Clifford circuits and “Clifford-Data-Regression” refers to the noise correction
 technique used here.</p>
-<p>Generators for Clifford-Data-Regression <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in the ` <code class="docutils literal notranslate"><span class="pre">qermit.clifford_noise_characterisation</span></code> module &lt;<a class="reference external" href="https://cqcl.github.io/qermit/clifford_noise_characterisation.html">https://cqcl.github.io/qermit/clifford_noise_characterisation.html</a>&gt;`_.</p>
+<p>Generators for Clifford-Data-Regression <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in the <code class="docutils literal notranslate"><span class="pre">qermit.clifford_noise_characterisation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/clifford_noise_characterisation.html">module</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.clifford_noise_characteisation</span> <span class="kn">import</span> <span class="n">gen_CDR_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">AerBackend</span><span class="p">,</span> <span class="n">IBMQBackend</span>
 
@@ -613,7 +613,7 @@ Furthermore, some keyword arguments allow even more customisation.</p>
 and expects a <code class="docutils literal notranslate"><span class="pre">_BaseExCorrectModel</span></code> object.
 It is by default set to model a linear relationship between noisy and noiseless expectation values, but
 the <code class="docutils literal notranslate"><span class="pre">_PolyCDRCorect</span></code> class can be used to define other relationships.</p>
-<p>In <a class="reference internal" href="#czarnik2020" id="id12"><span>[Czarnik2020]</span></a>, a Metropolis-Hastings rule is used to accept or reject state circuits
+<p>In <a class="reference internal" href="#czarnik2020" id="id14"><span>[Czarnik2020]</span></a>, a Metropolis-Hastings rule is used to accept or reject state circuits
 from the characterisation data. The likelihood function used in this rule can be
 defined with the <code class="docutils literal notranslate"><span class="pre">LikelihoodFunction</span></code> keyword argument, which expects a <code class="docutils literal notranslate"><span class="pre">LikelihoodFunction</span></code> object.
 The relationship between performance and choice of <code class="docutils literal notranslate"><span class="pre">LikelihoodFunction</span></code> is expected
@@ -757,7 +757,7 @@ The <code class="docutils literal notranslate"><span class="pre">MitEx</span></c
 <dt class="label" id="giurgica-tiron2020"><span class="brackets">Giurgica-Tiron2020</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id11">2</a>)</span></dt>
 <dd><p>Giurgica-Tiron, T., Hindy, Y., LaRose, Ryan., Mari, A., Zeng, W.J., 2020, Digital zero noise extrapolation for quantum error mitigation. 2020 IEEE International Conference on Quantum Computing and Engineering (QCE), Denver, CO, USA, 2020.</p>
 </dd>
-<dt class="label" id="czarnik2020"><span class="brackets">Czarnik2020</span><span class="fn-backref">(<a href="#id4">1</a>,<a href="#id12">2</a>)</span></dt>
+<dt class="label" id="czarnik2020"><span class="brackets">Czarnik2020</span><span class="fn-backref">(<a href="#id4">1</a>,<a href="#id14">2</a>)</span></dt>
 <dd><p>Czarnik, P., Arrasmith, A., Coles, P.J., Cincio, L., 2020. error mitigation with Clifford quantum-circuit data. arXiv:2005.10189.</p>
 </dd>
 <dt class="label" id="li2017"><span class="brackets"><a class="fn-backref" href="#id9">Li2017</a></span></dt>
