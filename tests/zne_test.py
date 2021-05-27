@@ -1,0 +1,289 @@
+# Copyright 2019-2021 Cambridge Quantum Computing
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+from qermit import (  # type: ignore
+    ObservableTracker,
+    SymbolsDict,
+)
+from qermit.zero_noise_extrapolation import (  # type: ignore
+    Folding,
+    Fit,
+    gen_ZNE_MitEx,
+)
+from qermit.zero_noise_extrapolation.zne import (  # type: ignore
+    gen_initial_compilation_task,
+    gen_duplication_task,
+    extrapolation_task_gen,
+    digital_folding_task_gen,
+)
+from pytket.extensions.qiskit import AerBackend, AerUnitaryBackend  # type: ignore
+from pytket import Circuit, Qubit
+from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.utils import QubitPauliOperator
+from numpy.polynomial.polynomial import polyval
+import math
+import numpy as np
+from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
+
+
+def test_gen_initial_compilation_task():
+
+    be = AerBackend()
+
+    task = gen_initial_compilation_task(be, optimisation_level=1)
+
+    assert task.n_in_wires == 1
+    assert task.n_out_wires == 1
+
+    c_1 = Circuit(2).CZ(0, 1).T(1)
+    c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
+
+    ac_1 = AnsatzCircuit(c_1, 10000, {})
+    ac_2 = AnsatzCircuit(c_2, 10000, {})
+
+    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+    qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+
+    experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
+    experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_2))
+
+    result = task([[experiment_1, experiment_2]])
+
+    compiled_experiment_1 = result[0][0]
+    compiled_experiment_2 = result[0][1]
+
+    compiled_c_1 = compiled_experiment_1[0][0]
+    compiled_c_2 = compiled_experiment_2[0][0]
+
+    # Check that the compiled circuits are indeed valid
+    assert be.valid_circuit(compiled_c_1)
+    assert be.valid_circuit(compiled_c_2)
+
+
+def test_gen_duplication_task():
+
+    n_dups = 2
+
+    task = gen_duplication_task(n_dups)
+
+    assert task.n_in_wires == 1
+    assert task.n_out_wires == n_dups
+
+    c_1 = Circuit(2).CZ(0, 1).T(1)
+    c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
+
+    ac_1 = AnsatzCircuit(c_1, 10000, {})
+    ac_2 = AnsatzCircuit(c_2, 10000, {})
+
+    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+    qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+
+    experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
+    experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_2))
+
+    result = task([[experiment_1, experiment_2]])
+
+    duplicate_1 = result[0]
+    duplicate_2 = result[1]
+
+    for duplicate_1_experiment, duplicate_2_experiment in zip(duplicate_1, duplicate_2):
+
+        duplicate_1_ac = duplicate_1_experiment[0]
+        duplicate_1_qpo = duplicate_1_experiment[1]
+
+        duplicate_2_ac = duplicate_2_experiment[0]
+        duplicate_2_qpo = duplicate_2_experiment[1]
+
+        assert duplicate_1_ac == duplicate_2_ac
+        assert (
+            duplicate_1_qpo._qubit_pauli_operator
+            == duplicate_2_qpo._qubit_pauli_operator
+        )
+
+
+def test_extrapolation_task_gen():
+
+    n_folds = [2, 3, 4, 5]
+
+    task = extrapolation_task_gen(n_folds, Fit.polynomial, False, 2)
+
+    assert task.n_in_wires == len(n_folds) + 1
+    assert task.n_out_wires == 1
+
+    # Defines the function (x/10 - 1)**2
+    coef_1 = [1, -2 / 10, 1 / 100]
+    # Defines the function -(x/10 - 1)**2
+    coef_2 = [-1, 2 / 10, -1 / 100]
+
+    # These function return pauli operators with expectation values depending on noise levels
+    def qpo_1(noise_level):
+        return QubitPauliOperator(
+            {QubitPauliString([Qubit(0)], [Pauli.Z]): polyval(noise_level, coef_1)}
+        )
+
+    def qpo_2(noise_level):
+        return QubitPauliOperator(
+            {QubitPauliString([Qubit(1)], [Pauli.X]): polyval(noise_level, coef_2)}
+        )
+
+    # Expectation results from noise as it is on the device.
+    qpo = [qpo_1(1), qpo_2(1)]
+
+    # Expectation values at defined noise scaling
+    args = [[qpo_1(i), qpo_2(i)] for i in n_folds]
+    args = tuple(args)
+
+    result = task([qpo, *args])[0]
+
+    experiment_1_result = result[0]._dict
+    experiment_2_result = result[1]._dict
+
+    # Check that the expectation values are as they would be in the ideal case.
+    # The coefficients defined above intersect at 1 and -1 which we take to be the ideal values.
+    assert math.isclose(
+        experiment_1_result[list(experiment_1_result.keys())[0]], 1, rel_tol=0.001
+    )
+    assert math.isclose(
+        experiment_2_result[list(experiment_2_result.keys())[0]], -1, rel_tol=0.001
+    )
+
+
+def test_digital_folding_task_gen():
+
+    be = AerBackend()
+
+    n_folds_1 = 5
+    n_folds_2 = 3
+
+    task_1 = digital_folding_task_gen(
+        be, n_folds_1, Folding.circuit, _allow_approx_fold=False
+    )
+    task_2 = digital_folding_task_gen(
+        be, n_folds_2, Folding.gate, _allow_approx_fold=False
+    )
+
+    assert task_1.n_in_wires == 1
+    assert task_1.n_out_wires == 1
+    assert task_2.n_in_wires == 1
+    assert task_2.n_out_wires == 1
+
+    c_1 = Circuit(2).CZ(0, 1).T(1)
+    c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
+
+    ac_1 = AnsatzCircuit(c_1, 10000, {})
+    ac_2 = AnsatzCircuit(c_2, 10000, {})
+
+    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+    qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+
+    experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
+    experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_2))
+
+    folded_experiment_1 = task_1([[experiment_1]])[0][0]
+    folded_experiment_2 = task_2([[experiment_2]])[0][0]
+
+    folded_c_1 = folded_experiment_1[0][0]
+    folded_c_2 = folded_experiment_2[0][0]
+
+    # Checks that the number of gates has been increased correctly.
+    # Note that in the case of circuit folding, barriers are added.
+    # This is why there is the n_folds_1 - 1 term at the end.
+    assert folded_c_1.n_gates == c_1.n_gates * n_folds_1 + n_folds_1 - 1
+    assert folded_c_2.n_gates == c_2.n_gates * n_folds_2
+
+    unitary_be = AerUnitaryBackend()
+
+    c_1_unitary = unitary_be.get_unitary(c_1)
+    c_2_unitary = unitary_be.get_unitary(c_2)
+    folded_c_1_unitary = unitary_be.get_unitary(folded_c_1)
+    folded_c_2_unitary = unitary_be.get_unitary(folded_c_2)
+
+    assert np.allclose(c_1_unitary, folded_c_1_unitary)
+    assert np.allclose(c_2_unitary, folded_c_2_unitary)
+
+
+def test_zne_identity():
+
+    backend = AerBackend()
+
+    me = gen_ZNE_MitEx(backend, [7, 5, 3], _label="TestZNEMitEx", optimisation_level=0)
+
+    c = Circuit(3)
+    for _ in range(10):
+        c.X(0).X(1).X(2)
+    ac = AnsatzCircuit(c, 100, SymbolsDict())
+
+    qps = QubitPauliString([Qubit(0), Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z, Pauli.Z])
+
+    qpo = QubitPauliOperator({qps: 1.0})
+
+    x = me.run([ObservableExperiment(ac, ObservableTracker(qpo))])
+
+    assert round(x[0]._dict[qps]) == 1
+
+
+def test_simple_run_end_to_end():
+
+    be = AerBackend()
+
+    me = gen_ZNE_MitEx(
+        be,
+        [2, 3, 4],
+        _label="TestZNEMitEx",
+        optimisation_level=0,
+        folding_type=Folding.gate,
+        show_fit=False,
+    )
+
+    c_1 = Circuit(2).CZ(0, 1).T(1)
+    c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
+    ac_1 = AnsatzCircuit(c_1, 10000, SymbolsDict())
+    ac_2 = AnsatzCircuit(c_2, 10000, SymbolsDict())
+    circ_list = []
+    circ_list.append(
+        ObservableExperiment(
+            ac_1,
+            ObservableTracker(
+                QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+            ),
+        )
+    )
+    circ_list.append(
+        ObservableExperiment(
+            ac_2,
+            ObservableTracker(
+                QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+            ),
+        )
+    )
+
+    result = me.run(circ_list)
+    expectation_1 = result[0]
+    expectation_2 = result[1]
+
+    res1 = expectation_1[QubitPauliString([Qubit(0)], [Pauli.Z])]
+    res2 = expectation_2[QubitPauliString([Qubit(1)], [Pauli.Z])]
+
+    assert round(float(res1)) == 1.0
+    assert round(float(res2)) == -1.0
+
+
+if __name__ == "__main__":
+    test_extrapolation_task_gen()
+    test_gen_duplication_task()
+    test_digital_folding_task_gen()
+    test_gen_initial_compilation_task()
+    test_zne_identity()
+    test_simple_run_end_to_end()
