@@ -381,8 +381,45 @@ It is on this approach that the implementation of PEC in ``qermit`` is based.
 Generators for Probabilistic-Error-Cancellation ``MitEx`` objects are available in 
 the  ``qermit.probabilistic_error_cancellation`` `module <https://cqcl.github.io/qermit/probabilistic_error_cancellation.html>`_.
  
+::
+
+    from qermit.probabilistic_error_cancellation import gen_PEC_Mitex
+    from pytket.extensions.qiskit import IBMQEmulatorBackend, AerBackend
+    
+    pec_mitex = gen_PEC_MitEx(device_backend = casablanca_backend, simulator_backend = noiseless_backend)
+    pec_mitex.get_task_graph()
 
 .. image:: PEC_taskgraph.png
+
+Let's construct a test case with expected value 1.0 and run the error-mitigation ``MitEx``.
+
+::
+
+    from pytket.circuit import Circuit, PauliExpBox, Qubit
+    from pytket.passes import DecomposeBoxes
+    from pytket.pauli import Pauli, QubitPauliString
+    from pytket.utils import QubitPauliOperator
+
+    from qermit import ObservableTracker, AnsatzCircuit, SymbolsDict, ObservableExperiment
+
+
+    peb_xyz = PauliExpBox([Pauli.X, Pauli.Y], 0.25)
+
+    c = Circuit(2)
+    c.add_pauliexpbox(peb_xyz, [Qubit(0), Qubit(1)]).Rz(0.2, 0).Rz(0.3, 1)
+    DecomposeBoxes().apply(c)
+
+    qubit_pauli_string = QubitPauliString([Qubit(0), Qubit(1)], [Pauli.Z, Pauli.Z])
+    ansatz_circuit = AnsatzCircuit(c, 2000, SymbolsDict())
+
+    exp = [ObservableExperiment(ansatz_circuit, ObservableTracker(QubitPauliOperator({qubit_pauli_string: 1.0})))]
+    results = pec_mitex.run(exp)
+    print(results)
+
+::
+
+    [{(Znode[5], Znode[6]): 1.01978876035084}]
+
 
 Zero-Noise-Extrapolation in ``qermit``
 --------------------------------------

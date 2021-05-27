@@ -475,7 +475,40 @@ using a classical simulator, and so can be compared to the results from noisy ru
 It is on this approach that the implementation of PEC in <code class="docutils literal notranslate"><span class="pre">qermit</span></code> is based.</p>
 <p>Generators for Probabilistic-Error-Cancellation <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in
 the  <code class="docutils literal notranslate"><span class="pre">qermit.probabilistic_error_cancellation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/probabilistic_error_cancellation.html">module</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.probabilistic_error_cancellation</span> <span class="kn">import</span> <span class="n">gen_PEC_Mitex</span>
+<span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQEmulatorBackend</span><span class="p">,</span> <span class="n">AerBackend</span>
+
+<span class="n">pec_mitex</span> <span class="o">=</span> <span class="n">gen_PEC_MitEx</span><span class="p">(</span><span class="n">device_backend</span> <span class="o">=</span> <span class="n">casablanca_backend</span><span class="p">,</span> <span class="n">simulator_backend</span> <span class="o">=</span> <span class="n">noiseless_backend</span><span class="p">)</span>
+<span class="n">pec_mitex</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+</pre></div>
+</div>
 <img alt="_images/PEC_taskgraph.png" src="_images/PEC_taskgraph.png" />
+<p>Let’s construct a test case with expected value 1.0 and run the error-mitigation <code class="docutils literal notranslate"><span class="pre">MitEx</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pytket.circuit</span> <span class="kn">import</span> <span class="n">Circuit</span><span class="p">,</span> <span class="n">PauliExpBox</span><span class="p">,</span> <span class="n">Qubit</span>
+<span class="kn">from</span> <span class="nn">pytket.passes</span> <span class="kn">import</span> <span class="n">DecomposeBoxes</span>
+<span class="kn">from</span> <span class="nn">pytket.pauli</span> <span class="kn">import</span> <span class="n">Pauli</span><span class="p">,</span> <span class="n">QubitPauliString</span>
+<span class="kn">from</span> <span class="nn">pytket.utils</span> <span class="kn">import</span> <span class="n">QubitPauliOperator</span>
+
+<span class="kn">from</span> <span class="nn">qermit</span> <span class="kn">import</span> <span class="n">ObservableTracker</span><span class="p">,</span> <span class="n">AnsatzCircuit</span><span class="p">,</span> <span class="n">SymbolsDict</span><span class="p">,</span> <span class="n">ObservableExperiment</span>
+
+
+<span class="n">peb_xyz</span> <span class="o">=</span> <span class="n">PauliExpBox</span><span class="p">([</span><span class="n">Pauli</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">Pauli</span><span class="o">.</span><span class="n">Y</span><span class="p">],</span> <span class="mf">0.25</span><span class="p">)</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">add_pauliexpbox</span><span class="p">(</span><span class="n">peb_xyz</span><span class="p">,</span> <span class="p">[</span><span class="n">Qubit</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">Qubit</span><span class="p">(</span><span class="mi">1</span><span class="p">)])</span><span class="o">.</span><span class="n">Rz</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">Rz</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">DecomposeBoxes</span><span class="p">()</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+<span class="n">qubit_pauli_string</span> <span class="o">=</span> <span class="n">QubitPauliString</span><span class="p">([</span><span class="n">Qubit</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">Qubit</span><span class="p">(</span><span class="mi">1</span><span class="p">)],</span> <span class="p">[</span><span class="n">Pauli</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">Pauli</span><span class="o">.</span><span class="n">Z</span><span class="p">])</span>
+<span class="n">ansatz_circuit</span> <span class="o">=</span> <span class="n">AnsatzCircuit</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="n">SymbolsDict</span><span class="p">())</span>
+
+<span class="n">exp</span> <span class="o">=</span> <span class="p">[</span><span class="n">ObservableExperiment</span><span class="p">(</span><span class="n">ansatz_circuit</span><span class="p">,</span> <span class="n">ObservableTracker</span><span class="p">(</span><span class="n">QubitPauliOperator</span><span class="p">({</span><span class="n">qubit_pauli_string</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">})))]</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pec_mitex</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{(</span><span class="n">Znode</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">Znode</span><span class="p">[</span><span class="mi">6</span><span class="p">]):</span> <span class="mf">1.01978876035084</span><span class="p">}]</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="zero-noise-extrapolation-in-qermit">
 <h2>Zero-Noise-Extrapolation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#zero-noise-extrapolation-in-qermit" title="Permalink to this headline">¶</a></h2>
