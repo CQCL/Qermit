@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -171,8 +174,8 @@
   <div class="section" id="qermit-measurement-reduction">
 <h1>qermit.measurement_reduction<a class="headerlink" href="#qermit-measurement-reduction" title="Permalink to this headline">¶</a></h1>
 <dl class="py method">
-<dt id="qermit.taskgraph.measurement_reduction.measurement_reduction_task_gen">
-<code class="sig-prename descclassname"><span class="pre">measurement_reduction.</span></code><code class="sig-name descname"><span class="pre">measurement_reduction_task_gen</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.partition.GraphColourMethod</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cx_config</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.transform.CXConfigType</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.taskgraph.measurement_reduction.measurement_reduction_task_gen" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.measurement_reduction.measurement_reduction_task_gen">
+<span class="sig-prename descclassname"><span class="pre">measurement_reduction.</span></span><span class="sig-name descname"><span class="pre">measurement_reduction_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.partition.GraphColourMethod</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cx_config</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.transform.CXConfigType</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.taskgraph.measurement_reduction.measurement_reduction_task_gen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses measurement reduction techniques available in the pytket.partition module to reduce
 the number of measurement circuits required to measure all expectations for an observable.</p>
 <dl class="field-list simple">
@@ -194,8 +197,8 @@ measurement circuits to ObservableTracker.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.taskgraph.measurement_reduction.gen_MeasurementReduction_MitEx">
-<code class="sig-prename descclassname"><span class="pre">measurement_reduction.</span></code><code class="sig-name descname"><span class="pre">gen_MeasurementReduction_MitEx</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx"><span class="pre">qermit.taskgraph.mitex.MitEx</span></a><a class="headerlink" href="#qermit.taskgraph.measurement_reduction.gen_MeasurementReduction_MitEx" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.taskgraph.measurement_reduction.gen_MeasurementReduction_MitEx">
+<span class="sig-prename descclassname"><span class="pre">measurement_reduction.</span></span><span class="sig-name descname"><span class="pre">gen_MeasurementReduction_MitEx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx"><span class="pre">qermit.taskgraph.mitex.MitEx</span></a><a class="headerlink" href="#qermit.taskgraph.measurement_reduction.gen_MeasurementReduction_MitEx" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a MitEx object that produces measurement circuits via Measurement Reduction
 methods.</p>
 <dl class="field-list simple">

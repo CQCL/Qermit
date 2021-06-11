@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -171,8 +174,8 @@
   <div class="section" id="qermit-frame-randomisation">
 <h1>qermit.frame_randomisation<a class="headerlink" href="#qermit-frame-randomisation" title="Permalink to this headline">¶</a></h1>
 <dl class="py method">
-<dt id="qermit.frame_randomisation.frame_randomisation.gen_Frame_Randomisation_MitRes">
-<code class="sig-prename descclassname"><span class="pre">frame_randomisation.</span></code><code class="sig-name descname"><span class="pre">gen_Frame_Randomisation_MitRes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes"><span class="pre">qermit.taskgraph.mitres.MitRes</span></a><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.gen_Frame_Randomisation_MitRes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.frame_randomisation.frame_randomisation.gen_Frame_Randomisation_MitRes">
+<span class="sig-prename descclassname"><span class="pre">frame_randomisation.</span></span><span class="sig-name descname"><span class="pre">gen_Frame_Randomisation_MitRes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes"><span class="pre">qermit.taskgraph.mitres.MitRes</span></a><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.gen_Frame_Randomisation_MitRes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produces a MitRes object that applies FrameRandomisation techniques to experiment circuits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -192,12 +195,12 @@ Default set to FrameRandomisation.UniversalFrameRandomisation.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="qermit.frame_randomisation.frame_randomisation.FrameRandomisation">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">qermit.frame_randomisation.frame_randomisation.</span></code><code class="sig-name descname"><span class="pre">FrameRandomisation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.frame_randomisation.frame_randomisation.FrameRandomisation">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qermit.frame_randomisation.frame_randomisation.</span></span><span class="sig-name descname"><span class="pre">FrameRandomisation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation" title="Permalink to this definition">¶</a></dt>
 <dd><p>An enumeration.</p>
 <dl class="py method">
-<dt id="qermit.frame_randomisation.frame_randomisation.FrameRandomisation.PauliFrameRandomisation">
-<code class="sig-name descname"><span class="pre">PauliFrameRandomisation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation.PauliFrameRandomisation" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.frame_randomisation.frame_randomisation.FrameRandomisation.PauliFrameRandomisation">
+<span class="sig-name descname"><span class="pre">PauliFrameRandomisation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation.PauliFrameRandomisation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses the pytket.tailoring method PauliFrameRandomisation  to return a list of
 circuits corresponding to instances of frame randomisation for the input circuit.</p>
 <dl class="field-list simple">
@@ -212,8 +215,8 @@ circuits corresponding to instances of frame randomisation for the input circuit
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.frame_randomisation.frame_randomisation.FrameRandomisation.UniversalFrameRandomisation">
-<code class="sig-name descname"><span class="pre">UniversalFrameRandomisation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation.UniversalFrameRandomisation" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.frame_randomisation.frame_randomisation.FrameRandomisation.UniversalFrameRandomisation">
+<span class="sig-name descname"><span class="pre">UniversalFrameRandomisation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation.UniversalFrameRandomisation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses the pytket.tailoring method UniversalFrameRandomisation  to return a list of
 circuits corresponding to instances of frame randomisation for the input circuit.
 UniversalFrameRandomisation rebases the circuit to a gate set such that
@@ -234,8 +237,8 @@ that Rz(-x) and Rz(x) incur similar noise for any angle x.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.frame_randomisation.frame_randomisation.frame_randomisation_circuits_task_gen">
-<code class="sig-prename descclassname"><span class="pre">frame_randomisation.</span></code><code class="sig-name descname"><span class="pre">frame_randomisation_circuits_task_gen</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_fr_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation" title="qermit.frame_randomisation.frame_randomisation.FrameRandomisation"><span class="pre">qermit.frame_randomisation.frame_randomisation.FrameRandomisation</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.frame_randomisation_circuits_task_gen" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.frame_randomisation.frame_randomisation.frame_randomisation_circuits_task_gen">
+<span class="sig-prename descclassname"><span class="pre">frame_randomisation.</span></span><span class="sig-name descname"><span class="pre">frame_randomisation_circuits_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_fr_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation" title="qermit.frame_randomisation.frame_randomisation.FrameRandomisation"><span class="pre">qermit.frame_randomisation.frame_randomisation.FrameRandomisation</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.frame_randomisation_circuits_task_gen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a MitTask object that produces Frame Randomisation circuits for some wire of experiment circuits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -245,8 +248,8 @@ that Rz(-x) and Rz(x) incur similar noise for any angle x.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="qermit.frame_randomisation.frame_randomisation.frame_randomisation_result_task_gen">
-<code class="sig-prename descclassname"><span class="pre">frame_randomisation.</span></code><code class="sig-name descname"><span class="pre">frame_randomisation_result_task_gen</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.frame_randomisation_result_task_gen" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="qermit.frame_randomisation.frame_randomisation.frame_randomisation_result_task_gen">
+<span class="sig-prename descclassname"><span class="pre">frame_randomisation.</span></span><span class="sig-name descname"><span class="pre">frame_randomisation_result_task_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.frame_randomisation_result_task_gen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a MitTask object that sequentially collates samples number of BackendResult objects into single
 BackendResult object. These collated BackendResult objects should include all frame experiments for a single
 original circuit.</p>

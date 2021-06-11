@@ -1018,10 +1018,18 @@ def gen_PEC_learning_based_MitEx(
     :type device_backend: Backend
     :param simulator_backend: Ideal state vector simulator used for simulating Clifford Circuits.
     :type simulator_backend: Backend
+
+    :key simulator_mitex: MitEx object ideal state simulations are run on, default simulator_backend.
+    :key device_mitex: MitEx object observable experiments are run on, default device_backend.
+    :key seed: Seed for np.random, default None.
+    :key optimisation_level: Optimisation level for initial compilation, default 0.
+    :key num_cliff: The number of random Clifford circuits generated for each primary circuit, default 10.
+
     :raises RuntimeError: Raised if the backend gate set does not include CX or CZ gates.
     :return: MitEx object implementing error-mitigation via learning based PEC.
     :rtype: MitEx
     """
+
     # Disallow backends that do not have 2 qubit clifford gates
     if not (
         (OpType.CX in device_backend._gate_set)  # type: ignore
@@ -1035,14 +1043,18 @@ def gen_PEC_learning_based_MitEx(
     _optimisation_level = kwargs.get("optimisation_level", 0)
     # TODO: Change to a number of clifford circuits which varies with the size of the circuit
     num_cliff_circ = kwargs.get("num_cliff", 10)
-    random_seed = kwargs.get("seed", 0)
 
-    np.random.seed(random_seed)
-
-    # culprit
-    _experiment_taskgraph = TaskGraph().from_TaskGraph(
-        MitEx(device_backend, _label="NoisyCliffordMitEx")
+    sim_mitex = copy.copy(
+        kwargs.get(
+            "simulator_mitex", MitEx(simulator_backend, _label="IdealCliffordMitEx")
+        )
     )
+
+    device_mitex = copy.copy(
+        kwargs.get("device_mitex", MitEx(device_backend, _label="NoisyMitex"))
+    )
+
+    _experiment_taskgraph = TaskGraph().from_TaskGraph(device_mitex)
 
     _experiment_taskgraph.add_wire()
 
@@ -1051,10 +1063,7 @@ def gen_PEC_learning_based_MitEx(
     )
     _experiment_taskgraph.prepend(get_noisy_clifford_circuits)
 
-    # culprit
-    _experiment_taskgraph.parallel(
-        MitEx(simulator_backend, _label="IdealCliffordMitEx")
-    )
+    _experiment_taskgraph.parallel(sim_mitex)
 
     _experiment_taskgraph.prepend(gen_duplication_task(2, _label="DuplicateClifford"))
 
@@ -1071,10 +1080,7 @@ def gen_PEC_learning_based_MitEx(
     learn_dist = learn_quasi_probs_task_gen(num_cliff_circ)
     _experiment_taskgraph.append(learn_dist)
 
-    _circuit_experiment_mitex = MitEx(device_backend, _label="NoisyCircuitMitEx")
-    _circuit_experiment_taskgraph = TaskGraph().from_TaskGraph(
-        _circuit_experiment_mitex
-    )
+    _circuit_experiment_taskgraph = TaskGraph().from_TaskGraph(device_mitex)
     _circuit_experiment_taskgraph.add_wire()
     get_noisy_circuits = gen_get_noisy_circuits(
         device_backend, _label="GetNoisyCircuits"
