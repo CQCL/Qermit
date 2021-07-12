@@ -318,7 +318,7 @@ def ccl_result_batching_task_gen(n_state_circuits: int) -> MitTask:
         experiment characterisation.
     :type n_state_circuits: int
 
-    :return: MitTask obect that organises QubitPauliOperator objects required for
+    :return: MitTask object that organises QubitPauliOperator objects required for
         characterisation.
     :rtype: MitTask.
     """
@@ -357,7 +357,7 @@ def ccl_likelihood_filtering_task_gen(
 ) -> MitTask:
     """
     :param likelihood_function: LikelihoodFunction enum used to accept or reject some pair of noisy and noiseless expectation.
-        Function must take two QubitPauliOperator as parametrer, and return a single float between 0 and 1 as answer.
+        Function must take two QubitPauliOperator as parameter, and return a single float between 0 and 1 as answer.
     :type likelihood_function: LikelihoodFunction
     :key seed: Seed value for sampling probability for likelihood function
 
