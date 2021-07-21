@@ -19,7 +19,7 @@ from .mittask import (
     CircuitShots,
     Wire,
 )
-from typing import List, Tuple, Union, cast
+from typing import List, Tuple, Union, cast, Sequence
 from .task_graph import TaskGraph
 from pytket.backends import Backend, ResultHandle
 from pytket.backends.backendresult import BackendResult
@@ -74,7 +74,8 @@ def backend_handle_task_gen(backend: Backend) -> MitTask:
         """
         if len(circuit_wires) != 0:
             circs, shots = map(list, zip(*circuit_wires))
-            return (backend.process_circuits(circs, n_shots=shots),)
+
+            return (backend.process_circuits(circs, n_shots=cast(Sequence[int], shots)),)
         else:
             return ([],)
 
