@@ -117,14 +117,14 @@ def cdr_calibration_task_gen(backend: Backend, model: _BaseExCorrectModel) -> Mi
 
                     noisy_char_dict[key].append(float(noisy_qpo._dict[key]))
                     exact_char_dict[key].append(float(exact_qpo._dict[key]))
-            if backend.characterisation is None:
-                raise ValueError("Backend has no characterisation attribute.")
+            if backend.backend_info is None:
+                raise ValueError("Backend has no backend_info attribute.")
 
-            backend.characterisation["CDR_" + str(counter)] = dict()
+            backend.backend_info.misc["CDR_" + str(counter)] = dict()
             # for each qubit pauli string in operator, add model for calibrating
             for key in noisy_char_dict:
                 model.calibrate(noisy_char_dict[key], exact_char_dict[key])
-                backend.characterisation["CDR_" + str(counter)][key] = copy.copy(model)
+                backend.backend_info.misc["CDR_" + str(counter)][key] = copy.copy(model)
             counter += 1
 
         return (True,)
@@ -159,17 +159,17 @@ def cdr_correction_task_gen(backend: Backend) -> MitTask:
         :type calibration_complete: bool
 
         """
-        if backend.characterisation is None:
-            raise ValueError("Backend has no characterisation attribute.")
+        if backend.backend_info is None:
+            raise ValueError("Backend has no backend_info attribute.")
 
         corrected_expectations = []
         for i in range(len(noisy_expectation)):
             char_string = "CDR_" + str(i)
-            if char_string not in backend.characterisation:
+            if char_string not in backend.backend_info.misc:
                 raise RuntimeError(
                     "CDR characterisation not stored in backend.charactersation attribute."
                 )
-            models = backend.characterisation[char_string]
+            models = backend.backend_info.misc[char_string]
             new_qpo_dict = dict()
             for qps in noisy_expectation[i]._dict:
                 new_qpo_dict[qps] = cast(

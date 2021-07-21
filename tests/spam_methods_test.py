@@ -17,8 +17,6 @@ from pytket import Circuit, Qubit
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 from pytket.circuit import Node  # type: ignore
 from pytket.routing import Architecture  # type: ignore
-from pytket.device import Device  # type: ignore
-
 from qermit.spam import (  # type: ignore
     gen_FullyCorrelated_SPAM_MitRes,
     gen_PartialCorrelated_SPAM_MitRes,
@@ -36,7 +34,6 @@ def gen_test_wire():
 def test_gen_FC_mr():
     experiment_wire = gen_test_wire()
     b = AerBackend()
-    b._characterisation = dict()
     qb_subsets = [
         [Qubit(0), Qubit(1)],
         [Qubit(2), Qubit(3)],
@@ -56,7 +53,6 @@ def test_gen_FC_mr():
 def test_gen_UC_mr():
     experiment_wire = gen_test_wire()
     b = AerBackend()
-    b._characterisation = dict()
     conn = [
         (Node("q", 0), Node("q", 1)),
         (Node("q", 2), Node("q", 1)),
@@ -66,7 +62,7 @@ def test_gen_UC_mr():
         (Node("q", 2), Node("q", 5)),
         (Node("q", 1), Node("q", 4)),
     ]
-    b._device = Device(Architecture(conn))
+    b.backend_info.architecture = Architecture(conn)
     mr = gen_UnCorrelated_SPAM_MitRes(b, 100)
     res = mr.run(experiment_wire)
     assert len(res) == 2
@@ -77,7 +73,6 @@ def test_gen_UC_mr():
 def test_gen_PC_mr():
     experiment_wire = gen_test_wire()
     b = AerBackend()
-    b._characterisation = dict()
     conn = [
         (Node("q", 0), Node("q", 1)),
         (Node("q", 2), Node("q", 1)),
@@ -87,7 +82,7 @@ def test_gen_PC_mr():
         (Node("q", 2), Node("q", 5)),
         (Node("q", 1), Node("q", 4)),
     ]
-    b._device = Device(Architecture(conn))
+    b.backend_info.architecture = Architecture(conn)
     mr = gen_PartialCorrelated_SPAM_MitRes(b, 100, 1)
     res = mr.run(experiment_wire)
     assert len(res) == 2

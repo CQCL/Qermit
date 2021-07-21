@@ -41,7 +41,7 @@ def test_backend_handle_result_task_gen():
 
     test_results = results_task([test_handles])[0]
     assert len(test_results) == 2
-    assert test_results[0].get_counts()[(0, 0)] == 20
+    assert test_results[0].get_counts()[(0, 0)] == 10
     assert test_results[1].get_counts()[(1, 1)] == 20
 
 
@@ -54,7 +54,7 @@ def test_mitres_run():
 
     res = mr.run([(c0, 10), (c1, 20)])
     assert len(res) == 2
-    assert res[0].get_counts()[(0, 0)] == 20
+    assert res[0].get_counts()[(0, 0)] == 10
     assert res[1].get_counts()[(1, 1)] == 20
 
 

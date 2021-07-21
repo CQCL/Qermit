@@ -36,7 +36,6 @@ def get_noisy_backend(n_qubits, prob_ro):
     error_ro = noise.ReadoutError(probabilities)
     for i in range(n_qubits):
         noise_model.add_readout_error(error_ro, [i])
-
     return AerBackend(noise_model)
 
 
@@ -49,7 +48,7 @@ def test_binary_int_methods():
 def test_get_transition_tomography_circuits():
     backend = get_noisy_backend(4, 0.1)
     pc = Circuit(2).CX(0, 1)
-    nodes = backend.device.architecture.nodes
+    nodes = backend.backend_info.architecture.nodes
     correlations = [[nodes[0], nodes[1]], [nodes[2], nodes[3]]]
     # get tomography circuits
     output = get_full_transition_tomography_circuits(pc, backend, correlations)
@@ -93,7 +92,7 @@ def test_get_transition_tomography_circuits():
 def test_calculate_correlation_matrices():
     backend = get_noisy_backend(4, 0.0000001)
     pc = Circuit(4)
-    nodes = backend.device.architecture.nodes
+    nodes = backend.backend_info.architecture.nodes
     correlations_0 = [[nodes[0]], [nodes[1]], [nodes[2]], [nodes[3]]]
     correlations_1 = [[nodes[0], nodes[1]], [nodes[2], nodes[3]]]
 
@@ -182,7 +181,7 @@ def test_correct_transition_noise():
 
     # get test characterisation
     pc = Circuit(4)
-    nodes = backend.device.architecture.nodes
+    nodes = backend.backend_info.architecture.nodes
     correlations = [[nodes[0], nodes[1]], [nodes[2], nodes[3]]]
     tomo_circs = get_full_transition_tomography_circuits(pc, backend, correlations)
     tomo_handles = backend.process_circuits(tomo_circs[0], 5)
@@ -197,9 +196,35 @@ def test_correct_transition_noise():
     )
 
 
+def test_process_model() -> None:
+    noise_model = noise.NoiseModel()
+    # add readout error to qubits 0, 1, 2
+    ro_probabilities = [[0.8, 0.2], [0.2, 0.8]]
+    error_ro = noise.ReadoutError(ro_probabilities)
+    for i in range(3):
+        noise_model.add_readout_error(error_ro, [i])
+    error_dp_sq = noise.errors.depolarizing_error(0.5, 1)
+    for i in range(3, 6):
+        noise_model.add_quantum_error(error_dp_sq, ["u3"], [i])
+    error_dp_mq = noise.errors.depolarizing_error(0.6, 2)
+    noise_model.add_quantum_error(error_dp_mq, ["cx"], [0, 7])
+    noise_model.add_quantum_error(error_dp_mq, ["cx"], [1, 2])
+    noise_model.add_quantum_error(error_dp_mq, ["cx"], [8, 9])
+
+    b = AerBackend(noise_model)
+    nodes = b.backend_info.architecture.nodes
+    assert len(nodes) == 9
+    assert "characterisation" in b.backend_info.misc
+    assert "GenericOneQubitQErrors" in b.backend_info.misc["characterisation"]
+    assert "GenericTwoQubitQErrors" in b.backend_info.misc["characterisation"]
+    assert nodes[3] in b.backend_info.all_node_gate_errors
+    assert (nodes[7], nodes[8]) in b.backend_info.all_edge_gate_errors
+
+
 if __name__ == "__main__":
-    test_binary_int_methods()
-    test_get_transition_tomography_circuits()
-    test_calculate_correlation_matrices()
-    test_correct_transition_noise()
-    test_reduce_matrices()
+    # test_binary_int_methods()
+    # test_get_transition_tomography_circuits()
+    # test_calculate_correlation_matrices()
+    # test_correct_transition_noise()
+    # test_reduce_matrices()
+    test_process_model()

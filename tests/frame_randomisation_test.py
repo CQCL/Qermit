@@ -64,7 +64,7 @@ def test_gen_Frame_Randomisation_MitRes():
     pfr_res = pfr_mitres.run(wire)
     assert len(pfr_res) == 2
     assert pfr_res[0].get_counts()[(1, 1)] == 100
-    assert pfr_res[1].get_counts()[(1, 1)] == 100
+    assert pfr_res[1].get_counts()[(1, 1)] == 50
 
     ufr_mitres = gen_Frame_Randomisation_MitRes(
         AerBackend(),
@@ -77,7 +77,7 @@ def test_gen_Frame_Randomisation_MitRes():
     ufr_res = ufr_mitres.run(wire)
     assert len(ufr_res) == 2
     assert ufr_res[0].get_counts()[(1, 1)] == 100
-    assert ufr_res[1].get_counts()[(1, 1)] == 100
+    assert ufr_res[1].get_counts()[(1, 1)] == 50
 
 
 if __name__ == "__main__":
