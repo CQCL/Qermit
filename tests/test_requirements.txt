@@ -1,2 +1,2 @@
-pytket-qiskit
+pytket-qiskit>=0.15.1
 pytest
