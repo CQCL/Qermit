@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 version = {}
 with open("_version.py") as fp:
@@ -13,6 +13,7 @@ setup(
     long_description_content_type="text/markdown",
     license="CQC Non-Commercial Use Software Licence",
     include_package_data=True,
+    packages=find_packages(),
     install_requires=["pytket ~= 0.13.0", "matplotlib", "networkx"],
     classifiers=[
         "Environment :: Console",
