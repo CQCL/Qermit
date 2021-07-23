@@ -106,9 +106,9 @@ def gen_UnCorrelated_SPAM_MitRes(
     :param calibration_shots: Number of shots required for each characterisation circuit
     :type calibration_shots: int
     """
-    if backend.device is None:
-        raise ValueError("Backend has no device attribute.")
-    correlations = [[n] for n in backend.device.nodes]
+    if backend.backend_info is None:
+        raise ValueError("Backend has no backend_info attribute.")
+    correlations = [[n] for n in backend.backend_info.architecture.nodes]
     return gen_FullyCorrelated_SPAM_MitRes(
         backend, calibration_shots, correlations, **kwargs
     )

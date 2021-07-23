@@ -52,13 +52,15 @@ def gen_full_tomography_spam_circuits_task(
     def task(
         obj, wire: List[CircuitShots]
     ) -> Tuple[List[CircuitShots], List[CircuitShots], List[StateInfo]]:
-        if backend.characterisation is None:
-            raise ValueError("Backend has no characterisation attribute.")
+        if backend.backend_info is None:
+            raise ValueError("Backend has no backend_info attribute.")
 
-        if "FullCorrelatedSpamCorrection" in backend.characterisation:
+        if "FullCorrelatedSpamCorrection" in backend.backend_info.misc:
             # check correlations distance
             if (
-                backend.characterisation["FullCorrelatedSpamCorrection"].CorrelatedNodes
+                backend.backend_info.misc[
+                    "FullCorrelatedSpamCorrection"
+                ].CorrelatedNodes
                 is qubit_subsets
             ):
                 return (wire, [], [])
@@ -114,9 +116,9 @@ def gen_full_tomography_spam_characterisation_task(
                 results, state_infos, qubit_subsets
             )
 
-            if backend.characterisation is None:
-                raise ValueError("Backend has no characterisation attribute.")
-            backend.characterisation["FullCorrelatedSpamCorrection"] = characterisation
+            if backend.backend_info is None:
+                raise ValueError("Backend has no backend_info attribute.")
+            backend.backend_info.misc["FullCorrelatedSpamCorrection"] = characterisation
         return (True,)
 
     return MitTask(
@@ -159,11 +161,11 @@ def gen_full_tomography_spam_correction_task(
         :return: Corrected Results
         :rtype: Tuple[List[BackendResult]]
         """
-        if backend.characterisation is None:
-            raise ValueError("Backend has no characterisation attribute.")
+        if backend.backend_info is None:
+            raise ValueError("Backend has no backend_info attribute.")
 
-        if "FullCorrelatedSpamCorrection" in backend.characterisation:
-            char = backend.characterisation["FullCorrelatedSpamCorrection"]
+        if "FullCorrelatedSpamCorrection" in backend.backend_info.misc:
+            char = backend.backend_info.misc["FullCorrelatedSpamCorrection"]
         else:
             raise ValueError(
                 "'FullCorrelatedSpamCorrection' not characterised for Backend."

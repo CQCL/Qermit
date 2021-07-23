@@ -23,7 +23,6 @@ from qermit.spam.partial_spam_correction import (  # type: ignore
     correct_partial_correlated_spam_task_gen,
 )
 from pytket.circuit import Qubit, CircBox, Circuit, Node  # type: ignore
-from pytket.device import Device  # type: ignore
 from pytket.routing import Architecture  # type: ignore
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 from numpy import identity
@@ -109,7 +108,6 @@ def test_partial_spam_setup_task_gen():
 
 def test_partial_correlated_spam_circuits_task_gen():
     b = AerBackend()
-    b._characterisation = dict()
     qbs = [Node(i) for i in range(5)]
     cons = [
         (qbs[0], qbs[1]),
@@ -119,7 +117,7 @@ def test_partial_correlated_spam_circuits_task_gen():
         (qbs[3], qbs[4]),
         (qbs[2], qbs[4]),
     ]
-    b._device = Device(Architecture(cons))
+    b.backend_info.architecture = Architecture(cons)
     task = partial_correlated_spam_circuits_task_gen(b, 10, 1)
     assert task.n_in_wires == 1
     assert task.n_out_wires == 2
@@ -136,7 +134,6 @@ def test_partial_correlated_spam_circuits_task_gen():
 
 def test_characterisation_correction():
     b = AerBackend()
-    b._characterisation = dict()
     qbs = [Node(i) for i in range(5)]
     cons = [
         (qbs[0], qbs[1]),
@@ -146,7 +143,7 @@ def test_characterisation_correction():
         (qbs[3], qbs[4]),
         (qbs[2], qbs[4]),
     ]
-    b._device = Device(Architecture(cons))
+    b.backend_info.architecture = Architecture(cons)
     res = partial_correlated_spam_circuits_task_gen(b, 10, 1)([True])
     circs = [r[0] for r in res[0]]
     handles = b.process_circuits(circs, 10)
@@ -158,9 +155,9 @@ def test_characterisation_correction():
 
     wire = (results, res[1])
     char_res = char_task(wire)
-    assert "CorrelatedSpamCorrection" in b.characterisation
+    assert "CorrelatedSpamCorrection" in b.backend_info.misc
     assert char_res == (True,)
-    char = b.characterisation["CorrelatedSpamCorrection"]
+    char = b.backend_info.misc["CorrelatedSpamCorrection"]
     assert char.Distance == 1
     identity_matrix = identity(4)
     for x in char.CorrelationToMatrix:

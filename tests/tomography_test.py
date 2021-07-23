@@ -36,7 +36,6 @@ def get_noisy_backend(n_qubits, prob_ro):
     error_ro = noise.ReadoutError(probabilities)
     for i in range(n_qubits):
         noise_model.add_readout_error(error_ro, [i])
-
     return AerBackend(noise_model)
 
 
@@ -49,7 +48,7 @@ def test_binary_int_methods():
 def test_get_transition_tomography_circuits():
     backend = get_noisy_backend(4, 0.1)
     pc = Circuit(2).CX(0, 1)
-    nodes = backend.device.architecture.nodes
+    nodes = backend.backend_info.architecture.nodes
     correlations = [[nodes[0], nodes[1]], [nodes[2], nodes[3]]]
     # get tomography circuits
     output = get_full_transition_tomography_circuits(pc, backend, correlations)
@@ -93,7 +92,7 @@ def test_get_transition_tomography_circuits():
 def test_calculate_correlation_matrices():
     backend = get_noisy_backend(4, 0.0000001)
     pc = Circuit(4)
-    nodes = backend.device.architecture.nodes
+    nodes = backend.backend_info.architecture.nodes
     correlations_0 = [[nodes[0]], [nodes[1]], [nodes[2]], [nodes[3]]]
     correlations_1 = [[nodes[0], nodes[1]], [nodes[2], nodes[3]]]
 
@@ -182,7 +181,7 @@ def test_correct_transition_noise():
 
     # get test characterisation
     pc = Circuit(4)
-    nodes = backend.device.architecture.nodes
+    nodes = backend.backend_info.architecture.nodes
     correlations = [[nodes[0], nodes[1]], [nodes[2], nodes[3]]]
     tomo_circs = get_full_transition_tomography_circuits(pc, backend, correlations)
     tomo_handles = backend.process_circuits(tomo_circs[0], 5)

@@ -1032,8 +1032,8 @@ def gen_PEC_learning_based_MitEx(
 
     # Disallow backends that do not have 2 qubit clifford gates
     if not (
-        (OpType.CX in device_backend._gate_set)  # type: ignore
-        or (OpType.CZ in device_backend._gate_set)  # type:ignore
+        (OpType.CX in device_backend.backend_info.gate_set)  # type: ignore
+        or (OpType.CZ in device_backend.backend_info.gate_set)  # type:ignore
     ):
         raise RuntimeError("The backend gate set must include CX or CZ gates")
 

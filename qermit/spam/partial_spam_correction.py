@@ -214,13 +214,13 @@ def partial_spam_setup_task_gen(backend: Backend, correlation_distance: int) -> 
             raise ValueError(
                 "Correlations distance must be 1 or greater for characterisation of partial spam correlations."
             )
-        if backend.characterisation is None:
+        if backend.backend_info is None:
             raise ValueError("Backend has no characterisation attribute.")
         else:
-            if "CorrelatedSpamCorrection" in backend.characterisation:
+            if "CorrelatedSpamCorrection" in backend.backend_info.misc:
                 # check correlations distance
                 if (
-                    backend.characterisation["CorrelatedSpamCorrection"].Distance
+                    backend.backend_info.misc["CorrelatedSpamCorrection"].Distance
                     is correlation_distance
                 ):
                     characterisation = False
@@ -263,9 +263,10 @@ def partial_correlated_spam_circuits_task_gen(
         if characterise:
             # get basic graph, representing nearest neighbour correlations
             correlations = nx.Graph()
-            if backend.device is None:
-                raise ValueError("Backend has no device attribute.")
-            correlations.add_edges_from(backend.device.coupling)
+
+            if backend.backend_info is None:
+                raise ValueError("Backend has no backend_info attribute.")
+            correlations.add_edges_from(backend.backend_info.architecture.coupling)
             # to allow non-nearest neighbour correlations, add edges to graph
             # to reflect larger distance correlations
             for _ in itertools.repeat(None, correlation_distance - 1):
@@ -382,14 +383,14 @@ def characterise_correlated_spam_task_gen(
                 v /= sum(v)
                 correlation_to_mat[nodes] = v
 
-            if backend.characterisation is None:
-                raise ValueError("Backend has no characterisation attribute.")
-            backend.characterisation[
-                "CorrelatedSpamCorrection"
-            ] = PartialCorrelatedNoiseCharacterisation(
-                correlations_distance, correlated_edges, correlation_to_mat
+            if backend.backend_info is None:
+                raise ValueError("Backend has no backend_info attribute.")
+            backend.backend_info.add_misc(
+                "CorrelatedSpamCorrection",
+                PartialCorrelatedNoiseCharacterisation(
+                    correlations_distance, correlated_edges, correlation_to_mat
+                ),
             )
-
         return (True,)
 
     return MitTask(
@@ -471,11 +472,10 @@ def correct_partial_correlated_spam_task_gen(
         characterised: bool,
     ) -> Tuple[List[BackendResult]]:
 
-        if backend.characterisation is None:
-            raise ValueError("Backend has no characterisation attribute.")
-
-        if "CorrelatedSpamCorrection" in backend.characterisation:
-            cnc = backend.characterisation["CorrelatedSpamCorrection"]
+        if backend.backend_info is None:
+            raise ValueError("Backend has no backend_info attribute.")
+        if "CorrelatedSpamCorrection" in backend.backend_info.misc:
+            cnc = backend.backend_info.misc["CorrelatedSpamCorrection"]
         else:
             raise ValueError(
                 "'CorrelatedSpamCorrection' not characterised for Backend."

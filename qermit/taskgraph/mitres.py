@@ -19,7 +19,7 @@ from .mittask import (
     CircuitShots,
     Wire,
 )
-from typing import List, Tuple, Union, cast
+from typing import List, Tuple, Union, cast, Sequence
 from .task_graph import TaskGraph
 from pytket.backends import Backend, ResultHandle
 from pytket.backends.backendresult import BackendResult
@@ -63,8 +63,7 @@ def backend_handle_task_gen(backend: Backend) -> MitTask:
     :return: Pure function that adds passes circuits to backend and gets handles.
     :rtype: MitTask
     """
-    # TODO: As devices allow variable shots to be passed, update Backend.process_circuits
-    # to optionally allow an iterable of shots to be passed. Then, just pass iterable here.
+
     def task(obj, circuit_wires: List[CircuitShots]) -> Tuple[List[ResultHandle]]:
         """
         :param circuit_wires: Circuits to be run on backend, number of shots to run of each.
@@ -74,9 +73,9 @@ def backend_handle_task_gen(backend: Backend) -> MitTask:
         :rtype: Tuple[List[ResultHandle]]
         """
         if len(circuit_wires) != 0:
-            circs, shots = zip(*circuit_wires)
-            n_shots = max(set(shots))
-            return (backend.process_circuits(circs, n_shots),)
+            circs, shots = map(list, zip(*circuit_wires))
+
+            return (backend.process_circuits(circs, n_shots=cast(Sequence[int], shots)),)
         else:
             return ([],)
 

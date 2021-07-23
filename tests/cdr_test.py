@@ -74,11 +74,11 @@ def test_cdr_calibration_correction_task_gen():
     ]
     # confirms calibration succesful
     assert cal_task([cal_wire])
-    assert "CDR_0" in b.characterisation
-    assert "CDR_1" in b.characterisation
+    assert "CDR_0" in b.backend_info.misc
+    assert "CDR_1" in b.backend_info.misc
 
-    model_0 = b.characterisation["CDR_0"]
-    model_1 = b.characterisation["CDR_1"]
+    model_0 = b.backend_info.misc["CDR_0"]
+    model_1 = b.backend_info.misc["CDR_1"]
     # calibrated of 1.0, should always return same value
     assert np.isclose(model_0[qps_012].correct(1.0), 1.0, rtol=1e-1)
     assert np.isclose(model_0[qps_01].correct(1.0), 0.75, rtol=1e-1)

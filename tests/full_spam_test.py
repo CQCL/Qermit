@@ -66,7 +66,7 @@ def test_full_tomography_spam_characterisation_task_gen():
 
     task_res = task([results, spam_info[2]])
     assert task_res == (True,)
-    char = b.characterisation["FullCorrelatedSpamCorrection"]
+    char = b.backend_info.misc["FullCorrelatedSpamCorrection"]
     assert char[0] == qb_subsets
     assert char[1] == {
         Qubit(0): (0, 0),
