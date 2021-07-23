@@ -7,7 +7,7 @@ This repo containts API documentation, a user manual for getting started with `q
 ## Getting Started
 
 `qermit` is available for ``python3.7`` or higher, on Linux, MacOS and Windows.
-To install, ensure that you have `pip` version 19 or above, and install using `pip` from a cloned repository.
+To install, ensure that you have `pip` version 19 or above, and install using `pip install qermit`.
 
 **Documentation** can be found at [cqcl.github.io/qermit](https://cqcl.github.io/qermit).
 
