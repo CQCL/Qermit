@@ -48,7 +48,7 @@ def backend_compile_circuit_shots_task_gen(
         start_time = time.time()
 
         for cs in circ_shots:
-            backend.compile_circuit(cs[0], optimisation_level=optimisation_level)
+            backend.compile_circuit(cs.Circuit, optimisation_level=optimisation_level)
 
         print("total time = %f" % (time.time() - start_time))
 
