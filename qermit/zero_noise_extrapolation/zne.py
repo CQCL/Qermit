@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
 
 from pytket.backends import Backend
 from qermit import (
@@ -247,6 +248,7 @@ class Fit(Enum):
             )
 
         # Fit data to polyexponential function
+        # TODO: Improve bounds here.
         bounds = ([-1, -2, *[-np.inf for i in range(deg)]], [1, 2, *[np.inf for i in range(deg)]])
         vals = curve_fit(
             poly_exp_func, x, y, p0=[0, 1, *[-1 for i in range(deg)]], maxfev=10000, bounds=bounds
@@ -558,6 +560,9 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
+        print("---> Entering %s" % kwargs.get("_label", "Duplicate"))
+        start_time = time.time()
+
         # Raise error if the number of duplications requested is less than 1
         if duplicates <= 0:
             raise ValueError(
@@ -594,6 +599,7 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
         # Compose coppies into wire format
         if duplicates == 1:
             me_copy = [copy_mitex_wire(circuit_tuple) for circuit_tuple in mitex_wire]
+            print("time taken = %f" % (time.time() - start_time))
             return (me_copy,)
         else:
             me_copies = [
@@ -602,6 +608,7 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
             for _ in range(duplicates - 1):
                 mc = [copy_mitex_wire(circuit_tuple) for circuit_tuple in mitex_wire]
                 me_copies.append(mc)
+            print("time taken = %f" % (time.time() - start_time))
             return tuple(me_copies)
 
     return MitTask(
@@ -744,9 +751,82 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
         noise_scaling_list, _fit_type, _show_fit, _deg
     )
 
+
+
+
     _experiment_taskgraph.append(extrapolation_task)
     _experiment_taskgraph.prepend(gen_duplication_task(len(noise_scaling_list) + 1))
     _experiment_taskgraph.prepend(
         gen_initial_compilation_task(backend, _optimisation_level)
     )
     return MitEx(backend).from_TaskGraph(_experiment_taskgraph)
+
+
+def gen_nq_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -> MitEx:
+    """Generates MitEx object which mitigates for noise using Zero Noise Extrapolation. This is the
+    process by which noise is amplified incrementally, and the zero noise case arrived at by
+    extrapolating backwards. For further explanantion see https://arxiv.org/abs/2005.10921.
+
+    :param backend: Backend on which the circuits are to be run.
+    :type backend: Backend
+    :param noise_scaling_list: A list of the amounts by which the noise should be scaled.
+    :type noise_scaling_list: List[float]
+    :return: MitEx object performing noise mitigation by ZNE.
+    :rtype: MitEx
+    """
+    _experiment_mitres = copy.copy(
+        kwargs.get(
+            "experiment_mitres",
+            MitRes(backend),
+        )
+    )
+
+    _experiment_mitex = copy.copy(
+        kwargs.get(
+            "experiment_mitex",
+            MitEx(backend, _label="ExperimentMitex", mitres=_experiment_mitres),
+        )
+    )
+    _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
+
+    _optimisation_level = kwargs.get("optimisation_level", 0)
+    _show_fit = kwargs.get("show_fit", False)
+    _folding_type = copy.copy(kwargs.get("folding_type", Folding.circuit))
+    _fit_type = copy.copy(kwargs.get("fit_type", Fit.linear))
+    _deg = kwargs.get("deg", len(noise_scaling_list) - 1)
+    _seed = kwargs.get("seed", None)
+    _allow_approx_fold = kwargs.get("allow_approx_fold", True)
+
+    np.random.seed(seed=_seed)
+
+    for fold in noise_scaling_list:
+
+        _label = str(fold) + "FoldMitEx"
+
+        fold_mitex = copy.copy(
+            kwargs.get(
+                "fold_mitex", MitEx(backend, _label=_label, mitres=MitRes(backend))
+            )
+        )
+
+        digital_folding_task = digital_folding_task_gen(
+            backend, fold, _folding_type, _allow_approx_fold
+        )
+        fold_mitex.prepend(digital_folding_task)
+        _experiment_taskgraph.parallel(fold_mitex)
+
+    extrapolation_task = extrapolation_task_gen(
+        noise_scaling_list, _fit_type, _show_fit, _deg
+    )
+
+
+
+        
+    _experiment_taskgraph.prepend(gen_duplication_task(len(noise_scaling_list) + 1))
+    _experiment_taskgraph.prepend(
+        gen_initial_compilation_task(backend, _optimisation_level)
+    )
+
+
+
+    return _experiment_taskgraph

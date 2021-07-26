@@ -43,6 +43,7 @@ import re
 from typing import List, Tuple, Dict, cast, Union, Any
 import copy
 import numpy as np
+import time
 
 QuasiProbabilities = List[float]
 
@@ -282,6 +283,10 @@ def gen_rebase_to_frames_and_computing() -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
+        print("---> Entering RebasePEC")
+
+        start_time = time.time()
+
         framed_circ_list = []
 
         for obs_exp in wire:
@@ -297,6 +302,8 @@ def gen_rebase_to_frames_and_computing() -> MitTask:
                     ObservableTracker=obs_exp.ObservableTracker,
                 )
             )
+
+        print("time taken = %f" % (time.time() - start_time))
 
         return (framed_circ_list,)
 
@@ -340,6 +347,9 @@ def gen_run_with_quasi_prob() -> MitTask:
         :rtype: Tuple[List[QubitPauliOperator]]
         """
 
+        print("---> Entering MitigateWithQuasiProbs")
+        start_time = time.time()
+
         circ_results_list = []
         # Creates new list of noisy results to match the form of the list
         # of quasi probabilities. Each inner list now consists of results
@@ -366,6 +376,8 @@ def gen_run_with_quasi_prob() -> MitTask:
             )
             em_expect_list.append(em_expect_qpo)
 
+        print("time taken = %f" % (time.time() - start_time))
+
         return (em_expect_list,)
 
     return MitTask(
@@ -376,14 +388,14 @@ def gen_run_with_quasi_prob() -> MitTask:
     )
 
 
-def collate_results_task_gen(num_cliff_circ: int) -> MitTask:
+def collate_results_task_gen() -> MitTask:
     """Generates task which collates results from running circuit, and circuits with frame
     gates wrapped in Pauli gates. The results are collated so as to facilitate
     learning the quasiprobabilities required for correction. The data itself is
     not changed by this task.
 
-    :param num_cliff_circ: The number of Clifford circuits generated for each inputted circuit.
-    :type num_cliff_circ: int
+    # :param num_cliff_circ: The number of Clifford circuits generated for each inputted circuit.
+    # :type num_cliff_circ: int
     :return: MitTask object collating results.
     :rtype: MitTask
     """
@@ -417,6 +429,9 @@ def collate_results_task_gen(num_cliff_circ: int) -> MitTask:
             Each list level fixes consecutively an ObservableExperiment, QubitPauliString, and Clifford circuit.
         :rtype: Tuple[List[List[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]]]
         """
+
+        print("---> Entering CollateResults")
+        start_time = time.time()
 
         if not len(ideal_list_structure) == len(ideal_results):
             raise RuntimeError(
@@ -493,6 +508,8 @@ def collate_results_task_gen(num_cliff_circ: int) -> MitTask:
 
             fixed_clifford_nn_experiment_operators.append(fixed_obs_exp_results)
 
+        print("time taken = %f" % (time.time() - start_time))
+
         return (fixed_clifford_nn_experiment_operators,)
 
     return MitTask(
@@ -533,6 +550,9 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
             list corresponds to quasi probabilities.
         :rtype: Tuple[List[List[QuasiProbabilities]]]
         """
+
+        print("---> Entering LearnQuasiProbs")
+        start_time = time.time()
 
         prob_list = []
         # qps_results is List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]
@@ -592,6 +612,8 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
             # prob_list holds this information for all QubitPauliOperators for all experiments
             prob_list.append(qps_quasi_prob_list)
 
+        print("time taken = %f" % (time.time() - start_time))
+
         return (prob_list,)
 
     return MitTask(
@@ -629,6 +651,9 @@ def gen_get_clifford_training_set(
         :return: Clifford circuits
         :rtype: Tuple[List[ObservableExperiment]]
         """
+
+        print("---> Entering CliffordTrainingSet", flush=True)
+        start_time = time.time()
 
         training_circ_list = []
 
@@ -668,6 +693,8 @@ def gen_get_clifford_training_set(
                             "training_circuit": training_circuit_num,
                         }
                     )
+
+        print("time taken = %f" % (time.time() - start_time))
 
         return (
             training_circ_list,
@@ -743,6 +770,9 @@ def gen_label_gates() -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
+        print("---> Entering LabelGates")
+        start_time = time.time()
+
         labelled_circ_list = []
 
         for experiment in wire:
@@ -757,6 +787,8 @@ def gen_label_gates() -> MitTask:
                     ObservableTracker=experiment.ObservableTracker,
                 )
             )
+
+        print("total time = %f" % (time.time() - start_time))
 
         return (labelled_circ_list,)
 
@@ -863,6 +895,9 @@ def gen_wrap_frame_gates() -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
+        print("---> Entering WrapFrameGates")
+        start_time = time.time()
+
         framed_circ_list = []
         for experiment in wire:
             framed_circ = wrap_frame_gates(experiment.AnsatzCircuit.Circuit)
@@ -876,6 +911,8 @@ def gen_wrap_frame_gates() -> MitTask:
                     ObservableTracker=experiment.ObservableTracker,
                 )
             )
+
+        print("total time = %f" % (time.time() - start_time))
 
         return (framed_circ_list,)
 
@@ -959,6 +996,9 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
+        print("---> Entering %s" % kwargs.get("_label", "GetNoisyCircuits"))
+        start_time = time.time()
+
         list_structure = []
 
         noisy_circuit_list = []
@@ -994,6 +1034,8 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
                 list_structure.append(
                     {"experiment": experiment_num, "error": error_num}
                 )
+
+        print("time taken = %f" % (time.time() - start_time))
 
         return (
             noisy_circuit_list,
@@ -1074,7 +1116,7 @@ def gen_PEC_learning_based_MitEx(
     )
     _experiment_taskgraph.prepend(get_clifford_training_set)
 
-    collate_results = collate_results_task_gen(num_cliff_circ)
+    collate_results = collate_results_task_gen()
     _experiment_taskgraph.append(collate_results)
 
     learn_dist = learn_quasi_probs_task_gen(num_cliff_circ)
