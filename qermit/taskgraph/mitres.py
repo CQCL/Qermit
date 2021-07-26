@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import time
 from .mittask import (
     MitTask,
     IOTask,
@@ -43,8 +43,15 @@ def backend_compile_circuit_shots_task_gen(
     """
 
     def task(obj, circ_shots: List[CircuitShots]) -> Tuple[List[CircuitShots]]:
+
+        print("---> Entering CompileCircuitShots (compiling with optimisation level %i)" % optimisation_level)
+        start_time = time.time()
+
         for cs in circ_shots:
             backend.compile_circuit(cs[0], optimisation_level=optimisation_level)
+
+        print("total time = %f" % (time.time() - start_time))
+
         return (circ_shots,)
 
     return MitTask(
@@ -72,12 +79,24 @@ def backend_handle_task_gen(backend: Backend) -> MitTask:
         :return: ResultHandles from process_circuits method.
         :rtype: Tuple[List[ResultHandle]]
         """
+
+        print("---> Entering CircuitsToHandles")
+        start_time = time.time()
+
         if len(circuit_wires) != 0:
             circs, shots = map(list, zip(*circuit_wires))
 
+<<<<<<< HEAD
             return (
                 backend.process_circuits(circs, n_shots=cast(Sequence[int], shots)),
             )
+=======
+            results = backend.process_circuits(circs, n_shots=cast(Sequence[int], shots))
+
+            print("total time = %f" % (time.time() - start_time))
+
+            return (results,)
+>>>>>>> Account for shots based clifford simulator in PEC
         else:
             return ([],)
 
@@ -96,7 +115,15 @@ def backend_res_task_gen(backend: Backend) -> MitTask:
     """
 
     def task(obj, handles: List[ResultHandle]) -> Tuple[List[BackendResult]]:
-        return (backend.get_results(handles),)
+
+        print("---> Entering HandlesToResults")
+        start_time = time.time()
+
+        results = backend.get_results(handles)
+
+        print("total time = %f" % (time.time() - start_time))
+
+        return (results,)
         """
         :param handles: ResultHandle objects previously produced from backend.
         :type handles: List[ResultHandle]

@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from tqdm import tqdm
 
 from qermit import (
     MitEx,
+    MitRes,
     AnsatzCircuit,
     MitTask,
     ObservableTracker,
@@ -28,6 +30,8 @@ from qermit.zero_noise_extrapolation.zne import (
 from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
+
+# from qermit.taskgraph import gen_compiled_MitRes
 
 from pytket.passes import RebaseIBM, DecomposeBoxes  # type: ignore
 from pytket.utils import QubitPauliOperator, get_pauli_expectation_value
@@ -72,6 +76,7 @@ def random_commuting_clifford(
     qps: QubitPauliString,
     simulator_backend: Backend,
     max_count: int = 1000,
+    n_shots: int = 1000
 ) -> Circuit:
     """Replace all Computing gates with random Clifford gates. The expectation
     of the given Pauli string on the final Clifford circuit is non-zero.
@@ -147,9 +152,17 @@ def random_commuting_clifford(
         rand_cliff_circ_copy = rand_cliff_circ.copy()
         place_with_map(rand_cliff_circ_copy, n_q_map)
 
-        expect_val = get_pauli_expectation_value(
-            rand_cliff_circ_copy, new_qps, simulator_backend
-        )
+        # Check if state is supported, otherwise use shots, otherwise raise error
+        if simulator_backend.supports_state:
+            expect_val = get_pauli_expectation_value(
+                rand_cliff_circ_copy, new_qps, simulator_backend
+            )
+        elif (simulator_backend.supports_shots or simulator_backend.supports_counts):
+            expect_val = get_pauli_expectation_value(
+                rand_cliff_circ_copy, new_qps, simulator_backend, n_shots=n_shots
+            )
+        else:
+            raise RuntimeError("The simulator backend does not support state, shots or counts.")
         # TODO: Better management of the case that there are no circuits with expectation value not equal to 0.
 
         # Check if the number of attempts at finding a circuit with non-zero expectation exceeds the maximum.
@@ -1008,7 +1021,10 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
 
             pauli_errors = list_pauli_gates(experiment.AnsatzCircuit.Circuit)
 
-            for error_num, error in enumerate(pauli_errors):
+            # print("Circuit num ", experiment.AnsatzCircuit.Circuit)
+            # print("Errors", pauli_errors)
+
+            for error_num, error in tqdm(enumerate(pauli_errors), total = len(pauli_errors)):
                 pauli_circ = substitute_pauli_but_one(
                     experiment.AnsatzCircuit.Circuit,
                     error["opgroup"],
@@ -1086,14 +1102,17 @@ def gen_PEC_learning_based_MitEx(
     # TODO: Change to a number of clifford circuits which varies with the size of the circuit
     num_cliff_circ = kwargs.get("num_cliff", 10)
 
+    # sim_mitres = MitRes(simulator_backend)
     sim_mitex = copy.copy(
         kwargs.get(
             "simulator_mitex", MitEx(simulator_backend, _label="IdealCliffordMitEx")
         )
     )
 
+    # device_mitres = gen_compiled_MitRes(backend=device_backend, optimisation_level=0)
+    device_mitres = MitRes(device_backend)
     device_mitex = copy.copy(
-        kwargs.get("device_mitex", MitEx(device_backend, _label="NoisyMitex"))
+        kwargs.get("device_mitex", MitEx(device_backend, _label="NoisyMitex", mitres=device_mitres))
     )
 
     _experiment_taskgraph = TaskGraph().from_TaskGraph(device_mitex)
