@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from pytket.predicates import CliffordCircuitPredicate
 from pytket import Circuit, OpType, Qubit
 from qermit import (  # type: ignore
     ObservableTracker,
@@ -39,13 +39,9 @@ import numpy as np
 
 def test_sample_weighted_clifford_angle():
     assert sample_weighted_clifford_angle(0.0, seed=10) == 0.0
-    # assert sample_weighted_clifford_angle(0.3, seed=10) == 0.25
     assert sample_weighted_clifford_angle(0.6, seed=10) == 0.5
     assert sample_weighted_clifford_angle(0.9, seed=10) == 1.0
-    # assert sample_weighted_clifford_angle(1.2, seed=10) == 1.25
     assert sample_weighted_clifford_angle(1.5, seed=10) == 1.5
-    # assert sample_weighted_clifford_angle(1.8, seed=10) == 1.75
-    # assert sample_weighted_clifford_angle(2.7, seed=10) == 0.75
 
 
 def count_rzs(circuit):
@@ -122,6 +118,17 @@ def test_gen_state_circuits():
 
     for bc in big_state_circuits:
         assert count_rzs(bc) == (num_commands - num_non_cliffs, num_non_cliffs)
+
+    big_state_circuits_cliff = gen_state_circuits(
+        big_c,
+        n_non_cliffords=0,
+        n_pairs=0,
+        total_state_circuits=10,
+        seed=184,
+    )
+
+    for bc in big_state_circuits_cliff:
+        assert CliffordCircuitPredicate().verify(bc)
 
 
 def test_ccl_state_task_gen():
