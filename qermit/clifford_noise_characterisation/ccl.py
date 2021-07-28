@@ -167,7 +167,7 @@ def gen_state_circuits(
     # rz_ops then only contains rz gates in c to be substituted for Clifford angles
     rz_ops.difference_update(non_cliffords)
     # Power of random Clifford gates to be substituted
-    cliffords = {num: random.randint(0, 8) for num in rz_ops}
+    cliffords = {num: random.randint(0, 4) for num in rz_ops}
 
     # TODO: Update this to use new circuit modification techniques available in pytket
     state_circuits: List[Circuit] = []
