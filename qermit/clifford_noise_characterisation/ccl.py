@@ -198,7 +198,7 @@ def gen_state_circuits(
                 # in cliffords mean it is denominated as Clifford, and hasn't been sampled for a pair
                 # as clifford_pair_elements has already been checked
                 # in this case, cliffords is a dict between Rz index and substitution S power
-                # get power from dict, multiply by 0.25 to get angle, add to circuit
+                # get power from dict, multiply by 0.5 to get angle, add to circuit
                 elif i in cliffords:
                     new_circuit.add_gate(com.op.type, [0.5 * cliffords[i]], com.qubits)
                 # final case means gate was chosen to retain non-Clifford, and has not been
