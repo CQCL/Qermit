@@ -56,7 +56,7 @@ class LikelihoodFunction(Enum):
 def sample_weighted_clifford_angle(rz_angle: float, **kwargs) -> float:
     """
     Calculates a weights distribution over different possible Clifford gates from input gate.
-    Clifford gates prepared by taking S gate to the power of n in {0,8}.
+    Clifford gates prepared by taking S gate to the power of n in {0,4}.
     n value sampled from calculated weights distribution.
     Distribution calculation as in B1, page 6 arXiv:2005.10189.
 
@@ -72,16 +72,16 @@ def sample_weighted_clifford_angle(rz_angle: float, **kwargs) -> float:
 
     rz_angle = rz_angle % 2
     rz_angle_matrix = np.asarray(
-        [[np.exp(-0.5 * np.pi * rz_angle), 0], [0, np.exp(0.5 * np.pi * rz_angle)]]
+        [[np.exp(-0.5 * np.pi * rz_angle * 1j), 0], [0, np.exp(0.5 * np.pi * rz_angle * 1j)]]
     )
     weights = []
-    for n in range(8):
+    for n in range(4):
         sn_matrix = np.asarray(
-            [[np.exp(-0.125 * np.pi * n), 0], [0, np.exp(0.125 * np.pi * n)]]
+            [[np.exp(-0.25 * np.pi * n * 1j), 0], [0, np.exp(0.25 * np.pi * n * 1j)]]
         )
         d = np.linalg.norm(rz_angle_matrix - sn_matrix)
         weights.append(np.exp((-(d ** 2)) * 4))
-    return 0.5 * random.choices(range(8), weights)[0]
+    return 0.5 * random.choices(range(4), weights)[0]
 
 
 def gen_state_circuits(
