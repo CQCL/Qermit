@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pytket.predicates import CliffordCircuitPredicate
+from pytket.predicates import CliffordCircuitPredicate # type: ignore
 from pytket import Circuit, OpType, Qubit
 from qermit import (  # type: ignore
     ObservableTracker,

@@ -72,7 +72,10 @@ def sample_weighted_clifford_angle(rz_angle: float, **kwargs) -> float:
 
     rz_angle = rz_angle % 2
     rz_angle_matrix = np.asarray(
-        [[np.exp(-0.5 * np.pi * rz_angle * 1j), 0], [0, np.exp(0.5 * np.pi * rz_angle * 1j)]]
+        [
+            [np.exp(-0.5 * np.pi * rz_angle * 1j), 0],
+            [0, np.exp(0.5 * np.pi * rz_angle * 1j)],
+        ]
     )
     weights = []
     for n in range(4):
