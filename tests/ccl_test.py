@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from pytket.predicates import CliffordCircuitPredicate # type: ignore
 from pytket import Circuit, OpType, Qubit
 from qermit import (  # type: ignore
     ObservableTracker,
@@ -39,18 +39,14 @@ import numpy as np
 
 def test_sample_weighted_clifford_angle():
     assert sample_weighted_clifford_angle(0.0, seed=10) == 0.0
-    assert sample_weighted_clifford_angle(0.3, seed=10) == 0.25
     assert sample_weighted_clifford_angle(0.6, seed=10) == 0.5
     assert sample_weighted_clifford_angle(0.9, seed=10) == 1.0
-    assert sample_weighted_clifford_angle(1.2, seed=10) == 1.25
     assert sample_weighted_clifford_angle(1.5, seed=10) == 1.5
-    assert sample_weighted_clifford_angle(1.8, seed=10) == 1.75
-    assert sample_weighted_clifford_angle(2.7, seed=10) == 0.75
 
 
 def count_rzs(circuit):
     all_coms = circuit.get_commands()
-    clifford_angles = set({0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 0, 2.0})
+    clifford_angles = set({0.5, 1.0, 1.5, 0, 2.0})
     non_cliff_counter = 0
     cliff_counter = 0
     for com in all_coms:
@@ -75,7 +71,7 @@ def test_gen_state_circuits():
     s_2_coms = state_circuits0[2].get_commands()
     # manually assert angles of gates are expected for given state circuits for given seed
     # state circuit 0
-    assert s_0_coms[1].op.params == [0.75]
+    assert s_0_coms[1].op.params == [0.5]
     assert s_0_coms[3].op.params == [0.5]
     assert s_0_coms[4].op.params == [0.5]
     assert s_0_coms[5].op.params == [0.1]
@@ -83,12 +79,12 @@ def test_gen_state_circuits():
     assert s_1_coms[1].op.params == [0.5]
     assert s_1_coms[3].op.params == [0.9]
     assert s_1_coms[4].op.params == [0.5]
-    assert s_1_coms[5].op.params == [0.0]
+    assert s_1_coms[5].op.params == [0]
     # state circuit 2
-    assert s_2_coms[1].op.params == [0.75]
+    assert s_2_coms[1].op.params == [0.5]
     assert s_2_coms[3].op.params == [0.9]
     assert s_2_coms[4].op.params == [0.5]
-    assert s_2_coms[5].op.params == [0.0]
+    assert s_2_coms[5].op.params == [0]
 
     rz_counts_0 = count_rzs(state_circuits0[0])
     # 0th element number of rz cliffs, 1st element number of rz non cliffs
@@ -122,6 +118,17 @@ def test_gen_state_circuits():
 
     for bc in big_state_circuits:
         assert count_rzs(bc) == (num_commands - num_non_cliffs, num_non_cliffs)
+
+    big_state_circuits_cliff = gen_state_circuits(
+        big_c,
+        n_non_cliffords=0,
+        n_pairs=0,
+        total_state_circuits=10,
+        seed=184,
+    )
+
+    for bc in big_state_circuits_cliff:
+        assert CliffordCircuitPredicate().verify(bc)
 
 
 def test_ccl_state_task_gen():

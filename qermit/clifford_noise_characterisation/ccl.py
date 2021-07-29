@@ -14,7 +14,7 @@
 
 
 from pytket import OpType, Circuit
-from pytket.passes import RebaseUFR  # type: ignore
+from pytket.passes import RebaseUFR, DecomposeBoxes  # type: ignore
 from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator
 from typing import List, Tuple
@@ -56,7 +56,7 @@ class LikelihoodFunction(Enum):
 def sample_weighted_clifford_angle(rz_angle: float, **kwargs) -> float:
     """
     Calculates a weights distribution over different possible Clifford gates from input gate.
-    Clifford gates prepared by taking S gate to the power of n in {0,8}.
+    Clifford gates prepared by taking S gate to the power of n in {0,4}.
     n value sampled from calculated weights distribution.
     Distribution calculation as in B1, page 6 arXiv:2005.10189.
 
@@ -72,16 +72,19 @@ def sample_weighted_clifford_angle(rz_angle: float, **kwargs) -> float:
 
     rz_angle = rz_angle % 2
     rz_angle_matrix = np.asarray(
-        [[np.exp(-0.5 * np.pi * rz_angle), 0], [0, np.exp(0.5 * np.pi * rz_angle)]]
+        [
+            [np.exp(-0.5 * np.pi * rz_angle * 1j), 0],
+            [0, np.exp(0.5 * np.pi * rz_angle * 1j)],
+        ]
     )
     weights = []
-    for n in range(8):
+    for n in range(4):
         sn_matrix = np.asarray(
-            [[np.exp(-0.125 * np.pi * n), 0], [0, np.exp(0.125 * np.pi * n)]]
+            [[np.exp(-0.25 * np.pi * n * 1j), 0], [0, np.exp(0.25 * np.pi * n * 1j)]]
         )
         d = np.linalg.norm(rz_angle_matrix - sn_matrix)
         weights.append(np.exp((-(d ** 2)) * 4))
-    return 0.25 * random.choices(range(8), weights)[0]
+    return 0.5 * random.choices(range(4), weights)[0]
 
 
 def gen_state_circuits(
@@ -89,7 +92,7 @@ def gen_state_circuits(
 ) -> List[Circuit]:
     """
     For given circuit c, returns total_state_circuits number of circuits, where each circuit is
-    run through some MitEx object to provide characteriastion data for later correction.
+    run through some MitEx object to provide characterisation data for later correction.
 
     State circuit construction as in appendix B of arXiv:2005.10189.
     State circuits are generated via a Markov Chain Monte Carlo technique.
@@ -110,7 +113,7 @@ def gen_state_circuits(
 
     :param c: Circuit for producing state circuits from.
     :type c: Circuit
-    :param n_non_cliffords: Number of non-Clifford gates in resulting characteriastion state circuits
+    :param n_non_cliffords: Number of non-Clifford gates in resulting characterisation state circuits
     :type n_non_cliffords: int
     :param n_pairs: Pairs of Clifford, Non-Clifford gates in state circuit generated.
     :type n_pairs: int
@@ -126,12 +129,13 @@ def gen_state_circuits(
         random.seed(kwargs.get("seed"))
 
     # Work in CX, H, Rz basis for ease
+    DecomposeBoxes().apply(c)
     RebaseUFR().apply(c)
     c.flatten_registers()
     all_coms = c.get_commands()
 
     #  angles that make Clifford gates for S^n
-    clifford_angles = set({0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 0})
+    clifford_angles = set({0.5, 1.0, 1.5, 0})
 
     if n_pairs > n_non_cliffords:
         raise ValueError(
@@ -163,10 +167,10 @@ def gen_state_circuits(
     # non_cliffords are indices for gates to be left non Clifford
 
     non_cliffords = set(random.sample(rz_ops, max_non_cliffs))
-    # rz_ops then only contains rz gates in c to be substitued for Clifford angles
+    # rz_ops then only contains rz gates in c to be substituted for Clifford angles
     rz_ops.difference_update(non_cliffords)
-    # Power of random Clifford gates to be substitued
-    cliffords = {num: random.randint(0, 8) for num in rz_ops}
+    # Power of random Clifford gates to be substituted
+    cliffords = {num: random.randint(0, 4) for num in rz_ops}
 
     # TODO: Update this to use new circuit modification techniques available in pytket
     state_circuits: List[Circuit] = []
@@ -197,9 +201,9 @@ def gen_state_circuits(
                 # in cliffords mean it is denominated as Clifford, and hasn't been sampled for a pair
                 # as clifford_pair_elements has already been checked
                 # in this case, cliffords is a dict between Rz index and substitution S power
-                # get power from dict, multiply by 0.25 to get angle, add to ceircuit
+                # get power from dict, multiply by 0.5 to get angle, add to circuit
                 elif i in cliffords:
-                    new_circuit.add_gate(com.op.type, [0.25 * cliffords[i]], com.qubits)
+                    new_circuit.add_gate(com.op.type, [0.5 * cliffords[i]], com.qubits)
                 # final case means gate was chosen to retain non-Clifford, and has not been
                 # sampled in any pair, so add original angle.
                 else:
