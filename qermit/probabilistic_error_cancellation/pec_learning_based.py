@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from tqdm import tqdm
+# from tqdm import tqdm
 
 from qermit import (
     MitEx,
@@ -296,9 +296,8 @@ def gen_rebase_to_frames_and_computing() -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
-        print("---> Entering RebasePEC")
-
-        start_time = time.time()
+        # print("---> Entering RebasePEC")
+        # start_time = time.time()
 
         framed_circ_list = []
 
@@ -316,7 +315,7 @@ def gen_rebase_to_frames_and_computing() -> MitTask:
                 )
             )
 
-        print("time taken = %f" % (time.time() - start_time))
+        # print("time taken = %f" % (time.time() - start_time))
 
         return (framed_circ_list,)
 
@@ -360,8 +359,8 @@ def gen_run_with_quasi_prob() -> MitTask:
         :rtype: Tuple[List[QubitPauliOperator]]
         """
 
-        print("---> Entering MitigateWithQuasiProbs")
-        start_time = time.time()
+        # print("---> Entering MitigateWithQuasiProbs")
+        # start_time = time.time()
 
         circ_results_list = []
         # Creates new list of noisy results to match the form of the list
@@ -389,7 +388,7 @@ def gen_run_with_quasi_prob() -> MitTask:
             )
             em_expect_list.append(em_expect_qpo)
 
-        print("time taken = %f" % (time.time() - start_time))
+        # print("time taken = %f" % (time.time() - start_time))
 
         return (em_expect_list,)
 
@@ -443,8 +442,8 @@ def collate_results_task_gen() -> MitTask:
         :rtype: Tuple[List[List[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]]]
         """
 
-        print("---> Entering CollateResults")
-        start_time = time.time()
+        # print("---> Entering CollateResults")
+        # start_time = time.time()
 
         if not len(ideal_list_structure) == len(ideal_results):
             raise RuntimeError(
@@ -521,7 +520,7 @@ def collate_results_task_gen() -> MitTask:
 
             fixed_clifford_nn_experiment_operators.append(fixed_obs_exp_results)
 
-        print("time taken = %f" % (time.time() - start_time))
+        # print("time taken = %f" % (time.time() - start_time))
 
         return (fixed_clifford_nn_experiment_operators,)
 
@@ -564,8 +563,8 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
         :rtype: Tuple[List[List[QuasiProbabilities]]]
         """
 
-        print("---> Entering LearnQuasiProbs")
-        start_time = time.time()
+        # print("---> Entering LearnQuasiProbs")
+        # start_time = time.time()
 
         prob_list = []
         # qps_results is List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]
@@ -625,7 +624,7 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
             # prob_list holds this information for all QubitPauliOperators for all experiments
             prob_list.append(qps_quasi_prob_list)
 
-        print("time taken = %f" % (time.time() - start_time))
+        # print("time taken = %f" % (time.time() - start_time))
 
         return (prob_list,)
 
@@ -665,8 +664,8 @@ def gen_get_clifford_training_set(
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
-        print("---> Entering CliffordTrainingSet", flush=True)
-        start_time = time.time()
+        # print("---> Entering CliffordTrainingSet", flush=True)
+        # start_time = time.time()
 
         training_circ_list = []
 
@@ -707,7 +706,7 @@ def gen_get_clifford_training_set(
                         }
                     )
 
-        print("time taken = %f" % (time.time() - start_time))
+        # print("time taken = %f" % (time.time() - start_time))
 
         return (
             training_circ_list,
@@ -783,8 +782,8 @@ def gen_label_gates() -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
-        print("---> Entering LabelGates")
-        start_time = time.time()
+        # print("---> Entering LabelGates")
+        # start_time = time.time()
 
         labelled_circ_list = []
 
@@ -801,7 +800,7 @@ def gen_label_gates() -> MitTask:
                 )
             )
 
-        print("total time = %f" % (time.time() - start_time))
+        # print("total time = %f" % (time.time() - start_time))
 
         return (labelled_circ_list,)
 
@@ -908,8 +907,8 @@ def gen_wrap_frame_gates() -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
-        print("---> Entering WrapFrameGates")
-        start_time = time.time()
+        # print("---> Entering WrapFrameGates")
+        # start_time = time.time()
 
         framed_circ_list = []
         for experiment in wire:
@@ -925,7 +924,7 @@ def gen_wrap_frame_gates() -> MitTask:
                 )
             )
 
-        print("total time = %f" % (time.time() - start_time))
+        # print("total time = %f" % (time.time() - start_time))
 
         return (framed_circ_list,)
 
@@ -1009,8 +1008,8 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
-        print("---> Entering %s" % kwargs.get("_label", "GetNoisyCircuits"))
-        start_time = time.time()
+        # print("---> Entering %s" % kwargs.get("_label", "GetNoisyCircuits"))
+        # start_time = time.time()
 
         list_structure = []
 
@@ -1024,7 +1023,8 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
             # print("Circuit num ", experiment.AnsatzCircuit.Circuit)
             # print("Errors", pauli_errors)
 
-            for error_num, error in tqdm(enumerate(pauli_errors), total = len(pauli_errors)):
+            # for error_num, error in tqdm(enumerate(pauli_errors), total = len(pauli_errors)):
+            for error_num, error in enumerate(pauli_errors):
                 pauli_circ = substitute_pauli_but_one(
                     experiment.AnsatzCircuit.Circuit,
                     error["opgroup"],
@@ -1051,7 +1051,7 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
                     {"experiment": experiment_num, "error": error_num}
                 )
 
-        print("time taken = %f" % (time.time() - start_time))
+        # print("time taken = %f" % (time.time() - start_time))
 
         return (
             noisy_circuit_list,

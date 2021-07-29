@@ -109,8 +109,8 @@ def filter_observable_tracker_task_gen() -> MitTask:
         :rtype: Tuple[List[List[CircuitShots]], List[ObservableTracker]]
         """
 
-        print("---> Entering FilterObservableTracker")
-        start_time = time.time()
+        # print("---> Entering FilterObservableTracker")
+        # start_time = time.time()
 
         output_circuits = []
         output_trackers = []
@@ -144,7 +144,7 @@ def filter_observable_tracker_task_gen() -> MitTask:
             )
             output_trackers.append(observable_tracker)
 
-        print("time taken = %f" % (time.time() - start_time))
+        # print("time taken = %f" % (time.time() - start_time))
 
         return (output_circuits, output_trackers)
 
@@ -172,8 +172,8 @@ def collate_circuit_shots_task_gen() -> MitTask:
         :rtype: Tuple[List[CircuitShots], List[int]]
         """
 
-        print("---> Entering CollateExperimentCircuits")
-        start_time = time.time()
+        # print("---> Entering CollateExperimentCircuits")
+        # start_time = time.time()
 
         collated_circuitshots = []
         lengths = []
@@ -181,7 +181,7 @@ def collate_circuit_shots_task_gen() -> MitTask:
             lengths.append(len(wire))
             collated_circuitshots.extend(wire)
 
-        print("time taken = %f" % (time.time() - start_time))
+        # print("time taken = %f" % (time.time() - start_time))
 
         return (collated_circuitshots, lengths)
 
@@ -210,8 +210,8 @@ def split_results_task_gen() -> MitTask:
         :rtype: Tuple(List[List[BackendResult]])
         """
 
-        print("---> Entering SplitResults")
-        start_time = time.time()
+        # print("---> Entering SplitResults")
+        # start_time = time.time()
 
         lower_bound = 0
         split_results = []
@@ -220,7 +220,7 @@ def split_results_task_gen() -> MitTask:
             split_results.append(results[lower_bound:upper_bound])
             lower_bound = upper_bound
 
-        print("time taken = %f" % (time.time() - start_time))
+        # print("time taken = %f" % (time.time() - start_time))
 
         return (split_results,)
 
