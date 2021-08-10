@@ -64,10 +64,11 @@ def gen_full_tomography_spam_circuits_task(
                 is qubit_subsets
             ):
                 return (wire, [], [])
-
-        process_circuit = Circuit()
-        for q in [qb for subset in qubit_subsets for qb in subset]:
-            process_circuit.add_qubit(q)
+        
+        # don't label qubits, due to circuit.append quirk
+        process_circuit = Circuit(
+            len([qb for subset in qubit_subsets for qb in subset])
+        )
         tomo_circuit_states = get_full_transition_tomography_circuits(
             process_circuit, backend, qubit_subsets
         )

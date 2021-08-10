@@ -106,9 +106,8 @@ def get_full_transition_tomography_circuits(
     FlattenRegisters().apply(xcirc)
     xbox = CircBox(xcirc)
 
-    # compile process circuit
-    backend.compile_circuit(process_circuit)
-
+    # TODO: circuit.append functionality means that having two cirucits with correctly labelled
+    # nodes will lead to reset operations being added
     # set up base circuit for appending xbox to
     base_circuit = Circuit()
     c_reg = []
