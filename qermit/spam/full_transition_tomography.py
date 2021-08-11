@@ -96,6 +96,13 @@ def get_full_transition_tomography_circuits(
     n_circuits = 1 << major_state_dimensions
     all_qubits = [qb for subset in correlations for qb in subset]
 
+    if len(process_circuit.qubits) != len(all_qubits):
+        raise ValueError(
+            "Process being characterised has {} qubits, correlations only specify {} qubits.".format(
+                len(process_circuit.qubits), len(all_qubits)
+            )
+        )
+        
     # output
     prepared_circuits = []
     state_infos = []
