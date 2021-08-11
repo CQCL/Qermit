@@ -490,7 +490,7 @@ def reduce_matrices(
         organise[unused[0]].append(unused[1])
     output_matrices = [reduce_matrix(organise[m], matrices[m]) for m in organise]
     normalised_mats = [
-        mat / np.sum(mat, axis=0) for mat in [x for x in output_matrices if x != []]
+        mat / np.sum(mat, axis=0) for mat in [x for x in output_matrices if x.size > 0]
     ]
     return normalised_mats
 
