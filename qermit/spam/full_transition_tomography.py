@@ -96,6 +96,13 @@ def get_full_transition_tomography_circuits(
     n_circuits = 1 << major_state_dimensions
     all_qubits = [qb for subset in correlations for qb in subset]
 
+    if len(process_circuit.qubits) != len(all_qubits):
+        raise ValueError(
+            "Process being characterised has {} qubits, correlations only specify {} qubits.".format(
+                len(process_circuit.qubits), len(all_qubits)
+            )
+        )
+
     # output
     prepared_circuits = []
     state_infos = []
@@ -106,16 +113,20 @@ def get_full_transition_tomography_circuits(
     FlattenRegisters().apply(xcirc)
     xbox = CircBox(xcirc)
 
-    # TODO: circuit.append functionality means that having two cirucits with correctly labelled
-    # nodes will lead to reset operations being added
+    # need to be default register to add as box suitably
+    backend.compile_circuit(process_circuit)
+    rename_map_pc = {}
+    for index, qb in enumerate(process_circuit.qubits):
+        rename_map_pc[qb] = Qubit(index)
+    process_circuit.rename_units(rename_map_pc)
+    pbox = CircBox(process_circuit)
+
     # set up base circuit for appending xbox to
-    base_circuit = Circuit()
-    c_reg = []
+    base_circuit = Circuit(len(all_qubits), len(all_qubits))
+    rename_map_bc = {}
     for index, qb in enumerate(all_qubits):
-        base_circuit.add_qubit(qb)
-        c_bit = Bit(index)
-        c_reg.append(c_bit)
-        base_circuit.add_bit(c_bit)
+        rename_map_bc[Qubit(index)] = qb
+    base_circuit.rename_units(rename_map_bc)
 
     # generate state circuits for given correlations
     for major_state_index in range(n_circuits):
@@ -131,15 +142,15 @@ def get_full_transition_tomography_circuits(
             for flipped_qb in itertools.compress(qubits, major_state[:dim]):
                 state_circuit.add_circbox(xbox, [flipped_qb])
         # Decompose boxes, add barriers to preserve circuit, add measures
-        DecomposeBoxes().apply(state_circuit)
         state_circuit.add_barrier(all_qubits)
         # add process circuit to measure
-        state_circuit.append(process_circuit)
+        state_circuit.add_circbox(pbox, state_circuit.qubits)
+        DecomposeBoxes().apply(state_circuit)
         state_circuit.add_barrier(all_qubits)
-        for qb, cb in zip(all_qubits, c_reg):
+        for qb, cb in zip(all_qubits, state_circuit.bits):
             state_circuit.Measure(qb, cb)
-
         # add to returned types
+        backend.compile_circuit(state_circuit)
         prepared_circuits.append(state_circuit)
         state_infos.append(StateInfo(new_state_dicts, state_circuit.qubit_to_bit_map))
     return (prepared_circuits, state_infos)
