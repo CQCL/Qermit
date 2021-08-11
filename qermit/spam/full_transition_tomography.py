@@ -102,7 +102,7 @@ def get_full_transition_tomography_circuits(
                 len(process_circuit.qubits), len(all_qubits)
             )
         )
-        
+
     # output
     prepared_circuits = []
     state_infos = []
