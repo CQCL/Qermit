@@ -47,7 +47,7 @@ def test_binary_int_methods():
 
 def test_get_transition_tomography_circuits():
     backend = get_noisy_backend(4, 0.1)
-    pc = Circuit(2).CX(0, 1)
+    pc = Circuit(4).CX(0, 1)
     nodes = backend.backend_info.architecture.nodes
     correlations = [[nodes[0], nodes[1]], [nodes[2], nodes[3]]]
     # get tomography circuits
