@@ -122,11 +122,13 @@ def get_full_transition_tomography_circuits(
     pbox = CircBox(process_circuit)
 
     # set up base circuit for appending xbox to
-    base_circuit = Circuit(len(all_qubits), len(all_qubits))
-    rename_map_bc = {}
+    base_circuit = Circuit()
+    c_reg = []
     for index, qb in enumerate(all_qubits):
-        rename_map_bc[Qubit(index)] = qb
-    base_circuit.rename_units(rename_map_bc)
+        base_circuit.add_qubit(qb)
+        c_bit = Bit(index)
+        c_reg.append(c_bit)
+        base_circuit.add_bit(c_bit)
 
     # generate state circuits for given correlations
     for major_state_index in range(n_circuits):
