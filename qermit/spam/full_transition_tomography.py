@@ -123,12 +123,14 @@ def get_full_transition_tomography_circuits(
 
     # set up base circuit for appending xbox to
     base_circuit = Circuit()
-    c_reg = []
-    for index, qb in enumerate(all_qubits):
+    index = 0
+    measures []
+    for qb in all_qubits:
         base_circuit.add_qubit(qb)
         c_bit = Bit(index)
-        c_reg.append(c_bit)
         base_circuit.add_bit(c_bit)
+        index += 1
+        measures.append((qb, c_bit))
 
     # generate state circuits for given correlations
     for major_state_index in range(n_circuits):
@@ -149,8 +151,10 @@ def get_full_transition_tomography_circuits(
         state_circuit.add_circbox(pbox, state_circuit.qubits)
         DecomposeBoxes().apply(state_circuit)
         state_circuit.add_barrier(all_qubits)
-        for qb, cb in zip(all_qubits, c_reg):
-            state_circuit.Measure(qb, cb)
+        # for qb, cb in zip(all_qubits, c_reg):
+            # state_circuit.Measure(qb, cb)
+        for p in measures:
+            state_circuit.Measure(p[0], p[1])
         # add to returned types
         backend.compile_circuit(state_circuit)
         prepared_circuits.append(state_circuit)
