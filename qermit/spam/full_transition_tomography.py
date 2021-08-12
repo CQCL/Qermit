@@ -124,7 +124,7 @@ def get_full_transition_tomography_circuits(
     # set up base circuit for appending xbox to
     base_circuit = Circuit()
     index = 0
-    measures []
+    measures = []
     for qb in all_qubits:
         base_circuit.add_qubit(qb)
         c_bit = Bit(index)
