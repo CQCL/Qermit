@@ -149,7 +149,7 @@ def get_full_transition_tomography_circuits(
         state_circuit.add_circbox(pbox, state_circuit.qubits)
         DecomposeBoxes().apply(state_circuit)
         state_circuit.add_barrier(all_qubits)
-        for qb, cb in zip(all_qubits, state_circuit.bits):
+        for qb, cb in zip(all_qubits, c_reg):
             state_circuit.Measure(qb, cb)
         # add to returned types
         backend.compile_circuit(state_circuit)
