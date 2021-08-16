@@ -43,6 +43,10 @@ def test_gen_full_tomography_spam_circuits_task():
     assert len(res) == 3
     assert res[0] == wire
     assert len(res[1]) == len(res[2])
+    assert len(res[1][0][0].get_commands()) == 6
+    assert len(res[1][1][0].get_commands()) == 8
+    assert len(res[1][2][0].get_commands()) == 8
+    assert len(res[1][3][0].get_commands()) == 10
 
 
 def test_full_tomography_spam_characterisation_task_gen():
