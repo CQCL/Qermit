@@ -96,6 +96,13 @@ def get_full_transition_tomography_circuits(
     n_circuits = 1 << major_state_dimensions
     all_qubits = [qb for subset in correlations for qb in subset]
 
+    if len(process_circuit.qubits) != len(all_qubits):
+        raise ValueError(
+            "Process being characterised has {} qubits, correlations only specify {} qubits.".format(
+                len(process_circuit.qubits), len(all_qubits)
+            )
+        )
+
     # output
     prepared_circuits = []
     state_infos = []
@@ -106,17 +113,24 @@ def get_full_transition_tomography_circuits(
     FlattenRegisters().apply(xcirc)
     xbox = CircBox(xcirc)
 
-    # compile process circuit
+    # need to be default register to add as box suitably
     backend.compile_circuit(process_circuit)
+    rename_map_pc = {}
+    for index, qb in enumerate(process_circuit.qubits):
+        rename_map_pc[qb] = Qubit(index)
+    process_circuit.rename_units(rename_map_pc)
+    pbox = CircBox(process_circuit)
 
     # set up base circuit for appending xbox to
     base_circuit = Circuit()
-    c_reg = []
-    for index, qb in enumerate(all_qubits):
+    index = 0
+    measures = {}
+    for qb in all_qubits:
         base_circuit.add_qubit(qb)
         c_bit = Bit(index)
-        c_reg.append(c_bit)
         base_circuit.add_bit(c_bit)
+        index += 1
+        measures[qb] = c_bit
 
     # generate state circuits for given correlations
     for major_state_index in range(n_circuits):
@@ -132,17 +146,17 @@ def get_full_transition_tomography_circuits(
             for flipped_qb in itertools.compress(qubits, major_state[:dim]):
                 state_circuit.add_circbox(xbox, [flipped_qb])
         # Decompose boxes, add barriers to preserve circuit, add measures
-        DecomposeBoxes().apply(state_circuit)
         state_circuit.add_barrier(all_qubits)
         # add process circuit to measure
-        state_circuit.append(process_circuit)
+        state_circuit.add_circbox(pbox, state_circuit.qubits)
+        DecomposeBoxes().apply(state_circuit)
         state_circuit.add_barrier(all_qubits)
-        for qb, cb in zip(all_qubits, c_reg):
-            state_circuit.Measure(qb, cb)
-
+        for q in measures:
+            state_circuit.Measure(q, measures[q])
         # add to returned types
+        backend.compile_circuit(state_circuit)
         prepared_circuits.append(state_circuit)
-        state_infos.append(StateInfo(new_state_dicts, state_circuit.qubit_to_bit_map))
+        state_infos.append(StateInfo(new_state_dicts, measures))
     return (prepared_circuits, state_infos)
 
 
@@ -480,7 +494,7 @@ def reduce_matrices(
         organise[unused[0]].append(unused[1])
     output_matrices = [reduce_matrix(organise[m], matrices[m]) for m in organise]
     normalised_mats = [
-        mat / np.sum(mat, axis=0) for mat in [x for x in output_matrices if x != []]
+        mat / np.sum(mat, axis=0) for mat in [x for x in output_matrices if x.size > 0]
     ]
     return normalised_mats
 
