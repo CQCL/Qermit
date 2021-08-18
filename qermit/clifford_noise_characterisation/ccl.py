@@ -69,6 +69,7 @@ def sample_weighted_clifford_angle(rz_angle: float, **kwargs) -> float:
     """
     if "seed" in kwargs:
         random.seed(kwargs.get("seed"))
+        np.random.seed(kwargs.get("seed"))
 
     rz_angle = rz_angle % 2
     rz_angle_matrix = np.asarray(
@@ -164,9 +165,10 @@ def gen_state_circuits(
     # therefore, there must be another Clifford gates remaining to produce all pairs
     # this doesn't throw an error as this threshold is hard to predict in advance
     max_non_cliffs = min(len(rz_ops) - n_pairs, n_non_cliffords)
+    n_pairs = min(n_pairs, max_non_cliffs)
     # non_cliffords are indices for gates to be left non Clifford
 
-    non_cliffords = set(random.sample(rz_ops, max_non_cliffs))
+    non_cliffords = np.random.choice(list(rz_ops), max_non_cliffs)
     # rz_ops then only contains rz gates in c to be substituted for Clifford angles
     rz_ops.difference_update(non_cliffords)
     # Power of random Clifford gates to be substituted
@@ -178,9 +180,9 @@ def gen_state_circuits(
     while len(state_circuits) < total_state_circuits:
         # cliffords.keys() are integers for now Clifford gates
         # sample some set of these to be subbed for original non-Clifford angle
-        clifford_pair_elements = set(random.sample(cliffords.keys(), n_pairs))
+        clifford_pair_elements = random.sample(list(cliffords.keys()), n_pairs)
         # from remaining non-Clifford Rz gates, sample some to have random Clifford gate
-        non_clifford_pair_elements = set(random.sample(non_cliffords, n_pairs))
+        non_clifford_pair_elements = random.sample(list(non_cliffords), n_pairs)
 
         # create new Circuit from scratch
         new_circuit = Circuit(c.n_qubits, len(c.bits))
