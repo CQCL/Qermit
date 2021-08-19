@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# from tqdm import tqdm
-
 from qermit import (
     MitEx,
     MitRes,
@@ -31,8 +29,6 @@ from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
 
-# from qermit.taskgraph import gen_compiled_MitRes
-
 from pytket.passes import RebaseIBM, DecomposeBoxes  # type: ignore
 from pytket.utils import QubitPauliOperator, get_pauli_expectation_value
 from pytket.backends import Backend
@@ -47,7 +43,7 @@ import re
 from typing import List, Tuple, Dict, cast, Union, Any
 import copy
 import numpy as np
-import time
+# import time
 
 QuasiProbabilities = List[float]
 
@@ -296,9 +292,6 @@ def gen_rebase_to_frames_and_computing() -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
-        # print("---> Entering RebasePEC")
-        # start_time = time.time()
-
         framed_circ_list = []
 
         for obs_exp in wire:
@@ -314,8 +307,6 @@ def gen_rebase_to_frames_and_computing() -> MitTask:
                     ObservableTracker=obs_exp.ObservableTracker,
                 )
             )
-
-        # print("time taken = %f" % (time.time() - start_time))
 
         return (framed_circ_list,)
 
@@ -359,9 +350,6 @@ def gen_run_with_quasi_prob() -> MitTask:
         :rtype: Tuple[List[QubitPauliOperator]]
         """
 
-        # print("---> Entering MitigateWithQuasiProbs")
-        # start_time = time.time()
-
         circ_results_list = []
         # Creates new list of noisy results to match the form of the list
         # of quasi probabilities. Each inner list now consists of results
@@ -387,8 +375,6 @@ def gen_run_with_quasi_prob() -> MitTask:
                 cast(Dict[Any, Union[int, float, complex]], em_expect)
             )
             em_expect_list.append(em_expect_qpo)
-
-        # print("time taken = %f" % (time.time() - start_time))
 
         return (em_expect_list,)
 
@@ -441,9 +427,6 @@ def collate_results_task_gen() -> MitTask:
             Each list level fixes consecutively an ObservableExperiment, QubitPauliString, and Clifford circuit.
         :rtype: Tuple[List[List[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]]]
         """
-
-        # print("---> Entering CollateResults")
-        # start_time = time.time()
 
         if not len(ideal_list_structure) == len(ideal_results):
             raise RuntimeError(
@@ -520,8 +503,6 @@ def collate_results_task_gen() -> MitTask:
 
             fixed_clifford_nn_experiment_operators.append(fixed_obs_exp_results)
 
-        # print("time taken = %f" % (time.time() - start_time))
-
         return (fixed_clifford_nn_experiment_operators,)
 
     return MitTask(
@@ -562,9 +543,6 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
             list corresponds to quasi probabilities.
         :rtype: Tuple[List[List[QuasiProbabilities]]]
         """
-
-        # print("---> Entering LearnQuasiProbs")
-        # start_time = time.time()
 
         prob_list = []
         # qps_results is List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]
@@ -624,8 +602,6 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
             # prob_list holds this information for all QubitPauliOperators for all experiments
             prob_list.append(qps_quasi_prob_list)
 
-        # print("time taken = %f" % (time.time() - start_time))
-
         return (prob_list,)
 
     return MitTask(
@@ -663,9 +639,6 @@ def gen_get_clifford_training_set(
         :return: Clifford circuits
         :rtype: Tuple[List[ObservableExperiment]]
         """
-
-        # print("---> Entering CliffordTrainingSet", flush=True)
-        # start_time = time.time()
 
         training_circ_list = []
 
@@ -705,8 +678,6 @@ def gen_get_clifford_training_set(
                             "training_circuit": training_circuit_num,
                         }
                     )
-
-        # print("time taken = %f" % (time.time() - start_time))
 
         return (
             training_circ_list,
@@ -782,9 +753,6 @@ def gen_label_gates() -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
-        # print("---> Entering LabelGates")
-        # start_time = time.time()
-
         labelled_circ_list = []
 
         for experiment in wire:
@@ -799,8 +767,6 @@ def gen_label_gates() -> MitTask:
                     ObservableTracker=experiment.ObservableTracker,
                 )
             )
-
-        # print("total time = %f" % (time.time() - start_time))
 
         return (labelled_circ_list,)
 
@@ -907,9 +873,6 @@ def gen_wrap_frame_gates() -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
-        # print("---> Entering WrapFrameGates")
-        # start_time = time.time()
-
         framed_circ_list = []
         for experiment in wire:
             framed_circ = wrap_frame_gates(experiment.AnsatzCircuit.Circuit)
@@ -923,8 +886,6 @@ def gen_wrap_frame_gates() -> MitTask:
                     ObservableTracker=experiment.ObservableTracker,
                 )
             )
-
-        # print("total time = %f" % (time.time() - start_time))
 
         return (framed_circ_list,)
 
@@ -1008,9 +969,6 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
-        # print("---> Entering %s" % kwargs.get("_label", "GetNoisyCircuits"))
-        # start_time = time.time()
-
         list_structure = []
 
         noisy_circuit_list = []
@@ -1019,9 +977,6 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
         for experiment_num, experiment in enumerate(wire):
 
             pauli_errors = list_pauli_gates(experiment.AnsatzCircuit.Circuit)
-
-            # print("Circuit num ", experiment.AnsatzCircuit.Circuit)
-            # print("Errors", pauli_errors)
 
             # for error_num, error in tqdm(enumerate(pauli_errors), total = len(pauli_errors)):
             for error_num, error in enumerate(pauli_errors):
@@ -1050,8 +1005,6 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
                 list_structure.append(
                     {"experiment": experiment_num, "error": error_num}
                 )
-
-        # print("time taken = %f" % (time.time() - start_time))
 
         return (
             noisy_circuit_list,
@@ -1102,14 +1055,12 @@ def gen_PEC_learning_based_MitEx(
     # TODO: Change to a number of clifford circuits which varies with the size of the circuit
     num_cliff_circ = kwargs.get("num_cliff", 10)
 
-    # sim_mitres = MitRes(simulator_backend)
     sim_mitex = copy.copy(
         kwargs.get(
             "simulator_mitex", MitEx(simulator_backend, _label="IdealCliffordMitEx")
         )
     )
 
-    # device_mitres = gen_compiled_MitRes(backend=device_backend, optimisation_level=0)
     device_mitres = MitRes(device_backend)
     device_mitex = copy.copy(
         kwargs.get("device_mitex", MitEx(device_backend, _label="NoisyMitex", mitres=device_mitres))
