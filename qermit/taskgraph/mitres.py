@@ -86,17 +86,11 @@ def backend_handle_task_gen(backend: Backend) -> MitTask:
         if len(circuit_wires) != 0:
             circs, shots = map(list, zip(*circuit_wires))
 
-<<<<<<< HEAD
-            return (
-                backend.process_circuits(circs, n_shots=cast(Sequence[int], shots)),
-            )
-=======
             results = backend.process_circuits(circs, n_shots=cast(Sequence[int], shots))
 
             # print("total time = %f" % (time.time() - start_time))
 
             return (results,)
->>>>>>> Account for shots based clifford simulator in PEC
         else:
             return ([],)
 
