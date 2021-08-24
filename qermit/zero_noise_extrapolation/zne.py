@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from pytket.backends import Backend
 from qermit import (
     MitEx,
@@ -247,9 +248,17 @@ class Fit(Enum):
 
         # Fit data to polyexponential function
         # TODO: Improve bounds here.
-        bounds = ([-1, -2, *[-np.inf for i in range(deg)]], [1, 2, *[np.inf for i in range(deg)]])
+        bounds = (
+            [-1, -2, *[-np.inf for i in range(deg)]],
+            [1, 2, *[np.inf for i in range(deg)]],
+        )
         vals = curve_fit(
-            poly_exp_func, x, y, p0=[0, 1, *[-1 for i in range(deg)]], maxfev=10000, bounds=bounds
+            poly_exp_func,
+            x,
+            y,
+            p0=[0, 1, *[-1 for i in range(deg)]],
+            maxfev=10000,
+            bounds=bounds,
         )
 
         # Extrapolate function to zero noise limit
@@ -743,9 +752,6 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
     extrapolation_task = extrapolation_task_gen(
         noise_scaling_list, _fit_type, _show_fit, _deg
     )
-
-
-
 
     _experiment_taskgraph.append(extrapolation_task)
     _experiment_taskgraph.prepend(gen_duplication_task(len(noise_scaling_list) + 1))

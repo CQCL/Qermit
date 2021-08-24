@@ -42,10 +42,8 @@ def backend_compile_circuit_shots_task_gen(
     """
 
     def task(obj, circ_shots: List[CircuitShots]) -> Tuple[List[CircuitShots]]:
-
         for cs in circ_shots:
             backend.compile_circuit(cs.Circuit, optimisation_level=optimisation_level)
-
         return (circ_shots,)
 
     return MitTask(
@@ -77,7 +75,9 @@ def backend_handle_task_gen(backend: Backend) -> MitTask:
         if len(circuit_wires) != 0:
             circs, shots = map(list, zip(*circuit_wires))
 
-            results = backend.process_circuits(circs, n_shots=cast(Sequence[int], shots))
+            results = backend.process_circuits(
+                circs, n_shots=cast(Sequence[int], shots)
+            )
 
             return (results,)
         else:

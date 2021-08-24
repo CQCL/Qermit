@@ -19,7 +19,6 @@ objects that automatically run digital zero noise extrapolation protocols.
 """
 from .zne import (
     gen_ZNE_MitEx,
-    gen_nq_ZNE_MitEx,
     Folding,
     Fit,
 )

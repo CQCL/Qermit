@@ -71,7 +71,7 @@ def random_commuting_clifford(
     qps: QubitPauliString,
     simulator_backend: Backend,
     max_count: int = 1000,
-    n_shots: int = 1000
+    n_shots: int = 1000,
 ) -> Circuit:
     """Replace all Computing gates with random Clifford gates. The expectation
     of the given Pauli string on the final Clifford circuit is non-zero.
@@ -152,12 +152,14 @@ def random_commuting_clifford(
             expect_val = get_pauli_expectation_value(
                 rand_cliff_circ_copy, new_qps, simulator_backend
             )
-        elif (simulator_backend.supports_shots or simulator_backend.supports_counts):
+        elif simulator_backend.supports_shots or simulator_backend.supports_counts:
             expect_val = get_pauli_expectation_value(
                 rand_cliff_circ_copy, new_qps, simulator_backend, n_shots=n_shots
             )
         else:
-            raise RuntimeError("The simulator backend does not support state, shots or counts.")
+            raise RuntimeError(
+                "The simulator backend does not support state, shots or counts."
+            )
         # TODO: Better management of the case that there are no circuits with expectation value not equal to 0.
 
         # Check if the number of attempts at finding a circuit with non-zero expectation exceeds the maximum.
@@ -1059,7 +1061,10 @@ def gen_PEC_learning_based_MitEx(
 
     device_mitres = MitRes(device_backend)
     device_mitex = copy.copy(
-        kwargs.get("device_mitex", MitEx(device_backend, _label="NoisyMitex", mitres=device_mitres))
+        kwargs.get(
+            "device_mitex",
+            MitEx(device_backend, _label="NoisyMitex", mitres=device_mitres),
+        )
     )
 
     _experiment_taskgraph = TaskGraph().from_TaskGraph(device_mitex)

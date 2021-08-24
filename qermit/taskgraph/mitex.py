@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from .mitres import (
     MitRes,
     backend_compile_circuit_shots_task_gen,
@@ -139,7 +140,6 @@ def filter_observable_tracker_task_gen() -> MitTask:
                 ]
             )
             output_trackers.append(observable_tracker)
-
         return (output_circuits, output_trackers)
 
     return MitTask(
@@ -165,13 +165,11 @@ def collate_circuit_shots_task_gen() -> MitTask:
         results for each experiment on a second wire.
         :rtype: Tuple[List[CircuitShots], List[int]]
         """
-
         collated_circuitshots = []
         lengths = []
         for wire in circuit_wires:
             lengths.append(len(wire))
             collated_circuitshots.extend(wire)
-
         return (collated_circuitshots, lengths)
 
     return MitTask(
@@ -198,14 +196,12 @@ def split_results_task_gen() -> MitTask:
         :return: All results split up into sublists for each MitEx experiment
         :rtype: Tuple(List[List[BackendResult]])
         """
-
         lower_bound = 0
         split_results = []
         for size in experiment_sizes:
             upper_bound = lower_bound + size
             split_results.append(results[lower_bound:upper_bound])
             lower_bound = upper_bound
-
         return (split_results,)
 
     return MitTask(_label="SplitResults", _n_in_wires=2, _n_out_wires=1, _method=task)
