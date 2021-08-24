@@ -23,12 +23,13 @@ from qermit.spam import (  # type: ignore
     gen_UnCorrelated_SPAM_MitRes,
     CorrectionMethod,
 )
+from qermit import CircuitShots
 
 
 def gen_test_wire():
     c0 = Circuit(4).X(0).X(2).measure_all()
     c1 = Circuit(5).X(1).X(3).measure_all()
-    return [(c0.copy(), 20), (c1.copy(), 20)]
+    return [CircuitShots(c0.copy(), 20), CircuitShots(c1.copy(), 20)]
 
 
 def test_gen_FC_mr():
