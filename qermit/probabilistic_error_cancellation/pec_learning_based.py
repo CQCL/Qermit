@@ -392,8 +392,6 @@ def collate_results_task_gen() -> MitTask:
     learning the quasiprobabilities required for correction. The data itself is
     not changed by this task.
 
-    # :param num_cliff_circ: The number of Clifford circuits generated for each inputted circuit.
-    # :type num_cliff_circ: int
     :return: MitTask object collating results.
     :rtype: MitTask
     """
@@ -978,7 +976,6 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
 
             pauli_errors = list_pauli_gates(experiment.AnsatzCircuit.Circuit)
 
-            # for error_num, error in tqdm(enumerate(pauli_errors), total = len(pauli_errors)):
             for error_num, error in enumerate(pauli_errors):
                 pauli_circ = substitute_pauli_but_one(
                     experiment.AnsatzCircuit.Circuit,

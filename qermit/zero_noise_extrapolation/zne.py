@@ -560,9 +560,6 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
         :rtype: Tuple[List[ObservableExperiment]]
         """
 
-        # print("---> Entering %s" % kwargs.get("_label", "Duplicate"))
-        # start_time = time.time()
-
         # Raise error if the number of duplications requested is less than 1
         if duplicates <= 0:
             raise ValueError(
@@ -599,7 +596,6 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
         # Compose coppies into wire format
         if duplicates == 1:
             me_copy = [copy_mitex_wire(circuit_tuple) for circuit_tuple in mitex_wire]
-            # print("time taken = %f" % (time.time() - start_time))
             return (me_copy,)
         else:
             me_copies = [
@@ -608,7 +604,6 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
             for _ in range(duplicates - 1):
                 mc = [copy_mitex_wire(circuit_tuple) for circuit_tuple in mitex_wire]
                 me_copies.append(mc)
-            # print("time taken = %f" % (time.time() - start_time))
             return tuple(me_copies)
 
     return MitTask(

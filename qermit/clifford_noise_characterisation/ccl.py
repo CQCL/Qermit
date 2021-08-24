@@ -152,6 +152,8 @@ def gen_state_circuits(
             if all_coms[i].op.params[0] not in clifford_angles:
                 rz_ops.add(i)
 
+    n_pairs = min(len(rz_ops), n_pairs)
+
     if n_pairs > len(rz_ops):
         raise ValueError(
             "More pairs {} than total Rz operations in circuit {}. Number of pairs must be less than or equal to.".format(
