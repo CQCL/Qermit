@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import time
 from .mitres import (
     MitRes,
     backend_compile_circuit_shots_task_gen,
@@ -109,9 +108,6 @@ def filter_observable_tracker_task_gen() -> MitTask:
         :rtype: Tuple[List[List[CircuitShots]], List[ObservableTracker]]
         """
 
-        # print("---> Entering FilterObservableTracker")
-        # start_time = time.time()
-
         output_circuits = []
         output_trackers = []
         for measurement_wire in list(measurement_wires):
@@ -144,8 +140,6 @@ def filter_observable_tracker_task_gen() -> MitTask:
             )
             output_trackers.append(observable_tracker)
 
-        # print("time taken = %f" % (time.time() - start_time))
-
         return (output_circuits, output_trackers)
 
     return MitTask(
@@ -172,16 +166,11 @@ def collate_circuit_shots_task_gen() -> MitTask:
         :rtype: Tuple[List[CircuitShots], List[int]]
         """
 
-        # print("---> Entering CollateExperimentCircuits")
-        # start_time = time.time()
-
         collated_circuitshots = []
         lengths = []
         for wire in circuit_wires:
             lengths.append(len(wire))
             collated_circuitshots.extend(wire)
-
-        # print("time taken = %f" % (time.time() - start_time))
 
         return (collated_circuitshots, lengths)
 
@@ -210,17 +199,12 @@ def split_results_task_gen() -> MitTask:
         :rtype: Tuple(List[List[BackendResult]])
         """
 
-        # print("---> Entering SplitResults")
-        # start_time = time.time()
-
         lower_bound = 0
         split_results = []
         for size in experiment_sizes:
             upper_bound = lower_bound + size
             split_results.append(results[lower_bound:upper_bound])
             lower_bound = upper_bound
-
-        # print("time taken = %f" % (time.time() - start_time))
 
         return (split_results,)
 
