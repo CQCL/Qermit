@@ -247,8 +247,18 @@ class Fit(Enum):
             )
 
         # Fit data to polyexponential function
+        # TODO: Improve bounds here.
+        bounds = (
+            [-1, -2, *[-np.inf for i in range(deg)]],
+            [1, 2, *[np.inf for i in range(deg)]],
+        )
         vals = curve_fit(
-            poly_exp_func, x, y, p0=[0, 1, *[-1 for i in range(deg)]], maxfev=10000
+            poly_exp_func,
+            x,
+            y,
+            p0=[0, 1, *[-1 for i in range(deg)]],
+            maxfev=10000,
+            bounds=bounds,
         )
 
         # Extrapolate function to zero noise limit

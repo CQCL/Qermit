@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from qermit import (
     MitEx,
+    MitRes,
     AnsatzCircuit,
     MitTask,
     ObservableTracker,
@@ -71,6 +71,7 @@ def random_commuting_clifford(
     qps: QubitPauliString,
     simulator_backend: Backend,
     max_count: int = 1000,
+    n_shots: int = 1000,
 ) -> Circuit:
     """Replace all Computing gates with random Clifford gates. The expectation
     of the given Pauli string on the final Clifford circuit is non-zero.
@@ -146,9 +147,19 @@ def random_commuting_clifford(
         rand_cliff_circ_copy = rand_cliff_circ.copy()
         place_with_map(rand_cliff_circ_copy, n_q_map)
 
-        expect_val = get_pauli_expectation_value(
-            rand_cliff_circ_copy, new_qps, simulator_backend
-        )
+        # Check if state is supported, otherwise use shots, otherwise raise error
+        if simulator_backend.supports_state:
+            expect_val = get_pauli_expectation_value(
+                rand_cliff_circ_copy, new_qps, simulator_backend
+            )
+        elif simulator_backend.supports_shots or simulator_backend.supports_counts:
+            expect_val = get_pauli_expectation_value(
+                rand_cliff_circ_copy, new_qps, simulator_backend, n_shots=n_shots
+            )
+        else:
+            raise RuntimeError(
+                "The simulator backend does not support state, shots or counts."
+            )
         # TODO: Better management of the case that there are no circuits with expectation value not equal to 0.
 
         # Check if the number of attempts at finding a circuit with non-zero expectation exceeds the maximum.
@@ -376,14 +387,12 @@ def gen_run_with_quasi_prob() -> MitTask:
     )
 
 
-def collate_results_task_gen(num_cliff_circ: int) -> MitTask:
+def collate_results_task_gen() -> MitTask:
     """Generates task which collates results from running circuit, and circuits with frame
     gates wrapped in Pauli gates. The results are collated so as to facilitate
     learning the quasiprobabilities required for correction. The data itself is
     not changed by this task.
 
-    :param num_cliff_circ: The number of Clifford circuits generated for each inputted circuit.
-    :type num_cliff_circ: int
     :return: MitTask object collating results.
     :rtype: MitTask
     """
@@ -1050,8 +1059,12 @@ def gen_PEC_learning_based_MitEx(
         )
     )
 
+    device_mitres = MitRes(device_backend)
     device_mitex = copy.copy(
-        kwargs.get("device_mitex", MitEx(device_backend, _label="NoisyMitex"))
+        kwargs.get(
+            "device_mitex",
+            MitEx(device_backend, _label="NoisyMitex", mitres=device_mitres),
+        )
     )
 
     _experiment_taskgraph = TaskGraph().from_TaskGraph(device_mitex)
@@ -1074,7 +1087,7 @@ def gen_PEC_learning_based_MitEx(
     )
     _experiment_taskgraph.prepend(get_clifford_training_set)
 
-    collate_results = collate_results_task_gen(num_cliff_circ)
+    collate_results = collate_results_task_gen()
     _experiment_taskgraph.append(collate_results)
 
     learn_dist = learn_quasi_probs_task_gen(num_cliff_circ)

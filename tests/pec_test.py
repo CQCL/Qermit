@@ -140,7 +140,7 @@ def test_collate_results_task_gen():
 
     num_cliff_circ = 4
 
-    task = collate_results_task_gen(num_cliff_circ=num_cliff_circ)
+    task = collate_results_task_gen()
     assert task.n_in_wires == 4
     assert task.n_out_wires == 1
 

@@ -103,7 +103,7 @@ def filter_observable_tracker_task_gen() -> MitTask:
         measurement_wires: List[ObservableExperiment],
     ) -> Tuple[List[List[CircuitShots]], List[ObservableTracker]]:
         """
-        :param measurement_wires: Wires containg Circuit information and Observable information
+        :param measurement_wires: Wires containing Circuit information and Observable information
         :type measurement_wires: List[ObservableExperiment]
         :returns: A modified ObservableTracker object, and a List of CircuitShots for each Observable measured
         :rtype: Tuple[List[List[CircuitShots]], List[ObservableTracker]]
@@ -150,7 +150,7 @@ def filter_observable_tracker_task_gen() -> MitTask:
 def collate_circuit_shots_task_gen() -> MitTask:
     """
     Each wire contains a single experiment with its own List of Circuits to run.
-    To improve paralleisation (i.e. reduce queueing time), these lists are collated
+    To improve parallelisation (i.e. reduce queueing time), these lists are collated
     and queued for a device at the same time.
     """
 
