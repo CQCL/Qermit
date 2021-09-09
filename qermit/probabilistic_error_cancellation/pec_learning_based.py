@@ -29,7 +29,7 @@ from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
 
-from pytket.passes import RebaseIBM, DecomposeBoxes  # type: ignore
+from pytket.passes import RebaseTket, DecomposeBoxes  # type: ignore
 from pytket.utils import QubitPauliOperator, get_pauli_expectation_value
 from pytket.backends import Backend
 from pytket.transform import Transform  # type: ignore
@@ -264,7 +264,7 @@ def PECRebase(circ: Circuit) -> Circuit:
     :rtype: Circuit
     """
     rebased_circ = circ.copy()
-    RebaseIBM().apply(rebased_circ)
+    RebaseTket().apply(rebased_circ)
     Transform.ReduceSingles().apply(rebased_circ)
     return rebased_circ
 
@@ -695,7 +695,7 @@ def label_gates(circ: Circuit) -> Circuit:
     """Label all of the gates in the circuit as with "Frame" or "Computing".
     The label includes an index to describe the ordering of the gates
 
-    :param circ: Circuit which should be in the U1, U2, U3, CX basis
+    :param circ: Circuit which should be in the tk1, CX basis
     :type circ: Circuit
     :raises RuntimeError: Raised if the circuit is not in the required basis.
     :return: Identical circuit, but with gates assigned opgroups.
@@ -712,7 +712,8 @@ def label_gates(circ: Circuit) -> Circuit:
     frame_count = 0
     for command in command_list:
         labelled_command = command.copy()
-        if labelled_command["op"]["type"] in ("U1", "U2", "U3"):
+        print('gate type ====== ', labelled_command["op"]["type"])
+        if labelled_command["op"]["type"] in ("tk1"):
             labelled_command["opgroup"] = "Computing %i" % comp_count
             comp_count += 1
         elif labelled_command["op"]["type"] in ("CX"):
@@ -720,7 +721,7 @@ def label_gates(circ: Circuit) -> Circuit:
             frame_count += 1
         else:
             raise RuntimeError(
-                'This gate is not one of either "U1", "U2", "U3" or "CX". Please ensure you have run PECRebase before using this function.'
+                'This gate is not one of either "tk1" or "CX". Please ensure you have run PECRebase before using this function.'
             )
         labelled_command_list.append(labelled_command)
 

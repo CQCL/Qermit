@@ -438,8 +438,8 @@ def test_gen_label_gates():
     circ_0 = (
         Circuit(2)
         .CX(1, 0)
-        .add_gate(OpType.U3, [0.1, 0.2, 0.3], [1])
-        .add_gate(OpType.U2, [0.2, 0.3], [0])
+        .add_gate(OpType.TK1, [0.1, 0.2, 0.3], [1])
+        .add_gate(OpType.TK1, [0.2, 0.3, 0], [0])
     )
     ansatz_circ_0 = AnsatzCircuit(circ_0, 100, SymbolsDict())
     experiment_0 = ObservableExperiment(
@@ -448,9 +448,9 @@ def test_gen_label_gates():
 
     circ_1 = (
         Circuit(2)
-        .add_gate(OpType.U1, [0.3], [1])
+        .add_gate(OpType.TK1, [0.3, 0, 0], [1])
         .CX(0, 1)
-        .add_gate(OpType.U2, [0.2, 0.3], [1])
+        .add_gate(OpType.TK1, [0.2, 0.3, 0], [1])
     )
     ansatz_circ_1 = AnsatzCircuit(circ_1, 100, SymbolsDict())
     experiment_1 = ObservableExperiment(
@@ -522,7 +522,7 @@ def test_gen_rebase_to_frames_and_computing():
 
     for output_experiment in output_wire:
         circuit = output_experiment[0][0]
-        assert GateSetPredicate({OpType.CX, OpType.U1, OpType.U2, OpType.U3}).verify(
+        assert GateSetPredicate({OpType.CX, OpType.TK1}).verify(
             circuit
         )
 
