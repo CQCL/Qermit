@@ -737,11 +737,7 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
 
         _label = str(fold) + "FoldMitEx"
 
-        fold_mitex = copy.copy(
-            kwargs.get(
-                "fold_mitex", MitEx(backend, _label=_label, mitres=MitRes(backend))
-            )
-        )
+        fold_mitex = copy.copy(MitEx(backend, _label=_label, mitres=_experiment_mitres))
 
         digital_folding_task = digital_folding_task_gen(
             backend, fold, _folding_type, _allow_approx_fold
