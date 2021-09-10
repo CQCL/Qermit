@@ -28,6 +28,7 @@ from qermit.zero_noise_extrapolation.zne import (  # type: ignore
     extrapolation_task_gen,
     digital_folding_task_gen,
 )
+from pytket.predicates import GateSetPredicate
 from pytket.extensions.qiskit import AerBackend, AerUnitaryBackend  # type: ignore
 from pytket import Circuit, Qubit
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
@@ -36,6 +37,25 @@ from numpy.polynomial.polynomial import polyval
 import math
 import numpy as np
 from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
+import qiskit.providers.aer.noise as noise
+
+n_qubits = 2
+
+prob_1 = 0.005
+prob_2 = 0.02
+
+noise_model = noise.NoiseModel()
+
+# Depolarizing quantum errors
+error_2 = noise.depolarizing_error(prob_2, 2)
+for edge in [[i, j] for i in range(n_qubits) for j in range(n_qubits)]:
+    noise_model.add_quantum_error(error_2, ["cx"], [edge[0], edge[1]])
+
+error_1 = noise.depolarizing_error(prob_1, 1)
+for node in [i for i in range(n_qubits)]:
+    noise_model.add_quantum_error(error_1, ["h", "rx", "u3"], [node])
+
+noisy_backend = AerBackend(noise_model)
 
 
 def test_gen_initial_compilation_task():
@@ -166,6 +186,7 @@ def test_digital_folding_task_gen():
 
     n_folds_1 = 5
     n_folds_2 = 3
+    n_folds_3 = 6
 
     task_1 = digital_folding_task_gen(
         be, n_folds_1, Folding.circuit, _allow_approx_fold=False
@@ -173,35 +194,54 @@ def test_digital_folding_task_gen():
     task_2 = digital_folding_task_gen(
         be, n_folds_2, Folding.gate, _allow_approx_fold=False
     )
+    task_3 = digital_folding_task_gen(
+        noisy_backend, n_folds_3, Folding.gate, _allow_approx_fold=False
+    )
 
     assert task_1.n_in_wires == 1
     assert task_1.n_out_wires == 1
     assert task_2.n_in_wires == 1
     assert task_2.n_out_wires == 1
+    assert task_3.n_in_wires == 1
+    assert task_3.n_out_wires == 1
 
     c_1 = Circuit(2).CZ(0, 1).T(1)
     c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
+    c_3 = Circuit(2).CX(0, 1).H(0).Rx(0.3, 1).Rz(0.6, 1)
 
     ac_1 = AnsatzCircuit(c_1, 10000, {})
     ac_2 = AnsatzCircuit(c_2, 10000, {})
+    ac_3 = AnsatzCircuit(c_3, 10000, {})
 
     qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
     qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+    qpo_3 = QubitPauliOperator(
+        {QubitPauliString([Qubit(0), Qubit(1)], [Pauli.Z, Pauli.Z]): 1}
+    )
 
     experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
     experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_2))
+    experiment_3 = ObservableExperiment(ac_3, ObservableTracker(qpo_3))
 
     folded_experiment_1 = task_1([[experiment_1]])[0][0]
     folded_experiment_2 = task_2([[experiment_2]])[0][0]
+    folded_experiment_3 = task_3([[experiment_3]])[0][0]
 
     folded_c_1 = folded_experiment_1[0][0]
     folded_c_2 = folded_experiment_2[0][0]
+    folded_c_3 = folded_experiment_3[0][0]
+
+    # TODO: Add a backend with a more restricted gateset
+    assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_1)
+    assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_2)
+    assert GateSetPredicate(noisy_backend.backend_info.gate_set).verify(folded_c_3)
 
     # Checks that the number of gates has been increased correctly.
-    # Note that in the case of circuit folding, barriers are added.
-    # This is why there is the n_folds_1 - 1 term at the end.
+    # Note that in both cases barriers are added. This is why there is the
+    # n_folds_i - 1 term at the end.
     assert folded_c_1.n_gates == c_1.n_gates * n_folds_1 + n_folds_1 - 1
-    assert folded_c_2.n_gates == c_2.n_gates * n_folds_2
+    assert folded_c_2.n_gates == c_2.n_gates * n_folds_2 + c_2.n_gates * (n_folds_2 - 1)
+    assert folded_c_3.n_gates == c_3.n_gates * n_folds_3 + c_3.n_gates * (n_folds_3 - 1)
 
     unitary_be = AerUnitaryBackend()
 

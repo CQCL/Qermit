@@ -143,7 +143,25 @@ class Folding(Enum):
             # Append command and inverse the appropriate number of times.
             folded_command_list.append(command)
             for _ in range(num_folds[command_index]):
+                folded_command_list.append(
+                    {
+                        "args": command["args"],
+                        "op": {
+                            "signature": ["Q" for _ in command["args"]],
+                            "type": "Barrier",
+                        },
+                    }
+                )
                 folded_command_list.append(*inverse_command)
+                folded_command_list.append(
+                    {
+                        "args": command["args"],
+                        "op": {
+                            "signature": ["Q" for _ in command["args"]],
+                            "type": "Barrier",
+                        },
+                    }
+                )
                 folded_command_list.append(command)
 
         folded_c_dict = c_dict.copy()
