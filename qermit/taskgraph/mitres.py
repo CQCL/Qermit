@@ -44,7 +44,7 @@ def backend_compile_circuit_shots_task_gen(
     def task(obj, circ_shots: List[CircuitShots]) -> Tuple[List[CircuitShots]]:
         return (
             [
-                (
+                CircuitShots(
                     backend.get_compiled_circuit(
                         cs.Circuit, optimisation_level=optimisation_level
                     ),
