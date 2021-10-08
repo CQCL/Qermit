@@ -712,7 +712,6 @@ def label_gates(circ: Circuit) -> Circuit:
     frame_count = 0
     for command in command_list:
         labelled_command = command.copy()
-        print("gate type ====== ", labelled_command["op"]["type"])
         if labelled_command["op"]["type"] in ("tk1"):
             labelled_command["opgroup"] = "Computing %i" % comp_count
             comp_count += 1
