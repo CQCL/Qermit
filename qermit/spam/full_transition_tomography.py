@@ -109,12 +109,12 @@ def get_full_transition_tomography_circuits(
 
     # set up CircBox of X gate for preparing basis states
     xcirc = Circuit(1).X(0)
-    backend.compile_circuit(xcirc)
+    xcirc = backend.get_compiled_circuit(xcirc)
     FlattenRegisters().apply(xcirc)
     xbox = CircBox(xcirc)
 
     # need to be default register to add as box suitably
-    backend.compile_circuit(process_circuit)
+    process_circuit = backend.get_compiled_circuit(process_circuit)
     rename_map_pc = {}
     for index, qb in enumerate(process_circuit.qubits):
         rename_map_pc[qb] = Qubit(index)
@@ -154,7 +154,7 @@ def get_full_transition_tomography_circuits(
         for q in measures:
             state_circuit.Measure(q, measures[q])
         # add to returned types
-        backend.compile_circuit(state_circuit)
+        state_circuit = backend.get_compiled_circuit(state_circuit)
         prepared_circuits.append(state_circuit)
         state_infos.append(StateInfo(new_state_dicts, measures))
     return (prepared_circuits, state_infos)

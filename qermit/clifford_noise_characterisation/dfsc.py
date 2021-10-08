@@ -77,7 +77,7 @@ def preparation_circuit_for_partition(
     Transform.RebaseToCliffordSingles().apply(clifford_circuit)
     for string in partition:
         transformed_string = apply_clifford_basis_change(string, clifford_circuit)
-        transformed_dict = transformed_string.to_dict()
+        transformed_dict = transformed_string.map
         for qubit in transformed_dict:
             if transformed_dict[qubit] == Pauli.X:
                 eigenstate_circuit.H(qubit)

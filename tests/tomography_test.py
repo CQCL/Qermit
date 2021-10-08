@@ -174,7 +174,7 @@ def test_correct_transition_noise():
     backend = get_noisy_backend(4, 0.1)
     # get test circuit
     test_circuit = Circuit(4).X(0).X(1).X(2).X(3).measure_all()
-    backend.compile_circuit(test_circuit)
+    test_circuit = backend.get_compiled_circuit(test_circuit)
     qubit_readout = test_circuit.qubit_to_bit_map
     handles = backend.process_circuits([test_circuit], 50)
     results = backend.get_results(handles)
