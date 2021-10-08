@@ -171,8 +171,8 @@ class Folding(Enum):
         return folded_c
 
     def odd_gate(circ: Circuit, noise_scaling: float) -> Circuit:
-        """Noise scaling by gate folding. In this case odd gates :math:`G` are 
-        replaced :math:`GG^{-1}G` until the number of gates is sufficiently 
+        """Noise scaling by gate folding. In this case odd gates :math:`G` are
+        replaced :math:`GG^{-1}G` until the number of gates is sufficiently
         scaled.
 
         :param circ: Original circuit to be folded.
@@ -189,7 +189,7 @@ class Folding(Enum):
         folded_command_list = []
 
         for command in c_dict["commands"]:
-            
+
             if fold:
                 # for _ in range(noise_scaling - 1):
                 command_circ_dict = c_dict.copy()
@@ -203,7 +203,7 @@ class Folding(Enum):
 
                 # Append command and inverse the appropriate number of times.
                 folded_command_list.append(command)
-                for _ in range(noise_scaling - 1):
+                for _ in range(cast(int, noise_scaling) - 1):
                     folded_command_list.append(
                         {
                             "args": command["args"],
@@ -232,7 +232,7 @@ class Folding(Enum):
         folded_c_dict = c_dict.copy()
         folded_c_dict["commands"] = folded_command_list
         folded_c = Circuit().from_dict(folded_c_dict)
-       
+
         return folded_c
 
 
