@@ -71,7 +71,7 @@ def get_basic_measurement_circuit(
     """
     measurement_circuit = Circuit()
     measured_qbs = []
-    for qb, p in string.to_dict().items():
+    for qb, p in string.map.items():
         if p == Pauli.I:
             continue
         measured_qbs.append(qb)

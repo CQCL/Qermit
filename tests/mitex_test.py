@@ -159,8 +159,7 @@ def test_collate_and_split_circuit_shots_task_gen():
     backend = AerBackend()
     just_circuits = []
     for c in circuits:
-        backend.compile_circuit(c[0])
-        just_circuits.append(c[0])
+        just_circuits.append(backend.get_compiled_circuit(c[0]))
     handles = backend.process_circuits(just_circuits, 1)
     results = backend.get_results(handles)
 
@@ -193,8 +192,7 @@ def test_get_expectations_task_gen():
     backend = AerBackend()
     just_circuits = []
     for c in split_output[0]:
-        backend.compile_circuit(c[0])
-        just_circuits.append(c[0])
+        just_circuits.append(backend.get_compiled_circuit(c[0]))
     handles = backend.process_circuits(just_circuits, 5)
     results = backend.get_results(handles)
 
