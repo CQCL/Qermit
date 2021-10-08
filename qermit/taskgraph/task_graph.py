@@ -239,7 +239,7 @@ class TaskGraph:
 
                     # These two cases imply faulty TaskGraph construction
                     # Note that this check is only made as this is necessary constraint for decomposing TaskGraph nodes
-                    # Faulty construction should be caughty at construction of TaskGraph object, including types
+                    # Faulty construction should be caught at construction of TaskGraph object, including types
                     if len(task_in_edges) != len(task_input_out_edges):
                         raise TypeError(
                             "Decomposition of TaskGraph node {} not permitted: node "
@@ -251,7 +251,7 @@ class TaskGraph:
                         raise TypeError(
                             "Decomposition of TaskGraph node {} not permitted: task_graph "
                             "expects {} output wires but node returns {}.".format(
-                                task, len(task_input_out_edges), len(task_in_edges)
+                                task, len(task_output_in_edges), len(task_out_edges)
                             )
                         )
 

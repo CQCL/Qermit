@@ -143,7 +143,25 @@ class Folding(Enum):
             # Append command and inverse the appropriate number of times.
             folded_command_list.append(command)
             for _ in range(num_folds[command_index]):
+                folded_command_list.append(
+                    {
+                        "args": command["args"],
+                        "op": {
+                            "signature": ["Q" for _ in command["args"]],
+                            "type": "Barrier",
+                        },
+                    }
+                )
                 folded_command_list.append(*inverse_command)
+                folded_command_list.append(
+                    {
+                        "args": command["args"],
+                        "op": {
+                            "signature": ["Q" for _ in command["args"]],
+                            "type": "Barrier",
+                        },
+                    }
+                )
                 folded_command_list.append(command)
 
         folded_c_dict = c_dict.copy()
@@ -737,17 +755,25 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
 
         _label = str(fold) + "FoldMitEx"
 
-        fold_mitex = copy.copy(
+        _fold_mitres = copy.copy(
             kwargs.get(
-                "fold_mitex", MitEx(backend, _label=_label, mitres=MitRes(backend))
+                "experiment_mitres",
+                MitRes(backend),
+            )
+        )
+
+        _fold_mitex = copy.copy(
+            kwargs.get(
+                "experiment_mitex",
+                MitEx(backend, _label=_label, mitres=_fold_mitres),
             )
         )
 
         digital_folding_task = digital_folding_task_gen(
             backend, fold, _folding_type, _allow_approx_fold
         )
-        fold_mitex.prepend(digital_folding_task)
-        _experiment_taskgraph.parallel(fold_mitex)
+        _fold_mitex.prepend(digital_folding_task)
+        _experiment_taskgraph.parallel(_fold_mitex)
 
     extrapolation_task = extrapolation_task_gen(
         noise_scaling_list, _fit_type, _show_fit, _deg
