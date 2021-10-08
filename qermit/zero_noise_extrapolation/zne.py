@@ -170,6 +170,71 @@ class Folding(Enum):
 
         return folded_c
 
+    def odd_gate(circ: Circuit, noise_scaling: float) -> Circuit:
+        """Noise scaling by gate folding. In this case odd gates :math:`G` are 
+        replaced :math:`GG^{-1}G` until the number of gates is sufficiently 
+        scaled.
+
+        :param circ: Original circuit to be folded.
+        :type circ: Circuit
+        :param noise_scaling: Factor by which to increase the noise.
+        :type noise_scaling: float
+        :return: Folded circuit implementing identical unitary to the initial circuit.
+        :rtype: Circuit
+        """
+
+        c_dict = circ.to_dict()
+
+        fold = True
+        folded_command_list = []
+
+        for command in c_dict["commands"]:
+            
+            if fold:
+                # for _ in range(noise_scaling - 1):
+                command_circ_dict = c_dict.copy()
+                command_circ_dict["commands"] = [command]
+                command_circ = Circuit().from_dict(command_circ_dict)
+
+                # Find the inverse of the command
+                inverse_command_circ = command_circ.dagger()
+                inverse_command_circ_dict = inverse_command_circ.to_dict()
+                inverse_command = inverse_command_circ_dict["commands"]
+
+                # Append command and inverse the appropriate number of times.
+                folded_command_list.append(command)
+                for _ in range(noise_scaling - 1):
+                    folded_command_list.append(
+                        {
+                            "args": command["args"],
+                            "op": {
+                                "signature": ["Q" for _ in command["args"]],
+                                "type": "Barrier",
+                            },
+                        }
+                    )
+                    folded_command_list.append(*inverse_command)
+                    folded_command_list.append(
+                        {
+                            "args": command["args"],
+                            "op": {
+                                "signature": ["Q" for _ in command["args"]],
+                                "type": "Barrier",
+                            },
+                        }
+                    )
+                    folded_command_list.append(command)
+            else:
+                folded_command_list.append(command)
+
+            fold = not fold
+
+        folded_c_dict = c_dict.copy()
+        folded_c_dict["commands"] = folded_command_list
+        folded_c = Circuit().from_dict(folded_c_dict)
+       
+        return folded_c
+
 
 def poly_exp_func(x: float, *params) -> float:
     """Definition of poly-exponential function for the purposes of fitting to data
