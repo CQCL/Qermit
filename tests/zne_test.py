@@ -28,7 +28,7 @@ from qermit.zero_noise_extrapolation.zne import (  # type: ignore
     extrapolation_task_gen,
     digital_folding_task_gen,
 )
-from pytket.extensions.qiskit import AerBackend, AerUnitaryBackend  # type: ignore
+from pytket.extensions.qiskit import AerBackend  # type: ignore
 from pytket import Circuit, Qubit
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.utils import QubitPauliOperator
@@ -203,12 +203,10 @@ def test_digital_folding_task_gen():
     assert folded_c_1.n_gates == c_1.n_gates * n_folds_1 + n_folds_1 - 1
     assert folded_c_2.n_gates == c_2.n_gates * n_folds_2
 
-    unitary_be = AerUnitaryBackend()
-
-    c_1_unitary = unitary_be.get_unitary(c_1)
-    c_2_unitary = unitary_be.get_unitary(c_2)
-    folded_c_1_unitary = unitary_be.get_unitary(folded_c_1)
-    folded_c_2_unitary = unitary_be.get_unitary(folded_c_2)
+    c_1_unitary = c_1.get_unitary()
+    c_2_unitary = c_2.get_unitary()
+    folded_c_1_unitary = folded_c_1.get_unitary()
+    folded_c_2_unitary = folded_c_2.get_unitary()
 
     assert np.allclose(c_1_unitary, folded_c_1_unitary)
     assert np.allclose(c_2_unitary, folded_c_2_unitary)

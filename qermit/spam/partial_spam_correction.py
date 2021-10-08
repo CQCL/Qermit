@@ -287,7 +287,7 @@ def partial_correlated_spam_circuits_task_gen(
 
             # produce basis state preparation circuit
             xcirc = Circuit(1).X(0)
-            backend.compile_circuit(xcirc)
+            xcirc = backend.get_compiled_circuit(xcirc)
             FlattenRegisters().apply(xcirc)
             x_prep_box = CircBox(xcirc)
 

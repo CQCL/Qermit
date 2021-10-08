@@ -522,9 +522,7 @@ def test_gen_rebase_to_frames_and_computing():
 
     for output_experiment in output_wire:
         circuit = output_experiment[0][0]
-        assert GateSetPredicate({OpType.CX, OpType.TK1}).verify(
-            circuit
-        )
+        assert GateSetPredicate({OpType.CX, OpType.TK1}).verify(circuit)
 
 
 def test_gen_PEC_learning_based_MitEx():

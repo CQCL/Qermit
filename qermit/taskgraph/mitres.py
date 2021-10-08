@@ -42,9 +42,20 @@ def backend_compile_circuit_shots_task_gen(
     """
 
     def task(obj, circ_shots: List[CircuitShots]) -> Tuple[List[CircuitShots]]:
-        for cs in circ_shots:
-            backend.compile_circuit(cs.Circuit, optimisation_level=optimisation_level)
-        return (circ_shots,)
+        # compiled_circuits = [(backend.get_compiled_circuit(cs.Circuit, optimisation_level=optimisation_level), cs.Shots) for cs in circ_shots]
+        # for cs in circ_shots:
+        #     cs.Circuit = backend.get_compiled_circuit(cs.Circuit, optimisation_level=optimisation_level)
+        return (
+            [
+                (
+                    backend.get_compiled_circuit(
+                        cs.Circuit, optimisation_level=optimisation_level
+                    ),
+                    cs.Shots,
+                )
+                for cs in circ_shots
+            ],
+        )
 
     return MitTask(
         _label="CompileCircuitShots", _n_in_wires=1, _n_out_wires=1, _method=task

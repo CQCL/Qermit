@@ -137,7 +137,7 @@ def random_commuting_clifford(
 
         new_qps_qbs = []
         qps_paulis = []
-        qps_dict = qps.to_dict()
+        qps_dict = qps.map
         for x in qps_dict:
             new_qps_qbs.append(n_q_map[x])
             qps_paulis.append(qps_dict[x])
@@ -712,7 +712,7 @@ def label_gates(circ: Circuit) -> Circuit:
     frame_count = 0
     for command in command_list:
         labelled_command = command.copy()
-        print('gate type ====== ', labelled_command["op"]["type"])
+        print("gate type ====== ", labelled_command["op"]["type"])
         if labelled_command["op"]["type"] in ("tk1"):
             labelled_command["opgroup"] = "Computing %i" % comp_count
             comp_count += 1
@@ -985,7 +985,9 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
                     [str_to_pauli_op(error["op"][0]), str_to_pauli_op(error["op"][1])],
                 )
 
-                backend.compile_circuit(pauli_circ, optimisation_level=0)
+                pauli_circ = backend.get_compiled_circuit(
+                    pauli_circ, optimisation_level=0
+                )
 
                 # TODO: Replace with a copy of MeasurementSetup rather than new object
                 new_ansatz_circuit = AnsatzCircuit(

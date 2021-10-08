@@ -665,7 +665,7 @@ def gen_initial_compilation_task(
             orig_qpo_dict = obs_exp[1]._qubit_pauli_operator._dict.copy()
             new_qpo_dict = {}
             for orig_qps in orig_qpo_dict:
-                orig_qps_dict = orig_qps.to_dict()
+                orig_qps_dict = orig_qps.map
                 new_qps_dict = {}
                 for q in orig_qps_dict:
                     new_qps_dict[final_map[q]] = orig_qps_dict[q]
