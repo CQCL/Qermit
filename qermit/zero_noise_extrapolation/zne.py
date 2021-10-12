@@ -194,7 +194,7 @@ class Folding(Enum):
                 # for _ in range(noise_scaling - 1):
                 command_circ_dict = c_dict.copy()
                 command_circ_dict["commands"] = [command]
-                command_circ = Circuit().from_dict(command_circ_dict)
+                command_circ = Circuit.from_dict(command_circ_dict)
 
                 # Find the inverse of the command
                 inverse_command_circ = command_circ.dagger()
