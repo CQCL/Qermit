@@ -208,7 +208,7 @@ class Folding(Enum):
                         {
                             "args": command["args"],
                             "op": {
-                                "signature": ["Q" for _ in command["args"]],
+                                "signature": ["Q"]*len(command["args"]),
                                 "type": "Barrier",
                             },
                         }
