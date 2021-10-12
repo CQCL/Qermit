@@ -229,9 +229,8 @@ class Folding(Enum):
 
             fold = not fold
 
-        folded_c_dict = c_dict.copy()
-        folded_c_dict["commands"] = folded_command_list
-        folded_c = Circuit().from_dict(folded_c_dict)
+        c_dict.update({"commands": folded_command_list})
+        folded_c = Circuit.from_dict(c_dict)
 
         return folded_c
 
