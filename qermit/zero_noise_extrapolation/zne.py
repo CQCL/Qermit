@@ -190,10 +190,10 @@ class Folding(Enum):
 
         for command in c_dict["commands"]:
 
+            command_circ_dict= {key: val for key, val in c_dict.items() if key != "commands"}
+
             if fold:
-                # for _ in range(noise_scaling - 1):
-                command_circ_dict = c_dict.copy()
-                command_circ_dict["commands"] = [command]
+                command_circ_dict.update({"commands": [command]})
                 command_circ = Circuit.from_dict(command_circ_dict)
 
                 # Find the inverse of the command
