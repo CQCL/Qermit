@@ -323,6 +323,11 @@ def test_odd_gate_folding():
     folded_circ = Folding.odd_gate(circ,2)
     correct_folded_circ = Circuit(2).CX(0,1).add_barrier([0,1]).CX(0,1).add_barrier([0,1]).CX(0,1).X(0).CX(1,0).add_barrier([1,0]).CX(1,0).add_barrier([1,0]).CX(1,0).X(1)
     assert folded_circ == correct_folded_circ
+    
+    circ = Circuit(3).CX(0,1).CX(1,2)
+    folded_circ = Folding.odd_gate(circ,3)
+    correct_folded_circ = Circuit(3).CX(0,1).add_barrier([0,1]).CX(0,1).add_barrier([0,1]).CX(0,1).add_barrier([0,1]).CX(0,1).add_barrier([0,1]).CX(0,1).CX(1,2)
+    assert folded_circ == correct_folded_circ
 
 
 if __name__ == "__main__":
