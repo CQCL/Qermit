@@ -170,7 +170,7 @@ class Folding(Enum):
 
         return folded_c
 
-    def odd_gate(circ: Circuit, noise_scaling: float) -> Circuit:
+    def odd_gate(circ: Circuit, noise_scaling: int) -> Circuit:
         """Noise scaling by gate folding. In this case odd gates :math:`G` are
         replaced :math:`GG^{-1}G` until the number of gates is sufficiently
         scaled.
@@ -203,7 +203,7 @@ class Folding(Enum):
 
                 # Append command and inverse the appropriate number of times.
                 folded_command_list.append(command)
-                for _ in range(cast(int, noise_scaling) - 1):
+                for _ in range(noise_scaling - 1):
                     folded_command_list.append(
                         {
                             "args": command["args"],
