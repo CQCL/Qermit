@@ -125,14 +125,16 @@ class Folding(Enum):
         # Calculate how many times each individual command needs to be folded
         num_folds = {i: list(commands_to_fold).count(i) for i in range(num_commands)}
 
+        command_circ_dict = {
+            key: val for key, val in c_dict.items() if key != "commands"
+        }
+
         folded_command_list = []
         # For each command, fold the appropriate number of times.
         for command_index in num_folds:
 
             command = c_dict["commands"][command_index]
-
-            command_circ_dict = c_dict.copy()
-            command_circ_dict["commands"] = [command]
+            command_circ_dict.update({"commands": [command]})
             command_circ = Circuit().from_dict(command_circ_dict)
 
             # Find the inverse of the command
@@ -147,7 +149,7 @@ class Folding(Enum):
                     {
                         "args": command["args"],
                         "op": {
-                            "signature": ["Q" for _ in command["args"]],
+                            "signature": ["Q"] * len(command["args"]),
                             "type": "Barrier",
                         },
                     }
@@ -157,7 +159,7 @@ class Folding(Enum):
                     {
                         "args": command["args"],
                         "op": {
-                            "signature": ["Q" for _ in command["args"]],
+                            "signature": ["Q"] * len(command["args"]),
                             "type": "Barrier",
                         },
                     }
@@ -167,6 +169,72 @@ class Folding(Enum):
         folded_c_dict = c_dict.copy()
         folded_c_dict["commands"] = folded_command_list
         folded_c = Circuit().from_dict(folded_c_dict)
+
+        return folded_c
+
+    def odd_gate(circ: Circuit, noise_scaling: int) -> Circuit:
+        """Noise scaling by gate folding. In this case odd gates :math:`G` are
+        replaced :math:`GG^{-1}G` until the number of gates is sufficiently
+        scaled.
+
+        :param circ: Original circuit to be folded.
+        :type circ: Circuit
+        :param noise_scaling: Factor by which to increase the noise.
+        :type noise_scaling: float
+        :return: Folded circuit implementing identical unitary to the initial circuit.
+        :rtype: Circuit
+        """
+
+        c_dict = circ.to_dict()
+
+        fold = True
+        folded_command_list = []
+
+        command_circ_dict = {
+            key: val for key, val in c_dict.items() if key != "commands"
+        }
+
+        for command in c_dict["commands"]:
+
+            if fold:
+                command_circ_dict.update({"commands": [command]})
+                command_circ = Circuit.from_dict(command_circ_dict)
+
+                # Find the inverse of the command
+                inverse_command_circ = command_circ.dagger()
+                inverse_command_circ_dict = inverse_command_circ.to_dict()
+                inverse_command = inverse_command_circ_dict["commands"]
+
+                # Append command and inverse the appropriate number of times.
+                folded_command_list.append(command)
+                for _ in range(noise_scaling - 1):
+                    folded_command_list.append(
+                        {
+                            "args": command["args"],
+                            "op": {
+                                "signature": ["Q"] * len(command["args"]),
+                                "type": "Barrier",
+                            },
+                        }
+                    )
+                    folded_command_list.append(*inverse_command)
+                    folded_command_list.append(
+                        {
+                            "args": command["args"],
+                            "op": {
+                                "signature": ["Q"] * len(command["args"]),
+                                "type": "Barrier",
+                            },
+                        }
+                    )
+                    folded_command_list.append(command)
+            else:
+                folded_command_list.append(command)
+
+            fold = not fold
+
+        c_dict.update({"commands": folded_command_list})
+        folded_c = Circuit.from_dict(c_dict)
 
         return folded_c
 
