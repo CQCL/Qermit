@@ -125,14 +125,16 @@ class Folding(Enum):
         # Calculate how many times each individual command needs to be folded
         num_folds = {i: list(commands_to_fold).count(i) for i in range(num_commands)}
 
+        command_circ_dict = {
+            key: val for key, val in c_dict.items() if key != "commands"
+        }
+
         folded_command_list = []
         # For each command, fold the appropriate number of times.
         for command_index in num_folds:
 
             command = c_dict["commands"][command_index]
-
-            command_circ_dict = c_dict.copy()
-            command_circ_dict["commands"] = [command]
+            command_circ_dict.update({"commands": [command]})
             command_circ = Circuit().from_dict(command_circ_dict)
 
             # Find the inverse of the command
@@ -147,7 +149,7 @@ class Folding(Enum):
                     {
                         "args": command["args"],
                         "op": {
-                            "signature": ["Q" for _ in command["args"]],
+                            "signature": ["Q"] * len(command["args"]),
                             "type": "Barrier",
                         },
                     }
@@ -157,7 +159,7 @@ class Folding(Enum):
                     {
                         "args": command["args"],
                         "op": {
-                            "signature": ["Q" for _ in command["args"]],
+                            "signature": ["Q"] * len(command["args"]),
                             "type": "Barrier",
                         },
                     }
@@ -188,9 +190,11 @@ class Folding(Enum):
         fold = True
         folded_command_list = []
 
-        for command in c_dict["commands"]:
+        command_circ_dict = {
+            key: val for key, val in c_dict.items() if key != "commands"
+        }
 
-            command_circ_dict= {key: val for key, val in c_dict.items() if key != "commands"}
+        for command in c_dict["commands"]:
 
             if fold:
                 command_circ_dict.update({"commands": [command]})
@@ -208,7 +212,7 @@ class Folding(Enum):
                         {
                             "args": command["args"],
                             "op": {
-                                "signature": ["Q"]*len(command["args"]),
+                                "signature": ["Q"] * len(command["args"]),
                                 "type": "Barrier",
                             },
                         }
@@ -218,7 +222,7 @@ class Folding(Enum):
                         {
                             "args": command["args"],
                             "op": {
-                                "signature": ["Q" for _ in command["args"]],
+                                "signature": ["Q"] * len(command["args"]),
                                 "type": "Barrier",
                             },
                         }
