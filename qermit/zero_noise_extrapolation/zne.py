@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from pytket.circuit.display import render_circuit_jupyter
 from pytket.backends import Backend
 from qermit import (
     MitEx,
@@ -172,7 +172,7 @@ class Folding(Enum):
 
         return folded_c
 
-    def odd_gate(circ: Circuit, noise_scaling: int) -> Circuit:
+    def odd_gate(circ: Circuit, noise_scaling: int, *args) -> Circuit:
         """Noise scaling by gate folding. In this case odd gates :math:`G` are
         replaced :math:`GG^{-1}G` until the number of gates is sufficiently
         scaled.
