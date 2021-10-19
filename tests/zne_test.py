@@ -388,10 +388,10 @@ def test_odd_gate_folding():
 
 
 if __name__ == "__main__":
-    # test_extrapolation_task_gen()
-    # test_gen_duplication_task()
+    test_extrapolation_task_gen()
+    test_gen_duplication_task()
     test_digital_folding_task_gen()
-    # test_gen_initial_compilation_task()
-    # test_zne_identity()
-    # test_simple_run_end_to_end()
-    # test_odd_gate_folding()
+    test_gen_initial_compilation_task()
+    test_zne_identity()
+    test_simple_run_end_to_end()
+    test_odd_gate_folding()
