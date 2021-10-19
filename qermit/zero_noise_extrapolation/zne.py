@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pytket.circuit.display import render_circuit_jupyter
 from pytket.backends import Backend
 from qermit import (
     MitEx,
@@ -775,9 +774,6 @@ def gen_initial_compilation_task(
                     ObservableTracker=ObservableTracker(new_qpo),
                 )
             )
-
-            print("compiled circuit")
-            render_circuit_jupyter(cu.circuit)
 
         return (mapped_wire,)
 
