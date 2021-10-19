@@ -29,7 +29,7 @@ from qermit.zero_noise_extrapolation.zne import (  # type: ignore
     digital_folding_task_gen,
 )
 from pytket.predicates import GateSetPredicate
-from pytket.extensions.qiskit import AerBackend # type: ignore
+from pytket.extensions.qiskit import AerBackend  # type: ignore
 from pytket import Circuit, Qubit
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.utils import QubitPauliOperator
@@ -255,7 +255,7 @@ def test_digital_folding_task_gen():
     assert folded_c_1.n_gates == c_1.n_gates * n_folds_1 + n_folds_1 - 1
     assert folded_c_2.n_gates == c_2.n_gates * n_folds_2 + c_2.n_gates * (n_folds_2 - 1)
     assert folded_c_3.n_gates == c_3.n_gates * n_folds_3 + c_3.n_gates * (n_folds_3 - 1)
-    assert folded_c_4.n_gates == c_4.n_gates + n_folds_4 * (2 * (c_4.n_gates + 1)//2)
+    assert folded_c_4.n_gates == c_4.n_gates + n_folds_4 * (2 * (c_4.n_gates + 1) // 2)
 
     c_1_unitary = c_1.get_unitary()
     c_2_unitary = c_2.get_unitary()
@@ -264,6 +264,7 @@ def test_digital_folding_task_gen():
 
     assert np.allclose(c_1_unitary, folded_c_1_unitary)
     assert np.allclose(c_2_unitary, folded_c_2_unitary)
+
 
 def test_zne_identity():
 
@@ -330,16 +331,43 @@ def test_simple_run_end_to_end():
     assert round(float(res1)) == 1.0
     assert round(float(res2)) == -1.0
 
+
 def test_odd_gate_folding():
 
-    circ = Circuit(2).CX(0,1).X(0).CX(1,0).X(1)
-    folded_circ = Folding.odd_gate(circ,2)
-    correct_folded_circ = Circuit(2).CX(0,1).add_barrier([0,1]).CX(0,1).add_barrier([0,1]).CX(0,1).X(0).CX(1,0).add_barrier([1,0]).CX(1,0).add_barrier([1,0]).CX(1,0).X(1)
+    circ = Circuit(2).CX(0, 1).X(0).CX(1, 0).X(1)
+    folded_circ = Folding.odd_gate(circ, 2)
+    correct_folded_circ = (
+        Circuit(2)
+        .CX(0, 1)
+        .add_barrier([0, 1])
+        .CX(0, 1)
+        .add_barrier([0, 1])
+        .CX(0, 1)
+        .X(0)
+        .CX(1, 0)
+        .add_barrier([1, 0])
+        .CX(1, 0)
+        .add_barrier([1, 0])
+        .CX(1, 0)
+        .X(1)
+    )
     assert folded_circ == correct_folded_circ
-    
-    circ = Circuit(3).CX(0,1).CX(1,2)
-    folded_circ = Folding.odd_gate(circ,3)
-    correct_folded_circ = Circuit(3).CX(0,1).add_barrier([0,1]).CX(0,1).add_barrier([0,1]).CX(0,1).add_barrier([0,1]).CX(0,1).add_barrier([0,1]).CX(0,1).CX(1,2)
+
+    circ = Circuit(3).CX(0, 1).CX(1, 2)
+    folded_circ = Folding.odd_gate(circ, 3)
+    correct_folded_circ = (
+        Circuit(3)
+        .CX(0, 1)
+        .add_barrier([0, 1])
+        .CX(0, 1)
+        .add_barrier([0, 1])
+        .CX(0, 1)
+        .add_barrier([0, 1])
+        .CX(0, 1)
+        .add_barrier([0, 1])
+        .CX(0, 1)
+        .CX(1, 2)
+    )
     assert folded_circ == correct_folded_circ
 
 
