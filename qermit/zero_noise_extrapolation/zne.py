@@ -47,7 +47,7 @@ class Folding(Enum):
     # TODO: Understand why self is needed etc
     # TODO: circ does not appear as input in docs
     # TODO Generalise with 'partial folding' to allow for non integer noise scaling
-    def circuit(circ: Circuit, noise_scaling: int, *args) -> Circuit:
+    def circuit(circ: Circuit, noise_scaling: int, **kwargs) -> Circuit:
         """Noise scaling by circuit folding. In this case the folded circuit is of
         the form :math:`CC^{-1}CC^{-1}...C` where :math:`C` is the original circuit. As such noise may be scaled by
         odd integers. The Unitary implemented is unchanged by this process.
@@ -79,7 +79,7 @@ class Folding(Enum):
 
         return folded_circ
 
-    def gate(circ: Circuit, noise_scaling: float, _allow_approx_fold: bool) -> Circuit:
+    def gate(circ: Circuit, noise_scaling: float, **kwargs) -> Circuit:
         """Noise scaling by gate folding. In this case gates :math:`G` are replaced at random
         with :math:`GG^{-1}G` until the number of gates is sufficiently scaled.
 
@@ -87,17 +87,21 @@ class Folding(Enum):
         :type circ: Circuit
         :param noise_scaling: Factor by which to increase the noise.
         :type noise_scaling: float
-        :param _allow_approx_fold: Allows for the noise to be increased by an amount close to that requested, as
+
+        :key _allow_approx_fold: Allows for the noise to be increased by an amount close to that requested, as
             opposed to by exactly the amount requested.
             This is necessary as there are cases where the exact noise scaling cannot be achieved.
             This occurs due to the discrete
             amounts by which the noise can be increased (i.e. the discrete amount by which one gate increases the noise).
         :type _allow_approx_fold: bool
+
         :raises ValueError: Raised if the requested noise scaling cannot be exactly achieved. This can be
             avoided by appropriately setting _allow_approx_fold.
         :return: Folded circuit implementing identical unitary to the initial circuit.
         :rtype: Circuit
         """
+
+        _allow_approx_fold = kwargs.get("_allow_approx_fold", 0)
 
         c_dict = circ.to_dict()
         num_commands = len(c_dict["commands"])
@@ -172,7 +176,7 @@ class Folding(Enum):
 
         return folded_c
 
-    def odd_gate(circ: Circuit, noise_scaling: int, *args) -> Circuit:
+    def odd_gate(circ: Circuit, noise_scaling: int, **kwargs) -> Circuit:
         """Noise scaling by gate folding. In this case odd gates :math:`G` are
         replaced :math:`GG^{-1}G` until the number of gates is sufficiently
         scaled.
@@ -539,7 +543,7 @@ def digital_folding_task_gen(
         for experiment in mitex_wire:
 
             # Apply the necessary folding method
-            zne_circ = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold)  # type: ignore
+            zne_circ = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold)  # type: ignore
 
             # TODO: This additional compilation pass may result in the circuit noise being
             # increased too much, and should be removed or better accounted for.
