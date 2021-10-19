@@ -772,6 +772,9 @@ def gen_initial_compilation_task(
                 )
             )
 
+            print("compiled circuit")
+            render_circuit_jupyter(cu.circuit)
+
         return (mapped_wire,)
 
     return MitTask(
