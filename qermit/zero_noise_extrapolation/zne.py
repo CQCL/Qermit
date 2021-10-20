@@ -737,6 +737,7 @@ def gen_initial_compilation_task(
             # Perform default compilation, tracking to which physical
             # qubits the initial qubits are mapped
             compiled_circ = obs_exp.AnsatzCircuit.Circuit.copy()
+
             cu = CompilationUnit(compiled_circ)
             backend.default_compilation_pass(
                 optimisation_level=optimisation_level

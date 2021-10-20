@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import pytest
 from qermit import (  # type: ignore
     ObservableTracker,
     SymbolsDict,
@@ -316,6 +316,20 @@ def test_simple_run_end_to_end():
 
     assert round(float(res1)) == 1.0
     assert round(float(res2)) == -1.0
+
+@pytest.mark.skip(reason="TK1 dagger currently incorrect")
+def test_circuit_folding_TK1():
+
+    circ = Circuit(2)
+    circ.add_gate(OpType.TK1, (0,0.1,0), [0])
+    circ.CX(0,1)
+
+    folded_circ = Folding.circuit(circ, 3)
+
+    circ_unitary = circ.get_unitary()
+    folded_circ_unitary = folded_circ.get_unitary()
+    assert np.allclose(circ_unitary, folded_circ_unitary)
+
 
 def test_odd_gate_folding():
 
