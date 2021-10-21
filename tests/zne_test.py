@@ -332,6 +332,7 @@ def test_simple_run_end_to_end():
     assert round(float(res2)) == -1.0
 
 
+<<<<<<< HEAD
 @pytest.mark.skip(reason="TK1 dagger currently incorrect")
 def test_circuit_folding_TK1():
 
@@ -346,6 +347,8 @@ def test_circuit_folding_TK1():
     assert np.allclose(circ_unitary, folded_circ_unitary)
 
 
+=======
+>>>>>>> b8808a598c3d7dfad7cc965eed47a4686bcef19b
 def test_odd_gate_folding():
 
     circ = Circuit(2).CX(0, 1).X(0).CX(1, 0).X(1)
