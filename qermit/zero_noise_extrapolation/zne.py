@@ -43,7 +43,6 @@ class Folding(Enum):
     :rtype: Circuit
     """
 
-    # TODO: Understand why self is needed etc
     # TODO: circ does not appear as input in docs
     # TODO Generalise with 'partial folding' to allow for non integer noise scaling
     def circuit(circ: Circuit, noise_scaling: int, **kwargs) -> Circuit:
