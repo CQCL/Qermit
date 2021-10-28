@@ -1,3 +1,3 @@
-pytket~=0.15.0
+pytket~=0.16.0
 matplotlib
 networkx
