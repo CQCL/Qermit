@@ -543,15 +543,28 @@ def digital_folding_task_gen(
 
             print(f'Noise scaling = {noise_scaling}'.format())
 
+            circ_unitary = experiment.AnsatzCircuit.Circuit.get_unitary()
+
+            print("Unfolded circuit")
+            render_circuit_jupyter(experiment.AnsatzCircuit.Circuit)
+
             # Apply the necessary folding method
             zne_circ = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold)  # type: ignore
+
+            print("Folded circuit")
+            render_circuit_jupyter(zne_circ)
+
+            folded_circ_unitary = zne_circ.get_unitary()
+
+            assert np.allclose(circ_unitary, folded_circ_unitary)
 
             # TODO: This additional compilation pass may result in the circuit noise being
             # increased too much, and should be removed or better accounted for.
 
             # This compilation pass was added to account for the case that
             # the inverse of a gate is not in the gateset of the backend.
-            backend.default_compilation_pass(optimisation_level=0).apply(zne_circ)
+            # backend.default_compilation_pass(optimisation_level=0).apply(zne_circ)
+            backend._rebase_pass.apply(zne_circ)
 
             folded_circuits.append(
                 ObservableExperiment(
@@ -564,6 +577,9 @@ def digital_folding_task_gen(
                 )
             )
 
+            assert np.allclose(circ_unitary, folded_circ_unitary)
+
+            print("Compiled and folded circuit")
             render_circuit_jupyter(zne_circ)
 
         return (folded_circuits,)
@@ -745,6 +761,9 @@ def gen_initial_compilation_task(
             # qubits the initial qubits are mapped
             compiled_circ = obs_exp.AnsatzCircuit.Circuit.copy()
 
+            print("Initial circuit")
+            render_circuit_jupyter(compiled_circ)
+
             cu = CompilationUnit(compiled_circ)
             backend.default_compilation_pass(
                 optimisation_level=optimisation_level
@@ -778,6 +797,9 @@ def gen_initial_compilation_task(
                     ObservableTracker=ObservableTracker(new_qpo),
                 )
             )
+
+            print("Compiled initial circuit")
+            render_circuit_jupyter(cu.circuit)
 
         return (mapped_wire,)
 
