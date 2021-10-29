@@ -34,6 +34,8 @@ from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial
 from pytket.circuit.display import render_circuit_jupyter
+from pytket import Qubit
+from pytket.pauli import Pauli
 
 
 class Folding(Enum):
@@ -488,9 +490,20 @@ def plot_fit(
     ax1 = fig.add_subplot(111)
 
     ax1.scatter(x, y, s=10, c="b", marker="s", label="data")
+
+    # print("x", x)
+    # print("y", y)
+
     ax1.plot(fit_x, fit_y, c="g", label="fit")
 
-    ax1.scatter(0, fit_to_zero, s=10, c="r", marker="o", label="prediction")
+    # print("fit_x", fit_x)
+    # print("fit_y", fit_y)
+
+    ax1.scatter(0, float(fit_to_zero), s=10, c="r", marker="o", label="prediction")
+
+    # print("fit_to_zero", fit_to_zero)
+
+    # ax1.ticklabel_format(useOffset=False, style='plain')
 
     plt.legend()
     plt.show()
@@ -541,18 +554,18 @@ def digital_folding_task_gen(
         # and perform the necessary compilation.
         for experiment in mitex_wire:
 
-            print(f'Noise scaling = {noise_scaling}'.format())
+            # print(f"Noise scaling = {noise_scaling}".format())
 
             circ_unitary = experiment.AnsatzCircuit.Circuit.get_unitary()
 
-            print("Unfolded circuit")
-            render_circuit_jupyter(experiment.AnsatzCircuit.Circuit)
+            # print("Unfolded circuit")
+            # render_circuit_jupyter(experiment.AnsatzCircuit.Circuit)
 
             # Apply the necessary folding method
             zne_circ = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold)  # type: ignore
 
-            print("Folded circuit")
-            render_circuit_jupyter(zne_circ)
+            # print("Folded circuit")
+            # render_circuit_jupyter(zne_circ)
 
             folded_circ_unitary = zne_circ.get_unitary()
 
@@ -579,8 +592,21 @@ def digital_folding_task_gen(
 
             assert np.allclose(circ_unitary, folded_circ_unitary)
 
-            print("Compiled and folded circuit")
-            render_circuit_jupyter(zne_circ)
+            qpo = QubitPauliOperator(
+                {
+                    QubitPauliString(
+                        [Qubit(i) for i in range(2)],
+                        [Pauli.Z for _ in range(2)],
+                    ): 1
+                }
+            )
+            # state_backend = AerStateBackend()
+            # folded_expectation = backend.get_operator_expectation_value(zne_circ, qpo)
+
+            # print(f"Folded expectation = {folded_expectation}".format())
+
+            # print("Compiled and folded circuit")
+            # render_circuit_jupyter(zne_circ)
 
         return (folded_circuits,)
 
@@ -628,6 +654,8 @@ def extrapolation_task_gen(
             {k: [d[k] for d in qpo_tuple] for k in qpo_tuple[0]._dict.keys()}
             for qpo_tuple in all_fold_qpo
         ]
+
+        # print("all_fold_qpo", all_fold_qpo)
 
         extrapolated = []
 
@@ -761,8 +789,8 @@ def gen_initial_compilation_task(
             # qubits the initial qubits are mapped
             compiled_circ = obs_exp.AnsatzCircuit.Circuit.copy()
 
-            print("Initial circuit")
-            render_circuit_jupyter(compiled_circ)
+            # print("Initial circuit")
+            # render_circuit_jupyter(compiled_circ)
 
             cu = CompilationUnit(compiled_circ)
             backend.default_compilation_pass(
@@ -798,8 +826,8 @@ def gen_initial_compilation_task(
                 )
             )
 
-            print("Compiled initial circuit")
-            render_circuit_jupyter(cu.circuit)
+            # print("Compiled initial circuit")
+            # render_circuit_jupyter(cu.circuit)
 
         return (mapped_wire,)
 
