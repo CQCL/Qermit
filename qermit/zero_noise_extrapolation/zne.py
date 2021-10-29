@@ -33,6 +33,7 @@ from pytket.predicates import CompilationUnit  # type: ignore
 from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial
+from pytket.circuit.display import render_circuit_jupyter
 
 
 class Folding(Enum):
@@ -298,7 +299,7 @@ class Fit(Enum):
         # Plot fitted function and data
         if _show_fit:
 
-            fit_x = np.linspace(0, x[-1], 100)
+            fit_x = np.linspace(0, max(x), 100)
             fit_y = [cube_root_func(i, *vals[0]) for i in fit_x]
 
             plot_fit(x, y, cast(List[float], fit_x), fit_y, fit_to_zero)
@@ -355,7 +356,7 @@ class Fit(Enum):
         # Plot data and fitted function
         if _show_fit:
 
-            fit_x = np.linspace(0, x[-1], 100)
+            fit_x = np.linspace(0, max(x), 100)
             fit_y = [poly_exp_func(i, *vals[0]) for i in fit_x]
 
             plot_fit(x, y, cast(List[float], fit_x), fit_y, fit_to_zero)
@@ -540,6 +541,8 @@ def digital_folding_task_gen(
         # and perform the necessary compilation.
         for experiment in mitex_wire:
 
+            print(f'Noise scaling = {noise_scaling}'.format())
+
             # Apply the necessary folding method
             zne_circ = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold)  # type: ignore
 
@@ -560,6 +563,8 @@ def digital_folding_task_gen(
                     ObservableTracker=experiment.ObservableTracker,
                 )
             )
+
+            render_circuit_jupyter(zne_circ)
 
         return (folded_circuits,)
 
