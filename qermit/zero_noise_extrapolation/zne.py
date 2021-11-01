@@ -487,10 +487,9 @@ def plot_fit(
     ax1 = fig.add_subplot(111)
 
     ax1.scatter(x, y, s=10, c="b", marker="s", label="data")
-
     ax1.plot(fit_x, fit_y, c="g", label="fit")
 
-    ax1.scatter(0, float(fit_to_zero), s=10, c="r", marker="o", label="prediction")
+    ax1.scatter(0, fit_to_zero, s=10, c="r", marker="o", label="prediction")
 
     plt.legend()
     plt.show()
@@ -540,8 +539,6 @@ def digital_folding_task_gen(
         # For each circuit in the input wire, extract the circuit, apply the fold,
         # and perform the necessary compilation.
         for experiment in mitex_wire:
-
-            circ_unitary = experiment.AnsatzCircuit.Circuit.get_unitary()
 
             # Apply the necessary folding method
             zne_circ = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold)  # type: ignore
