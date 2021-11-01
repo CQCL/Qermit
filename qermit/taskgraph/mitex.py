@@ -235,7 +235,6 @@ def get_expectations_task_gen() -> MitTask:
             observable.get_expectations(results)
             for observable, results in zip(trackers, all_results)
         ]
-        # print("output_qpos", output_qpos)
         return (output_qpos,)
 
     return MitTask(

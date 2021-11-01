@@ -25,7 +25,6 @@ from pytket.backends.backendresult import BackendResult
 import networkx as nx  # type: ignore
 import inspect
 from copy import deepcopy
-from pytket.circuit.display import render_circuit_jupyter
 
 
 def backend_compile_circuit_shots_task_gen(
@@ -83,12 +82,6 @@ def backend_handle_task_gen(backend: Backend) -> MitTask:
 
         if len(circuit_wires) != 0:
             circs, shots = map(list, zip(*circuit_wires))
-            
-            for circ in circs:
-                
-                print("Circuit being run")
-                # # print(circ.get_commands())
-                render_circuit_jupyter(circ)
 
             results = backend.process_circuits(
                 circs, n_shots=cast(Sequence[int], shots)
@@ -115,10 +108,6 @@ def backend_res_task_gen(backend: Backend) -> MitTask:
     def task(obj, handles: List[ResultHandle]) -> Tuple[List[BackendResult]]:
 
         results = backend.get_results(handles)
-
-        for result in results:
-
-            print("result", result.get_counts())
 
         return (results,)
         """
