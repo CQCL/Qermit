@@ -298,7 +298,7 @@ class Fit(Enum):
         # Plot fitted function and data
         if _show_fit:
 
-            fit_x = np.linspace(0, x[-1], 100)
+            fit_x = np.linspace(0, max(x), 100)
             fit_y = [cube_root_func(i, *vals[0]) for i in fit_x]
 
             plot_fit(x, y, cast(List[float], fit_x), fit_y, fit_to_zero)
@@ -355,7 +355,7 @@ class Fit(Enum):
         # Plot data and fitted function
         if _show_fit:
 
-            fit_x = np.linspace(0, x[-1], 100)
+            fit_x = np.linspace(0, max(x), 100)
             fit_y = [poly_exp_func(i, *vals[0]) for i in fit_x]
 
             plot_fit(x, y, cast(List[float], fit_x), fit_y, fit_to_zero)
@@ -548,7 +548,7 @@ def digital_folding_task_gen(
 
             # This compilation pass was added to account for the case that
             # the inverse of a gate is not in the gateset of the backend.
-            backend.default_compilation_pass(optimisation_level=0).apply(zne_circ)
+            backend._rebase_pass.apply(zne_circ) # type: ignore
 
             folded_circuits.append(
                 ObservableExperiment(
