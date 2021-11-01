@@ -84,11 +84,11 @@ def backend_handle_task_gen(backend: Backend) -> MitTask:
         if len(circuit_wires) != 0:
             circs, shots = map(list, zip(*circuit_wires))
             
-            # for circ in circs:
+            for circ in circs:
                 
-                # print("Circuit being run")
+                print("Circuit being run")
                 # # print(circ.get_commands())
-                # render_circuit_jupyter(circ)
+                render_circuit_jupyter(circ)
 
             results = backend.process_circuits(
                 circs, n_shots=cast(Sequence[int], shots)
@@ -115,6 +115,10 @@ def backend_res_task_gen(backend: Backend) -> MitTask:
     def task(obj, handles: List[ResultHandle]) -> Tuple[List[BackendResult]]:
 
         results = backend.get_results(handles)
+
+        for result in results:
+
+            print("result", result.get_counts())
 
         return (results,)
         """

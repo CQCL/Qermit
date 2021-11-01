@@ -554,7 +554,7 @@ def digital_folding_task_gen(
         # and perform the necessary compilation.
         for experiment in mitex_wire:
 
-            # print(f"Noise scaling = {noise_scaling}".format())
+            print(f"Noise scaling = {noise_scaling}".format())
 
             circ_unitary = experiment.AnsatzCircuit.Circuit.get_unitary()
 
@@ -564,8 +564,8 @@ def digital_folding_task_gen(
             # Apply the necessary folding method
             zne_circ = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold)  # type: ignore
 
-            # print("Folded circuit")
-            # render_circuit_jupyter(zne_circ)
+            print("Folded circuit")
+            render_circuit_jupyter(zne_circ)
 
             folded_circ_unitary = zne_circ.get_unitary()
 
@@ -592,14 +592,14 @@ def digital_folding_task_gen(
 
             assert np.allclose(circ_unitary, folded_circ_unitary)
 
-            qpo = QubitPauliOperator(
-                {
-                    QubitPauliString(
-                        [Qubit(i) for i in range(2)],
-                        [Pauli.Z for _ in range(2)],
-                    ): 1
-                }
-            )
+            # qpo = QubitPauliOperator(
+            #     {
+            #         QubitPauliString(
+            #             [Qubit(i) for i in range(2)],
+            #             [Pauli.Z for _ in range(2)],
+            #         ): 1
+            #     }
+            # )
             # state_backend = AerStateBackend()
             # folded_expectation = backend.get_operator_expectation_value(zne_circ, qpo)
 
@@ -826,8 +826,8 @@ def gen_initial_compilation_task(
                 )
             )
 
-            # print("Compiled initial circuit")
-            # render_circuit_jupyter(cu.circuit)
+            print("Compiled initial circuit")
+            render_circuit_jupyter(cu.circuit)
 
         return (mapped_wire,)
 
