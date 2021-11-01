@@ -67,7 +67,9 @@ class _PolyCDRCorrect(_BaseExCorrectModel):
         )
 
 
-def cdr_calibration_task_gen(backend: Backend, model: _BaseExCorrectModel) -> MitTask:
+def cdr_calibration_task_gen(
+    backend: Backend, model: _BaseExCorrectModel, tolerance: float
+) -> MitTask:
     """
     Uses calibration results from running characterisation circuits through a device
     and a noiseless simulator to characterise some model for correcting noisy expectation values.
@@ -76,6 +78,9 @@ def cdr_calibration_task_gen(backend: Backend, model: _BaseExCorrectModel) -> Mi
     :type backend: Backend
     :param model: Model type to be calibrated and stored in backend.
     :type model: _BaseExCorrectModel
+    :param tolerance: Model can be perturbed by exact values too close to 0, this parameter sets
+    an allowed distance between exact value and 0.
+    :type tolerance: float
     """
 
     def cdr_calibration_task(
@@ -103,20 +108,22 @@ def cdr_calibration_task_gen(backend: Backend, model: _BaseExCorrectModel) -> Mi
             for qpo_pair in calibration:
                 noisy_qpo = qpo_pair[0]
                 exact_qpo = qpo_pair[1]
+
                 # go through strings in operator
                 for key in noisy_qpo._dict:
                     # make sure keys are present (don't initialise at start incase indexing missing)
-                    if key not in noisy_char_dict:
-                        noisy_char_dict[key] = list()
-                    if key not in exact_char_dict:
-                        exact_char_dict[key] = list()
-                    if key not in exact_qpo._dict:
-                        raise ValueError(
-                            "Given key in calibration task for Clifford Data Regression should be present in exact and noisy characterisation results."
-                        )
+                    if abs(exact_qpo[key]) > tolerance:
+                        if key not in noisy_char_dict:
+                            noisy_char_dict[key] = list()
+                        if key not in exact_char_dict:
+                            exact_char_dict[key] = list()
+                        if key not in exact_qpo._dict:
+                            raise ValueError(
+                                "Given key in calibration task for Clifford Data Regression should be present in exact and noisy characterisation results."
+                            )
 
-                    noisy_char_dict[key].append(float(noisy_qpo._dict[key]))
-                    exact_char_dict[key].append(float(exact_qpo._dict[key]))
+                        noisy_char_dict[key].append(float(noisy_qpo._dict[key]))
+                        exact_char_dict[key].append(float(exact_qpo._dict[key]))
             if backend.backend_info is None:
                 raise ValueError("Backend has no backend_info attribute.")
 
@@ -172,10 +179,15 @@ def cdr_correction_task_gen(backend: Backend) -> MitTask:
             models = backend.backend_info.misc[char_string]
             new_qpo_dict = dict()
             for qps in noisy_expectation[i]._dict:
-                new_qpo_dict[qps] = cast(
-                    Union[int, float, complex],
-                    models[qps].correct(float(noisy_expectation[i]._dict[qps])),
-                )
+                if qps in models:
+                    new_qpo_dict[qps] = cast(
+                        Union[int, float, complex],
+                        models[qps].correct(float(noisy_expectation[i]._dict[qps])),
+                    )
+                else:
+                    new_qpo_dict[qps] = cast(
+                        Union[int, float, complex], noisy_expectation[i]._dict[qps]
+                    )
             corrected_expectations.append(QubitPauliOperator(new_qpo_dict))
 
         return (corrected_expectations,)
