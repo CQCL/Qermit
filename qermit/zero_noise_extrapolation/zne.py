@@ -548,7 +548,7 @@ def digital_folding_task_gen(
 
             # This compilation pass was added to account for the case that
             # the inverse of a gate is not in the gateset of the backend.
-            backend._rebase_pass.apply(zne_circ)
+            backend._rebase_pass.apply(zne_circ) # type: ignore
 
             folded_circuits.append(
                 ObservableExperiment(
