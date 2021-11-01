@@ -259,11 +259,17 @@ def test_digital_folding_task_gen():
 
     c_1_unitary = c_1.get_unitary()
     c_2_unitary = c_2.get_unitary()
+    c_3_unitary = c_3.get_unitary()
+    c_4_unitary = c_4.get_unitary()
     folded_c_1_unitary = folded_c_1.get_unitary()
     folded_c_2_unitary = folded_c_2.get_unitary()
+    folded_c_3_unitary = folded_c_3.get_unitary()
+    folded_c_4_unitary = folded_c_4.get_unitary()
 
     assert np.allclose(c_1_unitary, folded_c_1_unitary)
     assert np.allclose(c_2_unitary, folded_c_2_unitary)
+    assert np.allclose(c_3_unitary, folded_c_3_unitary)
+    assert np.allclose(c_4_unitary, folded_c_4_unitary)
 
 
 def test_zne_identity():
