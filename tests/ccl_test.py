@@ -69,22 +69,23 @@ def test_gen_state_circuits():
     s_0_coms = state_circuits0[0].get_commands()
     s_1_coms = state_circuits0[1].get_commands()
     s_2_coms = state_circuits0[2].get_commands()
+
     # manually assert angles of gates are expected for given state circuits for given seed
     # state circuit 0
-    assert s_0_coms[1].op.params == [0.63]
-    assert s_0_coms[3].op.params == [1.0]
-    assert s_0_coms[4].op.params == [0.0]
-    assert s_0_coms[5].op.params == [0.5]
+    assert s_0_coms[5].op.params == [0.63]
+    assert s_0_coms[7].op.params == [1.0]
+    assert s_0_coms[8].op.params == [0.0]
+    assert s_0_coms[10].op.params == [0.5]
     # state circuit 1
-    assert s_1_coms[1].op.params == [2.0]
-    assert s_1_coms[3].op.params == [0.5]
-    assert s_1_coms[4].op.params == [0.0]
-    assert s_1_coms[5].op.params == [0.1]
+    assert s_1_coms[5].op.params == [2.0]
+    assert s_1_coms[7].op.params == [0.5]
+    assert s_1_coms[8].op.params == [0.0]
+    assert s_1_coms[10].op.params == [0.1]
     # state circuit 2
-    assert s_2_coms[1].op.params == [2.0]
-    assert s_2_coms[3].op.params == [1.0]
-    assert s_2_coms[4].op.params == [0.2]
-    assert s_2_coms[5].op.params == [0.5]
+    assert s_2_coms[5].op.params == [2.0]
+    assert s_2_coms[7].op.params == [1.0]
+    assert s_2_coms[8].op.params == [0.2]
+    assert s_2_coms[10].op.params == [0.5]
 
     rz_counts_0 = count_rzs(state_circuits0[0])
     # 0th element number of rz cliffs, 1st element number of rz non cliffs
