@@ -181,10 +181,6 @@ def gen_state_circuits(
     n_non_cliffords = min(n_non_cliffords, len(rz_ops) - 1)
     n_cliffords = len(rz_ops) - n_non_cliffords
 
-    # if n_cliffords == 0:
-    #     n_non_cliffords = n_non_cliffords - 1
-    #     n_cliffords = 1
-
     n_pairs = min(n_cliffords, n_non_cliffords, n_pairs)
 
     # non_cliffords are indices for gates to be left non Clifford
