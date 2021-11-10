@@ -340,11 +340,17 @@ class Fit(Enum):
             [-1, -2, *[-np.inf for i in range(deg)]],
             [1, 2, *[np.inf for i in range(deg)]],
         )
+ 
+        # Initialise decaying poly-exponential with intersect at 
+        # unfolded noisy value.
+        least_noisy_y_index = x.index(1)
+        p0 = [0, y[least_noisy_y_index], *[-1 for i in range(deg)]]
+
         vals = curve_fit(
             poly_exp_func,
             x,
             y,
-            p0=[0, 1, *[-1 for i in range(deg)]],
+            p0=p0,
             maxfev=10000,
             bounds=bounds,
         )
