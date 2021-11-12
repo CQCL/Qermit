@@ -276,6 +276,8 @@ def test_cdr_mitex():
     ccl_me = gen_CDR_MitEx(b, b, n_non_cliffords=2, n_pairs=2, total_state_circuits=20)
     ccl_res = ccl_me.run([ObservableExperiment(ac0, t0), ObservableExperiment(ac1, t1)])
 
+    for x in ccl_me._cache:
+        print(x[0], x[2])
     me = MitEx(b)
     res = me.run([(ac0, t0), (ac1, t1)])
     # check that mitigated and non mitigated versions return identical values

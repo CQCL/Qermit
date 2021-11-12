@@ -51,6 +51,8 @@ class TaskGraph:
         self._i, self._o = IOTask.Input, IOTask.Output
         self._task_graph.add_edge(self._i, self._o, key=(0, 0), data=None)
 
+        self._cache = []
+
     def from_TaskGraph(self, task_graph: "TaskGraph"):
         """
         Returns a new TaskGraph object from another TaskGraph object.
@@ -362,6 +364,8 @@ class TaskGraph:
         # TODO Parallelism an option here, async an option for doing so.
         node_list = list(nx.topological_sort(self._task_graph))
 
+        self._cache = []
+
         for task in node_list:
             if task in (self._i, self._o):
                 continue
@@ -373,6 +377,7 @@ class TaskGraph:
             out_edges = self._task_graph.out_edges(task, data=True, keys=True)
 
             outputs = task(inputs)
+            self._cache.append((task._label, task, outputs))
             assert len(out_edges) == len(outputs)
             for _, _, ports, o_data in out_edges:
                 o_data["data"] = outputs[ports[0]]
