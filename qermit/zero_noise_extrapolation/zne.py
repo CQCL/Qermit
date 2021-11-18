@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pytket.passes import BasePass
+from pytket.passes import BasePass  # type: ignore
 from pytket.backends import Backend
 from qermit import (
     MitEx,
@@ -340,8 +340,8 @@ class Fit(Enum):
             [-1, -2, *[-np.inf for i in range(deg)]],
             [1, 2, *[np.inf for i in range(deg)]],
         )
- 
-        # Initialise decaying poly-exponential with intersect at 
+
+        # Initialise decaying poly-exponential with intersect at
         # unfolded noisy value.
         least_noisy_y_index = x.index(1)
         p0 = [0, y[least_noisy_y_index], *[-1 for i in range(deg)]]
@@ -792,7 +792,9 @@ def gen_initial_compilation_task(
 
 
 # TODO: Backend does not appear as input in documentation
-def gen_ZNE_MitEx(backend: Backend, rebase_pass: BasePass, noise_scaling_list: List[float], **kwargs) -> MitEx:
+def gen_ZNE_MitEx(
+    backend: Backend, rebase_pass: BasePass, noise_scaling_list: List[float], **kwargs
+) -> MitEx:
     """Generates MitEx object which mitigates for noise using Zero Noise Extrapolation. This is the
     process by which noise is amplified incrementally, and the zero noise case arrived at by
     extrapolating backwards. For further explanantion see https://arxiv.org/abs/2005.10921.
