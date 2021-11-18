@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pytket.circuit.display import render_circuit_jupyter
-from pytket.predicates import GateSetPredicate
+from pytket.passes import BasePass
 from pytket.backends import Backend
 from qermit import (
     MitEx,
@@ -23,15 +22,13 @@ from qermit import (
     ObservableExperiment,
     TaskGraph,
 )
-from sympy import Expr
-from pytket.passes import RebaseCustom  # type: ignore
 import copy
 from pytket.pauli import QubitPauliString  # type: ignore
 from enum import Enum
 import numpy as np
 from scipy.optimize import curve_fit  # type: ignore
 from typing import List, Tuple, cast
-from pytket import Circuit, OpType
+from pytket import Circuit
 from pytket.predicates import CompilationUnit  # type: ignore
 from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
@@ -503,50 +500,10 @@ def plot_fit(
     plt.legend()
     plt.show()
 
-def int_half(angle: float) -> int:
-    # assume float is approximately an even integer, and return the half
-    two_x = round(angle)
-    assert not two_x % 2
-    return two_x // 2
-
-def _approx_0_mod_2(x, eps: float = 1e-10) -> bool:
-    if isinstance(x, Expr) and not x.is_constant():
-        return False
-    x = float(x)
-    x %= 2
-    return min(x, 2 - x) < eps
-
-def _tk1_to_x_sx_rz(
-    a, b, c
-) -> Circuit:
-    circ = Circuit(1)
-    correction_phase = 0.0
-
-    if _approx_0_mod_2(b + 0.5) and _approx_0_mod_2(a) and _approx_0_mod_2(c):
-
-        # a = 2k, b = 2m-0.5, c = 2n
-        # Rz(2k)Rx(2m - 0.5)Rz(2n) = (-1)^{k+m+n}e^{i \pi /4} X.SX
-        circ.X(0).SX(0)
-        correction_phase += (
-            int_half(float(b) + 0.5) + int_half(float(a)) + int_half(float(c)) + 0.25
-        )
-    else:
-        raise Exception("This is a gate I am not prepared for.")
-
-    circ.add_phase(correction_phase)
-    return circ
-
-
-_my_rebase_pass = RebaseCustom(
-    {OpType.CX},
-    Circuit(2).CX(0, 1),
-    {OpType.X, OpType.SX, OpType.Rz},
-    _tk1_to_x_sx_rz,
-)
-
 
 def digital_folding_task_gen(
     backend: Backend,
+    rebase_pass: BasePass,
     noise_scaling: float,
     _folding_type: Folding,
     _allow_approx_fold: bool,
@@ -585,7 +542,6 @@ def digital_folding_task_gen(
         """
 
         folded_circuits = []
-        gateset = GateSetPredicate(backend.backend_info.gate_set) 
 
         # For each circuit in the input wire, extract the circuit, apply the fold,
         # and perform the necessary compilation.
@@ -599,10 +555,7 @@ def digital_folding_task_gen(
 
             # This compilation pass was added to account for the case that
             # the inverse of a gate is not in the gateset of the backend.
-            backend._rebase_pass.apply(zne_circ) # type: ignore           
-            if not gateset.verify(zne_circ):
-                _my_rebase_pass.apply(zne_circ)
-            assert(gateset.verify(zne_circ))
+            rebase_pass.apply(zne_circ)
 
             folded_circuits.append(
                 ObservableExperiment(
@@ -839,13 +792,15 @@ def gen_initial_compilation_task(
 
 
 # TODO: Backend does not appear as input in documentation
-def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -> MitEx:
+def gen_ZNE_MitEx(backend: Backend, rebase_pass: BasePass, noise_scaling_list: List[float], **kwargs) -> MitEx:
     """Generates MitEx object which mitigates for noise using Zero Noise Extrapolation. This is the
     process by which noise is amplified incrementally, and the zero noise case arrived at by
     extrapolating backwards. For further explanantion see https://arxiv.org/abs/2005.10921.
 
     :param backend: Backend on which the circuits are to be run.
     :type backend: Backend
+    :param rebase_pass: BasePass rebasing to the gateset of the backend.
+    :type rebase_pass: BasePass
     :param noise_scaling_list: A list of the amounts by which the noise should be scaled.
     :type noise_scaling_list: List[float]
     :return: MitEx object performing noise mitigation by ZNE.
@@ -895,7 +850,7 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
         )
 
         digital_folding_task = digital_folding_task_gen(
-            backend, fold, _folding_type, _allow_approx_fold
+            backend, rebase_pass, fold, _folding_type, _allow_approx_fold
         )
         _fold_mitex.prepend(digital_folding_task)
         _experiment_taskgraph.parallel(_fold_mitex)
