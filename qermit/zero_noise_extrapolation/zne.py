@@ -515,6 +515,8 @@ def digital_folding_task_gen(
     :param backend: This will be used to compile the circuit after folding to ensure
         that the gate set matches those available on the backend.
     :type backend: Backend
+    :param rebase_pass: BasePass to rebase circuits to the native gates of backend
+    :type rebase_pass: BasePass
     :param noise_scaling: The factor by which the noise is increased.
     :type noise_scaling: float
     :param _folding_type: The means by which the noise should be increased.
