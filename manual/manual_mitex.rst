@@ -460,8 +460,10 @@ the ``qermit.zero_noise_extrapolation`` `module <https://cqcl.github.io/qermit/z
 
     from qermit.zero_noise_extrapolation import gen_ZNE_MitEx
     from pytket.extensions.qiskit import IBMQEmulatorBackend
+    from pytket.extensions.qiskit.backends.ibm import _rebase_pass
 
-    zne_mitex = gen_ZNE_MitEx(casablanca_backend, folds = [3,5,7])
+
+    zne_mitex = gen_ZNE_MitEx(backend=casablanca_backend, rebase_pass=_rebase_pass, noise_scaling_list = [3,5,7])
     zne_mitex.get_task_graph()
 
 
