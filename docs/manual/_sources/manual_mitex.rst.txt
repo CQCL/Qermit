@@ -443,7 +443,7 @@ approaches, which might, for example, alter noise levels by stretching or otherw
 pulses acted on superconducting qubits. More specifically we increase 
 the effective noise by performing a folding operation on the circuit, which increases the 
 number of gates without affecting the unitary it implements. At their core these folding 
-methods use that, for a gate :math:``G``, :math:`G = G G^{-1} G`, and assume that making this 
+methods use that, for a gate :math:`G`, :math:`G = G G^{-1} G`, and assume that making this 
 substitution has the affect of tripling the noise.
 
 Extrapolation aims to recover an estimate of the expectation value of some observable, 
@@ -460,15 +460,20 @@ the ``qermit.zero_noise_extrapolation`` `module <https://cqcl.github.io/qermit/z
 
     from qermit.zero_noise_extrapolation import gen_ZNE_MitEx
     from pytket.extensions.qiskit import IBMQEmulatorBackend
+    from pytket.extensions.qiskit.backends.ibm import _rebase_pass
 
-    zne_mitex = gen_ZNE_MitEx(casablanca_backend, folds = [3,5,7])
+    zne_mitex = gen_ZNE_MitEx(backend=casablanca_backend, rebase_pass=_rebase_pass, noise_scaling_list = [3,5,7])
     zne_mitex.get_task_graph()
 
 
 .. image:: zne_taskgraph.png
 
-For each number of folds a different ``MitEx`` object is constructed. Let's
-construct a test case with expected value 1.0 and run the error-mitigation ``MitEx``.
+Here the three inputs are: ``backend``, the backend on which the circuits will 
+be run; ``rebase_pass``, a rebase pass which rebases to the gates native to the 
+backend; and ``noise_scaling_list``, a list of integer multiples by which the 
+noise will be scaled. For each noise scaling value a different ``MitEx`` object is 
+constructed. Let's construct a test case with expected value 1.0 and run the 
+error-mitigation ``MitEx``.
 
 ::
 
