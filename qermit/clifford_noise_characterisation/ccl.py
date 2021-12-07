@@ -136,7 +136,7 @@ def gen_state_circuits(
     all_coms = c.get_commands()
 
     #  angles that make Clifford gates for S^n
-    clifford_angles = set({0.5, 1.0, 1.5, 0})
+    clifford_angles = set({0, 0.5, 1.0, 1.5, 2, 2.5, 3, 3.5})
 
     if n_pairs > n_non_cliffords:
         raise ValueError(
