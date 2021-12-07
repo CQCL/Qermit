@@ -156,13 +156,14 @@ def gen_state_circuits(
 
     state_circuits: List[Circuit] = []
     if len(rz_ops) == 1:
+        index = rz_ops.pop()
         # make special case, just constantly
         # keep on producing state circuits until limit reached
         while len(state_circuits) < total_state_circuits:
             new_circuit = Circuit(c.n_qubits, len(c.bits))
             for i in range(len(all_coms)):
                 com = all_coms[i]
-                if com.op.type == OpType.Rz:
+                if com.op.type == OpType.Rz and i == index:
                     new_circuit.add_barrier(com.qubits)
                     angle = sample_weighted_clifford_angle(com.op.params[0])
                     new_circuit.add_gate(com.op.type, [angle], com.qubits)
@@ -189,7 +190,7 @@ def gen_state_circuits(
     # rz_ops then only contains rz gates in c to be substituted for Clifford angles
     rz_ops.difference_update(non_cliffords)
     # Power of random Clifford gates to be substituted
-    cliffords = {num: random.randint(0, 4) for num in rz_ops}
+    cliffords = {num: random.randint(0, 8) for num in rz_ops}
 
     # keep on producing state circuits until limit reached
     while len(state_circuits) < total_state_circuits:
