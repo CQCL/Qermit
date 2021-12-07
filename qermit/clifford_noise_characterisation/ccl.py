@@ -184,7 +184,7 @@ def gen_state_circuits(
     n_pairs = min(n_cliffords, n_non_cliffords, n_pairs)
 
     # non_cliffords are indices for gates to be left non Clifford
-    non_cliffords = np.random.choice(list(rz_ops), n_non_cliffords)
+    non_cliffords = np.random.choice(list(rz_ops), n_non_cliffords, replace=False)
 
     # rz_ops then only contains rz gates in c to be substituted for Clifford angles
     rz_ops.difference_update(non_cliffords)
