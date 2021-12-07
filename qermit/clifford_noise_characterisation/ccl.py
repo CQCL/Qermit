@@ -157,7 +157,7 @@ def gen_state_circuits(
     #  angles that make Clifford gates for S^n
     clifford_angles = set({0.5, 1.0, 1.5, 0})
     # TODO: Use all clifford angles
-    # clifford_angles = set({0, 0.5, 1.0, 1.5, 2, 2.5, 3, 3.5})
+    clifford_angles = set({0, 0.5, 1.0, 1.5, 2, 2.5, 3, 3.5})
 
     if n_pairs > n_non_cliffords:
         raise ValueError(
@@ -222,7 +222,8 @@ def gen_state_circuits(
 
     # non_cliffords are indices for gates to be left non Clifford
     # TODO: Should this be choice without replacement?
-    non_cliffords = np.random.choice(list(rz_ops), n_non_cliffords)
+    # non_cliffords = np.random.choice(list(rz_ops), n_non_cliffords)
+    non_cliffords = np.random.choice(list(rz_ops), n_non_cliffords, replace=False)
 
     print(f"non_cliffords (non-Clifford denominated as non-Clifford): {non_cliffords}")
 
