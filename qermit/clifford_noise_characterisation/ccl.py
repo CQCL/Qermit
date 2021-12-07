@@ -136,7 +136,7 @@ def gen_state_circuits(
     all_coms = c.get_commands()
 
     #  angles that make Clifford gates for S^n
-    clifford_angles = set({0.5, 1.0, 1.5, 0})
+    clifford_angles = set({0, 0.5, 1.0, 1.5, 2, 2.5, 3, 3.5})
 
     if n_pairs > n_non_cliffords:
         raise ValueError(
@@ -184,7 +184,7 @@ def gen_state_circuits(
     n_pairs = min(n_cliffords, n_non_cliffords, n_pairs)
 
     # non_cliffords are indices for gates to be left non Clifford
-    non_cliffords = np.random.choice(list(rz_ops), n_non_cliffords)
+    non_cliffords = np.random.choice(list(rz_ops), n_non_cliffords, replace=False)
 
     # rz_ops then only contains rz gates in c to be substituted for Clifford angles
     rz_ops.difference_update(non_cliffords)
