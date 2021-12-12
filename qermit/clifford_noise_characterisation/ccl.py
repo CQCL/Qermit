@@ -136,9 +136,6 @@ def gen_state_circuits(
     c.flatten_registers()
     all_coms = c.get_commands()
 
-    # all_coms_indexed = [(i, com) for i, com in enumerate(all_coms)]
-    # print(f"all_coms: {all_coms_indexed}")
-
     #  angles that make Clifford gates for S^n
     clifford_angles = set({0, 0.5, 1.0, 1.5, 2, 2.5, 3, 3.5})
 
@@ -155,16 +152,6 @@ def gen_state_circuits(
         if all_coms[i].op.type == OpType.Rz:
             if all_coms[i].op.params[0] not in clifford_angles:
                 rz_ops.add(i)
-
-    # print(f"rz_ops (index of non-clifford RZ gates): {rz_ops}")
-
-    # correct_clifford_angles = set({0, 0.5, 1.0, 1.5, 2, 2.5, 3, 3.5})
-    # correct_rz_ops = set()
-    # for i in range(len(all_coms)):
-    #     if all_coms[i].op.type == OpType.Rz:
-    #         if all_coms[i].op.params[0] not in correct_clifford_angles:
-    #             correct_rz_ops.add(i)
-    # print(f"actually the correct set of indexes is: {correct_rz_ops}")
 
     if len(rz_ops) == 0:
         return [c] * total_state_circuits
@@ -201,8 +188,6 @@ def gen_state_circuits(
     # non_cliffords are indices for gates to be left non Clifford
     non_cliffords = np.random.choice(list(rz_ops), n_non_cliffords, replace=False)
 
-    print(f"non_cliffords (non-Clifford denominated as non-Clifford): {non_cliffords}")
-
     # rz_ops then only contains rz gates in c to be substituted for Clifford angles
     rz_ops.difference_update(non_cliffords)
     # Power of random Clifford gates to be substituted
@@ -235,9 +220,6 @@ def gen_state_circuits(
                     angle = sample_weighted_clifford_angle(com.op.params[0])
                     new_circuit.add_gate(com.op.type, [angle], com.qubits)
                     new_circuit.add_barrier(com.qubits)
-                    # replaced_optype = com.op.type
-                    # orig_angle = com.op.params
-                    # print(f"Replacing gate {i} of optype {replaced_optype} of original angle {orig_angle} with angle {angle}.")
                 # in cliffords mean it is denominated as Clifford, and hasn't been sampled for a pair
                 # as clifford_pair_elements has already been checked
                 # in this case, cliffords is a dict between Rz index and substitution S power
@@ -245,10 +227,6 @@ def gen_state_circuits(
                 elif i in cliffords:
                     new_circuit.add_gate(com.op.type, [0.5 * cliffords[i]], com.qubits)
                     new_circuit.add_barrier(com.qubits)
-                    # angle = 0.5 * cliffords[i]
-                    # replaced_optype = com.op.type
-                    # orig_angle = com.op.params
-                    # print(f"Replacing gate {i} of optype {replaced_optype} of original angle {orig_angle} with angle {angle}.")
                 # final case means gate was chosen to retain non-Clifford, and has not been
                 # sampled in any pair, so add original angle.
                 else:
@@ -265,10 +243,6 @@ def gen_state_circuits(
         state_circuits.append(new_circuit)
         
     return state_circuits
-
-# from pytket.extensions.qiskit import AerStateBackend
-
-# temp_state_simulator = AerStateBackend()
 
 def ccl_state_task_gen(
     n_non_cliffords: int, n_pairs: int, total_state_circuits: int
@@ -326,8 +300,6 @@ def ccl_state_task_gen(
             # for each state circuit, create a new wire of for each state circuit
             # one for simulator, one for device
             for c in state_circuits:
-                # ideal_expectation = temp_state_simulator.get_operator_expectation_value(state_circuit=c, operator=qubit_pauli_operator)
-                # print(f"ccl_state_task_gen ideal_expectation: {ideal_expectation}")
                 wire_sim = ObservableExperiment(
                     AnsatzCircuit=AnsatzCircuit(
                         Circuit=c, Shots=shots, SymbolsDict=SymbolsDict()

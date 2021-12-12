@@ -54,13 +54,10 @@ class _PolyCDRCorrect(_BaseExCorrectModel):
         self.params = params
 
     def calibrate(self, noisy_exp: List[float], exact_exp: List[float]) -> None:
-        print(f"_PolyCDRCorrect calibrate noisy_exp {noisy_exp}")
-        print(f"_PolyCDRCorrect calibrate exact_exp {exact_exp}")
         self.params = cast(
             List[float],
             cast(np.ndarray, np.polyfit(x=noisy_exp, y=exact_exp, deg=self.degree)).tolist(),
         )
-        print(f"self.params: {self.params}")
 
     def correct(self, noisy_expectation: float) -> float:
         return cast(
@@ -88,9 +85,6 @@ def cdr_quality_check_task_gen(tolerance: float) -> MitTask:
 
             original_coefficient = original.to_list()[0]['coefficient'][0]
 
-            # is_close_list = [math.isclose(original_coefficient, calibration_qpo[0].to_list()[0]['coefficient'][0], abs_tol=tolerance) for calibration_qpo in calibration]
-            # print("is_close_list", is_close_list)
-
             isclose_count = 0
 
             for qpo_pair in calibration:
@@ -98,7 +92,6 @@ def cdr_quality_check_task_gen(tolerance: float) -> MitTask:
                 print("original", original, "qpo_pair", qpo_pair)
 
                 noisy_qpo = qpo_pair[0]
-                # exact_qpo = qpo_pair[1]
 
                 noisy_coefficient = noisy_qpo.to_list()[0]['coefficient'][0]
 
@@ -152,7 +145,6 @@ def cdr_calibration_task_gen(
         :return: A bool confirming characteriastion is complete
         :rtype: Tuple[bool]
         """
-        print(f"cdr_calibration_task calibration_results: {calibration_results}")
         counter = 0
         for calibration in calibration_results:
             # dict from QubitPauliString to Tuple[List[float], List[float]]
@@ -165,15 +157,11 @@ def cdr_calibration_task_gen(
                 noisy_qpo = qpo_pair[0]
                 exact_qpo = qpo_pair[1]
 
-                print(f"noisy_qpo = {noisy_qpo}")
-                print(f"exact_qpo = {exact_qpo}")
-
                 # go through strings in operator
                 for key in noisy_qpo._dict:
                     # make sure keys are present (don't initialise at start incase indexing missing)
                     exact_qpo_key = exact_qpo[key]
                     if abs(exact_qpo[key]) > tolerance:
-                        print(f"{exact_qpo_key} looking good")
                         if key not in noisy_char_dict:
                             noisy_char_dict[key] = list()
                         if key not in exact_char_dict:
@@ -185,11 +173,6 @@ def cdr_calibration_task_gen(
 
                         noisy_char_dict[key].append(float(noisy_qpo._dict[key]))
                         exact_char_dict[key].append(float(exact_qpo._dict[key]))
-                    else:
-                        print(f"{exact_qpo_key} not big enough")
-
-            print(f"noisy_char_dict: {noisy_char_dict}")
-            print(f"exact_char_dict: {exact_char_dict}")
 
             if backend.backend_info is None:
                 raise ValueError("Backend has no backend_info attribute.")
