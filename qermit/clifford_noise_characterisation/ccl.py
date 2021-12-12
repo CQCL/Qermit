@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pytket.circuit.display import render_circuit_jupyter
 from pytket import OpType, Circuit
 from pytket.passes import RebaseUFR, DecomposeBoxes  # type: ignore
 from pytket.backends import Backend
@@ -125,34 +124,20 @@ def gen_state_circuits(
     :return: All generated state circuits
     :rtype: List[Circuit]
     """
-    print("gen_state_circuits input circuit:")
-    render_circuit_jupyter(c)
-    print(f"n_non_cliffords: {n_non_cliffords}")
-    print(f"n_pairs: {n_pairs}")
-    print(f"total_state_circuits: {total_state_circuits}")
+
     # set seed if given
     if "seed" in kwargs:
-        # seed = kwargs.get("seed")
-        # print(f"seed: {seed}")
         random.seed(kwargs.get("seed"))
         np.random.seed(kwargs.get("seed"))
-
-    seed = random.randrange(2**32 - 1)
-    seed = 3971309005
-    random.seed(seed)
-    np.random.seed(seed)
-    print("Seed was:", seed)
 
     # Work in CX, H, Rz basis for ease
     DecomposeBoxes().apply(c)
     RebaseUFR().apply(c)
     c.flatten_registers()
-    print("gen_state_circuits compiled circuit")
-    render_circuit_jupyter(c)
     all_coms = c.get_commands()
 
-    all_coms_indexed = [(i, com) for i, com in enumerate(all_coms)]
-    print(f"all_coms: {all_coms_indexed}")
+    # all_coms_indexed = [(i, com) for i, com in enumerate(all_coms)]
+    # print(f"all_coms: {all_coms_indexed}")
 
     #  angles that make Clifford gates for S^n
     clifford_angles = set({0, 0.5, 1.0, 1.5, 2, 2.5, 3, 3.5})
@@ -171,15 +156,15 @@ def gen_state_circuits(
             if all_coms[i].op.params[0] not in clifford_angles:
                 rz_ops.add(i)
 
-    print(f"rz_ops (index of non-clifford RZ gates): {rz_ops}")
+    # print(f"rz_ops (index of non-clifford RZ gates): {rz_ops}")
 
-    correct_clifford_angles = set({0, 0.5, 1.0, 1.5, 2, 2.5, 3, 3.5})
-    correct_rz_ops = set()
-    for i in range(len(all_coms)):
-        if all_coms[i].op.type == OpType.Rz:
-            if all_coms[i].op.params[0] not in correct_clifford_angles:
-                correct_rz_ops.add(i)
-    print(f"actually the correct set of indexes is: {correct_rz_ops}")
+    # correct_clifford_angles = set({0, 0.5, 1.0, 1.5, 2, 2.5, 3, 3.5})
+    # correct_rz_ops = set()
+    # for i in range(len(all_coms)):
+    #     if all_coms[i].op.type == OpType.Rz:
+    #         if all_coms[i].op.params[0] not in correct_clifford_angles:
+    #             correct_rz_ops.add(i)
+    # print(f"actually the correct set of indexes is: {correct_rz_ops}")
 
     if len(rz_ops) == 0:
         return [c] * total_state_circuits
@@ -211,12 +196,7 @@ def gen_state_circuits(
     n_non_cliffords = min(n_non_cliffords, len(rz_ops) - 1)
     n_cliffords = len(rz_ops) - n_non_cliffords
 
-    print(f"n_non_cliffords: {n_non_cliffords}")
-    print(f"n_cliffords: {n_cliffords}")
-
     n_pairs = min(n_cliffords, n_non_cliffords, n_pairs)
-
-    print(f"n_pairs: {n_pairs}")
 
     # non_cliffords are indices for gates to be left non Clifford
     non_cliffords = np.random.choice(list(rz_ops), n_non_cliffords, replace=False)
@@ -225,22 +205,16 @@ def gen_state_circuits(
 
     # rz_ops then only contains rz gates in c to be substituted for Clifford angles
     rz_ops.difference_update(non_cliffords)
-    # print(f"rz_ops with only future clifford gates: {rz_ops}")
     # Power of random Clifford gates to be substituted
-    # TODO: This should technically be up to but not including 8
     cliffords = {num: random.randint(0, 4) for num in rz_ops}
-    print(f"cliffords (non-Clifford denominated as Clifford): {cliffords}")
 
     # keep on producing state circuits until limit reached
     while len(state_circuits) < total_state_circuits:
         # cliffords.keys() are integers for now Clifford gates
         # sample some set of these to be subbed for original non-Clifford angle
-        # TODO: Should the sample operations here be without replacement?
         clifford_pair_elements = random.sample(list(cliffords.keys()), n_pairs)
-        print(f"clifford_pair_elements (non-Clifford denominated as Clifford, but actually not): {clifford_pair_elements}")
         # from remaining non-Clifford Rz gates, sample some to have random Clifford gate
         non_clifford_pair_elements = random.sample(list(non_cliffords), n_pairs)
-        print(f"non_clifford_pair_elements (non-Clifford denominated as non-Clifford, but actually not) {non_clifford_pair_elements}")
 
         # create new Circuit from scratch
         new_circuit = Circuit(c.n_qubits, len(c.bits))
@@ -261,9 +235,9 @@ def gen_state_circuits(
                     angle = sample_weighted_clifford_angle(com.op.params[0])
                     new_circuit.add_gate(com.op.type, [angle], com.qubits)
                     new_circuit.add_barrier(com.qubits)
-                    replaced_optype = com.op.type
-                    orig_angle = com.op.params
-                    print(f"Replacing gate {i} of optype {replaced_optype} of original angle {orig_angle} with angle {angle}.")
+                    # replaced_optype = com.op.type
+                    # orig_angle = com.op.params
+                    # print(f"Replacing gate {i} of optype {replaced_optype} of original angle {orig_angle} with angle {angle}.")
                 # in cliffords mean it is denominated as Clifford, and hasn't been sampled for a pair
                 # as clifford_pair_elements has already been checked
                 # in this case, cliffords is a dict between Rz index and substitution S power
@@ -271,10 +245,10 @@ def gen_state_circuits(
                 elif i in cliffords:
                     new_circuit.add_gate(com.op.type, [0.5 * cliffords[i]], com.qubits)
                     new_circuit.add_barrier(com.qubits)
-                    angle = 0.5 * cliffords[i]
-                    replaced_optype = com.op.type
-                    orig_angle = com.op.params
-                    print(f"Replacing gate {i} of optype {replaced_optype} of original angle {orig_angle} with angle {angle}.")
+                    # angle = 0.5 * cliffords[i]
+                    # replaced_optype = com.op.type
+                    # orig_angle = com.op.params
+                    # print(f"Replacing gate {i} of optype {replaced_optype} of original angle {orig_angle} with angle {angle}.")
                 # final case means gate was chosen to retain non-Clifford, and has not been
                 # sampled in any pair, so add original angle.
                 else:
@@ -290,16 +264,11 @@ def gen_state_circuits(
         # all circuits accepted and run, some results later discarded if not accepted by Metropolis-Hastings rule
         state_circuits.append(new_circuit)
         
-        render_circuit_jupyter(new_circuit)
-
-        # all_coms_indexed = [(i, com) for i, com in enumerate(new_circuit.get_commands())]
-        # print(f"all_coms_indexed: {all_coms_indexed}")
-
     return state_circuits
 
-from pytket.extensions.qiskit import AerStateBackend
+# from pytket.extensions.qiskit import AerStateBackend
 
-temp_state_simulator = AerStateBackend()
+# temp_state_simulator = AerStateBackend()
 
 def ccl_state_task_gen(
     n_non_cliffords: int, n_pairs: int, total_state_circuits: int
@@ -357,8 +326,8 @@ def ccl_state_task_gen(
             # for each state circuit, create a new wire of for each state circuit
             # one for simulator, one for device
             for c in state_circuits:
-                ideal_expectation = temp_state_simulator.get_operator_expectation_value(state_circuit=c, operator=qubit_pauli_operator)
-                print(f"ccl_state_task_gen ideal_expectation: {ideal_expectation}")
+                # ideal_expectation = temp_state_simulator.get_operator_expectation_value(state_circuit=c, operator=qubit_pauli_operator)
+                # print(f"ccl_state_task_gen ideal_expectation: {ideal_expectation}")
                 wire_sim = ObservableExperiment(
                     AnsatzCircuit=AnsatzCircuit(
                         Circuit=c, Shots=shots, SymbolsDict=SymbolsDict()
@@ -416,15 +385,12 @@ def ccl_result_batching_task_gen(n_state_circuits: int) -> MitTask:
         :return: State circuit results split into separate lists for each experiment, with noisy and noiseless expectations paired together.
         :rtype: Tuple[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]
         """
-        # print(f"exact_exp: {exact_exp}")
-        # print(f"noisy_exp: {noisy_exp}")
         if len(noisy_exp) != len(exact_exp):
             raise RuntimeError(
                 "Batching task should receive identical number of Simulated and Device run results."
             )
 
         zipped = list(zip(noisy_exp, exact_exp))
-        print("zipped", *zipped, sep='\n')
         chunked_zipped = [
             zipped[i : i + n_state_circuits]
             for i in range(0, len(zipped), n_state_circuits)
@@ -467,9 +433,7 @@ def ccl_likelihood_filtering_task_gen(
         :return: Filtered calibration results.
         :rtype: Tuple[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]
         """
-        # print(f"ccl_likelihood_filtering_task_gen state_circuit_exp: {state_circuit_exp}")
         if likelihood_function == LikelihoodFunction.none:
-            print("likelihood_function == LikelihoodFunction.none")
             return (state_circuit_exp,)
         else:
             if "seed" in kwargs:
@@ -527,10 +491,6 @@ def gen_CDR_MitEx(
         default set to none.
     """
 
-    # seed = 10
-    # random.seed(seed)
-    # np.random.seed(seed)
-
     _states_sim_mitex = copy.copy(
         kwargs.get(
             "states_simluator_mitex",
@@ -567,27 +527,17 @@ def gen_CDR_MitEx(
     _states_sim_taskgraph.append(ccl_result_batching_task_gen(total_state_circuits))
 
     likelihood_function = kwargs.get("likelihood_function", LikelihoodFunction.none)
-    # _states_sim_taskgraph.append(ccl_likelihood_filtering_task_gen(likelihood_function))
-    # _states_sim_taskgraph.append(
-    #     cdr_calibration_task_gen(
-    #         device_backend,
-    #         kwargs.get("model", _PolyCDRCorrect(1)),
-    #         kwargs.get("tolerance", 0.01),
-    #     )
-    # )
 
     _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
     _experiment_taskgraph.parallel(_states_sim_taskgraph)
 
     _post_calibrate_task_graph = TaskGraph()
-    # _post_task_graph.add_wire()
     _post_calibrate_task_graph.append(ccl_likelihood_filtering_task_gen(likelihood_function))
     _post_calibrate_task_graph.append(cdr_calibration_task_gen(
             device_backend,
             kwargs.get("model", _PolyCDRCorrect(1)),
             kwargs.get("tolerance", 0.01),
         ))
-    # _post_calibrate_task_graph.add_wire()
 
     _post_task_graph = TaskGraph()
     _post_task_graph.parallel(_post_calibrate_task_graph)
