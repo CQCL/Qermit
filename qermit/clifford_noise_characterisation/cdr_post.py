@@ -23,6 +23,8 @@ from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator
 from pytket.pauli import QubitPauliString  # type: ignore
 from qermit import MitTask
+import math
+import warnings
 
 
 class _BaseExCorrectModel(ABC):
@@ -68,6 +70,56 @@ class _PolyCDRCorrect(_BaseExCorrectModel):
                 for coef, power in zip(self.params, range(self.degree, -1, -1))
             ),
         )
+
+def cdr_quality_check_task_gen(tolerance: float) -> MitTask:
+
+    def cdr_quality_check_task(
+        obj, 
+        noisy_expectation: List[QubitPauliOperator], 
+        state_circuit_exp: List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]],
+        ):
+
+        print("cdr_quality_check_task noisy_expectation:", noisy_expectation)
+        print("cdr_quality_check_task state_circuit_exp:", state_circuit_exp)
+
+        for calibration, original in zip(state_circuit_exp, noisy_expectation):
+
+            print("original dictionary:", original.to_list()[0]['coefficient'][0])
+
+            original_coefficient = original.to_list()[0]['coefficient'][0]
+
+            # is_close_list = [math.isclose(original_coefficient, calibration_qpo[0].to_list()[0]['coefficient'][0], abs_tol=tolerance) for calibration_qpo in calibration]
+            # print("is_close_list", is_close_list)
+
+            isclose_count = 0
+
+            for qpo_pair in calibration:
+
+                print("original", original, "qpo_pair", qpo_pair)
+
+                noisy_qpo = qpo_pair[0]
+                # exact_qpo = qpo_pair[1]
+
+                noisy_coefficient = noisy_qpo.to_list()[0]['coefficient'][0]
+
+                if math.isclose(noisy_coefficient, original_coefficient, abs_tol=tolerance):
+                    isclose_count += 1
+
+            print("===== isclose_count", isclose_count)
+                
+            if isclose_count <= len(calibration)/2:
+                warnings.warn("Training data differers regularly from original circuit. Fit may be poor.")
+
+
+
+        return (noisy_expectation, state_circuit_exp, )
+
+    return MitTask(
+        _label="CDRQualityCheck",
+        _n_in_wires=2,
+        _n_out_wires=2,
+        _method=cdr_quality_check_task,
+    )
 
 
 def cdr_calibration_task_gen(
@@ -170,8 +222,8 @@ def cdr_correction_task_gen(backend: Backend) -> MitTask:
 
     def cdr_correction_task(
         obj,
-        noisy_expectation: List[QubitPauliOperator],
         calibration_complete: bool,
+        noisy_expectation: List[QubitPauliOperator],
     ) -> Tuple[List[QubitPauliOperator]]:
         """
         :param noisy_expectation: QubitPauliOperator objects from some experiment

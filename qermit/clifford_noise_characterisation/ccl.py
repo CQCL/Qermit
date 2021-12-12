@@ -30,7 +30,7 @@ from qermit import (
 )
 # import sys
 from qermit.taskgraph import gen_compiled_MitRes
-from .cdr_post import cdr_calibration_task_gen, cdr_correction_task_gen, _PolyCDRCorrect
+from .cdr_post import cdr_calibration_task_gen, cdr_correction_task_gen, _PolyCDRCorrect, cdr_quality_check_task_gen
 import numpy as np
 import random
 from enum import Enum
@@ -571,20 +571,36 @@ def gen_CDR_MitEx(
     _states_sim_taskgraph.append(ccl_result_batching_task_gen(total_state_circuits))
 
     likelihood_function = kwargs.get("likelihood_function", LikelihoodFunction.none)
-    _states_sim_taskgraph.append(ccl_likelihood_filtering_task_gen(likelihood_function))
-    _states_sim_taskgraph.append(
-        cdr_calibration_task_gen(
-            device_backend,
-            kwargs.get("model", _PolyCDRCorrect(1)),
-            kwargs.get("tolerance", 0.01),
-        )
-    )
+    # _states_sim_taskgraph.append(ccl_likelihood_filtering_task_gen(likelihood_function))
+    # _states_sim_taskgraph.append(
+    #     cdr_calibration_task_gen(
+    #         device_backend,
+    #         kwargs.get("model", _PolyCDRCorrect(1)),
+    #         kwargs.get("tolerance", 0.01),
+    #     )
+    # )
 
     _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
     _experiment_taskgraph.parallel(_states_sim_taskgraph)
+
+    _post_calibrate_task_graph = TaskGraph()
+    # _post_task_graph.add_wire()
+    _post_calibrate_task_graph.append(ccl_likelihood_filtering_task_gen(likelihood_function))
+    _post_calibrate_task_graph.append(cdr_calibration_task_gen(
+            device_backend,
+            kwargs.get("model", _PolyCDRCorrect(1)),
+            kwargs.get("tolerance", 0.01),
+        ))
+    # _post_calibrate_task_graph.add_wire()
+
+    _post_task_graph = TaskGraph()
+    _post_task_graph.parallel(_post_calibrate_task_graph)
+    _post_task_graph.prepend(cdr_quality_check_task_gen(kwargs.get("tolerance", 0.01)))
+
     _experiment_taskgraph.prepend(
         ccl_state_task_gen(n_non_cliffords, n_pairs, total_state_circuits)
     )
+    _experiment_taskgraph.append(_post_task_graph)
     _experiment_taskgraph.append(cdr_correction_task_gen(device_backend))
 
     return MitEx(device_backend).from_TaskGraph(_experiment_taskgraph)
