@@ -55,7 +55,7 @@ def test_linear_cdr_calib() -> None:
 def test_cdr_calibration_correction_task_gen():
     b = AerBackend()
     b._characterisation = dict()
-    cal_task = cdr_calibration_task_gen(b, _PolyCDRCorrect(1), 0)
+    cal_task = cdr_calibration_task_gen(b, _PolyCDRCorrect(1))
     assert cal_task.n_in_wires == 1
     assert cal_task.n_out_wires == 1
 
