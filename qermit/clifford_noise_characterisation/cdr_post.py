@@ -160,7 +160,6 @@ def cdr_calibration_task_gen(
                 # go through strings in operator
                 for key in noisy_qpo._dict:
                     # make sure keys are present (don't initialise at start incase indexing missing)
-                    exact_qpo_key = exact_qpo[key]
                     if abs(exact_qpo[key]) > tolerance:
                         if key not in noisy_char_dict:
                             noisy_char_dict[key] = list()
@@ -173,7 +172,6 @@ def cdr_calibration_task_gen(
 
                         noisy_char_dict[key].append(float(noisy_qpo._dict[key]))
                         exact_char_dict[key].append(float(exact_qpo._dict[key]))
-
             if backend.backend_info is None:
                 raise ValueError("Backend has no backend_info attribute.")
 

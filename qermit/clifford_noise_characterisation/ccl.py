@@ -124,7 +124,6 @@ def gen_state_circuits(
     :return: All generated state circuits
     :rtype: List[Circuit]
     """
-
     # set seed if given
     if "seed" in kwargs:
         random.seed(kwargs.get("seed"))
@@ -152,7 +151,6 @@ def gen_state_circuits(
         if all_coms[i].op.type == OpType.Rz:
             if all_coms[i].op.params[0] not in clifford_angles:
                 rz_ops.add(i)
-
     if len(rz_ops) == 0:
         return [c] * total_state_circuits
 
@@ -241,8 +239,9 @@ def gen_state_circuits(
 
         # all circuits accepted and run, some results later discarded if not accepted by Metropolis-Hastings rule
         state_circuits.append(new_circuit)
-        
+
     return state_circuits
+
 
 def ccl_state_task_gen(
     n_non_cliffords: int, n_pairs: int, total_state_circuits: int
@@ -462,7 +461,6 @@ def gen_CDR_MitEx(
     :key likelihood_function: LikelihoodFunction used to filter state circuit results, given by a LikelihoodFunction Enum,
         default set to none.
     """
-
     _states_sim_mitex = copy.copy(
         kwargs.get(
             "states_simluator_mitex",
