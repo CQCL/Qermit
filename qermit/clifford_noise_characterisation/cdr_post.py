@@ -100,7 +100,7 @@ def cdr_quality_check_task_gen(distance_tolerance: float) -> MitTask:
         values for each calibration experiment.
         :type state_circuit_exp: List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]
         :return: The original inputs are returned unaltered.
-        :rtype: [type]
+        :rtype: Tuple[List[QubitPauliOperator], List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]
         """
 
         for calibration, original in zip(state_circuit_exp, noisy_expectation):

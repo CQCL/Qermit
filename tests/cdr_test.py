@@ -19,6 +19,7 @@ from qermit.clifford_noise_characterisation.cdr_post import (  # type: ignore
     _PolyCDRCorrect,
     cdr_calibration_task_gen,
     cdr_correction_task_gen,
+    cdr_quality_check_task_gen,
 )
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 from pytket.pauli import QubitPauliString, Pauli  # type: ignore
@@ -50,6 +51,51 @@ def test_linear_cdr_calib() -> None:
     new_noisy = np.linspace(0.1, 1.1, 20)
     new_corrected_vals = np.vectorize(test_model.correct)(new_noisy)
     assert np.isclose(new_corrected_vals, exact_correct(new_noisy), rtol=1e-1).all()
+
+
+def test_cdr_quality_check_task_gen():
+
+    qual_task = cdr_quality_check_task_gen(distance_tolerance=0.1)
+    assert qual_task.n_in_wires == 2
+    assert qual_task.n_out_wires == 2
+
+    # set up dummy test wires
+    qps_012 = QubitPauliString(
+        [Qubit(0), Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z, Pauli.Z]
+    )
+    qps_01 = QubitPauliString([Qubit(0), Qubit(1)], [Pauli.Z, Pauli.Z])
+
+    qpo_012_original_noisy = QubitPauliOperator({qps_012: 1.0})
+    qpo_01_original_noisy = QubitPauliOperator({qps_01: 0.5})
+
+    qpo_012_training_1_noisy = QubitPauliOperator({qps_012: 0.99})
+    qpo_012_training_2_noisy = QubitPauliOperator({qps_012: 0.98})
+    qpo_012_training_1_ideal = QubitPauliOperator({qps_012: 1})
+    qpo_012_training_2_ideal = QubitPauliOperator({qps_012: 1})
+
+    qpo_01_training_1_noisy = QubitPauliOperator({qps_01: 0.45})
+    qpo_01_training_2_noisy = QubitPauliOperator({qps_01: 0.55})
+    qpo_01_training_1_ideal = QubitPauliOperator({qps_01: 0.5})
+    qpo_01_training_2_ideal = QubitPauliOperator({qps_01: 0.5})
+
+    noisy_expectation = [qpo_012_original_noisy, qpo_01_original_noisy]
+    state_circuit_exp = [
+        [
+            (qpo_012_training_1_noisy, qpo_012_training_1_ideal),
+            (qpo_012_training_2_noisy, qpo_012_training_2_ideal),
+        ],
+        [
+            (qpo_01_training_1_noisy, qpo_01_training_1_ideal),
+            (qpo_01_training_2_noisy, qpo_01_training_2_ideal),
+        ],
+    ]
+
+    noisy_expectation_return, state_circuit_exp_return = qual_task(
+        [noisy_expectation, state_circuit_exp]
+    )
+
+    assert noisy_expectation_return == noisy_expectation
+    assert state_circuit_exp == state_circuit_exp_return
 
 
 def test_cdr_calibration_correction_task_gen():
