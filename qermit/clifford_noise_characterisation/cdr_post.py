@@ -76,29 +76,18 @@ def cdr_quality_check_task_gen(distance_tolerance: float) -> MitTask:
         state_circuit_exp: List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]],
         ):
 
-        print("cdr_quality_check_task noisy_expectation:", noisy_expectation)
-        print("cdr_quality_check_task state_circuit_exp:", state_circuit_exp)
-
         for calibration, original in zip(state_circuit_exp, noisy_expectation):
-
-            print("original dictionary:", original.to_list()[0]['coefficient'][0])
 
             original_coefficient = original.to_list()[0]['coefficient'][0]
 
             is_far_count = 0
-
             for qpo_pair in calibration:
-
-                print("original", original, "qpo_pair", qpo_pair)
-
                 noisy_qpo = qpo_pair[0]
-
                 noisy_coefficient = noisy_qpo.to_list()[0]['coefficient'][0]
 
                 if not math.isclose(noisy_coefficient, original_coefficient, abs_tol=distance_tolerance):
                     is_far_count += 1
 
-            print("===== is_far_count", is_far_count)
             if is_far_count > len(calibration)/2:
                 warnings.warn("Training data regularly differers significantly from original circuit. Fit may be poor.")
 

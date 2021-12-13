@@ -55,7 +55,7 @@ def test_linear_cdr_calib() -> None:
 def test_cdr_calibration_correction_task_gen():
     b = AerBackend()
     b._characterisation = dict()
-    cal_task = cdr_calibration_task_gen(b, _PolyCDRCorrect(1),0)
+    cal_task = cdr_calibration_task_gen(b, _PolyCDRCorrect(1), 0)
     assert cal_task.n_in_wires == 1
     assert cal_task.n_out_wires == 1
 
@@ -72,7 +72,7 @@ def test_cdr_calibration_correction_task_gen():
         [(qpo_012, qpo_012), (qpo_01, qpo_01)],
         [(qpo_01, qpo_01), (qpo_012, qpo_012)],
     ]
-    # confirms calibration succesful
+    # confirms calibration successful
     assert cal_task([cal_wire])
     assert "CDR_0" in b.backend_info.misc
     assert "CDR_1" in b.backend_info.misc
@@ -93,7 +93,7 @@ def test_cdr_calibration_correction_task_gen():
         QubitPauliOperator({qps_01: 1.0, qps_012: 1.0}),
         QubitPauliOperator({qps_01: 1.0, qps_012: 1.0}),
     ]
-    cor_res = cor_task((to_correct, True))[0]
+    cor_res = cor_task((True, to_correct))[0]
 
     assert len(cor_res) == 2
     assert np.isclose(float(cor_res[0][qps_01]), 0.75, rtol=1e-1)

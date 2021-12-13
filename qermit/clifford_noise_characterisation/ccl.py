@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from pytket import OpType, Circuit
 from pytket.passes import RebaseUFR, DecomposeBoxes  # type: ignore
 from pytket.backends import Backend
@@ -27,7 +28,6 @@ from qermit import (
     ObservableExperiment,
     TaskGraph,
 )
-# import sys
 from qermit.taskgraph import gen_compiled_MitRes
 from .cdr_post import cdr_calibration_task_gen, cdr_correction_task_gen, _PolyCDRCorrect, cdr_quality_check_task_gen
 import numpy as np
