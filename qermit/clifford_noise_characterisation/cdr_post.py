@@ -86,7 +86,7 @@ def cdr_quality_check_task_gen(distance_tolerance: float) -> MitTask:
         obj,
         noisy_expectation: List[QubitPauliOperator],
         state_circuit_exp: List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]],
-    ):
+    ) -> Tuple[List[QubitPauliOperator], List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]:
         """
         For each calibration result, check the difference between its noisy
         expectation value and that of the original circuit. Raise a warning if
