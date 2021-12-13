@@ -501,7 +501,7 @@ def gen_CDR_MitEx(
     _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
     _experiment_taskgraph.parallel(_states_sim_taskgraph)
 
-    _post_calibrate_task_graph = TaskGraph()
+    _post_calibrate_task_graph = TaskGraph(_label="FitCalibrate")
     _post_calibrate_task_graph.append(ccl_likelihood_filtering_task_gen(likelihood_function))
     _post_calibrate_task_graph.append(cdr_calibration_task_gen(
             device_backend,
@@ -510,7 +510,7 @@ def gen_CDR_MitEx(
         )
     )
 
-    _post_task_graph = TaskGraph()
+    _post_task_graph = TaskGraph(_label="QualityCheckCorrect")
     _post_task_graph.parallel(_post_calibrate_task_graph)
     _post_task_graph.prepend(cdr_quality_check_task_gen(distance_tolerance=kwargs.get("distance_tolerance", 0.1)))
 
