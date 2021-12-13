@@ -198,3 +198,51 @@ def cdr_correction_task_gen(backend: Backend) -> MitTask:
         _n_out_wires=1,
         _method=cdr_correction_task,
     )
+
+
+
+        
+def gen_single_state_circuit(commands: List[Command], cliffords: Dict[int, int], non_cliffords: Set[int], n_pairs: int) -> Circuit:
+    # cliffords.keys() are integers for now Clifford gates
+    # sample some set of these to be subbed for original non-Clifford angle
+    clifford_pair_elements = random.sample(list(cliffords.keys()), n_pairs)
+    # from remaining non-Clifford Rz gates, sample some to have random Clifford gate
+    non_clifford_pair_elements = random.sample(list(non_cliffords), n_pairs)
+    # create new Circuit from scratch
+    new_circuit = Circuit(c.n_qubits, len(c.bits))
+    for i in range(len(commands)):
+        com = commands[i]
+        if com.op.type == OpType.Rz:
+            new_circuit.add_barrier(com.qubits)
+            # 3 sets of gates int must be in
+            # in clifford_pair_elements means gate has been denominated as Clifford,
+            # but is in some sampled pair so add original angle
+            if i in clifford_pair_elements:
+                new_circuit.add_gate(com.op.type, com.op.params, com.qubits)
+                new_circuit.add_barrier(com.qubits)
+            # in non_clifford_pair_elements mean gate was denominated to be left non-Clifford,
+            # but its value has been sampled in a pair to now be Clifford
+            # random angle is sampled and returned
+            elif i in non_clifford_pair_elements:
+                angle = sample_weighted_clifford_angle(com.op.params[0])
+                new_circuit.add_gate(com.op.type, [angle], com.qubits)
+                new_circuit.add_barrier(com.qubits)
+            # in cliffords mean it is denominated as Clifford, and hasn't been sampled for a pair
+            # as clifford_pair_elements has already been checked
+            # in this case, cliffords is a dict between Rz index and substitution S power
+            # get power from dict, multiply by 0.5 to get angle, add to circuit
+            elif i in cliffords:
+                new_circuit.add_gate(com.op.type, [0.5 * cliffords[i]], com.qubits)
+                new_circuit.add_barrier(com.qubits)
+            # final case means gate was chosen to retain non-Clifford, and has not been
+            # sampled in any pair, so add original angle.
+            else:
+                new_circuit.add_gate(com.op.type, com.op.params, com.qubits)
+                new_circuit.add_barrier(com.qubits)
+        # Measure gate has special case, but can assume 1 qubit to 1 bit
+        elif com.op.type is OpType.Measure:
+            new_circuit.Measure(com.qubits[0], com.bits[0])
+        # CX or H gate, add as is
+        else:
+            new_circuit.add_gate(com.op.type, com.qubits)
+

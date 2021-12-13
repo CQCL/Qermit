@@ -14,9 +14,10 @@
 
 
 from pytket import OpType, Circuit
+from pytket.circuit import Command 
 from pytket.passes import RebaseUFR, DecomposeBoxes  # type: ignore
 from pytket.backends import Backend
-from pytket.utils import QubitPauliOperator
+from pytket.utils import QubitPauliOperator, expectation_from_counts
 from typing import List, Tuple
 import copy
 from qermit import (
@@ -120,6 +121,9 @@ def gen_state_circuits(
     :param total_state_circuits: Total number of state circuits to be produced for characterisation
     :type total_state_circuits: int
     :key: seed for random methods
+    :key: banned_values, List[int]
+    :key: tolerance, float
+    :key: simulator_backend, Backend
 
     :return: All generated state circuits
     :rtype: List[Circuit]
@@ -190,10 +194,14 @@ def gen_state_circuits(
     # rz_ops then only contains rz gates in c to be substituted for Clifford angles
     rz_ops.difference_update(non_cliffords)
     # Power of random Clifford gates to be substituted
-    cliffords = {num: random.randint(0, 8) for num in rz_ops}
+    cliffords = {num: random.randint(0, 4) for num in rz_ops}
 
+
+    noiseless_expectations = set()
+    simluator_backend = kwargs.get("simulator_backend", AerBackend())
     # keep on producing state circuits until limit reached
     while len(state_circuits) < total_state_circuits:
+
         # cliffords.keys() are integers for now Clifford gates
         # sample some set of these to be subbed for original non-Clifford angle
         clifford_pair_elements = random.sample(list(cliffords.keys()), n_pairs)
@@ -238,14 +246,23 @@ def gen_state_circuits(
             else:
                 new_circuit.add_gate(com.op.type, com.qubits)
 
-        # all circuits accepted and run, some results later discarded if not accepted by Metropolis-Hastings rule
-        state_circuits.append(new_circuit)
 
+        compiled_state = simulator_backend.get_compiled_circuit(new_circuit)
+        h = simulator_backend.process_circuit(compiled_state, 100)
+        counts = simulator_backend.get_result(h).get_counts()
+        expectation = expectation_from_counts(counts)
+        add_expectation = True
+        for e in noiseless_expectations:
+            if abs(e - expectation) < tolerance:
+
+
+        noiseless_expectations.add(expectation_from_counts(counts))
+        state_circuits.append(new_circuit)
     return state_circuits
 
 
 def ccl_state_task_gen(
-    n_non_cliffords: int, n_pairs: int, total_state_circuits: int
+    n_non_cliffords: int, n_pairs: int, total_state_circuits: int, simulator_backend: Backend
 ) -> MitTask:
     """
     Returns a MitTask object for which given some set of experiments,
@@ -296,6 +313,7 @@ def ccl_state_task_gen(
                 n_non_cliffords,
                 n_pairs,
                 total_state_circuits,
+                simulator_backend,
             )
             # for each state circuit, create a new wire of for each state circuit
             # one for simulator, one for device
@@ -510,7 +528,7 @@ def gen_CDR_MitEx(
     _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
     _experiment_taskgraph.parallel(_states_sim_taskgraph)
     _experiment_taskgraph.prepend(
-        ccl_state_task_gen(n_non_cliffords, n_pairs, total_state_circuits)
+        ccl_state_task_gen(n_non_cliffords, n_pairs, total_state_circuits, simulator_backend)
     )
     _experiment_taskgraph.append(cdr_correction_task_gen(device_backend))
 
