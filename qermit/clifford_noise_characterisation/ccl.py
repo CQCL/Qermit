@@ -506,7 +506,7 @@ def gen_CDR_MitEx(
     _post_calibrate_task_graph.append(cdr_calibration_task_gen(
             device_backend,
             kwargs.get("model", _PolyCDRCorrect(1)),
-            kwargs.get("tolerance", 0.01)
+            kwargs.get("tolerance", 0.01),
         )
     )
 
