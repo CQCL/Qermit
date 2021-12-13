@@ -464,6 +464,9 @@ def gen_CDR_MitEx(
         of the calibration circuits and 0.
     :key distance_tolerance: The absolute tolerance on the distance between 
         expectation values of the calibration and original circuit.
+    :key calibration_fraction: The upper bound on the fraction of calibration 
+        circuits which have noisy expectation values far from that of the 
+        original circuit.
     """
     _states_sim_mitex = copy.copy(
         kwargs.get(
@@ -516,7 +519,7 @@ def gen_CDR_MitEx(
 
     _post_task_graph = TaskGraph(_label="QualityCheckCorrect")
     _post_task_graph.parallel(_post_calibrate_task_graph)
-    _post_task_graph.prepend(cdr_quality_check_task_gen(distance_tolerance=kwargs.get("distance_tolerance", 0.1)))
+    _post_task_graph.prepend(cdr_quality_check_task_gen(distance_tolerance=kwargs.get("distance_tolerance", 0.1), calibration_fraction=kwargs.get("calibration_fraction", 0.5)))
 
     _experiment_taskgraph.prepend(
         ccl_state_task_gen(n_non_cliffords, n_pairs, total_state_circuits)

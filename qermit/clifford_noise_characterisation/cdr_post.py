@@ -71,7 +71,7 @@ class _PolyCDRCorrect(_BaseExCorrectModel):
         )
 
 
-def cdr_quality_check_task_gen(distance_tolerance: float) -> MitTask:
+def cdr_quality_check_task_gen(distance_tolerance: float, calibration_fraction: float) -> MitTask:
     """
     Check quality of calibration results. In particular, ensure that a
     significant proportion of the calibrations circuits have noisy expectation
@@ -80,6 +80,10 @@ def cdr_quality_check_task_gen(distance_tolerance: float) -> MitTask:
     :param distance_tolerance: The absolute tolerance on the distance between
     expectation values of the calibration and original circuit.
     :type distance_tolerance: float
+    :param calibration_fraction: The upper bound on the fraction of calibration 
+        circuits which have noisy expectation values far from that of the 
+        original circuit.
+    :type calibration_fraction: float
     """
 
     def cdr_quality_check_task(
@@ -123,7 +127,7 @@ def cdr_quality_check_task_gen(distance_tolerance: float) -> MitTask:
 
             # Raise a warning if the calibration circuits regularly have noisy
             # expectation value far from the original circuit.
-            if is_far_count > len(calibration) / 2:
+            if is_far_count > len(calibration) * calibration_fraction:
                 warnings.warn(
                     "Training data regularly differers significantly from original circuit. Fit may be poor."
                 )
