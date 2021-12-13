@@ -69,25 +69,55 @@ class _PolyCDRCorrect(_BaseExCorrectModel):
         )
 
 def cdr_quality_check_task_gen(distance_tolerance: float) -> MitTask:
+    """
+    Check quality of calibration results. In particular, ensure that a 
+    significant proportion of the calibrations circuits have noisy expectation 
+    value close to that of the noisy expectation value of the original circuit.
+
+    :param distance_tolerance: The absolute tolerance on the distance between 
+    expectation values of the calibration and original circuit.
+    :type distance_tolerance: float
+    """
 
     def cdr_quality_check_task(
         obj, 
         noisy_expectation: List[QubitPauliOperator], 
         state_circuit_exp: List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]],
         ):
+        """
+        For each calibration result, check the difference between its noisy 
+        expectation value and that of the original circuit. Raise a warning if 
+        this value is large for a significant portion of the calibration 
+        circuits.
+
+        :param noisy_expectation: List of noisy expectation values from 
+        original circuits.
+        :type noisy_expectation: List[QubitPauliOperator]
+        :param state_circuit_exp: A list of noisy and noiseless expectation 
+        values for each calibration experiment.
+        :type state_circuit_exp: List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]
+        :return: The original inputs are returned unaltered.
+        :rtype: [type]
+        """
 
         for calibration, original in zip(state_circuit_exp, noisy_expectation):
 
+            # The noisy expectation value of the original circuit.
             original_coefficient = original.to_list()[0]['coefficient'][0]
 
             is_far_count = 0
             for qpo_pair in calibration:
                 noisy_qpo = qpo_pair[0]
+                # The noisy expectation value of the calibration circuit. 
                 noisy_coefficient = noisy_qpo.to_list()[0]['coefficient'][0]
 
+                # Check the closeness of the expectation value of the training 
+                # circuit and that of the original circuit.
                 if not math.isclose(noisy_coefficient, original_coefficient, abs_tol=distance_tolerance):
                     is_far_count += 1
 
+            # Raise a warning if the calibration circuits regularly have noisy 
+            # expectation value far from the original circuit.
             if is_far_count > len(calibration)/2:
                 warnings.warn("Training data regularly differers significantly from original circuit. Fit may be poor.")
 
