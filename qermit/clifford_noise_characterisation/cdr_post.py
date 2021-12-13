@@ -68,7 +68,7 @@ class _PolyCDRCorrect(_BaseExCorrectModel):
             ),
         )
 
-def cdr_quality_check_task_gen(tolerance: float) -> MitTask:
+def cdr_quality_check_task_gen(distance_tolerance: float) -> MitTask:
 
     def cdr_quality_check_task(
         obj, 
@@ -85,7 +85,7 @@ def cdr_quality_check_task_gen(tolerance: float) -> MitTask:
 
             original_coefficient = original.to_list()[0]['coefficient'][0]
 
-            isclose_count = 0
+            is_far_count = 0
 
             for qpo_pair in calibration:
 
@@ -95,15 +95,12 @@ def cdr_quality_check_task_gen(tolerance: float) -> MitTask:
 
                 noisy_coefficient = noisy_qpo.to_list()[0]['coefficient'][0]
 
-                if math.isclose(noisy_coefficient, original_coefficient, abs_tol=tolerance):
-                    isclose_count += 1
+                if not math.isclose(noisy_coefficient, original_coefficient, abs_tol=distance_tolerance):
+                    is_far_count += 1
 
-            print("===== isclose_count", isclose_count)
-                
-            if isclose_count <= len(calibration)/2:
-                warnings.warn("Training data differers regularly from original circuit. Fit may be poor.")
-
-
+            print("===== is_far_count", is_far_count)
+            if is_far_count > len(calibration)/2:
+                warnings.warn("Training data regularly differers significantly from original circuit. Fit may be poor.")
 
         return (noisy_expectation, state_circuit_exp, )
 
@@ -116,7 +113,7 @@ def cdr_quality_check_task_gen(tolerance: float) -> MitTask:
 
 
 def cdr_calibration_task_gen(
-    backend: Backend, model: _BaseExCorrectModel
+    backend: Backend, model: _BaseExCorrectModel, tolerance: float
 ) -> MitTask:
     """
     Uses calibration results from running characterisation circuits through a device
@@ -160,17 +157,18 @@ def cdr_calibration_task_gen(
                 # go through strings in operator
                 for key in noisy_qpo._dict:
                     # make sure keys are present (don't initialise at start incase indexing missing)
-                    if key not in noisy_char_dict:
-                        noisy_char_dict[key] = list()
-                    if key not in exact_char_dict:
-                        exact_char_dict[key] = list()
-                    if key not in exact_qpo._dict:
-                        raise ValueError(
-                            "Given key in calibration task for Clifford Data Regression should be present in exact and noisy characterisation results."
-                        )
+                    if abs(exact_qpo[key]) > tolerance:
+                        if key not in noisy_char_dict:
+                            noisy_char_dict[key] = list()
+                        if key not in exact_char_dict:
+                            exact_char_dict[key] = list()
+                        if key not in exact_qpo._dict:
+                            raise ValueError(
+                                "Given key in calibration task for Clifford Data Regression should be present in exact and noisy characterisation results."
+                            )
 
-                    noisy_char_dict[key].append(float(noisy_qpo._dict[key]))
-                    exact_char_dict[key].append(float(exact_qpo._dict[key]))
+                        noisy_char_dict[key].append(float(noisy_qpo._dict[key]))
+                        exact_char_dict[key].append(float(exact_qpo._dict[key]))
             if backend.backend_info is None:
                 raise ValueError("Backend has no backend_info attribute.")
 

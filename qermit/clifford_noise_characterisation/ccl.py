@@ -506,12 +506,13 @@ def gen_CDR_MitEx(
     _post_calibrate_task_graph.append(cdr_calibration_task_gen(
             device_backend,
             kwargs.get("model", _PolyCDRCorrect(1)),
+            kwargs.get("tolerance", 0.01)
         )
     )
 
     _post_task_graph = TaskGraph()
     _post_task_graph.parallel(_post_calibrate_task_graph)
-    _post_task_graph.prepend(cdr_quality_check_task_gen(kwargs.get("tolerance", 0.01)))
+    _post_task_graph.prepend(cdr_quality_check_task_gen(distance_tolerance=kwargs.get("distance_tolerance", 0.1)))
 
     _experiment_taskgraph.prepend(
         ccl_state_task_gen(n_non_cliffords, n_pairs, total_state_circuits)
