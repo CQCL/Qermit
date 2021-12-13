@@ -460,6 +460,10 @@ def gen_CDR_MitEx(
     :key model: Model characterised by state circuits, default _PolyCDRCorrect(1) (see cdr_post.py for other options).
     :key likelihood_function: LikelihoodFunction used to filter state circuit results, given by a LikelihoodFunction Enum,
         default set to none.
+    :key tolerance: Sets an allowed distance between exact expectation value 
+        of the calibration circuits and 0.
+    :key distance_tolerance: The absolute tolerance on the distance between 
+        expectation values of the calibration and original circuit.
     """
     _states_sim_mitex = copy.copy(
         kwargs.get(
