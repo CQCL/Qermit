@@ -266,9 +266,18 @@ def ccl_state_task_gen(
     :type n_pairs:
     :param total_state_circuits: Number of state circuits prepared for characterisation.
     :type total_state_circuits: int
-    :param tolerance: Model can be perturbed by exact values too close to 0, this parameter sets
-    an allowed distance between exact value and 0.
+    :param tolerance: Model can be perturbed when calibration circuits have by 
+        exact expectation values values too close to each other. This parameter 
+        sets a distance between exact expectation values which at least some 
+        calibration circuits should have.
     :type tolerance: float
+    :param simulator_backend: Backend object simulated characterisation experiments are
+        default run through.
+    :type simulator_backend: Backend
+    :param max_attempts: The maximum number of times to attempt to generate a 
+        list of calibrations circuit with significantly different expectation 
+        values, before resorting to a list with similar expectation values.
+    :type max_attempts: int
 
     :return: MitTask object for preparing and returning state circuits for characterisation.
     :rtype: MitTask
