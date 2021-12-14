@@ -271,7 +271,7 @@ def ccl_state_task_gen(
     :param total_state_circuits: Number of state circuits prepared for characterisation.
     :type total_state_circuits: int
     :param tolerance: Model can be perturbed when calibration circuits have by
-        exact expectation values values too close to each other. This parameter
+        exact expectation values too close to each other. This parameter
         sets a distance between exact expectation values which at least some
         calibration circuits should have.
     :type tolerance: float
