@@ -140,6 +140,9 @@ def test_ccl_state_task_gen():
         n_non_cliffords=num_non_cliffs,
         n_pairs=2,
         total_state_circuits=tot_state_circuits,
+        simulator_backend=AerBackend(),
+        tolerance=0.01,
+        max_state_circuits_attempts=10,
     )
     assert task.n_in_wires == 1
     assert task.n_out_wires == 3
@@ -192,11 +195,18 @@ def test_result_batching_task_gen():
     t1 = ObservableTracker(QubitPauliOperator({qps_01: 0.5}))
     ac1 = AnsatzCircuit(c.copy(), 10, SymbolsDict())
 
+    b=AerBackend()
+
     n_state_circuits = 10
     res = ccl_state_task_gen(
-        n_non_cliffords=2, n_pairs=2, total_state_circuits=n_state_circuits
+        n_non_cliffords=2, 
+        n_pairs=2, 
+        total_state_circuits=n_state_circuits, 
+        simulator_backend=b,
+        tolerance=0.01,
+        max_state_circuits_attempts=10,
     )([[ObservableExperiment(ac0, t0), ObservableExperiment(ac1, t1)]])
-    mitex = MitEx(backend=AerBackend())
+    mitex = MitEx(backend=b)
     qpos_noiseless = mitex.run(res[1])
     qpos_noisy = mitex.run(res[2])
 
