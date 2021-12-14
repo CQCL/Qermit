@@ -71,7 +71,9 @@ class _PolyCDRCorrect(_BaseExCorrectModel):
         )
 
 
-def cdr_quality_check_task_gen(distance_tolerance: float, calibration_fraction: float) -> MitTask:
+def cdr_quality_check_task_gen(
+    distance_tolerance: float, calibration_fraction: float
+) -> MitTask:
     """
     Check quality of calibration results. In particular, ensure that a
     significant proportion of the calibrations circuits have noisy expectation
@@ -80,8 +82,8 @@ def cdr_quality_check_task_gen(distance_tolerance: float, calibration_fraction: 
     :param distance_tolerance: The absolute tolerance on the distance between
     expectation values of the calibration and original circuit.
     :type distance_tolerance: float
-    :param calibration_fraction: The upper bound on the fraction of calibration 
-        circuits which have noisy expectation values far from that of the 
+    :param calibration_fraction: The upper bound on the fraction of calibration
+        circuits which have noisy expectation values far from that of the
         original circuit.
     :type calibration_fraction: float
     """
@@ -90,7 +92,10 @@ def cdr_quality_check_task_gen(distance_tolerance: float, calibration_fraction: 
         obj,
         noisy_expectation: List[QubitPauliOperator],
         state_circuit_exp: List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]],
-    ) -> Tuple[List[QubitPauliOperator], List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]:
+    ) -> Tuple[
+        List[QubitPauliOperator],
+        List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]],
+    ]:
         """
         For each calibration result, check the difference between its noisy
         expectation value and that of the original circuit. Raise a warning if
@@ -146,7 +151,8 @@ def cdr_quality_check_task_gen(distance_tolerance: float, calibration_fraction: 
 
 
 def cdr_calibration_task_gen(
-    backend: Backend, model: _BaseExCorrectModel,
+    backend: Backend,
+    model: _BaseExCorrectModel,
 ) -> MitTask:
     """
     Uses calibration results from running characterisation circuits through a device
