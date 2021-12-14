@@ -195,13 +195,13 @@ def test_result_batching_task_gen():
     t1 = ObservableTracker(QubitPauliOperator({qps_01: 0.5}))
     ac1 = AnsatzCircuit(c.copy(), 10, SymbolsDict())
 
-    b=AerBackend()
+    b = AerBackend()
 
     n_state_circuits = 10
     res = ccl_state_task_gen(
-        n_non_cliffords=2, 
-        n_pairs=2, 
-        total_state_circuits=n_state_circuits, 
+        n_non_cliffords=2,
+        n_pairs=2,
+        total_state_circuits=n_state_circuits,
         simulator_backend=b,
         tolerance=0.01,
         max_state_circuits_attempts=10,
