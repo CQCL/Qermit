@@ -42,7 +42,6 @@ import warnings
 import math
 
 
-
 class LikelihoodFunction(Enum):
     def none(
         self, qpo_noisy: QubitPauliOperator, qpo_exact: QubitPauliOperator
@@ -252,7 +251,12 @@ def gen_state_circuits(
 
 
 def ccl_state_task_gen(
-    n_non_cliffords: int, n_pairs: int, total_state_circuits: int, simulator_backend: Backend, tolerance: float, max_attempts: int,
+    n_non_cliffords: int,
+    n_pairs: int,
+    total_state_circuits: int,
+    simulator_backend: Backend,
+    tolerance: float,
+    max_state_circuits_attempts: int,
 ) -> MitTask:
     """
     Returns a MitTask object for which given some set of experiments,
@@ -266,18 +270,18 @@ def ccl_state_task_gen(
     :type n_pairs:
     :param total_state_circuits: Number of state circuits prepared for characterisation.
     :type total_state_circuits: int
-    :param tolerance: Model can be perturbed when calibration circuits have by 
-        exact expectation values values too close to each other. This parameter 
-        sets a distance between exact expectation values which at least some 
+    :param tolerance: Model can be perturbed when calibration circuits have by
+        exact expectation values values too close to each other. This parameter
+        sets a distance between exact expectation values which at least some
         calibration circuits should have.
     :type tolerance: float
     :param simulator_backend: Backend object simulated characterisation experiments are
         default run through.
     :type simulator_backend: Backend
-    :param max_attempts: The maximum number of times to attempt to generate a 
-        list of calibrations circuit with significantly different expectation 
+    :param max_state_circuits_attempts: The maximum number of times to attempt to generate a
+        list of calibrations circuit with significantly different expectation
         values, before resorting to a list with similar expectation values.
-    :type max_attempts: int
+    :type max_state_circuits_attempts: int
 
     :return: MitTask object for preparing and returning state circuits for characterisation.
     :rtype: MitTask
@@ -313,7 +317,7 @@ def ccl_state_task_gen(
 
             all_close = True
             attempt = 0
-            while all_close and attempt < max_attempts:
+            while all_close and attempt < max_state_circuits_attempts:
 
                 state_circuits = gen_state_circuits(
                     c_copy,
@@ -322,11 +326,19 @@ def ccl_state_task_gen(
                     total_state_circuits,
                 )
 
-                pauli_expectation_list = [get_operator_expectation_value(c, qubit_pauli_operator, simulator_backend) for c in state_circuits]
-                all_close = all(math.isclose(pauli_expectation, pauli_expectation_list[0], abs_tol=tolerance) for pauli_expectation in pauli_expectation_list)
+                pauli_expectation_list = [
+                    get_operator_expectation_value(
+                        c, qubit_pauli_operator, simulator_backend
+                    )
+                    for c in state_circuits
+                ]
+                all_close = all(
+                    abs(pauli_expectation - pauli_expectation_list[0]) <= tolerance
+                    for pauli_expectation in pauli_expectation_list
+                )
 
                 attempt += 1
-                
+
             if all_close:
                 warnings.warn(
                     "All calibration data is similar. Fit may be poor as a result."
@@ -565,7 +577,14 @@ def gen_CDR_MitEx(
     )
 
     _experiment_taskgraph.prepend(
-        ccl_state_task_gen(n_non_cliffords, n_pairs, total_state_circuits, simulator_backend=simulator_backend, tolerance=kwargs.get("tolerance", 0.01), max_attempts=kwargs.get("max_attempts", 10))
+        ccl_state_task_gen(
+            n_non_cliffords,
+            n_pairs,
+            total_state_circuits,
+            simulator_backend=simulator_backend,
+            tolerance=kwargs.get("tolerance", 0.01),
+            max_state_circuits_attempts=kwargs.get("max_state_circuits_attempts", 10),
+        )
     )
     _experiment_taskgraph.append(_post_task_graph)
     _experiment_taskgraph.append(cdr_correction_task_gen(device_backend))
