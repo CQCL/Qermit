@@ -129,7 +129,7 @@ def cdr_quality_check_task_gen(distance_tolerance: float, calibration_fraction: 
             # expectation value far from the original circuit.
             if is_far_count > len(calibration) * calibration_fraction:
                 warnings.warn(
-                    "Training data regularly differers significantly from original circuit. Fit may be poor."
+                    "Training data regularly differs significantly from original circuit. Fit may be poor."
                 )
 
         return (
