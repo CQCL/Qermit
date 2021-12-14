@@ -311,13 +311,6 @@ def ccl_state_task_gen(
             c_copy = ansatz_circuit.Circuit.copy()
             c_copy.symbol_substitution(ansatz_circuit.SymbolsDict._symbolic_map)
 
-            seed = random.randrange(2**32)
-            seed=121066056
-            random.seed(seed)
-            np.random.seed(seed)
-            # rng = random.Random(seed)
-            print("Seed was:", seed)
-
             all_close = True
             attempt = 0
             while all_close and attempt < max_attempts:
@@ -330,10 +323,8 @@ def ccl_state_task_gen(
                 )
 
                 pauli_expectation_list = [get_operator_expectation_value(c, qubit_pauli_operator, simulator_backend) for c in state_circuits]
-                print("pauli_expectation_list", pauli_expectation_list)
                 all_close = all(math.isclose(pauli_expectation, pauli_expectation_list[0], abs_tol=tolerance) for pauli_expectation in pauli_expectation_list)
 
-                print("attempt", attempt, "all_close", all_close)
                 attempt += 1
                 
             if all_close:
