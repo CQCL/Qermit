@@ -23,6 +23,8 @@ from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator
 from pytket.pauli import QubitPauliString  # type: ignore
 from qermit import MitTask
+import math
+import warnings
 
 
 class _BaseExCorrectModel(ABC):
@@ -54,7 +56,9 @@ class _PolyCDRCorrect(_BaseExCorrectModel):
     def calibrate(self, noisy_exp: List[float], exact_exp: List[float]) -> None:
         self.params = cast(
             List[float],
-            cast(np.ndarray, np.polyfit(noisy_exp, exact_exp, self.degree)).tolist(),
+            cast(
+                np.ndarray, np.polyfit(x=noisy_exp, y=exact_exp, deg=self.degree)
+            ).tolist(),
         )
 
     def correct(self, noisy_expectation: float) -> float:
@@ -65,6 +69,80 @@ class _PolyCDRCorrect(_BaseExCorrectModel):
                 for coef, power in zip(self.params, range(self.degree, -1, -1))
             ),
         )
+
+
+def cdr_quality_check_task_gen(distance_tolerance: float, calibration_fraction: float) -> MitTask:
+    """
+    Check quality of calibration results. In particular, ensure that a
+    significant proportion of the calibrations circuits have noisy expectation
+    value close to that of the noisy expectation value of the original circuit.
+
+    :param distance_tolerance: The absolute tolerance on the distance between
+    expectation values of the calibration and original circuit.
+    :type distance_tolerance: float
+    :param calibration_fraction: The upper bound on the fraction of calibration 
+        circuits which have noisy expectation values far from that of the 
+        original circuit.
+    :type calibration_fraction: float
+    """
+
+    def cdr_quality_check_task(
+        obj,
+        noisy_expectation: List[QubitPauliOperator],
+        state_circuit_exp: List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]],
+    ) -> Tuple[List[QubitPauliOperator], List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]:
+        """
+        For each calibration result, check the difference between its noisy
+        expectation value and that of the original circuit. Raise a warning if
+        this value is large for a significant portion of the calibration
+        circuits.
+
+        :param noisy_expectation: List of noisy expectation values from
+        original circuits.
+        :type noisy_expectation: List[QubitPauliOperator]
+        :param state_circuit_exp: A list of noisy and noiseless expectation
+        values for each calibration experiment.
+        :type state_circuit_exp: List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]
+        :return: The original inputs are returned unaltered.
+        :rtype: Tuple[List[QubitPauliOperator], List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]
+        """
+
+        for calibration, original in zip(state_circuit_exp, noisy_expectation):
+
+            # The noisy expectation value of the original circuit.
+            original_coefficient = original.to_list()[0]["coefficient"][0]
+
+            is_far_count = 0
+            for qpo_pair in calibration:
+                noisy_qpo = qpo_pair[0]
+                # The noisy expectation value of the calibration circuit.
+                noisy_coefficient = noisy_qpo.to_list()[0]["coefficient"][0]
+
+                # Check the closeness of the expectation value of the training
+                # circuit and that of the original circuit.
+                if not math.isclose(
+                    noisy_coefficient, original_coefficient, abs_tol=distance_tolerance
+                ):
+                    is_far_count += 1
+
+            # Raise a warning if the calibration circuits regularly have noisy
+            # expectation value far from the original circuit.
+            if is_far_count > len(calibration) * calibration_fraction:
+                warnings.warn(
+                    "Training data regularly differs significantly from original circuit. Fit may be poor."
+                )
+
+        return (
+            noisy_expectation,
+            state_circuit_exp,
+        )
+
+    return MitTask(
+        _label="CDRQualityCheck",
+        _n_in_wires=2,
+        _n_out_wires=2,
+        _method=cdr_quality_check_task,
+    )
 
 
 def cdr_calibration_task_gen(
@@ -155,8 +233,8 @@ def cdr_correction_task_gen(backend: Backend) -> MitTask:
 
     def cdr_correction_task(
         obj,
-        noisy_expectation: List[QubitPauliOperator],
         calibration_complete: bool,
+        noisy_expectation: List[QubitPauliOperator],
     ) -> Tuple[List[QubitPauliOperator]]:
         """
         :param noisy_expectation: QubitPauliOperator objects from some experiment
