@@ -16,7 +16,7 @@
 from pytket import OpType, Circuit
 from pytket.passes import RebaseUFR, DecomposeBoxes  # type: ignore
 from pytket.backends import Backend
-from pytket.utils import QubitPauliOperator
+from pytket.utils import QubitPauliOperator, get_operator_expectation_value
 from typing import List, Tuple
 import copy
 from qermit import (
@@ -38,6 +38,9 @@ from .cdr_post import (
 import numpy as np
 import random
 from enum import Enum
+import warnings
+import math
+
 
 
 class LikelihoodFunction(Enum):
@@ -249,7 +252,7 @@ def gen_state_circuits(
 
 
 def ccl_state_task_gen(
-    n_non_cliffords: int, n_pairs: int, total_state_circuits: int
+    n_non_cliffords: int, n_pairs: int, total_state_circuits: int, simulator_backend: Backend, tolerance: float, max_attempts: int,
 ) -> MitTask:
     """
     Returns a MitTask object for which given some set of experiments,
@@ -263,6 +266,9 @@ def ccl_state_task_gen(
     :type n_pairs:
     :param total_state_circuits: Number of state circuits prepared for characterisation.
     :type total_state_circuits: int
+    :param tolerance: Model can be perturbed by exact values too close to 0, this parameter sets
+    an allowed distance between exact value and 0.
+    :type tolerance: float
 
     :return: MitTask object for preparing and returning state circuits for characterisation.
     :rtype: MitTask
@@ -295,12 +301,37 @@ def ccl_state_task_gen(
             # generate all state circuits
             c_copy = ansatz_circuit.Circuit.copy()
             c_copy.symbol_substitution(ansatz_circuit.SymbolsDict._symbolic_map)
-            state_circuits = gen_state_circuits(
-                c_copy,
-                n_non_cliffords,
-                n_pairs,
-                total_state_circuits,
-            )
+
+            seed = random.randrange(2**32)
+            seed=121066056
+            random.seed(seed)
+            np.random.seed(seed)
+            # rng = random.Random(seed)
+            print("Seed was:", seed)
+
+            all_close = True
+            attempt = 0
+            while all_close and attempt < max_attempts:
+
+                state_circuits = gen_state_circuits(
+                    c_copy,
+                    n_non_cliffords,
+                    n_pairs,
+                    total_state_circuits,
+                )
+
+                pauli_expectation_list = [get_operator_expectation_value(c, qubit_pauli_operator, simulator_backend) for c in state_circuits]
+                print("pauli_expectation_list", pauli_expectation_list)
+                all_close = all(math.isclose(pauli_expectation, pauli_expectation_list[0], abs_tol=tolerance) for pauli_expectation in pauli_expectation_list)
+
+                print("attempt", attempt, "all_close", all_close)
+                attempt += 1
+                
+            if all_close:
+                warnings.warn(
+                    "All calibration data is similar. Fit may be poor as a result."
+                )
+
             # for each state circuit, create a new wire of for each state circuit
             # one for simulator, one for device
             for c in state_circuits:
@@ -521,7 +552,6 @@ def gen_CDR_MitEx(
         cdr_calibration_task_gen(
             device_backend,
             kwargs.get("model", _PolyCDRCorrect(1)),
-            kwargs.get("tolerance", 0.01),
         )
     )
 
@@ -535,7 +565,7 @@ def gen_CDR_MitEx(
     )
 
     _experiment_taskgraph.prepend(
-        ccl_state_task_gen(n_non_cliffords, n_pairs, total_state_circuits)
+        ccl_state_task_gen(n_non_cliffords, n_pairs, total_state_circuits, simulator_backend=simulator_backend, tolerance=kwargs.get("tolerance", 0.01), max_attempts=kwargs.get("max_attempts", 10))
     )
     _experiment_taskgraph.append(_post_task_graph)
     _experiment_taskgraph.append(cdr_correction_task_gen(device_backend))

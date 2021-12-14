@@ -109,6 +109,9 @@ def cdr_quality_check_task_gen(distance_tolerance: float, calibration_fraction: 
 
         for calibration, original in zip(state_circuit_exp, noisy_expectation):
 
+            print("original", original, sep='\n')
+            print("calibration", *calibration, sep='\n')
+
             # The noisy expectation value of the original circuit.
             original_coefficient = original.to_list()[0]["coefficient"][0]
 
@@ -127,6 +130,7 @@ def cdr_quality_check_task_gen(distance_tolerance: float, calibration_fraction: 
 
             # Raise a warning if the calibration circuits regularly have noisy
             # expectation value far from the original circuit.
+            print("is_far_count", is_far_count, "len(calibration)", len(calibration), "calibration_fraction", calibration_fraction)
             if is_far_count > len(calibration) * calibration_fraction:
                 warnings.warn(
                     "Training data regularly differs significantly from original circuit. Fit may be poor."
@@ -146,7 +150,7 @@ def cdr_quality_check_task_gen(distance_tolerance: float, calibration_fraction: 
 
 
 def cdr_calibration_task_gen(
-    backend: Backend, model: _BaseExCorrectModel, tolerance: float
+    backend: Backend, model: _BaseExCorrectModel,
 ) -> MitTask:
     """
     Uses calibration results from running characterisation circuits through a device
@@ -156,9 +160,6 @@ def cdr_calibration_task_gen(
     :type backend: Backend
     :param model: Model type to be calibrated and stored in backend.
     :type model: _BaseExCorrectModel
-    :param tolerance: Model can be perturbed by exact values too close to 0, this parameter sets
-    an allowed distance between exact value and 0.
-    :type tolerance: float
     """
 
     def cdr_calibration_task(
@@ -190,18 +191,21 @@ def cdr_calibration_task_gen(
                 # go through strings in operator
                 for key in noisy_qpo._dict:
                     # make sure keys are present (don't initialise at start incase indexing missing)
-                    if abs(exact_qpo[key]) > tolerance:
-                        if key not in noisy_char_dict:
-                            noisy_char_dict[key] = list()
-                        if key not in exact_char_dict:
-                            exact_char_dict[key] = list()
-                        if key not in exact_qpo._dict:
-                            raise ValueError(
-                                "Given key in calibration task for Clifford Data Regression should be present in exact and noisy characterisation results."
-                            )
+                    # if abs(exact_qpo[key]) > tolerance:
+                    # print(f"{noisy_qpo} is all good")
+                    if key not in noisy_char_dict:
+                        noisy_char_dict[key] = list()
+                    if key not in exact_char_dict:
+                        exact_char_dict[key] = list()
+                    if key not in exact_qpo._dict:
+                        raise ValueError(
+                            "Given key in calibration task for Clifford Data Regression should be present in exact and noisy characterisation results."
+                        )
 
-                        noisy_char_dict[key].append(float(noisy_qpo._dict[key]))
-                        exact_char_dict[key].append(float(exact_qpo._dict[key]))
+                    noisy_char_dict[key].append(float(noisy_qpo._dict[key]))
+                    exact_char_dict[key].append(float(exact_qpo._dict[key]))
+                    # else:
+                    #     print(f"{noisy_qpo} is too small")
             if backend.backend_info is None:
                 raise ValueError("Backend has no backend_info attribute.")
 
