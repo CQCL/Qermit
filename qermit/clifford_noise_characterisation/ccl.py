@@ -16,7 +16,7 @@
 from pytket import OpType, Circuit
 from pytket.passes import RebaseUFR, DecomposeBoxes  # type: ignore
 from pytket.backends import Backend
-from pytket.utils import QubitPauliOperator
+from pytket.utils import QubitPauliOperator, get_operator_expectation_value
 from typing import List, Tuple
 import copy
 from qermit import (
@@ -38,6 +38,8 @@ from .cdr_post import (
 import numpy as np
 import random
 from enum import Enum
+import warnings
+import math
 
 
 class LikelihoodFunction(Enum):
@@ -249,7 +251,12 @@ def gen_state_circuits(
 
 
 def ccl_state_task_gen(
-    n_non_cliffords: int, n_pairs: int, total_state_circuits: int
+    n_non_cliffords: int,
+    n_pairs: int,
+    total_state_circuits: int,
+    simulator_backend: Backend,
+    tolerance: float,
+    max_state_circuits_attempts: int,
 ) -> MitTask:
     """
     Returns a MitTask object for which given some set of experiments,
@@ -263,6 +270,18 @@ def ccl_state_task_gen(
     :type n_pairs:
     :param total_state_circuits: Number of state circuits prepared for characterisation.
     :type total_state_circuits: int
+    :param tolerance: Model can be perturbed when calibration circuits have by
+        exact expectation values too close to each other. This parameter
+        sets a distance between exact expectation values which at least some
+        calibration circuits should have.
+    :type tolerance: float
+    :param simulator_backend: Backend object simulated characterisation experiments are
+        default run through.
+    :type simulator_backend: Backend
+    :param max_state_circuits_attempts: The maximum number of times to attempt to generate a
+        list of calibrations circuit with significantly different expectation
+        values, before resorting to a list with similar expectation values.
+    :type max_state_circuits_attempts: int
 
     :return: MitTask object for preparing and returning state circuits for characterisation.
     :rtype: MitTask
@@ -295,12 +314,36 @@ def ccl_state_task_gen(
             # generate all state circuits
             c_copy = ansatz_circuit.Circuit.copy()
             c_copy.symbol_substitution(ansatz_circuit.SymbolsDict._symbolic_map)
-            state_circuits = gen_state_circuits(
-                c_copy,
-                n_non_cliffords,
-                n_pairs,
-                total_state_circuits,
-            )
+
+            all_close = True
+            attempt = 0
+            while all_close and attempt < max_state_circuits_attempts:
+
+                state_circuits = gen_state_circuits(
+                    c_copy,
+                    n_non_cliffords,
+                    n_pairs,
+                    total_state_circuits,
+                )
+
+                pauli_expectation_list = [
+                    get_operator_expectation_value(
+                        c, qubit_pauli_operator, simulator_backend
+                    )
+                    for c in state_circuits
+                ]
+                all_close = all(
+                    abs(pauli_expectation - pauli_expectation_list[0]) <= tolerance
+                    for pauli_expectation in pauli_expectation_list
+                )
+
+                attempt += 1
+
+            if all_close:
+                warnings.warn(
+                    "Clifford Data Regression performs best when the exact expectation values of all calibration circuits are not the same. However, the generated calibration circuits have similar exact expectation values. Fit of the extrapolation function may be poor as a result."
+                )
+
             # for each state circuit, create a new wire of for each state circuit
             # one for simulator, one for device
             for c in state_circuits:
@@ -465,8 +508,10 @@ def gen_CDR_MitEx(
     :key model: Model characterised by state circuits, default _PolyCDRCorrect(1) (see cdr_post.py for other options).
     :key likelihood_function: LikelihoodFunction used to filter state circuit results, given by a LikelihoodFunction Enum,
         default set to none.
-    :key tolerance: Sets an allowed distance between exact expectation value
-        of the calibration circuits and 0.
+    :key tolerance: Model can be perturbed when calibration circuits have by
+        exact expectation values too close to each other. This parameter
+        sets a distance between exact expectation values which at least some
+        calibration circuits should have.
     :key distance_tolerance: The absolute tolerance on the distance between
         expectation values of the calibration and original circuit.
     :key calibration_fraction: The upper bound on the fraction of calibration
@@ -521,7 +566,6 @@ def gen_CDR_MitEx(
         cdr_calibration_task_gen(
             device_backend,
             kwargs.get("model", _PolyCDRCorrect(1)),
-            kwargs.get("tolerance", 0.01),
         )
     )
 
@@ -535,7 +579,14 @@ def gen_CDR_MitEx(
     )
 
     _experiment_taskgraph.prepend(
-        ccl_state_task_gen(n_non_cliffords, n_pairs, total_state_circuits)
+        ccl_state_task_gen(
+            n_non_cliffords,
+            n_pairs,
+            total_state_circuits,
+            simulator_backend=simulator_backend,
+            tolerance=kwargs.get("tolerance", 0.01),
+            max_state_circuits_attempts=kwargs.get("max_state_circuits_attempts", 10),
+        )
     )
     _experiment_taskgraph.append(_post_task_graph)
     _experiment_taskgraph.append(cdr_correction_task_gen(device_backend))

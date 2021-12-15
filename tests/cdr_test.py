@@ -55,7 +55,9 @@ def test_linear_cdr_calib() -> None:
 
 def test_cdr_quality_check_task_gen():
 
-    qual_task = cdr_quality_check_task_gen(distance_tolerance=0.1, calibration_fraction=0.5)
+    qual_task = cdr_quality_check_task_gen(
+        distance_tolerance=0.1, calibration_fraction=0.5
+    )
     assert qual_task.n_in_wires == 2
     assert qual_task.n_out_wires == 2
 
@@ -101,7 +103,7 @@ def test_cdr_quality_check_task_gen():
 def test_cdr_calibration_correction_task_gen():
     b = AerBackend()
     b._characterisation = dict()
-    cal_task = cdr_calibration_task_gen(b, _PolyCDRCorrect(1), 0)
+    cal_task = cdr_calibration_task_gen(b, _PolyCDRCorrect(1))
     assert cal_task.n_in_wires == 1
     assert cal_task.n_out_wires == 1
 
