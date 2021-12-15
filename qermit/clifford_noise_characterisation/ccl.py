@@ -341,7 +341,7 @@ def ccl_state_task_gen(
 
             if all_close:
                 warnings.warn(
-                    "All calibration data is similar. Fit may be poor as a result."
+                    "The exact expectation values of all calibration circuits are similar. Fit of the extrapolation function may be poor as a result."
                 )
 
             # for each state circuit, create a new wire of for each state circuit
@@ -508,8 +508,10 @@ def gen_CDR_MitEx(
     :key model: Model characterised by state circuits, default _PolyCDRCorrect(1) (see cdr_post.py for other options).
     :key likelihood_function: LikelihoodFunction used to filter state circuit results, given by a LikelihoodFunction Enum,
         default set to none.
-    :key tolerance: Sets an allowed distance between exact expectation value
-        of the calibration circuits and 0.
+    :key tolerance: Model can be perturbed when calibration circuits have by
+        exact expectation values too close to each other. This parameter
+        sets a distance between exact expectation values which at least some
+        calibration circuits should have.
     :key distance_tolerance: The absolute tolerance on the distance between
         expectation values of the calibration and original circuit.
     :key calibration_fraction: The upper bound on the fraction of calibration
