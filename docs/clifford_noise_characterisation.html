@@ -212,8 +212,10 @@ backend with some compilation of circuit.</p>
 default set to none.</p>
 </dd>
 <dt class="field-odd">Key tolerance</dt>
-<dd class="field-odd"><p>Sets an allowed distance between exact expectation value
-of the calibration circuits and 0.</p>
+<dd class="field-odd"><p>Model can be perturbed when calibration circuits have by
+exact expectation values too close to each other. This parameter
+sets a distance between exact expectation values which at least some
+calibration circuits should have.</p>
 </dd>
 <dt class="field-even">Key distance_tolerance</dt>
 <dd class="field-even"><p>The absolute tolerance on the distance between
@@ -278,7 +280,7 @@ original circuit.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.clifford_noise_characterisation.ccl.ccl_state_task_gen">
-<span class="sig-prename descclassname"><span class="pre">ccl.</span></span><span class="sig-name descname"><span class="pre">ccl_state_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_pairs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_state_circuits</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.clifford_noise_characterisation.ccl.ccl_state_task_gen" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ccl.</span></span><span class="sig-name descname"><span class="pre">ccl_state_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_pairs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_state_circuits</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulator_backend</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket.backends.backend.Backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_state_circuits_attempts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.clifford_noise_characterisation.ccl.ccl_state_task_gen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a MitTask object for which given some set of experiments,
 for each experiment prepares a set of state circuits for Clifford Circuit Learning characterisation.
 The original experiment is returned on the first wire, state circuits for running on backend on second wire,
@@ -289,6 +291,15 @@ and state circuits for noiseless simulation on the third wire.</p>
 <li><p><strong>n_non_cliffords</strong> (<em>int</em>) – Number of remaining non-Clifford gates in generated State Circuits.</p></li>
 <li><p><strong>n_pairs</strong> – Parameter used for guiding properties of State Circuits generated.</p></li>
 <li><p><strong>total_state_circuits</strong> (<em>int</em>) – Number of state circuits prepared for characterisation.</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em>) – Model can be perturbed when calibration circuits have by
+exact expectation values too close to each other. This parameter
+sets a distance between exact expectation values which at least some
+calibration circuits should have.</p></li>
+<li><p><strong>simulator_backend</strong> (<em>Backend</em>) – Backend object simulated characterisation experiments are
+default run through.</p></li>
+<li><p><strong>max_state_circuits_attempts</strong> (<em>int</em>) – The maximum number of times to attempt to generate a
+list of calibrations circuit with significantly different expectation
+values, before resorting to a list with similar expectation values.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
