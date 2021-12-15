@@ -341,7 +341,7 @@ def ccl_state_task_gen(
 
             if all_close:
                 warnings.warn(
-                    "The exact expectation values of all calibration circuits are similar. Fit of the extrapolation function may be poor as a result."
+                    "Clifford Data Regression performs best when the exact expectation values of all calibration circuits are not the same. However, the generated calibration circuits have similar exact expectation values. Fit of the extrapolation function may be poor as a result."
                 )
 
             # for each state circuit, create a new wire of for each state circuit
