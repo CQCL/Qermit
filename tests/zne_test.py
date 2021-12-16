@@ -196,10 +196,18 @@ def test_digital_folding_task_gen():
         be, be._rebase_pass, n_folds_2, Folding.gate, _allow_approx_fold=False
     )
     task_3 = digital_folding_task_gen(
-        noisy_backend, noisy_backend._rebase_pass, n_folds_3, Folding.gate, _allow_approx_fold=False
+        noisy_backend,
+        noisy_backend._rebase_pass,
+        n_folds_3,
+        Folding.gate,
+        _allow_approx_fold=False,
     )
     task_4 = digital_folding_task_gen(
-        noisy_backend, noisy_backend._rebase_pass, n_folds_4, Folding.odd_gate, _allow_approx_fold=False
+        noisy_backend,
+        noisy_backend._rebase_pass,
+        n_folds_4,
+        Folding.odd_gate,
+        _allow_approx_fold=False,
     )
 
     assert task_1.n_in_wires == 1
@@ -215,7 +223,7 @@ def test_digital_folding_task_gen():
     c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
     c_3 = Circuit(2).CX(0, 1).H(0).Rx(0.3, 1).Rz(0.6, 1)
     c_4 = Circuit(2).CX(0, 1).H(0).Rz(0.3, 1)
-    c_5 = Circuit(2).H(0).add_barrier([0,1]).CX(0,1)
+    c_5 = Circuit(2).H(0).add_barrier([0, 1]).CX(0, 1)
 
     ac_1 = AnsatzCircuit(c_1, 10000, {})
     ac_2 = AnsatzCircuit(c_2, 10000, {})
@@ -269,8 +277,16 @@ def test_digital_folding_task_gen():
     assert folded_c_3.n_gates == c_3.n_gates * n_folds_3 + c_3.n_gates * (n_folds_3 - 1)
     assert folded_c_4.n_gates == c_4.n_gates + n_folds_4 * 2 * ((c_4.n_gates + 1) // 2)
     assert folded_c_5.n_gates == c_5.n_gates * n_folds_1 + n_folds_1 - 1
-    assert folded_c_6.n_gates == (c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)) * n_folds_2 + (c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)) * (n_folds_2 - 1) + c_5.n_gates_of_type(OpType.Barrier)
-    assert folded_c_7.n_gates == c_5.n_gates + n_folds_4 * 2 * (((c_5.n_gates-c_5.n_gates_of_type(OpType.Barrier)) + 1) // 2)
+    assert folded_c_6.n_gates == (
+        c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)
+    ) * n_folds_2 + (c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)) * (
+        n_folds_2 - 1
+    ) + c_5.n_gates_of_type(
+        OpType.Barrier
+    )
+    assert folded_c_7.n_gates == c_5.n_gates + n_folds_4 * 2 * (
+        ((c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)) + 1) // 2
+    )
 
     c_1_unitary = c_1.get_unitary()
     c_2_unitary = c_2.get_unitary()
@@ -298,7 +314,13 @@ def test_zne_identity():
 
     backend = AerBackend()
 
-    me = gen_ZNE_MitEx(backend, backend._rebase_pass, [7, 5, 3], _label="TestZNEMitEx", optimisation_level=0)
+    me = gen_ZNE_MitEx(
+        backend,
+        backend._rebase_pass,
+        [7, 5, 3],
+        _label="TestZNEMitEx",
+        optimisation_level=0,
+    )
 
     c = Circuit(3)
     for _ in range(10):

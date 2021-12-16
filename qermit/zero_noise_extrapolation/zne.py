@@ -77,7 +77,6 @@ class Folding(Enum):
                     folded_circ.add_barrier(gate.args)
                 else:
                     folded_circ.add_gate(gate.op.dagger, gate.args)
-            # folded_circ.add_circuit(circ.dagger(), folded_circ.qubits, folded_circ.bits)
 
             # Add barrier between circuit and its inverse
             folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
@@ -115,10 +114,14 @@ class Folding(Enum):
         num_commands = len(c_dict["commands"])
 
         # Count and locate the number of commands that are not barriers
-        c_dict_commands_non_barrier = [(i, command) for (i, command) in enumerate(c_dict['commands']) if command['op']['type'] != 'Barrier']
+        c_dict_commands_non_barrier = [
+            (i, command)
+            for (i, command) in enumerate(c_dict["commands"])
+            if command["op"]["type"] != "Barrier"
+        ]
         num_non_barrier_commands = len(c_dict_commands_non_barrier)
 
-        # Calculate the number of gates that need to be folded. Note that only 
+        # Calculate the number of gates that need to be folded. Note that only
         # non barrier commands should be folded so only these are counted.
         num_additional_commands = (noise_scaling - 1) * num_non_barrier_commands
         num_folded_commands = int(num_additional_commands // 2)
@@ -135,7 +138,7 @@ class Folding(Enum):
             )
 
         # Choose a random selection of commands to fold. Commands are referenced by their index.
-        # These are chosen with replacement. Only non barrier commands should 
+        # These are chosen with replacement. Only non barrier commands should
         # be folded, and so only the index of those are added here.
         commands_to_fold = np.random.choice(
             [i[0] for i in c_dict_commands_non_barrier], num_folded_commands
@@ -155,8 +158,8 @@ class Folding(Enum):
             command_circ_dict.update({"commands": [command]})
             command_circ = Circuit().from_dict(command_circ_dict)
 
-            # Commands which are not to be folded may not be invertible (for 
-            # example barriers) and so the inverse is not calculated in that 
+            # Commands which are not to be folded may not be invertible (for
+            # example barriers) and so the inverse is not calculated in that
             # case.
             if num_folds[command_index] > 0:
                 # Find the inverse of the command
@@ -218,9 +221,9 @@ class Folding(Enum):
 
         for command in c_dict["commands"]:
 
-            # Barriers are added to the circuit but otherwise effectively 
+            # Barriers are added to the circuit but otherwise effectively
             # skipped.
-            if command['op']['type'] == 'Barrier':
+            if command["op"]["type"] == "Barrier":
 
                 folded_command_list.append(command)
 
