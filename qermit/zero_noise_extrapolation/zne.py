@@ -114,11 +114,14 @@ class Folding(Enum):
         c_dict = circ.to_dict()
         num_commands = len(c_dict["commands"])
 
+        c_dict_commands_non_barrier = [(i, command) for (i, command) in enumerate(c_dict['commands']) if command['op']['type'] != 'Barrier']
+        num_non_barrier_commands = len(c_dict_commands_non_barrier)
+
         # Calculate the number of gates that need to be folded
-        num_additional_commands = (noise_scaling - 1) * num_commands
+        num_additional_commands = (noise_scaling - 1) * num_non_barrier_commands
         num_folded_commands = int(num_additional_commands // 2)
 
-        true_noise_scaling = 1 + ((num_folded_commands * 2) / num_commands)
+        true_noise_scaling = 1 + ((num_folded_commands * 2) / num_non_barrier_commands)
         # This check isolates the case where the noise folding that can be achieved is different
         # from that requested. While noise_scaling can be any real value, as the gates increase
         # the noise by discrete values, not all folding values are possible.
@@ -132,7 +135,7 @@ class Folding(Enum):
         # Choose a random selection of commands to fold. Commands are referenced by their index.
         # These are chosen with replacement.
         commands_to_fold = np.random.choice(
-            [i for i in range(num_commands)], num_folded_commands
+            [i[0] for i in c_dict_commands_non_barrier], num_folded_commands
         )
         # Calculate how many times each individual command needs to be folded
         num_folds = {i: list(commands_to_fold).count(i) for i in range(num_commands)}
@@ -149,10 +152,11 @@ class Folding(Enum):
             command_circ_dict.update({"commands": [command]})
             command_circ = Circuit().from_dict(command_circ_dict)
 
-            # Find the inverse of the command
-            inverse_command_circ = command_circ.dagger()
-            inverse_command_circ_dict = inverse_command_circ.to_dict()
-            inverse_command = inverse_command_circ_dict["commands"]
+            if num_folds[command_index] > 0:
+                # Find the inverse of the command
+                inverse_command_circ = command_circ.dagger()
+                inverse_command_circ_dict = inverse_command_circ.to_dict()
+                inverse_command = inverse_command_circ_dict["commands"]
 
             # Append command and inverse the appropriate number of times.
             folded_command_list.append(command)
