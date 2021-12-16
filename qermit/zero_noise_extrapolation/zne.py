@@ -114,10 +114,12 @@ class Folding(Enum):
         c_dict = circ.to_dict()
         num_commands = len(c_dict["commands"])
 
+        # Count and locate the number of commands that are not barriers
         c_dict_commands_non_barrier = [(i, command) for (i, command) in enumerate(c_dict['commands']) if command['op']['type'] != 'Barrier']
         num_non_barrier_commands = len(c_dict_commands_non_barrier)
 
-        # Calculate the number of gates that need to be folded
+        # Calculate the number of gates that need to be folded. Note that only 
+        # non barrier commands should be folded so only these are counted.
         num_additional_commands = (noise_scaling - 1) * num_non_barrier_commands
         num_folded_commands = int(num_additional_commands // 2)
 
@@ -133,7 +135,8 @@ class Folding(Enum):
             )
 
         # Choose a random selection of commands to fold. Commands are referenced by their index.
-        # These are chosen with replacement.
+        # These are chosen with replacement. Only non barrier commands should 
+        # be folded, and so only the index of those are added here.
         commands_to_fold = np.random.choice(
             [i[0] for i in c_dict_commands_non_barrier], num_folded_commands
         )
@@ -152,6 +155,9 @@ class Folding(Enum):
             command_circ_dict.update({"commands": [command]})
             command_circ = Circuit().from_dict(command_circ_dict)
 
+            # Commands which are not to be folded may not be invertible (for 
+            # example barriers) and so the inverse is not calculated in that 
+            # case.
             if num_folds[command_index] > 0:
                 # Find the inverse of the command
                 inverse_command_circ = command_circ.dagger()
@@ -212,7 +218,13 @@ class Folding(Enum):
 
         for command in c_dict["commands"]:
 
-            if fold:
+            # Barriers are added to the circuit but otherwise effectively 
+            # skipped.
+            if command['op']['type'] == 'Barrier':
+
+                folded_command_list.append(command)
+
+            elif fold:
                 command_circ_dict.update({"commands": [command]})
                 command_circ = Circuit.from_dict(command_circ_dict)
 
@@ -244,10 +256,12 @@ class Folding(Enum):
                         }
                     )
                     folded_command_list.append(command)
+
+                fold = not fold
             else:
                 folded_command_list.append(command)
 
-            fold = not fold
+                fold = not fold
 
         c_dict.update({"commands": folded_command_list})
         folded_c = Circuit.from_dict(c_dict)

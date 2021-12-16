@@ -242,6 +242,7 @@ def test_digital_folding_task_gen():
     folded_experiment_4 = task_4([[experiment_4]])[0][0]
     folded_experiment_5 = task_1([[experiment_5]])[0][0]
     folded_experiment_6 = task_2([[experiment_5]])[0][0]
+    folded_experiment_7 = task_4([[experiment_5]])[0][0]
 
     folded_c_1 = folded_experiment_1[0][0]
     folded_c_2 = folded_experiment_2[0][0]
@@ -249,6 +250,7 @@ def test_digital_folding_task_gen():
     folded_c_4 = folded_experiment_4[0][0]
     folded_c_5 = folded_experiment_5[0][0]
     folded_c_6 = folded_experiment_6[0][0]
+    folded_c_7 = folded_experiment_7[0][0]
 
     # TODO: Add a backend with a more restricted gateset
     assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_1)
@@ -257,6 +259,7 @@ def test_digital_folding_task_gen():
     assert GateSetPredicate(noisy_backend.backend_info.gate_set).verify(folded_c_4)
     assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_5)
     assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_6)
+    assert GateSetPredicate(noisy_backend.backend_info.gate_set).verify(folded_c_7)
 
     # Checks that the number of gates has been increased correctly.
     # Note that in both cases barriers are added. This is why there is the
@@ -264,9 +267,10 @@ def test_digital_folding_task_gen():
     assert folded_c_1.n_gates == c_1.n_gates * n_folds_1 + n_folds_1 - 1
     assert folded_c_2.n_gates == c_2.n_gates * n_folds_2 + c_2.n_gates * (n_folds_2 - 1)
     assert folded_c_3.n_gates == c_3.n_gates * n_folds_3 + c_3.n_gates * (n_folds_3 - 1)
-    assert folded_c_4.n_gates == c_4.n_gates + n_folds_4 * (2 * (c_4.n_gates + 1) // 2)
+    assert folded_c_4.n_gates == c_4.n_gates + n_folds_4 * 2 * ((c_4.n_gates + 1) // 2)
     assert folded_c_5.n_gates == c_5.n_gates * n_folds_1 + n_folds_1 - 1
     assert folded_c_6.n_gates == (c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)) * n_folds_2 + (c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)) * (n_folds_2 - 1) + c_5.n_gates_of_type(OpType.Barrier)
+    assert folded_c_7.n_gates == c_5.n_gates + n_folds_4 * 2 * (((c_5.n_gates-c_5.n_gates_of_type(OpType.Barrier)) + 1) // 2)
 
     c_1_unitary = c_1.get_unitary()
     c_2_unitary = c_2.get_unitary()
@@ -279,6 +283,7 @@ def test_digital_folding_task_gen():
     folded_c_4_unitary = folded_c_4.get_unitary()
     folded_c_5_unitary = folded_c_5.get_unitary()
     folded_c_6_unitary = folded_c_6.get_unitary()
+    folded_c_7_unitary = folded_c_7.get_unitary()
 
     assert np.allclose(c_1_unitary, folded_c_1_unitary)
     assert np.allclose(c_2_unitary, folded_c_2_unitary)
@@ -286,6 +291,7 @@ def test_digital_folding_task_gen():
     assert np.allclose(c_4_unitary, folded_c_4_unitary)
     assert np.allclose(c_5_unitary, folded_c_5_unitary)
     assert np.allclose(c_5_unitary, folded_c_6_unitary)
+    assert np.allclose(c_5_unitary, folded_c_7_unitary)
 
 
 def test_zne_identity():
