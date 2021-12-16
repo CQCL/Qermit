@@ -28,7 +28,7 @@ from enum import Enum
 import numpy as np
 from scipy.optimize import curve_fit  # type: ignore
 from typing import List, Tuple, cast
-from pytket import Circuit
+from pytket import Circuit, OpType
 from pytket.predicates import CompilationUnit  # type: ignore
 from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
@@ -70,9 +70,19 @@ class Folding(Enum):
 
             # Add barrier between circuit and its inverse
             folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
-            folded_circ.add_circuit(circ.dagger(), folded_circ.qubits, folded_circ.bits)
 
+            # Add inverse circuit by iterating though commands and inverting them
+            for gate in reversed(circ.get_commands()):
+                if gate.op.type == OpType.Barrier:
+                    folded_circ.add_barrier(gate.args)
+                else:
+                    folded_circ.add_gate(gate.op.dagger, gate.args)
+            # folded_circ.add_circuit(circ.dagger(), folded_circ.qubits, folded_circ.bits)
+
+            # Add barrier between circuit and its inverse
             folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
+
+            # Add original circuit
             folded_circ.add_circuit(circ, folded_circ.qubits, folded_circ.bits)
 
         return folded_circ
