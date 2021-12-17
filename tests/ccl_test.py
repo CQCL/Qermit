@@ -149,7 +149,7 @@ def test_ccl_state_task_gen():
 
     c = Circuit(3).Rz(0.63, 1).Rz(0.2, 0).Rz(0.1, 2)
     c.Rz(0.43, 1).Rz(0.5, 0).Rz(0.8, 2)
-    c.Rz(1.23, 1).Rz(1.2, 0).Rz(1.1, 2)
+    c.Rz(1.23, 1).Rz(1.2, 0).add_barrier([0, 1]).Rz(1.1, 2)
     c.Rz(9.63, 1).Rz(8.2, 0).Rz(10.1, 2)
 
     qps_012 = QubitPauliString(
