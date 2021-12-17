@@ -39,7 +39,6 @@ import numpy as np
 import random
 from enum import Enum
 import warnings
-import math
 
 
 class LikelihoodFunction(Enum):
