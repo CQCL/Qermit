@@ -153,3 +153,4 @@ def test_cdr_calibration_correction_task_gen():
 if __name__ == "__main__":
     test_linear_cdr_calib()
     test_cdr_calibration_correction_task_gen()
+    test_cdr_quality_check_task_gen()

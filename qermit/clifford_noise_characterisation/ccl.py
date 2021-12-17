@@ -177,6 +177,9 @@ def gen_state_circuits(
                 # Measure gate has special case, but can assume 1 qubit to 1 bit
                 elif com.op.type is OpType.Measure:
                     new_circuit.Measure(com.qubits[0], com.bits[0])
+                # A special case for Barrier metaop
+                elif com.op.type == OpType.Barrier:
+                    new_circuit.add_barrier(com.args)
                 # CX or H gate, add as is
                 else:
                     new_circuit.add_gate(com.op.type, com.qubits)
