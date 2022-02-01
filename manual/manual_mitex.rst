@@ -460,17 +460,15 @@ the ``qermit.zero_noise_extrapolation`` `module <https://cqcl.github.io/qermit/z
 
     from qermit.zero_noise_extrapolation import gen_ZNE_MitEx
     from pytket.extensions.qiskit import IBMQEmulatorBackend
-    from pytket.extensions.qiskit.backends.ibm import _rebase_pass
 
-    zne_mitex = gen_ZNE_MitEx(backend=casablanca_backend, rebase_pass=_rebase_pass, noise_scaling_list = [3,5,7])
+    zne_mitex = gen_ZNE_MitEx(backend=casablanca_backend, noise_scaling_list = [3,5,7])
     zne_mitex.get_task_graph()
 
 
 .. image:: zne_taskgraph.png
 
 Here the three inputs are: ``backend``, the backend on which the circuits will 
-be run; ``rebase_pass``, a rebase pass which rebases to the gates native to the 
-backend; and ``noise_scaling_list``, a list of integer multiples by which the 
+be run; and ``noise_scaling_list``, a list of integer multiples by which the 
 noise will be scaled. For each noise scaling value a different ``MitEx`` object is 
 constructed. Let's construct a test case with expected value 1.0 and run the 
 error-mitigation ``MitEx``.
