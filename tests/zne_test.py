@@ -190,21 +190,19 @@ def test_digital_folding_task_gen():
     n_folds_4 = 2
 
     task_1 = digital_folding_task_gen(
-        be, be._rebase_pass, n_folds_1, Folding.circuit, _allow_approx_fold=False
+        be, n_folds_1, Folding.circuit, _allow_approx_fold=False
     )
     task_2 = digital_folding_task_gen(
-        be, be._rebase_pass, n_folds_2, Folding.gate, _allow_approx_fold=False
+        be, n_folds_2, Folding.gate, _allow_approx_fold=False
     )
     task_3 = digital_folding_task_gen(
         noisy_backend,
-        noisy_backend._rebase_pass,
         n_folds_3,
         Folding.gate,
         _allow_approx_fold=False,
     )
     task_4 = digital_folding_task_gen(
         noisy_backend,
-        noisy_backend._rebase_pass,
         n_folds_4,
         Folding.odd_gate,
         _allow_approx_fold=False,
@@ -316,7 +314,6 @@ def test_zne_identity():
 
     me = gen_ZNE_MitEx(
         backend,
-        backend._rebase_pass,
         [7, 5, 3],
         _label="TestZNEMitEx",
         optimisation_level=0,
@@ -342,7 +339,6 @@ def test_simple_run_end_to_end():
 
     me = gen_ZNE_MitEx(
         be,
-        be._rebase_pass,
         [2, 3, 4],
         _label="TestZNEMitEx",
         optimisation_level=0,
