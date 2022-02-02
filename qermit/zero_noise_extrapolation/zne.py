@@ -82,7 +82,11 @@ class Folding(Enum):
             folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
 
             # Add original circuit
-            folded_circ.add_circuit(circ, folded_circ.qubits, folded_circ.bits)
+            for gate in circ.get_commands():
+                if gate.op.type == OpType.Barrier:
+                    folded_circ.add_barrier(gate.args)
+                else:
+                    folded_circ.add_gate(gate.op, gate.args)
 
         return folded_circ
 

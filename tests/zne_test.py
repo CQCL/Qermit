@@ -57,6 +57,10 @@ for node in [i for i in range(n_qubits)]:
 
 noisy_backend = AerBackend(noise_model)
 
+from pytket.extensions.qiskit import IBMQEmulatorBackend
+
+emulator_backend = IBMQEmulatorBackend("ibmq_bogota")
+
 
 def test_gen_initial_compilation_task():
 
@@ -178,6 +182,36 @@ def test_extrapolation_task_gen():
     assert math.isclose(
         experiment_2_result[list(experiment_2_result.keys())[0]], -1, rel_tol=0.001
     )
+
+
+def test_folding_compiled_circuit():
+
+    n_folds_1 = 3
+
+    task_1 = digital_folding_task_gen(
+        emulator_backend,
+        emulator_backend._rebase_pass,
+        n_folds_1,
+        Folding.circuit,
+        _allow_approx_fold=False,
+    )
+
+    assert task_1.n_in_wires == 1
+    assert task_1.n_out_wires == 1
+
+    c_1 = Circuit(1).Rz(3.5, 0)
+    c_1 = emulator_backend.get_compiled_circuit(c_1)
+
+    ac_1 = AnsatzCircuit(c_1, 10000, {})
+
+    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+
+    experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
+
+    folded_experiment_1 = task_1([[experiment_1]])[0][0]
+    assert OpType.Reset not in [
+        com.op.type for com in folded_experiment_1.AnsatzCircuit.Circuit.get_commands()
+    ]
 
 
 def test_digital_folding_task_gen():
