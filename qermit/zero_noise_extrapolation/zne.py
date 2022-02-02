@@ -585,9 +585,7 @@ def digital_folding_task_gen(
 
             # This compilation pass was added to account for the case that
             # the inverse of a gate is not in the gateset of the backend.
-            rebase_pass = backend.rebase_pass()
-            rebase_pass.apply(zne_circ)
-            
+            backend.rebase_pass().apply(zne_circ)
 
             folded_circuits.append(
                 ObservableExperiment(
@@ -824,9 +822,7 @@ def gen_initial_compilation_task(
 
 
 # TODO: Backend does not appear as input in documentation
-def gen_ZNE_MitEx(
-    backend: Backend, noise_scaling_list: List[float], **kwargs
-) -> MitEx:
+def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -> MitEx:
     """Generates MitEx object which mitigates for noise using Zero Noise Extrapolation. This is the
     process by which noise is amplified incrementally, and the zero noise case arrived at by
     extrapolating backwards. For further explanantion see https://arxiv.org/abs/2005.10921.
