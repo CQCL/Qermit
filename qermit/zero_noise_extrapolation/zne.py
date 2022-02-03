@@ -534,7 +534,6 @@ def plot_fit(
 
 def digital_folding_task_gen(
     backend: Backend,
-    rebase_pass: BasePass,
     noise_scaling: float,
     _folding_type: Folding,
     _allow_approx_fold: bool,
@@ -546,8 +545,6 @@ def digital_folding_task_gen(
     :param backend: This will be used to compile the circuit after folding to ensure
         that the gate set matches those available on the backend.
     :type backend: Backend
-    :param rebase_pass: BasePass to rebase circuits to the native gates of backend
-    :type rebase_pass: BasePass
     :param noise_scaling: The factor by which the noise is increased.
     :type noise_scaling: float
     :param _folding_type: The means by which the noise should be increased.
@@ -588,7 +585,7 @@ def digital_folding_task_gen(
 
             # This compilation pass was added to account for the case that
             # the inverse of a gate is not in the gateset of the backend.
-            rebase_pass.apply(zne_circ)
+            backend.rebase_pass().apply(zne_circ)
 
             folded_circuits.append(
                 ObservableExperiment(
@@ -825,17 +822,13 @@ def gen_initial_compilation_task(
 
 
 # TODO: Backend does not appear as input in documentation
-def gen_ZNE_MitEx(
-    backend: Backend, rebase_pass: BasePass, noise_scaling_list: List[float], **kwargs
-) -> MitEx:
+def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -> MitEx:
     """Generates MitEx object which mitigates for noise using Zero Noise Extrapolation. This is the
     process by which noise is amplified incrementally, and the zero noise case arrived at by
     extrapolating backwards. For further explanantion see https://arxiv.org/abs/2005.10921.
 
     :param backend: Backend on which the circuits are to be run.
     :type backend: Backend
-    :param rebase_pass: BasePass rebasing to the gateset of the backend.
-    :type rebase_pass: BasePass
     :param noise_scaling_list: A list of the amounts by which the noise should be scaled.
     :type noise_scaling_list: List[float]
     :return: MitEx object performing noise mitigation by ZNE.
@@ -885,7 +878,7 @@ def gen_ZNE_MitEx(
         )
 
         digital_folding_task = digital_folding_task_gen(
-            backend, rebase_pass, fold, _folding_type, _allow_approx_fold
+            backend, fold, _folding_type, _allow_approx_fold
         )
         _fold_mitex.prepend(digital_folding_task)
         _experiment_taskgraph.parallel(_fold_mitex)

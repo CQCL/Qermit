@@ -545,16 +545,14 @@ advantages depending on: the device, dominant noise channel, etc.</p>
 the <code class="docutils literal notranslate"><span class="pre">qermit.zero_noise_extrapolation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/zero_noise_extrapolation.html">module</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.zero_noise_extrapolation</span> <span class="kn">import</span> <span class="n">gen_ZNE_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQEmulatorBackend</span>
-<span class="kn">from</span> <span class="nn">pytket.extensions.qiskit.backends.ibm</span> <span class="kn">import</span> <span class="n">_rebase_pass</span>
 
-<span class="n">zne_mitex</span> <span class="o">=</span> <span class="n">gen_ZNE_MitEx</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">casablanca_backend</span><span class="p">,</span> <span class="n">rebase_pass</span><span class="o">=</span><span class="n">_rebase_pass</span><span class="p">,</span> <span class="n">noise_scaling_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">])</span>
+<span class="n">zne_mitex</span> <span class="o">=</span> <span class="n">gen_ZNE_MitEx</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">casablanca_backend</span><span class="p">,</span> <span class="n">noise_scaling_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">])</span>
 <span class="n">zne_mitex</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="_images/zne_taskgraph.png" src="_images/zne_taskgraph.png" />
 <p>Here the three inputs are: <code class="docutils literal notranslate"><span class="pre">backend</span></code>, the backend on which the circuits will
-be run; <code class="docutils literal notranslate"><span class="pre">rebase_pass</span></code>, a rebase pass which rebases to the gates native to the
-backend; and <code class="docutils literal notranslate"><span class="pre">noise_scaling_list</span></code>, a list of integer multiples by which the
+be run; and <code class="docutils literal notranslate"><span class="pre">noise_scaling_list</span></code>, a list of integer multiples by which the
 noise will be scaled. For each noise scaling value a different <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> object is
 constructed. Let’s construct a test case with expected value 1.0 and run the
 error-mitigation <code class="docutils literal notranslate"><span class="pre">MitEx</span></code>.</p>
