@@ -196,7 +196,6 @@ def test_folding_compiled_circuit():
 
     task_1 = digital_folding_task_gen(
         emulator_backend,
-        emulator_backend._rebase_pass,
         n_folds_1,
         Folding.circuit,
         _allow_approx_fold=False,
