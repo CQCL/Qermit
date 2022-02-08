@@ -38,6 +38,7 @@ import numpy as np
 from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
 import qiskit.providers.aer.noise as noise
 from pytket.circuit import OpType
+from qiskit import IBMQ  # type: ignore
 
 n_qubits = 2
 
@@ -59,7 +60,8 @@ noisy_backend = AerBackend(noise_model)
 
 from pytket.extensions.qiskit import IBMQEmulatorBackend
 
-emulator_backend = IBMQEmulatorBackend("ibmq_bogota")
+skip_remote_tests: bool = not IBMQ.stored_account()
+REASON = "IBMQ account not configured"
 
 
 def test_gen_initial_compilation_task():
@@ -184,7 +186,10 @@ def test_extrapolation_task_gen():
     )
 
 
+@pytest.mark.skipif(skip_remote_tests, reason=REASON)
 def test_folding_compiled_circuit():
+
+    emulator_backend = IBMQEmulatorBackend("ibmq_bogota")
 
     n_folds_1 = 3
 
