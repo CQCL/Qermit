@@ -39,6 +39,7 @@ from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
 import qiskit.providers.aer.noise as noise
 from pytket.circuit import OpType
 from qiskit import IBMQ  # type: ignore
+import pytest
 
 n_qubits = 2
 
