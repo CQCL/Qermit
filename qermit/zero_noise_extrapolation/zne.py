@@ -35,6 +35,16 @@ import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial
 
 
+box_types = {
+    OpType.CircBox,
+    OpType.ExpBox,
+    OpType.PauliExpBox,
+    OpType.Unitary1qBox,
+    OpType.Unitary2qBox,
+    OpType.Unitary3qBox,
+}
+
+
 class Folding(Enum):
     """Folding techniques used to increase the noise levels.
 
@@ -75,6 +85,8 @@ class Folding(Enum):
             for gate in reversed(circ.get_commands()):
                 if gate.op.type == OpType.Barrier:
                     folded_circ.add_barrier(gate.args)
+                elif gate.op.type in box_types:
+                    raise RuntimeError("Box types not supported when folding.")
                 else:
                     folded_circ.add_gate(gate.op.dagger, gate.args)
 
@@ -82,7 +94,13 @@ class Folding(Enum):
             folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
 
             # Add original circuit
-            folded_circ.add_circuit(circ, folded_circ.qubits, folded_circ.bits)
+            for gate in circ.get_commands():
+                if gate.op.type == OpType.Barrier:
+                    folded_circ.add_barrier(gate.args)
+                elif gate.op.type in box_types:
+                    raise RuntimeError("Box types not supported when folding.")
+                else:
+                    folded_circ.add_gate(gate.op, gate.args)
 
         return folded_circ
 
