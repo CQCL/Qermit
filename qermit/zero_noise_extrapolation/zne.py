@@ -35,6 +35,16 @@ import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial
 
 
+box_types = {
+    OpType.CircBox,
+    OpType.ExpBox,
+    OpType.PauliExpBox,
+    OpType.Unitary1qBox,
+    OpType.Unitary2qBox,
+    OpType.Unitary3qBox,
+}
+
+
 class Folding(Enum):
     """Folding techniques used to increase the noise levels.
 
@@ -75,18 +85,8 @@ class Folding(Enum):
             for gate in reversed(circ.get_commands()):
                 if gate.op.type == OpType.Barrier:
                     folded_circ.add_barrier(gate.args)
-                elif gate.op.type == OpType.CircBox:
-                    folded_circ.add_circbox(gate.op.dagger, gate.args)
-                elif gate.op.type == OpType.ExpBox:
-                    folded_circ.add_expbox(gate.op.dagger, gate.args)
-                elif gate.op.type == OpType.PauliExpBox:
-                    folded_circ.add_pauliexpbox(gate.op.dagger, gate.args)
-                elif gate.op.type == OpType.Unitary1qBox:
-                    folded_circ.add_unitary1qbox(gate.op.dagger, gate.args)
-                elif gate.op.type == OpType.Unitary2qBox:
-                    folded_circ.add_unitary2qbox(gate.op.dagger, gate.args)
-                elif gate.op.type == OpType.Unitary3qBox:
-                    folded_circ.add_unitary3qbox(gate.op.dagger, gate.args)
+                elif gate.op.type in box_types:
+                    raise RuntimeError("Box types not supported when folding.")
                 else:
                     folded_circ.add_gate(gate.op.dagger, gate.args)
 
@@ -97,18 +97,8 @@ class Folding(Enum):
             for gate in circ.get_commands():
                 if gate.op.type == OpType.Barrier:
                     folded_circ.add_barrier(gate.args)
-                elif gate.op.type == OpType.CircBox:
-                    folded_circ.add_circbox(gate.op, gate.args)
-                elif gate.op.type == OpType.ExpBox:
-                    folded_circ.add_expbox(gate.op, gate.args)
-                elif gate.op.type == OpType.PauliExpBox:
-                    folded_circ.add_pauliexpbox(gate.op, gate.args)
-                elif gate.op.type == OpType.Unitary1qBox:
-                    folded_circ.add_unitary1qbox(gate.op, gate.args)
-                elif gate.op.type == OpType.Unitary2qBox:
-                    folded_circ.add_unitary2qbox(gate.op, gate.args)
-                elif gate.op.type == OpType.Unitary3qBox:
-                    folded_circ.add_unitary3qbox(gate.op, gate.args)
+                elif gate.op.type in box_types:
+                    raise RuntimeError("Box types not supported when folding.")
                 else:
                     folded_circ.add_gate(gate.op, gate.args)
 
