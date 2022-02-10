@@ -38,6 +38,8 @@ import numpy as np
 from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
 import qiskit.providers.aer.noise as noise
 from pytket.circuit import OpType
+from qiskit import IBMQ  # type: ignore
+import pytest
 
 n_qubits = 2
 
@@ -56,6 +58,11 @@ for node in [i for i in range(n_qubits)]:
     noise_model.add_quantum_error(error_1, ["h", "rx", "u3"], [node])
 
 noisy_backend = AerBackend(noise_model)
+
+from pytket.extensions.qiskit import IBMQEmulatorBackend
+
+skip_remote_tests: bool = not IBMQ.stored_account()
+REASON = "IBMQ account not configured"
 
 
 def test_gen_initial_compilation_task():
@@ -178,6 +185,38 @@ def test_extrapolation_task_gen():
     assert math.isclose(
         experiment_2_result[list(experiment_2_result.keys())[0]], -1, rel_tol=0.001
     )
+
+
+@pytest.mark.skipif(skip_remote_tests, reason=REASON)
+def test_folding_compiled_circuit():
+
+    emulator_backend = IBMQEmulatorBackend("ibmq_bogota")
+
+    n_folds_1 = 3
+
+    task_1 = digital_folding_task_gen(
+        emulator_backend,
+        n_folds_1,
+        Folding.circuit,
+        _allow_approx_fold=False,
+    )
+
+    assert task_1.n_in_wires == 1
+    assert task_1.n_out_wires == 1
+
+    c_1 = Circuit(1).Rz(3.5, 0)
+    c_1 = emulator_backend.get_compiled_circuit(c_1)
+
+    ac_1 = AnsatzCircuit(c_1, 10000, {})
+
+    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+
+    experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
+
+    folded_experiment_1 = task_1([[experiment_1]])[0][0]
+    assert OpType.Reset not in [
+        com.op.type for com in folded_experiment_1.AnsatzCircuit.Circuit.get_commands()
+    ]
 
 
 def test_digital_folding_task_gen():
