@@ -552,7 +552,7 @@ Generators for Clifford-Data-Regression ``MitEx`` objects are available in the `
 
 ::
 
-    from qermit.clifford_noise_characteisation import gen_CDR_MitEx
+    from qermit.clifford_noise_characterisation import gen_CDR_MitEx
     from pytket.extensions.qiskit import AerBackend, IBMQBackend
 
     
