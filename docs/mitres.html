@@ -1,77 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>qermit.mitres &mdash; qermit 0.1.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="qermit.mitex" href="mitex.html" />
     <link rel="prev" title="qermit.taskgraph" href="taskgraph.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> qermit
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
                 0.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -79,19 +39,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">API Reference:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="taskgraph.html">qermit.taskgraph</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">qermit.mitres</a></li>
@@ -106,86 +55,45 @@
 <li class="toctree-l1"><a class="reference internal" href="probabilistic_error_cancellation.html">qermit.probabilistic_error_cancellation</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">qermit</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>qermit.mitres</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/mitres.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="qermit-mitres">
-<h1>qermit.mitres<a class="headerlink" href="#qermit-mitres" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="qermit-mitres">
+<h1>qermit.mitres<a class="headerlink" href="#qermit-mitres" title="Permalink to this headline"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.MitRes">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qermit.taskgraph.mitres.</span></span><span class="sig-name descname"><span class="pre">MitRes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket.backends.backend.Backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'MitRes'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qermit.taskgraph.mitres.</span></span><span class="sig-name descname"><span class="pre">MitRes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pytket.backends.backend.Backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'MitRes'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes" title="Permalink to this definition"></a></dt>
 <dd><p>A TaskGraph extension of mitigation of counts/shots for individual circuits.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.MitRes.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuits_wire</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket.backends.backendresult.BackendResult</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.__call__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuits_wire</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket.backends.backendresult.BackendResult</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.__call__" title="Permalink to this definition"></a></dt>
 <dd><p>Call self as a function.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.MitRes.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket.backends.backend.Backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'MitRes'</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pytket.backends.backend.Backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'MitRes'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.__init__" title="Permalink to this definition"></a></dt>
 <dd><p>MitRes objects are defined by the backend objects all circuits are executed on.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -199,13 +107,13 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.MitRes.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.__str__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.__str__" title="Permalink to this definition"></a></dt>
 <dd><p>Return str(self).</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.MitRes.add_n_wires">
-<span class="sig-name descname"><span class="pre">add_n_wires</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_wires</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.add_n_wires" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_n_wires</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_wires</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.add_n_wires" title="Permalink to this definition"></a></dt>
 <dd><p>Requests to add num_wires number of edges between the input vertex
 and output vertex, with no type restrictions. Not permitted for MitRes,
 raises TypeError.</p>
@@ -218,14 +126,14 @@ raises TypeError.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.MitRes.add_wire">
-<span class="sig-name descname"><span class="pre">add_wire</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.add_wire" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_wire</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.add_wire" title="Permalink to this definition"></a></dt>
 <dd><p>Requests to add a single edge between the input vertex and output vertex.
 Not permitted for MitRes, raises TypeError.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.MitRes.check_append_wires">
-<span class="sig-name descname"><span class="pre">check_append_wires</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">qermit.taskgraph.task_graph.TaskGraph</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.check_append_wires" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">check_append_wires</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">qermit.taskgraph.task_graph.TaskGraph</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.check_append_wires" title="Permalink to this definition"></a></dt>
 <dd><p>Confirms that the number of in wires the passed task has is equal
 to the number of in wires to the output, and that the number
 of out wires the passed task has is 1. Also checks that the
@@ -246,7 +154,7 @@ return type is Tuple[List[BackendResult]].</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.MitRes.check_prepend_wires">
-<span class="sig-name descname"><span class="pre">check_prepend_wires</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">qermit.taskgraph.task_graph.TaskGraph</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.check_prepend_wires" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">check_prepend_wires</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">qermit.taskgraph.task_graph.TaskGraph</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.check_prepend_wires" title="Permalink to this definition"></a></dt>
 <dd><p>Confirms that the number of out wires the passed task has is equal
 to the number of out wires from the input, and that the number
 of in wires the passed task has is 1. Also checks that the
@@ -267,7 +175,7 @@ return type is Tuple[List[CircuitShots]].</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.MitRes.from_TaskGraph">
-<span class="sig-name descname"><span class="pre">from_TaskGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_graph</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">qermit.taskgraph.task_graph.TaskGraph</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.from_TaskGraph" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">from_TaskGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">qermit.taskgraph.task_graph.TaskGraph</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.from_TaskGraph" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a MitRes object from a TaskGraph object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -284,7 +192,7 @@ return type is Tuple[List[CircuitShots]].</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.MitRes.parallel">
-<span class="sig-name descname"><span class="pre">parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">qermit.taskgraph.task_graph.TaskGraph</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.parallel" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">qermit.taskgraph.task_graph.TaskGraph</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.parallel" title="Permalink to this definition"></a></dt>
 <dd><p>Requests to add new MitTask/TaskGraph to TaskGraph object in parallel.
 Not permitted for MitRes, raises TypeError.</p>
 <dl class="field-list simple">
@@ -296,7 +204,7 @@ Not permitted for MitRes, raises TypeError.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.MitRes.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_shots</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket.backends.backendresult.BackendResult</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.run" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket.backends.backendresult.BackendResult</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.mitres.MitRes.run" title="Permalink to this definition"></a></dt>
 <dd><p>Overloaded run method from TaskGraph class to add type checking.
 A single experiment is defined by a Tuple containing a circuit to be run
 on some backend and the number of shots to take of said circuit.
@@ -320,7 +228,7 @@ internal backends and the number of shots to take of said circuit.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.backend_compile_circuit_shots_task_gen">
-<span class="sig-prename descclassname"><span class="pre">mitres.</span></span><span class="sig-name descname"><span class="pre">backend_compile_circuit_shots_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimisation_level</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.taskgraph.mitres.backend_compile_circuit_shots_task_gen" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">mitres.</span></span><span class="sig-name descname"><span class="pre">backend_compile_circuit_shots_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimisation_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.mitres.backend_compile_circuit_shots_task_gen" title="Permalink to this definition"></a></dt>
 <dd><p>For each circuit in passed List[CircuitShots] argument, pass
 circuit to compile_circuit method of given backend with given optimisation level.
 Returns new wire wherein each circuit has been compiled.</p>
@@ -336,7 +244,7 @@ Returns new wire wherein each circuit has been compiled.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.backend_handle_task_gen">
-<span class="sig-prename descclassname"><span class="pre">mitres.</span></span><span class="sig-name descname"><span class="pre">backend_handle_task_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.taskgraph.mitres.backend_handle_task_gen" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">mitres.</span></span><span class="sig-name descname"><span class="pre">backend_handle_task_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.mitres.backend_handle_task_gen" title="Permalink to this definition"></a></dt>
 <dd><p>Passes every tuple of Circuit and Shots to the backend object MitTask
 is defined by, returning a handle for later retrieving results for each circuit.
 If different numbers of shots are passed, each circuit is run with the maximum number of shots.</p>
@@ -355,7 +263,7 @@ If different numbers of shots are passed, each circuit is run with the maximum n
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitres.backend_res_task_gen">
-<span class="sig-prename descclassname"><span class="pre">mitres.</span></span><span class="sig-name descname"><span class="pre">backend_res_task_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.taskgraph.mitres.backend_res_task_gen" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">mitres.</span></span><span class="sig-name descname"><span class="pre">backend_res_task_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.mitres.backend_res_task_gen" title="Permalink to this definition"></a></dt>
 <dd><p>For each ResultHandle passed to task, retrieves a BackendResult object from
 the backend the task is defined by.</p>
 <dl class="field-list simple">
@@ -365,54 +273,37 @@ the backend the task is defined by.</p>
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="mitex.html" class="btn btn-neutral float-right" title="qermit.mitex" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="taskgraph.html" class="btn btn-neutral float-left" title="qermit.taskgraph" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mitex.html" class="btn btn-neutral float-right" title="qermit.mitex" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Cambridge Quantum Computing Ltd.
-
-    </p>
+    <p>&#169; Copyright 2021, Cambridge Quantum Computing Ltd.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
