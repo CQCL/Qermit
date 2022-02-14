@@ -13,7 +13,7 @@ CQC's python module for interfacing with `CQC <https://cambridgequantum.com/>`_ 
 it is practically straightforward to run an experiment with multiple forms of error-mitigation 
 where appropriate.
 
-``qermit`` is compatible with ``pytket`` 0.11.0.
+``qermit`` is compatible with ``pytket`` 0.19.0.
 
 To install, run
 

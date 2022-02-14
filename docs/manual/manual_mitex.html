@@ -1,38 +1,18 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>MitEx &mdash; qermit-manual  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
-  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
+      <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
@@ -41,38 +21,19 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="MitRes" href="manual_mitres.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> qermit-manual
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -80,18 +41,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="manual_intro.html">What is qermit?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="manual_mitres.html">MitRes</a></li>
@@ -106,73 +56,32 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">qermit-manual</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>MitEx</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/manual_mitex.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="mitex">
-<h1>MitEx<a class="headerlink" href="#mitex" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="mitex">
+<h1>MitEx<a class="headerlink" href="#mitex" title="Permalink to this headline"></a></h1>
 <p>A core process of many NISQ applications, such as variational algorithms, is the evaluation of the
 average value of observables for some circuit. This corresponds to measuring the expected value of
 the bit strings returned by measured qubit shots.</p>
@@ -215,7 +124,7 @@ the observable being measured and the measurement circuits required to do so.</p
 <span class="n">sym</span> <span class="o">=</span> <span class="n">fresh_symbol</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
 <span class="n">circuit</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">Rz</span><span class="p">(</span><span class="n">sym</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">shots</span> <span class="o">=</span> <span class="mi">300</span>
-<span class="n">symbols</span> <span class="o">=</span> <span class="n">SymbolsDict</span><span class="o">.</span><span class="n">symbols_from_dict</span><span class="p">({</span><span class="n">test</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">})</span>
+<span class="n">symbols</span> <span class="o">=</span> <span class="n">SymbolsDict</span><span class="o">.</span><span class="n">symbols_from_dict</span><span class="p">({</span><span class="n">sym</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">})</span>
 <span class="n">ansatz_circuit</span> <span class="o">=</span> <span class="n">AnsatzCircuit</span><span class="p">(</span><span class="n">Circuit</span><span class="o">=</span><span class="n">circuit</span><span class="p">,</span> <span class="n">Shots</span><span class="o">=</span><span class="n">shots</span><span class="p">,</span> <span class="n">SymbolsDict</span><span class="o">=</span><span class="n">symbols</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -268,8 +177,8 @@ the expectation value for each <code class="docutils literal notranslate"><span 
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> constructor has a <code class="docutils literal notranslate"><span class="pre">mitres</span></code> keyword, which if passed a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object will construct the resulting <code class="docutils literal notranslate"><span class="pre">MitEx</span></code>
 from it. This is similar in spirit to the combining of error-mitigation methods discussed in “Combining <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> methods”.</p>
-<div class="section" id="error-mitigation-with-mitex">
-<h2>Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitEx</span></code><a class="headerlink" href="#error-mitigation-with-mitex" title="Permalink to this headline">¶</a></h2>
+<section id="error-mitigation-with-mitex">
+<h2>Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitEx</span></code><a class="headerlink" href="#error-mitigation-with-mitex" title="Permalink to this headline"></a></h2>
 <p>As with <code class="docutils literal notranslate"><span class="pre">MitRes</span></code>, to produce a <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> object that executes an error-mitigation
 protocol when <code class="docutils literal notranslate"><span class="pre">MitEx.run</span></code> is called, additional <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects need to be added
 to the task graph.</p>
@@ -284,9 +193,9 @@ a <code class="docutils literal notranslate"><span class="pre">TaskGraph</span><
 is nearly identical for <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> we will not explain this again here - if you are interested please refer to that section
 of the manual. However, we will consider extending a <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> object with new <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects so as
 to show the type constraints explicitly.</p>
-</div>
-<div class="section" id="extending-mitex-with-mittask">
-<h2>Extending <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> with <code class="docutils literal notranslate"><span class="pre">MitTask</span></code><a class="headerlink" href="#extending-mitex-with-mittask" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="extending-mitex-with-mittask">
+<h2>Extending <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> with <code class="docutils literal notranslate"><span class="pre">MitTask</span></code><a class="headerlink" href="#extending-mitex-with-mittask" title="Permalink to this headline"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">MitEx.append</span></code> and <code class="docutils literal notranslate"><span class="pre">MitEx.prepend</span></code> methods can be used to extend the
 <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects the <code class="docutils literal notranslate"><span class="pre">MitEx._task_graph</span></code> attribute holds.</p>
 <p>In some estimation experiments, a priori knowledge about the circuit structure and observable measured can be utilised to discard Shots.
@@ -386,7 +295,7 @@ in <code class="docutils literal notranslate"><span class="pre">BackendResult</s
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.taskgraph</span> <span class="kn">import</span> <span class="n">backend_compile_circuit_shots_task_gen</span>
-
+<span class="kn">from</span> <span class="nn">qermit</span> <span class="kn">import</span> <span class="n">MitRes</span>
 
 <span class="n">mitres_discard</span> <span class="o">=</span> <span class="n">MitRes</span><span class="p">(</span><span class="n">backend</span> <span class="o">=</span> <span class="n">sim_backend</span><span class="p">)</span>
 <span class="n">mitres_discard</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">discard_task</span><span class="p">)</span>
@@ -397,7 +306,7 @@ in <code class="docutils literal notranslate"><span class="pre">BackendResult</s
 <img alt="_images/discard_mitres_taskgraph.png" src="_images/discard_mitres_taskgraph.png" />
 <p>Lets create a new <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> object constructed from <code class="docutils literal notranslate"><span class="pre">mitres_discard</span></code> and then test it.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">combined_mitex</span> <span class="o">=</span> <span class="n">MitEx</span><span class="p">(</span><span class="n">sim_backend</span><span class="p">,</span> <span class="n">mitres</span> <span class="o">=</span> <span class="n">mitres_discard</span><span class="p">)</span>
-<span class="n">combined_mitex</span><span class="o">.</span><span class="n">prepend</span><span class="p">(</span><span class="n">add_ancillas_task_gen</span><span class="p">([(</span><span class="n">Qubit</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">Qubit</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">Bit</span><span class="p">(</span><span class="mi">3</span><span class="p">))])</span>
+<span class="n">combined_mitex</span><span class="o">.</span><span class="n">prepend</span><span class="p">(</span><span class="n">add_ancillas_task_gen</span><span class="p">([(</span><span class="n">Qubit</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">Qubit</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">Bit</span><span class="p">(</span><span class="mi">3</span><span class="p">))]))</span>
 <span class="n">combined_mitex</span><span class="o">.</span><span class="n">decompose_TaskGraph_nodes</span><span class="p">()</span>
 <span class="n">combined_mitex</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
 </pre></div>
@@ -407,12 +316,12 @@ in <code class="docutils literal notranslate"><span class="pre">BackendResult</s
 <span class="n">circuit_discard</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">H</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">Rz</span><span class="p">(</span><span class="n">sym_discard</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">shots</span> <span class="o">=</span> <span class="mi">500</span>
 <span class="n">symbols</span> <span class="o">=</span> <span class="n">SymbolsDict</span><span class="o">.</span><span class="n">symbols_from_dict</span><span class="p">({</span><span class="n">sym_discard</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">})</span>
-<span class="n">ansatz_circuit_discard</span> <span class="o">=</span> <span class="n">AnsatzCircuit</span><span class="p">(</span><span class="n">Circuit</span><span class="o">=</span><span class="n">circuit_discard</span><span class="p">,</span> <span class="n">Shots</span><span class="o">=</span><span class="n">shots</span><span class="p">,</span> <span class="n">SymbolsDict</span><span class="o">=</span><span class="n">symbols</span><span class="p">)</span>
+<span class="n">ansatz_circuit_discard</span> <span class="o">=</span> <span class="n">AnsatzCircuit</span><span class="p">(</span><span class="n">Circuit</span><span class="o">=</span><span class="n">circuit_discard</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">Shots</span><span class="o">=</span><span class="n">shots</span><span class="p">,</span> <span class="n">SymbolsDict</span><span class="o">=</span><span class="n">symbols</span><span class="p">)</span>
 
 <span class="n">qps</span> <span class="o">=</span> <span class="n">QubitPauliString</span><span class="p">([</span><span class="n">Qubit</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">Qubit</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">Qubit</span><span class="p">(</span><span class="mi">2</span><span class="p">)],</span> <span class="p">[</span><span class="n">Pauli</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">Pauli</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">Pauli</span><span class="o">.</span><span class="n">Z</span><span class="p">])</span>
 <span class="n">qpo_discard</span> <span class="o">=</span> <span class="n">QubitPauliOperator</span><span class="p">({</span><span class="n">qps</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">})</span>
 
-<span class="n">discard_results</span> <span class="o">=</span> <span class="n">discard_mitex</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">ObservableExperiment</span><span class="p">(</span><span class="n">ansatz_circuit_discard</span><span class="p">,</span> <span class="n">ObservableTracker</span><span class="p">(</span><span class="n">qpo_discard</span><span class="p">))])</span>
+<span class="n">discard_results</span> <span class="o">=</span> <span class="n">combined_mitex</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">ObservableExperiment</span><span class="p">(</span><span class="n">ansatz_circuit_discard</span><span class="p">,</span> <span class="n">ObservableTracker</span><span class="p">(</span><span class="n">qpo_discard</span><span class="p">))])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">discard_results</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -439,12 +348,14 @@ return <code class="docutils literal notranslate"><span class="pre">Tuple[List[Q
 </div>
 <p>As a simple example, this task iterates through every value of every <code class="docutils literal notranslate"><span class="pre">QubitPauliOperator</span></code> and sets the value to 0
 if its value is within some passed range. A more realistic example may modify the values give some characterisation.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discard_mitex</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">modify_operator_task_gen</span><span class="p">(</span><span class="mf">0.1</span><span class="p">))</span>
-<span class="n">discard_mitex</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">combined_mitex</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">modify_operator_task_gen</span><span class="p">(</span><span class="mf">0.1</span><span class="p">))</span>
+<span class="n">combined_mitex</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="_images/combined_mitex_final_taskgraph.png" src="_images/combined_mitex_final_taskgraph.png" />
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">discard_mitex</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">ObservableExperiment</span><span class="p">(</span><span class="n">ansatz_circuit_discard</span><span class="p">,</span> <span class="n">ObservableTracker</span><span class="p">(</span><span class="n">qpo_discard</span><span class="p">))]))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansatz_circuit_discard</span> <span class="o">=</span> <span class="n">AnsatzCircuit</span><span class="p">(</span><span class="n">Circuit</span><span class="o">=</span><span class="n">circuit_discard</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">Shots</span><span class="o">=</span><span class="n">shots</span><span class="p">,</span> <span class="n">SymbolsDict</span><span class="o">=</span><span class="n">symbols</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">discard_mitex</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">ObservableExperiment</span><span class="p">(</span><span class="n">ansatz_circuit_discard</span><span class="p">,</span> <span class="n">ObservableTracker</span><span class="p">(</span><span class="n">qpo_discard</span><span class="p">))]))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{(</span><span class="n">Zq</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Zq</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Zq</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span> <span class="mf">1.00000000000000</span><span class="p">}]</span>
@@ -455,9 +366,9 @@ if its value is within some passed range. A more realistic example may modify th
 Zero-Noise-Extrapolation <a class="reference internal" href="#giurgica-tiron2020" id="id3"><span>[Giurgica-Tiron2020]</span></a>, Clifford Data Regression with Clifford-Circuit-Learning <a class="reference internal" href="#czarnik2020" id="id4"><span>[Czarnik2020]</span></a>, and
 Depolarisation-Factor-Supression-For-Nearest-Clifford (an internal method).
 As with <code class="docutils literal notranslate"><span class="pre">MitRes</span></code>, each is available via a selection of generator functions.</p>
-</div>
-<div class="section" id="probabilistic-error-cancellation-in-qermit">
-<h2>Probabilistic-Error-Cancellation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#probabilistic-error-cancellation-in-qermit" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="probabilistic-error-cancellation-in-qermit">
+<h2>Probabilistic-Error-Cancellation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#probabilistic-error-cancellation-in-qermit" title="Permalink to this headline"></a></h2>
 <p>Probabilistic-Error-Cancellation (PEC), introduced in <a class="reference internal" href="#temme2016" id="id5"><span>[Temme2016]</span></a>, utilises that it is
 possible to mitigate for the effect of errors by sampling from a set of erroneous circuits.
 In particular, a linear combination of the expectation values of an observable measured
@@ -478,10 +389,18 @@ using a classical simulator, and so can be compared to the results from noisy ru
 It is on this approach that the implementation of PEC in <code class="docutils literal notranslate"><span class="pre">qermit</span></code> is based.</p>
 <p>Generators for Probabilistic-Error-Cancellation <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in
 the  <code class="docutils literal notranslate"><span class="pre">qermit.probabilistic_error_cancellation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/probabilistic_error_cancellation.html">module</a>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.probabilistic_error_cancellation</span> <span class="kn">import</span> <span class="n">gen_PEC_Mitex</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.probabilistic_error_cancellation</span> <span class="kn">import</span> <span class="n">gen_PEC_learning_based_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQEmulatorBackend</span><span class="p">,</span> <span class="n">AerBackend</span>
 
-<span class="n">pec_mitex</span> <span class="o">=</span> <span class="n">gen_PEC_MitEx</span><span class="p">(</span><span class="n">device_backend</span> <span class="o">=</span> <span class="n">casablanca_backend</span><span class="p">,</span> <span class="n">simulator_backend</span> <span class="o">=</span> <span class="n">noiseless_backend</span><span class="p">)</span>
+<span class="n">noiseless_backend</span> <span class="o">=</span> <span class="n">AerBackend</span><span class="p">()</span>
+<span class="n">casablanca_backend</span> <span class="o">=</span> <span class="n">IBMQEmulatorBackend</span><span class="p">(</span>
+  <span class="s2">&quot;ibmq_casablanca&quot;</span><span class="p">,</span>
+  <span class="n">hub</span><span class="o">=</span><span class="s1">&#39;partner-cqc&#39;</span><span class="p">,</span>
+  <span class="n">group</span><span class="o">=</span><span class="s1">&#39;internal&#39;</span><span class="p">,</span>
+  <span class="n">project</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">pec_mitex</span> <span class="o">=</span> <span class="n">gen_PEC_learning_based_MitEx</span><span class="p">(</span><span class="n">device_backend</span> <span class="o">=</span> <span class="n">casablanca_backend</span><span class="p">,</span> <span class="n">simulator_backend</span> <span class="o">=</span> <span class="n">noiseless_backend</span><span class="p">)</span>
 <span class="n">pec_mitex</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -512,9 +431,9 @@ the  <code class="docutils literal notranslate"><span class="pre">qermit.probabi
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{(</span><span class="n">Znode</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">Znode</span><span class="p">[</span><span class="mi">6</span><span class="p">]):</span> <span class="mf">1.01978876035084</span><span class="p">}]</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="zero-noise-extrapolation-in-qermit">
-<h2>Zero-Noise-Extrapolation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#zero-noise-extrapolation-in-qermit" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="zero-noise-extrapolation-in-qermit">
+<h2>Zero-Noise-Extrapolation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#zero-noise-extrapolation-in-qermit" title="Permalink to this headline"></a></h2>
 <p>Zero-Noise-Extrapolation (ZNE), introduced concurrently in <a class="reference internal" href="#li2017" id="id9"><span>[Li2017]</span></a> and <a class="reference internal" href="#temme2016" id="id10"><span>[Temme2016]</span></a>, utilises
 differing effective device noise levels to perform error correction. In particular,
 the results of a computation at a variety of noise levels are used to extrapolate to the
@@ -593,9 +512,9 @@ The type of folding used for creating digitally noisier circuits can be specifie
 for <code class="docutils literal notranslate"><span class="pre">gate</span></code> folding and <code class="docutils literal notranslate"><span class="pre">circuit</span></code> folding.
 The fit used to extrapolate results can be specified via the <code class="docutils literal notranslate"><span class="pre">_fit_type</span></code> keyword argument.
 This expects a <code class="docutils literal notranslate"><span class="pre">Fit</span></code> object, which default has support for a variety of fits.</p>
-</div>
-<div class="section" id="clifford-circuit-learning-and-clifford-data-regression-in-qermit">
-<h2>Clifford-Circuit-Learning and Clifford-Data-Regression in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#clifford-circuit-learning-and-clifford-data-regression-in-qermit" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="clifford-circuit-learning-and-clifford-data-regression-in-qermit">
+<h2>Clifford-Circuit-Learning and Clifford-Data-Regression in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#clifford-circuit-learning-and-clifford-data-regression-in-qermit" title="Permalink to this headline"></a></h2>
 <p>Correcting device noise typically requires some characterisation of what the noise is, while characterising
 noise typically requires an understanding of what data would look like <em>without</em> noise.</p>
 <p>Clifford-Circuit-Learning uses quantum circuits composed primarily of Clifford gates to characterise and correct
@@ -613,7 +532,7 @@ circuit is then run on the device and its observable estimate corrected by the m
 efficiently simulated classically Clifford circuits and “Clifford-Data-Regression” refers to the noise correction
 technique used here.</p>
 <p>Generators for Clifford-Data-Regression <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in the <code class="docutils literal notranslate"><span class="pre">qermit.clifford_noise_characterisation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/clifford_noise_characterisation.html">module</a>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.clifford_noise_characteisation</span> <span class="kn">import</span> <span class="n">gen_CDR_MitEx</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.clifford_noise_characterisation</span> <span class="kn">import</span> <span class="n">gen_CDR_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">AerBackend</span><span class="p">,</span> <span class="n">IBMQBackend</span>
 
 
@@ -712,9 +631,9 @@ without error-mitigation.</p>
 for noiseless simluation of all state circuits, the <code class="docutils literal notranslate"><span class="pre">StatesDeviceMitex</span></code> keyword argument
 defines the <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> object for device executions of all state circuits, and the <code class="docutils literal notranslate"><span class="pre">ExperimentMitex</span></code> object
 defines the <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> object all experiment circuits are executed on.</p>
-</div>
-<div class="section" id="depolarisation-factor-supression-for-nearest-clifford-in-qermit">
-<h2>Depolarisation-Factor-Supression-For-Nearest-Clifford in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#depolarisation-factor-supression-for-nearest-clifford-in-qermit" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="depolarisation-factor-supression-for-nearest-clifford-in-qermit">
+<h2>Depolarisation-Factor-Supression-For-Nearest-Clifford in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#depolarisation-factor-supression-for-nearest-clifford-in-qermit" title="Permalink to this headline"></a></h2>
 <p>This method estimates the averaged incoherent noise component affecting the entire circuit structure
 and reduces its effect on computing expectation values. The main advantage of DFSC is that it does
 not require significant quantum resource overhead (no additional ancillas and no increased depth)
@@ -809,54 +728,37 @@ The <code class="docutils literal notranslate"><span class="pre">MitEx</span></c
 <dd><p>Strikis, A., Qin, D., Chen, Y., Benjamin, S. C., &amp; Li, Y. (2020). Learning-based quantum error mitigation. arXiv preprint arXiv:2005.07601.</p>
 </dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="manual_mitres.html" class="btn btn-neutral float-left" title="MitRes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2020-2021 Cambridge Quantum Computing Ltd.
-
-    </p>
+    <p>&#169; Copyright 2020-2021 Cambridge Quantum Computing Ltd.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

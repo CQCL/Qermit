@@ -1,38 +1,18 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>MitRes &mdash; qermit-manual  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
-  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
+      <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
@@ -40,39 +20,20 @@
         <script src="_static/thebelab-helper.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="MitEx" href="manual_mitex.html" />
     <link rel="prev" title="What is qermit?" href="manual_intro.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> qermit-manual
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -80,18 +41,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="manual_intro.html">What is qermit?</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">MitRes</a><ul>
@@ -106,73 +56,32 @@
 <li class="toctree-l1"><a class="reference internal" href="manual_mitex.html">MitEx</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">qermit-manual</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>MitRes</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/manual_mitres.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="mitres">
-<h1>MitRes<a class="headerlink" href="#mitres" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="mitres">
+<h1>MitRes<a class="headerlink" href="#mitres" title="Permalink to this headline"></a></h1>
 <p>A typical process for running experiments on quantum devices is as follows: first
 a logical quantum circuit is constructed, next it is compiled to fit to the constraints of
 the quantum device of choice (such as the connectivity graph or set of gate primitives) before
@@ -228,8 +137,8 @@ When the run function is called, a topological sort is applied to the graph to o
 <p>You may notice that the arguments of the <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects are different, requiring
 <code class="docutils literal notranslate"><span class="pre">Tuple</span></code> type objects. This is necessary for the execution in the <code class="docutils literal notranslate"><span class="pre">TaskGraph.run</span></code> method.
 All typing information is accessible via the <code class="docutils literal notranslate"><span class="pre">qermit</span></code> documentation.</p>
-<div class="section" id="error-mitigation-with-mitres">
-<h2>Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitRes</span></code><a class="headerlink" href="#error-mitigation-with-mitres" title="Permalink to this headline">¶</a></h2>
+<section id="error-mitigation-with-mitres">
+<h2>Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitRes</span></code><a class="headerlink" href="#error-mitigation-with-mitres" title="Permalink to this headline"></a></h2>
 <p>To produce a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object that executes an error-mitigation protocol when the <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code>
 method is called, additional <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects need to be added to its task graph.</p>
 <p>The defining characteristic of a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object is that the first <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> object
@@ -239,9 +148,9 @@ This is a crucial type constraint required for the combining of error-mitigation
 <p>Given this, there are two viable approaches to producing error-mitigation <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects, either
 extending a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object with new <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects under strict type constraints, or constructing
 a <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code> object with relaxed type constraints on internal tasks and then casting to a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object at completion.</p>
-</div>
-<div class="section" id="extending-mitres-with-mittask">
-<h2>Extending <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> with <code class="docutils literal notranslate"><span class="pre">MitTask</span></code><a class="headerlink" href="#extending-mitres-with-mittask" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="extending-mitres-with-mittask">
+<h2>Extending <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> with <code class="docutils literal notranslate"><span class="pre">MitTask</span></code><a class="headerlink" href="#extending-mitres-with-mittask" title="Permalink to this headline"></a></h2>
 <p>We have already seen that the basic construction of a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object has two <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects, one
 submitting Circuit to a <code class="docutils literal notranslate"><span class="pre">pytket</span></code> Backend to retrieve unique handles, the other submitting these handles
 back to the Backend to retrieve <code class="docutils literal notranslate"><span class="pre">BackendResult</span></code>.</p>
@@ -323,7 +232,7 @@ compiles a <code class="docutils literal notranslate"><span class="pre">List[Cir
 <span class="nb">print</span><span class="p">(</span><span class="n">test_results</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">([</span><span class="n">CircuitShots</span><span class="p">(</span><span class="n">Circuit</span><span class="o">=</span><span class="p">[</span><span class="n">U3</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="n">CX</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="n">Measure</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">--&gt;</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="n">U3</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="n">Measure</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">--&gt;</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="p">],</span> <span class="n">Shots</span><span class="o">=</span><span class="mi">10</span><span class="p">)],)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">([</span><span class="n">CircuitShots</span><span class="p">(</span><span class="n">Circuit</span><span class="o">=</span><span class="p">[</span><span class="n">TK1</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="n">CX</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="n">Measure</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">--&gt;</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="n">TK1</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="n">Measure</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">--&gt;</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="p">],</span> <span class="n">Shots</span><span class="o">=</span><span class="mi">10</span><span class="p">)],)</span>
 </pre></div>
 </div>
 <p>We can see that the circuit has been compiled to the <code class="docutils literal notranslate"><span class="pre">AerBackend</span></code> gate set primitive and returned a suitable type - Let’s prepend it to
@@ -336,9 +245,9 @@ the basic <code class="docutils literal notranslate"><span class="pre">MitRes</s
 <img alt="_images/mitres_compile_circs.png" src="_images/mitres_compile_circs.png" />
 <p>If we were to use the <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code> method now to run an experiment, all circuits would be compiled with sim_backend before
 being executed on the hardware. The <code class="docutils literal notranslate"><span class="pre">MitRes.append</span></code> method works similarly - later examples will show it in use.</p>
-</div>
-<div class="section" id="constructing-mitres-from-taskgraph">
-<h2>Constructing <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> from <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code><a class="headerlink" href="#constructing-mitres-from-taskgraph" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="constructing-mitres-from-taskgraph">
+<h2>Constructing <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> from <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code><a class="headerlink" href="#constructing-mitres-from-taskgraph" title="Permalink to this headline"></a></h2>
 <p>Error-mitigation methods can involve complicated sequences of tasks to work. The strict type requirements of the
 <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> prepend and append rules preserve properties required for combining error-mitigation methods, but restrict
 the possible structure and order of tasks.</p>
@@ -420,13 +329,13 @@ We can add this ``MitTask`` to our ``TaskGraph`` object.
 
 
 <span class="k">def</span> <span class="nf">append_task_gen</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MitTask</span><span class="p">:</span>
-      <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">results0</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BackendResult</span><span class="p">],</span> <span class="n">wire0</span><span class="p">:</span> <span class="n">Wire</span><span class="p">,</span> <span class="n">wire1</span><span class="p">:</span> <span class="n">Wire</span><span class="p">,</span> <span class="n">results1</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BackendResult</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Wire</span><span class="p">,</span> <span class="n">Counter</span><span class="p">]:</span>
-      <span class="n">both_counts</span> <span class="o">=</span> <span class="p">[</span><span class="n">results0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">(),</span> <span class="n">results1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">()]</span>
-      <span class="n">combined_counts</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">both_counts</span><span class="p">)</span>
-      <span class="k">return</span> <span class="p">(</span><span class="n">wire0</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">wire1</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">combined_counts</span><span class="p">)</span>
-      <span class="k">return</span> <span class="n">MitTask</span><span class="p">(</span>
-         <span class="n">_label</span><span class="o">=</span><span class="s2">&quot;AppendTask&quot;</span><span class="p">,</span> <span class="n">_n_in_wires</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">_n_out_wires</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">_method</span><span class="o">=</span><span class="n">task</span>
-      <span class="p">)</span>
+   <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">results0</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BackendResult</span><span class="p">],</span> <span class="n">wire0</span><span class="p">:</span> <span class="n">Wire</span><span class="p">,</span> <span class="n">wire1</span><span class="p">:</span> <span class="n">Wire</span><span class="p">,</span> <span class="n">results1</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BackendResult</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Wire</span><span class="p">,</span> <span class="n">Counter</span><span class="p">]:</span>
+       <span class="n">both_counts</span> <span class="o">=</span> <span class="p">[</span><span class="n">results0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">(),</span> <span class="n">results1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">()]</span>
+       <span class="n">combined_counts</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">both_counts</span><span class="p">)</span>
+       <span class="k">return</span> <span class="p">(</span><span class="n">wire0</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">wire1</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">combined_counts</span><span class="p">)</span>
+   <span class="k">return</span> <span class="n">MitTask</span><span class="p">(</span>
+      <span class="n">_label</span><span class="o">=</span><span class="s2">&quot;AppendTask&quot;</span><span class="p">,</span> <span class="n">_n_in_wires</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">_n_out_wires</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">_method</span><span class="o">=</span><span class="n">task</span>
+   <span class="p">)</span>
 
 <span class="n">task_graph</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">append_task_gen</span><span class="p">())</span>
 <span class="n">task_graph</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
@@ -490,9 +399,9 @@ actual error-mitigation techniques available in <code class="docutils literal no
 are available via a selection of generator functions. When called, the error-mitigation method of choice is constructed by
 acting on a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object with the construction methods just discussed. In this manner composition is facilitated, as each generator
 method allows the error-mitigation method to be constructed around custom <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects using keyword arguments.</p>
-</div>
-<div class="section" id="spam-mitigation-in-qermit">
-<h2>SPAM Mitigation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#spam-mitigation-in-qermit" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="spam-mitigation-in-qermit">
+<h2>SPAM Mitigation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#spam-mitigation-in-qermit" title="Permalink to this headline"></a></h2>
 <p>A prominent source of noise is that occurring during State Preparation and Measurement (SPAM).</p>
 <p>SPAM error-mitigation methods can correct for such noise through a post-processing step that modifies the output
 distribution measured from repeatedly sampling shots. This is possible given the assumption that SPAM noise is not
@@ -528,7 +437,7 @@ another generator function <code class="docutils literal notranslate"><span clas
 from the <code class="docutils literal notranslate"><span class="pre">Backend.device</span></code> attribute.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.spam</span> <span class="kn">import</span> <span class="n">gen_FullyCorrelated_SPAM_MitRes</span>
 
-<span class="n">casablanca_nodes</span> <span class="o">=</span> <span class="n">casablanca_backend</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">nodes</span>
+<span class="n">casablanca_nodes</span> <span class="o">=</span> <span class="n">casablanca_backend</span><span class="o">.</span><span class="n">backend_info</span><span class="o">.</span><span class="n">architecture</span><span class="o">.</span><span class="n">nodes</span>
 <span class="n">correlated_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">casablanca_nodes</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">casablanca_nodes</span><span class="p">[</span><span class="mi">3</span><span class="p">:]]</span>
 <span class="n">spam_mitres_fc</span> <span class="o">=</span> <span class="n">gen_FullyCorrelated_SPAM_MitRes</span><span class="p">(</span><span class="n">backend</span> <span class="o">=</span> <span class="n">casablanca_backend</span><span class="p">,</span>
                                                    <span class="n">correlations</span> <span class="o">=</span> <span class="n">correlated_nodes</span><span class="p">,</span>
@@ -619,9 +528,9 @@ is an artifact of the correction procedure, but importantly we can see that the 
 </pre></div>
 </div>
 <p>As with the emulator <code class="docutils literal notranslate"><span class="pre">Backend</span></code>, the distribution of results returned with SPAM error-mitigation for this simple test case is improved.</p>
-</div>
-<div class="section" id="frame-randomisation-in-qermit">
-<h2>Frame-Randomisation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#frame-randomisation-in-qermit" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="frame-randomisation-in-qermit">
+<h2>Frame-Randomisation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#frame-randomisation-in-qermit" title="Permalink to this headline"></a></h2>
 <p>While it is not possible to efficiently characterise and suppress all device noise, it can be advantageous to transform some adverse type of noise into a less damaging type.</p>
 <p>Coherent errors are additional unwanted unitary rotations that may appear throughout a quantum computation. Their effect can be damaging due to a possible faster rate of error accumulation than in the case of probabilistic (incoherent) errors.</p>
 <p>Randomisation protocols can be used to tailor the form of the noise profile. By averaging the n-qubit noise channel over all elements from a group (specifically some subgroup of the full unitary group on n qubits), the resulting noise is invariant under the action of any element from this group.</p>
@@ -707,9 +616,9 @@ the results returned when using the mitigation <code class="docutils literal not
 aren’t enough shots here to say anything conclusive.</p>
 <p>However, we have shown that it is as straightforward to execute any Circuit with frame-randomisation as it is
 without, or as it was with SPAM error-mitigation.</p>
-</div>
-<div class="section" id="combining-mitres-methods">
-<h2>Combining <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> methods<a class="headerlink" href="#combining-mitres-methods" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="combining-mitres-methods">
+<h2>Combining <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> methods<a class="headerlink" href="#combining-mitres-methods" title="Permalink to this headline"></a></h2>
 <p>One of the key features of <code class="docutils literal notranslate"><span class="pre">qermit</span></code> is how it easily facilitates running combinations of error-mitigation protocols.
 While each error-mitigated <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> generator will have different options for what combinations can be done, for
 this example we will consider combining the frame-randomisation and SPAM mitigation methods we’ve previously looked at.</p>
@@ -753,55 +662,38 @@ combined <code class="docutils literal notranslate"><span class="pre">MitRes</sp
 <dd><p>Wallman, J., Emerson, J., 2015. Noise tailoring for scalable quantum computation via randomized compiling. Phys. Rev. A 94, 052325 (2016).</p>
 </dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="manual_mitex.html" class="btn btn-neutral float-right" title="MitEx" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="manual_intro.html" class="btn btn-neutral float-left" title="What is qermit?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="manual_mitex.html" class="btn btn-neutral float-right" title="MitEx" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2020-2021 Cambridge Quantum Computing Ltd.
-
-    </p>
+    <p>&#169; Copyright 2020-2021 Cambridge Quantum Computing Ltd.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

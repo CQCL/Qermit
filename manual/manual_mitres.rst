@@ -194,7 +194,7 @@ The callable expects a ``Tuple`` of the arguments to the ``MitTask._method`` att
 
 ::
 
-   ([CircuitShots(Circuit=[U3(0.5, 0, 1) q[1]; CX q[0], q[1]; Measure q[0] --> c[0]; U3(0.5, 0, 1) q[1]; Measure q[1] --> c[1]; ], Shots=10)],)
+   ([CircuitShots(Circuit=[TK1(0.5, 0.5, 0.5) q[1]; CX q[0], q[1]; Measure q[0] --> c[0]; TK1(0.5, 0.5, 0.5) q[1]; Measure q[1] --> c[1]; ], Shots=10)],)
 
 We can see that the circuit has been compiled to the ``AerBackend`` gate set primitive and returned a suitable type - Let's prepend it to 
 the basic ``MitRes`` object.
@@ -321,13 +321,13 @@ We can construct a similar ``MitTask`` for ``TaskGraph.append``.
 
 
    def append_task_gen() -> MitTask:
-         def task(obj, results0: List[BackendResult], wire0: Wire, wire1: Wire, results1: List[BackendResult]) -> Tuple[Wire, Counter]:
-         both_counts = [results0[0].get_counts(), results1[0].get_counts()]
-         combined_counts = reduce(operator.add, both_counts)
-         return (wire0[::-1] + " " + wire1[::-1], combined_counts)
-         return MitTask(
-            _label="AppendTask", _n_in_wires=4, _n_out_wires=2, _method=task
-         )
+      def task(obj, results0: List[BackendResult], wire0: Wire, wire1: Wire, results1: List[BackendResult]) -> Tuple[Wire, Counter]:
+          both_counts = [results0[0].get_counts(), results1[0].get_counts()]
+          combined_counts = reduce(operator.add, both_counts)
+          return (wire0[::-1] + " " + wire1[::-1], combined_counts)
+      return MitTask(
+         _label="AppendTask", _n_in_wires=4, _n_out_wires=2, _method=task
+      )
       
    task_graph.append(append_task_gen())
    task_graph.get_task_graph()
@@ -452,7 +452,7 @@ from the ``Backend.device`` attribute.
 
    from qermit.spam import gen_FullyCorrelated_SPAM_MitRes
 
-   casablanca_nodes = casablanca_backend.device.nodes
+   casablanca_nodes = casablanca_backend.backend_info.architecture.nodes
    correlated_nodes = [casablanca_nodes[:3], casablanca_nodes[3:]]
    spam_mitres_fc = gen_FullyCorrelated_SPAM_MitRes(backend = casablanca_backend, 
                                                       correlations = correlated_nodes, 
