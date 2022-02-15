@@ -375,7 +375,7 @@ def ccl_state_task_gen(
         return (experiment_wires, simulator_wires, device_wires)
 
     return MitTask(
-        _label="CCL_State_Circuits",
+        _label="CCLStateCircuits",
         _n_in_wires=1,
         _n_out_wires=3,
         _method=task,
@@ -528,7 +528,7 @@ def gen_CDR_MitEx(
             "states_simluator_mitex",
             MitEx(
                 simulator_backend,
-                _label="StatesSimMitex",
+                _label="StatesSimMitEx",
                 mitres=gen_compiled_MitRes(simulator_backend, 0),
             ),
         )
@@ -538,7 +538,7 @@ def gen_CDR_MitEx(
             "states_device_mitex",
             MitEx(
                 device_backend,
-                _label="StatesDeviceMitex",
+                _label="StatesDeviceMitEx",
                 mitres=gen_compiled_MitRes(device_backend, 0),
             ),
         )
@@ -548,7 +548,7 @@ def gen_CDR_MitEx(
             "experiment_mitex",
             MitEx(
                 device_backend,
-                _label="ExperimentMitex",
+                _label="ExperimentMitEx",
                 mitres=gen_compiled_MitRes(device_backend, 0),
             ),
         )
