@@ -375,7 +375,7 @@ def ccl_state_task_gen(
         return (experiment_wires, simulator_wires, device_wires)
 
     return MitTask(
-        _label="CCL_State_Circuits",
+        _label="CCLStateCircuits",
         _n_in_wires=1,
         _n_out_wires=3,
         _method=task,
