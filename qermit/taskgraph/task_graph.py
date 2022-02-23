@@ -12,17 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import networkx as nx  # type: ignore
+from typing import List, Union, Tuple, cast, TYPE_CHECKING
+import copy
+from tempfile import NamedTemporaryFile
 
 from .mittask import (
     MitTask,
     IOTask,
     Wire,
 )
-import networkx as nx  # type: ignore
-import graphviz as gv  # type: ignore
-from typing import List, Union, Tuple, cast
-import copy
-from tempfile import NamedTemporaryFile
+from .graphviz import _taskgraph_to_graphviz
+
+if TYPE_CHECKING:
+    import graphviz as gv  # type: ignore
 
 
 class TaskGraph:
@@ -383,123 +386,14 @@ class TaskGraph:
         ]
         return cast(Tuple[List[Wire]], tuple(output_wire))
 
-    def get_task_graph(self) -> gv.Digraph:
+    def get_task_graph(self) -> "gv.Digraph":
         """
         Return a visual representation of the DAG as a graphviz object.
 
         :returns:   Representation of the DAG
         :rtype:     graphviz.DiGraph
         """
-        G = gv.Digraph(
-            "MEME",
-            strict=True,
-        )
-
-        G.attr(rankdir="LR", ranksep="0.3", nodesep="0.15", margin="0")
-        wire_color = "red"
-        task_color = "darkolivegreen3"
-        io_color = "green"
-        out_color = "black"
-        in_color = "white"
-
-        boundary_node_attr = {"fontname": "Courier", "fontsize": "8"}
-        boundary_nodes = {self._i, self._o}
-
-        with G.subgraph(name="cluster_input") as c:
-            c.attr(rank="source")
-            c.node_attr.update(shape="point", color=io_color)
-            for i in range(len(self._task_graph.out_edges(self._i))):
-                c.node(
-                    name=str(((str(self._i) + "out").replace("::", "_"), i)),
-                    xlabel="Input" + str(i),
-                    **boundary_node_attr,
-                )
-
-        with G.subgraph(name="cluster_output") as c:
-            c.attr(rank="sink")
-            c.node_attr.update(shape="point", color=io_color)
-            for i in range(len(self._task_graph.in_edges(self._o))):
-                c.node(
-                    name=str(((str(self._o) + "in").replace("::", "_"), i)),
-                    xlabel="Output",
-                    **boundary_node_attr,
-                )
-
-        node_cluster_attr = {
-            "style": "rounded, filled",
-            "color": task_color,
-            "fontname": "Times-Roman",
-            "fontsize": "10",
-            "margin": "5",
-            "lheight": "100",
-        }
-        in_port_node_attr = {
-            "color": in_color,
-            "shape": "point",
-            "weight": "2",
-            "fontname": "Helvetica",
-            "fontsize": "8",
-            "rank": "source",
-        }
-        out_port_node_attr = {
-            "color": out_color,
-            "shape": "point",
-            "weight": "2",
-            "fontname": "Helvetica",
-            "fontsize": "8",
-            "rank": "sink",
-        }
-        count = 0
-        for node, ndata in self._task_graph.nodes.items():
-            if node not in boundary_nodes:
-                with G.subgraph(name="cluster_" + node._label + str(count)) as c:
-                    count = count + 1
-                    c.attr(label=str(node._label), **node_cluster_attr)
-
-                    n_in_ports = self._task_graph.in_degree(node)
-                    if n_in_ports == 1:
-                        c.node(
-                            name=str(((str(node) + "in").replace("::", "-"), 0)),
-                            **in_port_node_attr,
-                        )
-                    else:
-                        for i in range(n_in_ports):
-                            c.node(
-                                name=str(((str(node) + "in").replace("::", "-"), i)),
-                                xlabel=str(i),
-                                **in_port_node_attr,
-                            )
-
-                    n_out_ports = self._task_graph.out_degree(node)
-                    if n_out_ports == 1:
-                        c.node(
-                            name=str(((str(node) + "out").replace("::", "-"), 0)),
-                            **out_port_node_attr,
-                        )
-                    else:
-                        for i in range(n_out_ports):
-                            c.node(
-                                name=str(((str(node) + "out").replace("::", "-"), i)),
-                                xlabel=str(i),
-                                **out_port_node_attr,
-                            )
-
-        edge_attr = {
-            "weight": "2",
-            "arrowhead": "vee",
-            "arrowsize": "0.2",
-            "headclip": "true",
-            "tailclip": "true",
-        }
-        for edge, edata in self._task_graph.edges.items():
-            src_node, tgt_node, _ = edge
-            src_port = edge[2][0]
-            tgt_port = edge[2][1]
-            src_nodename = str(((str(src_node) + "out").replace("::", "-"), src_port))
-            tgt_nodename = str(((str(tgt_node) + "in").replace("::", "-"), tgt_port))
-            G.edge(src_nodename, tgt_nodename, color=wire_color, **edge_attr)
-        self.G = G
-        return G
+        return _taskgraph_to_graphviz(self._task_graph, None, self._label)
 
     def view_task_graph(self) -> None:
         """
