@@ -533,7 +533,7 @@ def gen_CDR_MitEx(
             "states_simluator_mitex",
             MitEx(
                 simulator_backend,
-                _label="StatesSimMitEx",
+                _label="StatesSimMitex",
                 mitres=gen_compiled_MitRes(simulator_backend, 0),
             ),
         )
@@ -543,7 +543,7 @@ def gen_CDR_MitEx(
             "states_device_mitex",
             MitEx(
                 device_backend,
-                _label="StatesDeviceMitEx",
+                _label="StatesDeviceMitex",
                 mitres=gen_compiled_MitRes(device_backend, 0),
             ),
         )
@@ -553,7 +553,7 @@ def gen_CDR_MitEx(
             "experiment_mitex",
             MitEx(
                 device_backend,
-                _label="ExperimentMitEx",
+                _label="ExperimentMitex",
                 mitres=gen_compiled_MitRes(device_backend, 0),
             ),
         )
