@@ -14,7 +14,7 @@
 
 
 from pytket import OpType, Circuit
-from pytket.passes import RebaseUFR, DecomposeBoxes  # type: ignore
+from pytket.passes import DecomposeBoxes  # type: ignore
 from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator, get_operator_expectation_value
 from typing import List, Tuple
@@ -39,6 +39,11 @@ import numpy as np
 import random
 from enum import Enum
 import warnings
+from pytket.passes import auto_rebase_pass
+
+
+ufr_gateset = {OpType.CX, OpType.Rz, OpType.H}
+ufr_rebase = auto_rebase_pass(ufr_gateset)
 
 
 class LikelihoodFunction(Enum):
@@ -89,7 +94,7 @@ def sample_weighted_clifford_angle(rz_angle: float, **kwargs) -> float:
             [[np.exp(-0.25 * np.pi * n * 1j), 0], [0, np.exp(0.25 * np.pi * n * 1j)]]
         )
         d = np.linalg.norm(rz_angle_matrix - sn_matrix)
-        weights.append(np.exp((-(d ** 2)) * 4))
+        weights.append(np.exp((-(d**2)) * 4))
     return 0.5 * random.choices(range(4), weights)[0]
 
 
@@ -137,7 +142,7 @@ def gen_state_circuits(
 
     # Work in CX, H, Rz basis for ease
     DecomposeBoxes().apply(c)
-    RebaseUFR().apply(c)
+    ufr_rebase.apply(c)
     c.flatten_registers()
     all_coms = c.get_commands()
 
