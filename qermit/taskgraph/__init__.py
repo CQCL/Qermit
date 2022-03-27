@@ -32,6 +32,9 @@ from .mitres import (
     backend_compile_circuit_shots_task_gen,
     backend_handle_task_gen,
     backend_res_task_gen,
+    split_shots_task_gen,
+    group_shots_task_gen,
+    gen_shot_split_mitres,
 )
 from .mitex import (
     MitEx,
