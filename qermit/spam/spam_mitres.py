@@ -28,12 +28,6 @@ from qermit.spam.full_spam_correction import (
     CorrectionMethod,
     gen_get_bit_maps_task,
 )
-from qermit.spam.partial_spam_correction import (
-    partial_correlated_spam_circuits_task_gen,
-    characterise_correlated_spam_task_gen,
-    partial_spam_setup_task_gen,
-    correct_partial_correlated_spam_task_gen,
-)
 from pytket.backends import Backend
 from typing import List
 from pytket.circuit import Node  # type: ignore
@@ -112,79 +106,3 @@ def gen_UnCorrelated_SPAM_MitRes(
     return gen_FullyCorrelated_SPAM_MitRes(
         backend, calibration_shots, correlations, **kwargs
     )
-
-
-def gen_PartialCorrelated_SPAM_MitRes(
-    backend: Backend, calibration_shots: int, correlations_distance: int, **kwargs
-) -> MitRes:
-    """Produces a MitRes object for performing SPAM correction assuming with n-distance noise correlations.
-
-    :param backend: Default Backend characterisation and experiment are executed on.
-    :type backend: Backend
-    :param calibration_shots: Number of shots required for each characterisation circuit
-    :type calibration_shots: int
-    :param correlations_distance: Distance over Backend Connectivity graph over which correlations in Qubit SPAM Noise is expected.
-    :type correlations_distance: int
-    """
-
-    _mitres_spam_calib = copy.copy(
-        kwargs.get("calibration_mitres", MitRes(backend, _label="SPAMCalibration"))
-    )
-    _mitres_spam_calib._label = "SPAMCalibration"
-
-    _mitres_spam_correction = copy.copy(
-        kwargs.get("correction_mitres", gen_compiled_MitRes(backend, 1))
-    )
-    _mitres_spam_correction._label = "SPAMCorrection"
-
-    _spam_correction_task_graph = TaskGraph().from_TaskGraph(_mitres_spam_correction)
-    # Both Looking something like this
-    #
-    # --[Input]--[C2r]--[Output]--
-    #
-    _spam_correction_task_graph.add_wire()
-
-    _spam_calb_task_graph = TaskGraph().from_TaskGraph(_mitres_spam_calib)
-    _spam_calb_task_graph.add_wire()
-    # _spam_calb_task_graph and _spam_correction_task_graph looking like below:
-    #
-    # --|Input|--[C2r]--|Output|--
-    #   |     |---------|      |
-    #
-    _spam_calb_task_graph.prepend(
-        partial_correlated_spam_circuits_task_gen(
-            backend, calibration_shots, correlations_distance
-        )
-    )
-    #
-    # --|Input|--|GenSpam|--[C2r]--|Output|--
-    #   |     |--| Circs |---------|      |
-    #
-    _spam_calb_task_graph.append(
-        characterise_correlated_spam_task_gen(
-            backend, correlations_distance, calibration_shots
-        )
-    )
-    #
-    # --|Input|--|GenSpam|--[C2r]--|Characterise|--|Output|--
-    #   |     |--| Circs |---------|    SPAM    |
-    #
-    _spam_correction_task_graph.parallel(_spam_calb_task_graph)
-    #
-    # --|Input|---------------------------[C2r]-------------------------------|Output|--
-    #   |     |---------------------------------------------------------------|      |
-    #   |     |---|SPAMInput|--|GenSpam|--[C2r]--|Characterise|--|SPAMOutput|-|      |
-    #             |         |--| Circs |---------|     SPAM   |
-    #
-    _spam_correction_task_graph.prepend(
-        partial_spam_setup_task_gen(backend, correlations_distance)
-    )
-    _spam_correction_task_graph.append(
-        correct_partial_correlated_spam_task_gen(backend)
-    )
-    #
-    # --|Input|--|Spl|---------------------------[C2r]--------------------------------|Cor |--|Output|--
-    #   |     |--|itt|----------------------------------------------------------------|rec |--|      |
-    #   |     |--|er |---|SPAMInput|--|GenSpam|--[C2r]--|Characterise|--|SPAMOutput|--|tion|--|      |
-    #                    |         |--| Circs |---------|    SPAM    |
-    return MitRes(backend).from_TaskGraph(_spam_correction_task_graph)

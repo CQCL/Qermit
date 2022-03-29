@@ -18,14 +18,4 @@ qermit.spam
 .. automethod:: qermit.spam.full_spam_correction.gen_get_bit_maps_task
 
 
-.. automethod:: qermit.spam.partial_spam_correction.partial_spam_setup_task_gen
-
-.. automethod:: qermit.spam.partial_spam_correction.partial_correlated_spam_circuits_task_gen
-
-.. automethod:: qermit.spam.partial_spam_correction.characterise_correlated_spam_task_gen
-
-.. automethod:: qermit.spam.partial_spam_correction.correct_partial_correlated_spam_task_gen
-
-
-
 
