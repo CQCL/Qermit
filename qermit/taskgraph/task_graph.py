@@ -21,7 +21,7 @@ from .mittask import (
 import networkx as nx  # type: ignore
 import graphviz as gv  # type: ignore
 from typing import List, Union, Tuple, cast
-from copy import copy
+from copy import copy, deepcopy
 from tempfile import NamedTemporaryFile
 
 
@@ -61,7 +61,7 @@ class TaskGraph:
         :return: Copied TaskGraph
         :rtype: TaskGraph
         """
-        self._task_graph = copy.deepcopy(task_graph._task_graph)
+        self._task_graph = deepcopy(task_graph._task_graph)
         self._label = task_graph._label
         return self
 
