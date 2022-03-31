@@ -17,8 +17,6 @@ from abc import ABC, abstractmethod
 from typing import List, Tuple, cast, Dict, Union
 
 import numpy as np  #  type: ignore
-import copy
-
 from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator
 from pytket.pauli import QubitPauliString  # type: ignore
@@ -212,7 +210,7 @@ def cdr_calibration_task_gen(
             # for each qubit pauli string in operator, add model for calibrating
             for key in noisy_char_dict:
                 model.calibrate(noisy_char_dict[key], exact_char_dict[key])
-                backend.backend_info.misc["CDR_" + str(counter)][key] = copy.copy(model)
+                backend.backend_info.misc["CDR_" + str(counter)][key] = model
             counter += 1
 
         return (True,)

@@ -37,7 +37,7 @@ from qermit.spam.partial_spam_correction import (
 from pytket.backends import Backend
 from typing import List
 from pytket.circuit import Node  # type: ignore
-import copy
+from copy import copy
 
 
 def gen_FullyCorrelated_SPAM_MitRes(
@@ -55,14 +55,14 @@ def gen_FullyCorrelated_SPAM_MitRes(
     :param correlations: Each sublist of Node corresponds to some set of fully correlated nodes.
     :type correlations: List[List[Node]]
     """
-    _mitres_spam_calib = copy.copy(
+    _mitres_spam_calib = copy(
         kwargs.get("calibration_mitres", MitRes(backend, _label="SPAMCalibration"))
     )
     _mitres_spam_calib._label = "SPAMCalibration"
 
     _task_graph_spam_calib = TaskGraph().from_TaskGraph(_mitres_spam_calib)
 
-    _mitres_spam_correction = copy.copy(
+    _mitres_spam_correction = copy(
         kwargs.get("correction_mitres", MitRes(backend, _label="SPAMCorrection"))
     )
     _mitres_spam_correction._label = "SPAMCorrection"
@@ -127,12 +127,12 @@ def gen_PartialCorrelated_SPAM_MitRes(
     :type correlations_distance: int
     """
 
-    _mitres_spam_calib = copy.copy(
+    _mitres_spam_calib = copy(
         kwargs.get("calibration_mitres", MitRes(backend, _label="SPAMCalibration"))
     )
     _mitres_spam_calib._label = "SPAMCalibration"
 
-    _mitres_spam_correction = copy.copy(
+    _mitres_spam_correction = copy(
         kwargs.get("correction_mitres", gen_compiled_MitRes(backend, 1))
     )
     _mitres_spam_correction._label = "SPAMCorrection"

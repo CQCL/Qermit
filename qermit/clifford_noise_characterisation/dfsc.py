@@ -22,7 +22,7 @@ from pytket.tailoring import apply_clifford_basis_change  # type: ignore
 from numpy import mean
 
 from typing import List, Tuple, cast, Union, Dict
-import copy
+from copy import copy
 
 from qermit import (
     MitEx,
@@ -314,7 +314,7 @@ def DFSC_correction_task_gen(zero_threshold: float) -> MitTask:
 
 def gen_DFSC_MitEx(backend: Backend, **kwargs) -> MitEx:
     """
-    Produces a MitEx object that applies DFSC characteriastion to all experiment results.
+    Produces a MitEx object that applies DFSC characterisation to all experiment results.
 
     :param backend: Backend experiments are run through.
     :type backend: Backend
@@ -326,7 +326,7 @@ def gen_DFSC_MitEx(backend: Backend, **kwargs) -> MitEx:
 
     """
 
-    _experiment_mitex = copy.copy(
+    _experiment_mitex = copy(
         kwargs.get(
             "experiment_mitex",
             MitEx(
@@ -336,7 +336,7 @@ def gen_DFSC_MitEx(backend: Backend, **kwargs) -> MitEx:
             ),
         )
     )
-    _characterisation_mitex = copy.copy(
+    _characterisation_mitex = copy(
         kwargs.get(
             "characterisation_mitex",
             MitEx(

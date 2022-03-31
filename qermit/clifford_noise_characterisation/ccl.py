@@ -18,7 +18,7 @@ from pytket.passes import DecomposeBoxes  # type: ignore
 from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator, get_operator_expectation_value
 from typing import List, Tuple
-import copy
+from copy import copy
 from qermit import (
     MitEx,
     ObservableTracker,
@@ -362,18 +362,16 @@ def ccl_state_task_gen(
                         Circuit=c, Shots=shots, SymbolsDict=SymbolsDict()
                     ),
                     ObservableTracker=ObservableTracker(
-                        copy.copy(qubit_pauli_operator)
-                    ),
+                        copy(qubit_pauli_operator)
+                    ),  # no copy meanins changes to one QubitPauliOperator can be made to all
                 )
                 wire_device = ObservableExperiment(
                     AnsatzCircuit=AnsatzCircuit(
                         Circuit=c.copy(),
-                        Shots=copy.copy(shots),
+                        Shots=copy(shots),
                         SymbolsDict=SymbolsDict(),
                     ),
-                    ObservableTracker=ObservableTracker(
-                        copy.copy(qubit_pauli_operator)
-                    ),
+                    ObservableTracker=ObservableTracker(copy(qubit_pauli_operator)),
                 )
                 simulator_wires.append(wire_sim)
                 device_wires.append(wire_device)
@@ -528,7 +526,7 @@ def gen_CDR_MitEx(
         circuits which have noisy expectation values far from that of the
         original circuit.
     """
-    _states_sim_mitex = copy.copy(
+    _states_sim_mitex = copy(
         kwargs.get(
             "states_simluator_mitex",
             MitEx(
@@ -538,7 +536,7 @@ def gen_CDR_MitEx(
             ),
         )
     )
-    _states_device_mitex = copy.copy(
+    _states_device_mitex = copy(
         kwargs.get(
             "states_device_mitex",
             MitEx(
@@ -548,7 +546,7 @@ def gen_CDR_MitEx(
             ),
         )
     )
-    _experiment_mitex = copy.copy(
+    _experiment_mitex = copy(
         kwargs.get(
             "experiment_mitex",
             MitEx(
