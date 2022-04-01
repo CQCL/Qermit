@@ -25,6 +25,7 @@ from pytket.backends.backendresult import BackendResult
 import networkx as nx  # type: ignore
 import inspect
 from copy import deepcopy
+from itertools import repeat
 
 
 def backend_compile_circuit_shots_task_gen(
@@ -341,19 +342,24 @@ def split_shots_task_gen(max_shots: int) -> MitTask:
         # then the maximum, and divide the job into several smaller ones if
         # this is the case.
         for i, circ_shots in enumerate(circuit_wires):
-
-            shots_to_run = circ_shots.Shots
-
-            while shots_to_run > 0:
-
-                split_circ_shots = CircuitShots(
-                    circ_shots.Circuit, min(max_shots, shots_to_run)
+            div_val = circ_shots.Shots // max_shots
+            # Divide into jobs of size max_shots
+            if circ_shots.Shots > max_shots:
+                split_circuit_wires.extend(
+                    [
+                        CircuitShots(circ_shots.Circuit, max_shots)
+                        for _ in range(div_val)
+                    ]
                 )
-                # append a job with a reduced number of shots to the list.
-                split_circuit_wires.append(split_circ_shots)
-                # Append the original circuit index to the index list.
-                split_index.append(i)
-                shots_to_run -= max_shots
+            # Add remaining shots
+            if circ_shots.Shots % max_shots > 0:
+                split_circuit_wires.append(
+                    CircuitShots(circ_shots.Circuit, circ_shots.Shots % max_shots)
+                )
+            # Add new job indexes
+            split_index.extend(
+                repeat(i, div_val + min(1, circ_shots.Shots % max_shots))
+            )
 
         return (split_circuit_wires, split_index)
 
