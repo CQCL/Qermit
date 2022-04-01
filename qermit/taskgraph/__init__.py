@@ -34,7 +34,7 @@ from .mitres import (
     backend_res_task_gen,
     split_shots_task_gen,
     group_shots_task_gen,
-    gen_shot_split_mitres,
+    gen_shot_split_MitRes,
 )
 from .mitex import (
     MitEx,

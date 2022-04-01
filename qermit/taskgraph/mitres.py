@@ -422,7 +422,7 @@ def group_shots_task_gen() -> MitTask:
     return MitTask(_label="MergeShots", _n_in_wires=2, _n_out_wires=1, _method=task)
 
 
-def gen_shot_split_mitres(backend: Backend, max_shots: int) -> MitRes:
+def gen_shot_split_MitRes(backend: Backend, max_shots: int) -> MitRes:
     """
     Wraps a mitres in tasks which ensures shots requested by individual
     jobs never exceed max_shots. It does so by splitting the shots over several

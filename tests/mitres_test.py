@@ -22,7 +22,7 @@ from qermit.taskgraph.mitres import (  # type: ignore
     backend_res_task_gen,
     split_shots_task_gen,
     group_shots_task_gen,
-    gen_shot_split_mitres,
+    gen_shot_split_MitRes,
 )
 from pytket import Circuit
 from pytket.extensions.qiskit import AerBackend  # type: ignore
@@ -119,11 +119,11 @@ def test_group_shots_task_gen():
     assert len(merged_results[0][1].get_shots()) == 4
     assert len(merged_results[0][2].get_shots()) == 11
 
-def test_gen_shot_split_mitres():
+def test_gen_shot_split_MitRes():
 
     backend = AerBackend()
 
-    mitres = gen_shot_split_mitres(backend, 5)
+    mitres = gen_shot_split_MitRes(backend, 5)
     mitres.get_task_graph()
 
     n_shots_1 = 8
@@ -142,4 +142,4 @@ if __name__ == "__main__":
     test_mitres_run()
     test_split_shots_task_gen()
     test_group_shots_task_gen()
-    test_gen_shot_split_mitres()
+    test_gen_shot_split_MitRes()
