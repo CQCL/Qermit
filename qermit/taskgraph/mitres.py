@@ -26,6 +26,9 @@ import networkx as nx  # type: ignore
 import inspect
 from copy import deepcopy
 from itertools import repeat
+from pytket.utils.outcomearray import OutcomeArray
+from pytket import Bit
+import numpy as np
 
 
 def backend_compile_circuit_shots_task_gen(
@@ -407,15 +410,15 @@ def group_shots_task_gen() -> MitTask:
         ]
 
         # For each circuit, combine the results.
-        for fixed_circ in grouped_results:
-            # initialise result with the first that corresponds to this circuit.
-            circ_all_result_dict = fixed_circ[0].to_dict()
-            # For the remaining results, append the shots.
-            for circ_result in fixed_circ[1:]:
-                circ_all_result_dict["shots"]["array"].extend(
-                    circ_result.to_dict()["shots"]["array"]
+        for chunk in grouped_results:
+            # Concatenate shots from all results
+            combined_shots = np.concatenate([result.get_shots() for result in chunk])
+            outcome_array = OutcomeArray.from_readouts(combined_shots)
+            merged_results.append(
+                BackendResult(
+                    shots=outcome_array, c_bits=cast(Sequence[Bit], chunk[0].c_bits)
                 )
-            merged_results.append(BackendResult().from_dict(circ_all_result_dict))
+            )
 
         return (merged_results,)
 
