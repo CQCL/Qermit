@@ -306,7 +306,8 @@ class MitRes(TaskGraph):
 
 
 def split_shots_task_gen(max_shots: int) -> MitTask:
-    """When the number of shots requested is higher than max_shots, this task
+    """
+    When the number of shots requested is higher than max_shots, this task
     splits the jobs into several individual jobs, where the total number of
     shots matched that initially requested.
 
@@ -319,7 +320,8 @@ def split_shots_task_gen(max_shots: int) -> MitTask:
     def task(
         obj, circuit_wires: List[CircuitShots]
     ) -> Tuple[List[CircuitShots], List[int]]:
-        """This task divides a job into several smaller ones, if the number of
+        """
+        This task divides a job into several smaller ones, if the number of
         shots requested is larger then the maximum allowed.
 
         :param circuit_wires: A list of the circuits to be run, and the number
@@ -367,7 +369,8 @@ def split_shots_task_gen(max_shots: int) -> MitTask:
 
 
 def group_shots_task_gen() -> MitTask:
-    """Returns task which groups together jobs that correspond to the same
+    """
+    Returns task which groups together jobs that correspond to the same
     circuit. Original larger job could have been split by task returned
     by split_shots_task_gen.
 
@@ -378,7 +381,8 @@ def group_shots_task_gen() -> MitTask:
     def task(
         obj, results_wires: List[BackendResult], split_index: List[int]
     ) -> Tuple[List[BackendResult]]:
-        """Task which merges jobs which correspond to the same circuit.
+        """
+        Task which merges jobs which correspond to the same circuit.
 
         :param results_wires: A list of results, some of which correspond to
         the same circuit.
@@ -419,7 +423,8 @@ def group_shots_task_gen() -> MitTask:
 
 
 def gen_shot_split_mitres(backend: Backend, max_shots: int) -> MitRes:
-    """Wraps a mitres in tasks which ensures shots requested by individual
+    """
+    Wraps a mitres in tasks which ensures shots requested by individual
     jobs never exceed max_shots. It does so by splitting the shots over several
     jobs if necessary.
 
