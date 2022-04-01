@@ -43,6 +43,7 @@ from .mitex import (
     collate_circuit_shots_task_gen,
     split_results_task_gen,
     get_expectations_task_gen,
+    gen_compiled_shot_split_MitRes,
 )
 from .utils import SymbolsDict, MeasurementCircuit, ObservableTracker
 from .measurement_reduction import gen_MeasurementReduction_MitEx
