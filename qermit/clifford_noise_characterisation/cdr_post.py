@@ -21,6 +21,7 @@ from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator
 from pytket.pauli import QubitPauliString  # type: ignore
 from qermit import MitTask
+from copy import copy
 import math
 import warnings
 from sympy.core.expr import Expr
@@ -210,7 +211,8 @@ def cdr_calibration_task_gen(
             # for each qubit pauli string in operator, add model for calibrating
             for key in noisy_char_dict:
                 model.calibrate(noisy_char_dict[key], exact_char_dict[key])
-                backend.backend_info.misc["CDR_" + str(counter)][key] = model
+                # calibrate creates new model, copy it in to backend
+                backend.backend_info.misc["CDR_" + str(counter)][key] = copy(model)
             counter += 1
 
         return (True,)
