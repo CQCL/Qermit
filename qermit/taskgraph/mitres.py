@@ -338,7 +338,7 @@ def split_shots_task_gen(max_shots: int) -> MitTask:
         # the original list. This is to say all circuits in the new list
         # assigned an index i by this index list correspond to original
         # circuit i.
-        split_index = []
+        split_index: List[int] = []
 
         # For each circuit, check if the number of shots requested is greater
         # then the maximum, and divide the job into several smaller ones if
