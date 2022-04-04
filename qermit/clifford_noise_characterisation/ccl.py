@@ -363,7 +363,7 @@ def ccl_state_task_gen(
                     ),
                     ObservableTracker=ObservableTracker(
                         copy(qubit_pauli_operator)
-                    ),  # no copy meanins changes to one QubitPauliOperator can be made to all
+                    ),  # no copy means changes to one QubitPauliOperator can be made to all
                 )
                 wire_device = ObservableExperiment(
                     AnsatzCircuit=AnsatzCircuit(
