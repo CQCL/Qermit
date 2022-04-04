@@ -248,7 +248,7 @@ class ObservableTracker:
         :type qubit_pauli_strings: List[QubitPauliString]
         """
         self._qubit_pauli_operator = qubit_pauli_operator
-        # indices being inde in measurement circuits
+        # indices being index in measurement circuits
         self._qps_to_indices: Dict[
             QubitPauliString, List[Tuple[int, List[Bit], bool]]
         ] = dict()
@@ -280,6 +280,16 @@ class ObservableTracker:
 
     def __repr__(self):
         return str(self)
+
+    def clear(self):
+        """
+        Erases all held information that is not the qubit pauli operator.
+        """
+        self._qps_to_indices = dict()
+        for k in self._qubit_pauli_operator._dict.keys():
+            self._qps_to_indices[k] = list()
+        self._measurement_circuits: List[MeasurementCircuit] = list()
+        self._partitions: List[QubitPauliString] = list()
 
     def modify_coefficients(
         self, new_coefficients: List[Tuple[QubitPauliString, float]]
