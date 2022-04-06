@@ -20,7 +20,7 @@ from pytket.utils import (
 )
 from pytket.pauli import QubitPauliString  # type: ignore
 from pytket.backends.backendresult import BackendResult
-import copy
+from copy import copy
 from sympy import Symbol  # type: ignore
 from typing import Iterable, Dict, Union, Tuple, List
 from collections import OrderedDict
@@ -266,11 +266,14 @@ class ObservableTracker:
 
         :return: New ObservableTracker object
         """
-        new_obj = ObservableTracker(copy.copy(to_copy._qubit_pauli_operator))
+        # these variables could be mutated in the first ObservableTracker and effect
+        # this one
+        # To fix, copy everything
+        new_obj = ObservableTracker(copy(to_copy._qubit_pauli_operator))
 
-        new_obj._qps_to_indices = copy.copy(to_copy._qps_to_indices)
-        new_obj._measurement_circuits = copy.copy(to_copy._measurement_circuits)
-        new_obj._partitions = copy.copy(to_copy._partitions)
+        new_obj._qps_to_indices = copy(to_copy._qps_to_indices)
+        new_obj._measurement_circuits = copy(to_copy._measurement_circuits)
+        new_obj._partitions = copy(to_copy._partitions)
         return new_obj
 
     def __str__(self):

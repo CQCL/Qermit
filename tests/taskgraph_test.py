@@ -95,8 +95,8 @@ def test_basic_task_graph_methods():
     # check results are expected also
     assert tg.run([10]) == (500, 50)
 
-    # test sandwich, and duplication of final results
-    tg.sandwich(duplicate_wire_task_gen(1, 1), duplicate_wire_task_gen(2, 2))
+    tg.prepend(duplicate_wire_task_gen(1, 1))
+    tg.append(duplicate_wire_task_gen(2, 2))
     assert len(tg.tasks) == 5
     assert tg.run([10]) == (500, 50, 500, 50)
 
