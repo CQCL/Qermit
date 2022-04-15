@@ -11,3 +11,9 @@ qermit.mitres
 .. automethod:: qermit.taskgraph.mitres.backend_handle_task_gen
 
 .. automethod:: qermit.taskgraph.mitres.backend_res_task_gen
+
+.. automethod:: qermit.taskgraph.mitrex.gen_shot_split_MitRes
+
+.. automethod:: qermit.taskgraph.mitrex.split_shots_task_gen
+
+.. automethod:: qermit.taskgraph.mitrex.group_shots_task_gen
