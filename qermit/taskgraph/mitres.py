@@ -312,7 +312,7 @@ def split_shots_task_gen(max_shots: int) -> MitTask:
     """
     When the number of shots requested is higher than max_shots, this task
     splits the jobs into several individual jobs, where the total number of
-    shots matched that initially requested.
+    shots matches that initially requested.
 
     :param max_shots: The maximum number of shots per job.
     :type max_shots: int
