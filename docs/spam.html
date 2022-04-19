@@ -114,21 +114,6 @@ Requires 2 circuits to characterise device.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="qermit.spam.spam_mitres.gen_PartialCorrelated_SPAM_MitRes">
-<span class="sig-prename descclassname"><span class="pre">spam_mitres.</span></span><span class="sig-name descname"><span class="pre">gen_PartialCorrelated_SPAM_MitRes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calibration_shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlations_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes"><span class="pre">qermit.taskgraph.mitres.MitRes</span></a></span></span><a class="headerlink" href="#qermit.spam.spam_mitres.gen_PartialCorrelated_SPAM_MitRes" title="Permalink to this definition"></a></dt>
-<dd><p>Produces a MitRes object for performing SPAM correction assuming with n-distance noise correlations.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> (<em>Backend</em>) – Default Backend characterisation and experiment are executed on.</p></li>
-<li><p><strong>calibration_shots</strong> (<em>int</em>) – Number of shots required for each characterisation circuit</p></li>
-<li><p><strong>correlations_distance</strong> (<em>int</em>) – Distance over Backend Connectivity graph over which correlations in Qubit SPAM Noise is expected.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="qermit.spam.full_spam_correction.gen_full_tomography_spam_circuits_task">
 <span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_full_tomography_spam_circuits_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit_subsets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Qubit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_circuits_task" title="Permalink to this definition"></a></dt>
 <dd><p>Generate MitTask for calibration circuits according to the specified correlation and given backend.</p>
@@ -191,76 +176,6 @@ and correct results given by CorrectionMethod enum.</p>
 <span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_get_bit_maps_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_get_bit_maps_task" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a task that takes a list of circuits and returns the circuits, and a map betwen
 each circuit bit and the qubit it is measured on.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="qermit.spam.partial_spam_correction.partial_spam_setup_task_gen">
-<span class="sig-prename descclassname"><span class="pre">partial_spam_correction.</span></span><span class="sig-name descname"><span class="pre">partial_spam_setup_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">correlation_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.partial_spam_correction.partial_spam_setup_task_gen" title="Permalink to this definition"></a></dt>
-<dd><p>Sets up required information for characterising and correcting SPAM noise.
-Includes check for whether SPAM Characterisation needs to be run.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> (<em>Backend</em>) – Default Backend characterisation and experiment are executed on.</p></li>
-<li><p><strong>correlations_distance</strong> (<em>int</em>) – Distance over Backend Connectivity graph over which correlations in Qubit SPAM Noise is expected.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A MitTask object that completes said task.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="qermit.spam.partial_spam_correction.partial_correlated_spam_circuits_task_gen">
-<span class="sig-prename descclassname"><span class="pre">partial_spam_correction.</span></span><span class="sig-name descname"><span class="pre">partial_correlated_spam_circuits_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calibration_shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.partial_spam_correction.partial_correlated_spam_circuits_task_gen" title="Permalink to this definition"></a></dt>
-<dd><p>For Given Backend, returns circuits characterisating SPAM noise for up to correlation_distance distance on the Backend connectivity graph.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> (<em>Backend</em>) – Default Backend characterisation and experiment are executed on.</p></li>
-<li><p><strong>calibration_shots</strong> (<em>int</em>) – Number of shots required for each characterisation circuit</p></li>
-<li><p><strong>correlations_distance</strong> (<em>int</em>) – Distance over Backend Connectivity graph over which correlations in Qubit SPAM Noise is expected.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A MitTask object that produces Characterisation circuits.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="qermit.spam.partial_spam_correction.characterise_correlated_spam_task_gen">
-<span class="sig-prename descclassname"><span class="pre">partial_spam_correction.</span></span><span class="sig-name descname"><span class="pre">characterise_correlated_spam_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">correlations_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration_shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.partial_spam_correction.characterise_correlated_spam_task_gen" title="Permalink to this definition"></a></dt>
-<dd><p>Produces SPAM characterisation matrices for each correlation expected.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> (<em>Backend</em>) – Backend which characterisation to be stored in</p></li>
-<li><p><strong>correlations_distance</strong> (<em>int</em>) – Correlation Distance which charactersation was produced for - only required for setting in backend.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A MitTask object that assigns a PartialCorrelatedNoiseCharacterisation to backend.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="qermit.spam.partial_spam_correction.correct_partial_correlated_spam_task_gen">
-<span class="sig-prename descclassname"><span class="pre">partial_spam_correction.</span></span><span class="sig-name descname"><span class="pre">correct_partial_correlated_spam_task_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.partial_spam_correction.correct_partial_correlated_spam_task_gen" title="Permalink to this definition"></a></dt>
-<dd><p>Produces and returns a MitTask object to apply SPAM correction to BackendResult objects.
-:param backend: Backend from which Spam Correction characterisation is retrieved.
-:type backend: Backend</p>
 </dd></dl>
 
 </section>

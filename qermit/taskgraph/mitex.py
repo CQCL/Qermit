@@ -16,6 +16,7 @@
 from .mitres import (
     MitRes,
     backend_compile_circuit_shots_task_gen,
+    gen_shot_split_MitRes,
 )
 from .task_graph import TaskGraph
 from .mittask import (
@@ -36,6 +37,26 @@ from pytket.backends import Backend  # type: ignore
 import inspect
 from copy import deepcopy
 
+
+def gen_compiled_shot_split_MitRes(backend: Backend, max_shots: int, optimisation_level: int = 1) -> MitRes:
+    """
+    Returns a shot splitting MitRes object with a compilation task prepended that compiles
+    circuit wires via backend.compile_circuit. Optimisation level can be optionally
+    set as defined by backend.compile_circuit.
+
+    :param backend: Backend with circuits are compiled for.
+    :type backend: Backend
+    :param max_shots: The maximum number of shots that each job should request.
+    :type max_shots: int
+    :param optimisation_level: Sets options in compile_circuit method
+    :type optimisation_level: int
+
+    :return: shot splitting MitRes object with compilation task prepended.
+    :rtype: MitRes
+    """
+    mr = gen_shot_split_MitRes(backend, max_shots)
+    mr.prepend(backend_compile_circuit_shots_task_gen(backend, optimisation_level))
+    return mr
 
 def gen_compiled_MitRes(backend: Backend, optimisation_level: int = 1) -> MitRes:
     """
@@ -235,6 +256,8 @@ def get_expectations_task_gen() -> MitTask:
             observable.get_expectations(results)
             for observable, results in zip(trackers, all_results)
         ]
+        for observable in trackers:
+            observable.clear()
         return (output_qpos,)
 
     return MitTask(

@@ -20,7 +20,6 @@ Mitigation methods to experiment results.
 """
 from .spam_mitres import (
     gen_FullyCorrelated_SPAM_MitRes,
-    gen_PartialCorrelated_SPAM_MitRes,
     gen_UnCorrelated_SPAM_MitRes,
     CorrectionMethod,
 )
