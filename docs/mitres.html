@@ -273,6 +273,63 @@ the backend the task is defined by.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.taskgraph.mitres.gen_shot_split_MitRes">
+<span class="sig-prename descclassname"><span class="pre">mitres.</span></span><span class="sig-name descname"><span class="pre">gen_shot_split_MitRes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes"><span class="pre">qermit.taskgraph.mitres.MitRes</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.mitres.gen_shot_split_MitRes" title="Permalink to this definition"></a></dt>
+<dd><p>Wraps a mitres in tasks which ensures shots requested by individual
+jobs never exceed max_shots. It does so by splitting the shots over several
+jobs if necessary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>backend</strong> (<em>Backend</em>) – The backend on which to run the jobs.</p></li>
+<li><p><strong>max_shots</strong> (<em>int</em>) – The maximum number of shots that each job should request.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A MitRes object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes">MitRes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.taskgraph.mitres.split_shots_task_gen">
+<span class="sig-prename descclassname"><span class="pre">mitres.</span></span><span class="sig-name descname"><span class="pre">split_shots_task_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.mitres.split_shots_task_gen" title="Permalink to this definition"></a></dt>
+<dd><p>When the number of shots requested is higher than max_shots, this task
+splits the jobs into several individual jobs, where the total number of
+shots matches that initially requested.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>max_shots</strong> (<em>int</em>) – The maximum number of shots per job.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A task dividing the job into several smaller ones.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.taskgraph.mitres.group_shots_task_gen">
+<span class="sig-prename descclassname"><span class="pre">mitres.</span></span><span class="sig-name descname"><span class="pre">group_shots_task_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.mitres.group_shots_task_gen" title="Permalink to this definition"></a></dt>
+<dd><p>Returns task which groups together jobs that correspond to the same
+circuit. Original larger job could have been split by task returned
+by split_shots_task_gen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Task merging jobs which correspond to the same circuit.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 

@@ -17,12 +17,14 @@ from qermit import (  # type: ignore
     MitEx,
     SymbolsDict,
     ObservableTracker,
+    CircuitShots,
 )
 from qermit.taskgraph.mitex import (  # type: ignore
     filter_observable_tracker_task_gen,
     collate_circuit_shots_task_gen,
     split_results_task_gen,
     get_expectations_task_gen,
+    gen_compiled_shot_split_MitRes,
 )
 import copy
 from pytket.circuit import Circuit, fresh_symbol, Qubit, OpType  # type: ignore
@@ -243,6 +245,23 @@ def test_mitex_run():
     assert res[0][qps_01] == 0.5
     assert res[0][qps_12] == -1.0
     assert res[1][qps_012] == 0.7
+
+def test_gen_compiled_shot_split_MitRes():
+
+    backend = AerBackend()
+
+    mitres = gen_compiled_shot_split_MitRes(backend, 5, optimisation_level=2)
+    mitres.get_task_graph()
+
+    n_shots_1 = 8
+    circ_1 = Circuit(1).X(0).X(0).measure_all()
+    n_shots_2 = 12
+    circ_2 = Circuit(2).CX(0,1).measure_all()
+
+    results = mitres.run([CircuitShots(circ_1, n_shots_1), CircuitShots(circ_2, n_shots_2)])
+
+    assert len(results[0].get_shots()) == n_shots_1
+    assert len(results[1].get_shots()) == n_shots_2
 
 
 if __name__ == "__main__":

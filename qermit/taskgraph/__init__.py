@@ -32,6 +32,9 @@ from .mitres import (
     backend_compile_circuit_shots_task_gen,
     backend_handle_task_gen,
     backend_res_task_gen,
+    split_shots_task_gen,
+    group_shots_task_gen,
+    gen_shot_split_MitRes,
 )
 from .mitex import (
     MitEx,
@@ -40,6 +43,7 @@ from .mitex import (
     collate_circuit_shots_task_gen,
     split_results_task_gen,
     get_expectations_task_gen,
+    gen_compiled_shot_split_MitRes,
 )
 from .utils import SymbolsDict, MeasurementCircuit, ObservableTracker
 from .measurement_reduction import gen_MeasurementReduction_MitEx
