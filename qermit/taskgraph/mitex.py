@@ -38,7 +38,9 @@ import inspect
 from copy import deepcopy
 
 
-def gen_compiled_shot_split_MitRes(backend: Backend, max_shots: int, optimisation_level: int = 1) -> MitRes:
+def gen_compiled_shot_split_MitRes(
+    backend: Backend, max_shots: int, optimisation_level: int = 1
+) -> MitRes:
     """
     Returns a shot splitting MitRes object with a compilation task prepended that compiles
     circuit wires via backend.compile_circuit. Optimisation level can be optionally
@@ -57,6 +59,7 @@ def gen_compiled_shot_split_MitRes(backend: Backend, max_shots: int, optimisatio
     mr = gen_shot_split_MitRes(backend, max_shots)
     mr.prepend(backend_compile_circuit_shots_task_gen(backend, optimisation_level))
     return mr
+
 
 def gen_compiled_MitRes(backend: Backend, optimisation_level: int = 1) -> MitRes:
     """

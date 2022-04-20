@@ -18,7 +18,6 @@ from qermit import (
     TaskGraph,
 )
 from qermit.taskgraph import (
-    gen_compiled_MitRes,
     backend_compile_circuit_shots_task_gen,
 )
 from qermit.spam.full_spam_correction import (
