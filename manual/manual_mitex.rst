@@ -188,7 +188,6 @@ will lack physical meaning, it will display how such a method could be written.
                     c.add_bit(b)
                     c.CX(q0, q1)
                     c.Measure(q1, b)
-                print(c.get_commands())
             return (experiment_wire,)
         return MitTask(_label="AddMeasureAncillas", _n_in_wires=1, _n_out_wires=1, _method=task)
 
@@ -211,7 +210,7 @@ adding measured ancilla ``Qubit``.
     sim_backend = AerBackend()
     mitex_discard = MitEx(backend = sim_backend)
     mitex_discard.prepend(ancillas_task)
-    mitex.get_task_graph()
+    mitex_discard.get_task_graph()
 
 
 .. image:: ancilla_mitex_taskgraph.png
@@ -343,7 +342,7 @@ if its value is within some passed range. A more realistic example may modify th
     
     ansatz_circuit_discard = AnsatzCircuit(Circuit=circuit_discard.copy(), Shots=shots, SymbolsDict=symbols)
 
-    print(discard_mitex.run([ObservableExperiment(ansatz_circuit_discard, ObservableTracker(qpo_discard))]))
+    print(combined_mitex.run([ObservableExperiment(ansatz_circuit_discard, ObservableTracker(qpo_discard))]))
 
 ::
 
@@ -389,14 +388,14 @@ the  ``qermit.probabilistic_error_cancellation`` `module <https://cqcl.github.io
     from pytket.extensions.qiskit import IBMQEmulatorBackend, AerBackend
 
     noiseless_backend = AerBackend()
-    casablanca_backend = IBMQEmulatorBackend(
-      "ibmq_casablanca",
-      hub='partner-cqc',
-      group='internal',
-      project='default',
+    lagos_backend = IBMQEmulatorBackend(
+      "ibm_lagos",
+      hub='',
+      group='',
+      project='',
     )  
 
-    pec_mitex = gen_PEC_learning_based_MitEx(device_backend = casablanca_backend, simulator_backend = noiseless_backend)
+    pec_mitex = gen_PEC_learning_based_MitEx(device_backend = lagos_backend, simulator_backend = noiseless_backend)
     pec_mitex.get_task_graph()
 
 .. image:: PEC_taskgraph.png
@@ -471,7 +470,7 @@ the ``qermit.zero_noise_extrapolation`` `module <https://cqcl.github.io/qermit/z
     from qermit.zero_noise_extrapolation import gen_ZNE_MitEx
     from pytket.extensions.qiskit import IBMQEmulatorBackend
 
-    zne_mitex = gen_ZNE_MitEx(backend=casablanca_backend, noise_scaling_list = [3,5,7])
+    zne_mitex = gen_ZNE_MitEx(backend=lagos_backend, noise_scaling_list = [3,5,7])
     zne_mitex.get_task_graph()
 
 
@@ -557,10 +556,10 @@ Generators for Clifford-Data-Regression ``MitEx`` objects are available in the `
 
     
     noisy_backend = IBMQBackend(
-      "ibmq_casablanca",
-      hub='partner-cqc',
-      group='internal',
-      project='default',
+      "ibm_lagos",
+      hub='',
+      group='',
+      project='',
     )  
     noiseless_backend = AerBackend()
 
@@ -656,7 +655,7 @@ For comparison we can run the same experiment without error-mitigation.
 
     [{(Zq[0], Zq[1], Zq[2]): 0.729000000000000}]
 
-For the basic example constructed, fairly small 2000 shots and the ibmq_casablanca device available
+For the basic example constructed, fairly small 2000 shots and the ibm_lagos device available
 through IBMQ, we see that the error-mitigated expectation value is closer to the expected value 1.0 than 
 without error-mitigation.
 
@@ -701,13 +700,13 @@ in the ``qermit.clifford_noise_characterisation`` `module <https://cqcl.github.i
     from qermit.clifford_noise_characterisation import gen_DFSC_MitEx
     from pytket.extensions.qiskit import IBMQBackend
 
-    casablanca_backend = IBMQEmulatorBackend(
-      "ibmq_casablanca",
-      hub='partner-cqc',
-      group='internal',
-      project='default',
+    lagos_backend = IBMQEmulatorBackend(
+      "ibm_lagos",
+      hub='',
+      group='',
+      project='',
     )  
-    dfsc_mitex = gen_DFSC_MitEx(casablanca_backend)
+    dfsc_mitex = gen_DFSC_MitEx(lagos_backend)
     dfsc_mitex.get_task_graph()
 
 
