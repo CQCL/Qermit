@@ -295,7 +295,6 @@ def test_cdr_mitex():
     assert len(ccl_res) == 2
     assert len(res) == 2
 
-    # TODO: values coming out as sympy floats - fix
     assert np.isclose(float(ccl_res[0][qps_012]), float(res[0][qps_012]), rtol=1e-1)
     assert np.isclose(float(ccl_res[1][qps_01]), float(res[1][qps_01]), rtol=1e-1)
 

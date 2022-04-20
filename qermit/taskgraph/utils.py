@@ -427,8 +427,6 @@ class ObservableTracker:
         """
         return self._measurement_circuits
 
-    # TODO: QSE derives expectations differently for measurement circuits
-    # Method will need to be renamed once this is suppported
     def get_expectations(self, results: List[BackendResult]) -> QubitPauliOperator:
         """
         For given list of results, returns a QubitPauliOperator giving an expectation for each QubitPauliString
