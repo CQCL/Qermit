@@ -22,7 +22,7 @@ from qermit.spam import (  # type: ignore
     gen_UnCorrelated_SPAM_MitRes,
     CorrectionMethod,
 )
-from qermit.mittask import CircuitShots  # type: ignore
+from qermit.taskgraph import CircuitShots  # type: ignore
 
 
 def gen_test_wire():
