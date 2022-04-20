@@ -31,7 +31,7 @@ from pytket.utils import QubitPauliOperator
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket import Bit, Circuit
 from pytket.backends.backendresult import BackendResult
-from typing import Tuple, List, Union, cast
+from typing import Tuple, List, OrderedDict, Union, cast
 import networkx as nx  # type: ignore
 from pytket.backends import Backend  # type: ignore
 import inspect
@@ -294,6 +294,9 @@ class MitEx(TaskGraph):
         # start building default MitEx task graph
         self._task_graph = nx.MultiDiGraph()
         self._i, self._o = IOTask.Input, IOTask.Output
+
+        # if requested, all data is held in cache and can be accessed after running
+        self._cache: OrderedDict[str, Tuple[MitTask, List[Wire]]] = OrderedDict()
 
         # add edge from input to filtering task to generate measurement circuits
         filter_observable_tracker_task = filter_observable_tracker_task_gen()

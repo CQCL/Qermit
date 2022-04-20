@@ -18,7 +18,7 @@ from .mittask import (
     CircuitShots,
     Wire,
 )
-from typing import List, Tuple, Union, cast, Sequence
+from typing import List, Tuple, Union, OrderedDict, cast, Sequence
 from .task_graph import TaskGraph
 from pytket.backends import Backend, ResultHandle
 from pytket.backends.backendresult import BackendResult
@@ -152,6 +152,9 @@ class MitRes(TaskGraph):
 
         # default constructor runs all circuits through passed Backend
         self._task_graph = nx.MultiDiGraph()
+
+        # if requested, all data is held in cache and can be accessed after running
+        self._cache: OrderedDict[str, Tuple[MitTask, List[Wire]]] = OrderedDict()
 
         c2h = backend_handle_task_gen(backend)
         h2r = backend_res_task_gen(backend)
