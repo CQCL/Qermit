@@ -100,7 +100,7 @@ the ``pytket`` ``Backend`` the ``MitEx`` object is defined by.
 
    mitex.get_task_graph()
 
-.. image:: mitexgraph.png
+.. image:: mitex_taskgraph.png
 
 
 
