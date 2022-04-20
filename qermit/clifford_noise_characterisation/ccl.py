@@ -14,11 +14,11 @@
 
 
 from pytket import OpType, Circuit
-from pytket.passes import RebaseUFR, DecomposeBoxes  # type: ignore
+from pytket.passes import DecomposeBoxes  # type: ignore
 from pytket.backends import Backend
-from pytket.utils import QubitPauliOperator
+from pytket.utils import QubitPauliOperator, get_operator_expectation_value
 from typing import List, Tuple
-import copy
+from copy import copy
 from qermit import (
     MitEx,
     ObservableTracker,
@@ -29,10 +29,21 @@ from qermit import (
     TaskGraph,
 )
 from qermit.taskgraph import gen_compiled_MitRes
-from .cdr_post import cdr_calibration_task_gen, cdr_correction_task_gen, _PolyCDRCorrect
+from .cdr_post import (
+    cdr_calibration_task_gen,
+    cdr_correction_task_gen,
+    _PolyCDRCorrect,
+    cdr_quality_check_task_gen,
+)
 import numpy as np
 import random
 from enum import Enum
+import warnings
+from pytket.passes import auto_rebase_pass
+
+
+ufr_gateset = {OpType.CX, OpType.Rz, OpType.H}
+ufr_rebase = auto_rebase_pass(ufr_gateset)
 
 
 class LikelihoodFunction(Enum):
@@ -83,7 +94,7 @@ def sample_weighted_clifford_angle(rz_angle: float, **kwargs) -> float:
             [[np.exp(-0.25 * np.pi * n * 1j), 0], [0, np.exp(0.25 * np.pi * n * 1j)]]
         )
         d = np.linalg.norm(rz_angle_matrix - sn_matrix)
-        weights.append(np.exp((-(d ** 2)) * 4))
+        weights.append(np.exp((-(d**2)) * 4))
     return 0.5 * random.choices(range(4), weights)[0]
 
 
@@ -131,12 +142,12 @@ def gen_state_circuits(
 
     # Work in CX, H, Rz basis for ease
     DecomposeBoxes().apply(c)
-    RebaseUFR().apply(c)
+    ufr_rebase.apply(c)
     c.flatten_registers()
     all_coms = c.get_commands()
 
     #  angles that make Clifford gates for S^n
-    clifford_angles = set({0.5, 1.0, 1.5, 0})
+    clifford_angles = set({0, 0.5, 1.0, 1.5, 2, 2.5, 3, 3.5})
 
     if n_pairs > n_non_cliffords:
         raise ValueError(
@@ -170,6 +181,9 @@ def gen_state_circuits(
                 # Measure gate has special case, but can assume 1 qubit to 1 bit
                 elif com.op.type is OpType.Measure:
                     new_circuit.Measure(com.qubits[0], com.bits[0])
+                # A special case for Barrier metaop
+                elif com.op.type == OpType.Barrier:
+                    new_circuit.add_barrier(com.args)
                 # CX or H gate, add as is
                 else:
                     new_circuit.add_gate(com.op.type, com.qubits)
@@ -184,7 +198,7 @@ def gen_state_circuits(
     n_pairs = min(n_cliffords, n_non_cliffords, n_pairs)
 
     # non_cliffords are indices for gates to be left non Clifford
-    non_cliffords = np.random.choice(list(rz_ops), n_non_cliffords)
+    non_cliffords = np.random.choice(list(rz_ops), n_non_cliffords, replace=False)
 
     # rz_ops then only contains rz gates in c to be substituted for Clifford angles
     rz_ops.difference_update(non_cliffords)
@@ -233,6 +247,9 @@ def gen_state_circuits(
             # Measure gate has special case, but can assume 1 qubit to 1 bit
             elif com.op.type is OpType.Measure:
                 new_circuit.Measure(com.qubits[0], com.bits[0])
+            # A special case for Barrier metaop
+            elif com.op.type == OpType.Barrier:
+                new_circuit.add_barrier(com.args)
             # CX or H gate, add as is
             else:
                 new_circuit.add_gate(com.op.type, com.qubits)
@@ -244,7 +261,12 @@ def gen_state_circuits(
 
 
 def ccl_state_task_gen(
-    n_non_cliffords: int, n_pairs: int, total_state_circuits: int
+    n_non_cliffords: int,
+    n_pairs: int,
+    total_state_circuits: int,
+    simulator_backend: Backend,
+    tolerance: float,
+    max_state_circuits_attempts: int,
 ) -> MitTask:
     """
     Returns a MitTask object for which given some set of experiments,
@@ -258,6 +280,18 @@ def ccl_state_task_gen(
     :type n_pairs:
     :param total_state_circuits: Number of state circuits prepared for characterisation.
     :type total_state_circuits: int
+    :param tolerance: Model can be perturbed when calibration circuits have by
+        exact expectation values too close to each other. This parameter
+        sets a distance between exact expectation values which at least some
+        calibration circuits should have.
+    :type tolerance: float
+    :param simulator_backend: Backend object simulated characterisation experiments are
+        default run through.
+    :type simulator_backend: Backend
+    :param max_state_circuits_attempts: The maximum number of times to attempt to generate a
+        list of calibrations circuit with significantly different expectation
+        values, before resorting to a list with similar expectation values.
+    :type max_state_circuits_attempts: int
 
     :return: MitTask object for preparing and returning state circuits for characterisation.
     :rtype: MitTask
@@ -290,12 +324,36 @@ def ccl_state_task_gen(
             # generate all state circuits
             c_copy = ansatz_circuit.Circuit.copy()
             c_copy.symbol_substitution(ansatz_circuit.SymbolsDict._symbolic_map)
-            state_circuits = gen_state_circuits(
-                c_copy,
-                n_non_cliffords,
-                n_pairs,
-                total_state_circuits,
-            )
+
+            all_close = True
+            attempt = 0
+            while all_close and attempt < max_state_circuits_attempts:
+
+                state_circuits = gen_state_circuits(
+                    c_copy,
+                    n_non_cliffords,
+                    n_pairs,
+                    total_state_circuits,
+                )
+
+                pauli_expectation_list = [
+                    get_operator_expectation_value(
+                        c, qubit_pauli_operator, simulator_backend
+                    )
+                    for c in state_circuits
+                ]
+                all_close = all(
+                    abs(pauli_expectation - pauli_expectation_list[0]) <= tolerance
+                    for pauli_expectation in pauli_expectation_list
+                )
+
+                attempt += 1
+
+            if all_close:
+                warnings.warn(
+                    "Clifford Data Regression performs best when the exact expectation values of all calibration circuits are not the same. However, the generated calibration circuits have similar exact expectation values. Fit of the extrapolation function may be poor as a result."
+                )
+
             # for each state circuit, create a new wire of for each state circuit
             # one for simulator, one for device
             for c in state_circuits:
@@ -304,25 +362,23 @@ def ccl_state_task_gen(
                         Circuit=c, Shots=shots, SymbolsDict=SymbolsDict()
                     ),
                     ObservableTracker=ObservableTracker(
-                        copy.copy(qubit_pauli_operator)
-                    ),
+                        copy(qubit_pauli_operator)
+                    ),  # no copy means changes to one QubitPauliOperator can be made to all
                 )
                 wire_device = ObservableExperiment(
                     AnsatzCircuit=AnsatzCircuit(
                         Circuit=c.copy(),
-                        Shots=copy.copy(shots),
+                        Shots=copy(shots),
                         SymbolsDict=SymbolsDict(),
                     ),
-                    ObservableTracker=ObservableTracker(
-                        copy.copy(qubit_pauli_operator)
-                    ),
+                    ObservableTracker=ObservableTracker(copy(qubit_pauli_operator)),
                 )
                 simulator_wires.append(wire_sim)
                 device_wires.append(wire_device)
         return (experiment_wires, simulator_wires, device_wires)
 
     return MitTask(
-        _label="CCL_State_Circuits",
+        _label="CCLStateCircuits",
         _n_in_wires=1,
         _n_out_wires=3,
         _method=task,
@@ -460,33 +516,42 @@ def gen_CDR_MitEx(
     :key model: Model characterised by state circuits, default _PolyCDRCorrect(1) (see cdr_post.py for other options).
     :key likelihood_function: LikelihoodFunction used to filter state circuit results, given by a LikelihoodFunction Enum,
         default set to none.
+    :key tolerance: Model can be perturbed when calibration circuits have by
+        exact expectation values too close to each other. This parameter
+        sets a distance between exact expectation values which at least some
+        calibration circuits should have.
+    :key distance_tolerance: The absolute tolerance on the distance between
+        expectation values of the calibration and original circuit.
+    :key calibration_fraction: The upper bound on the fraction of calibration
+        circuits which have noisy expectation values far from that of the
+        original circuit.
     """
-    _states_sim_mitex = copy.copy(
+    _states_sim_mitex = copy(
         kwargs.get(
             "states_simluator_mitex",
             MitEx(
                 simulator_backend,
-                _label="StatesSimMitex",
+                _label="StatesSimMitEx",
                 mitres=gen_compiled_MitRes(simulator_backend, 0),
             ),
         )
     )
-    _states_device_mitex = copy.copy(
+    _states_device_mitex = copy(
         kwargs.get(
             "states_device_mitex",
             MitEx(
                 device_backend,
-                _label="StatesDeviceMitex",
+                _label="StatesDeviceMitEx",
                 mitres=gen_compiled_MitRes(device_backend, 0),
             ),
         )
     )
-    _experiment_mitex = copy.copy(
+    _experiment_mitex = copy(
         kwargs.get(
             "experiment_mitex",
             MitEx(
                 device_backend,
-                _label="ExperimentMitex",
+                _label="ExperimentMitEx",
                 mitres=gen_compiled_MitRes(device_backend, 0),
             ),
         )
@@ -497,20 +562,41 @@ def gen_CDR_MitEx(
     _states_sim_taskgraph.append(ccl_result_batching_task_gen(total_state_circuits))
 
     likelihood_function = kwargs.get("likelihood_function", LikelihoodFunction.none)
-    _states_sim_taskgraph.append(ccl_likelihood_filtering_task_gen(likelihood_function))
-    _states_sim_taskgraph.append(
-        cdr_calibration_task_gen(
-            device_backend,
-            kwargs.get("model", _PolyCDRCorrect(1)),
-            kwargs.get("tolerance", 0.01),
-        )
-    )
 
     _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
     _experiment_taskgraph.parallel(_states_sim_taskgraph)
-    _experiment_taskgraph.prepend(
-        ccl_state_task_gen(n_non_cliffords, n_pairs, total_state_circuits)
+
+    _post_calibrate_task_graph = TaskGraph(_label="FitCalibrate")
+    _post_calibrate_task_graph.append(
+        ccl_likelihood_filtering_task_gen(likelihood_function)
     )
+    _post_calibrate_task_graph.append(
+        cdr_calibration_task_gen(
+            device_backend,
+            kwargs.get("model", _PolyCDRCorrect(1)),
+        )
+    )
+
+    _post_task_graph = TaskGraph(_label="QualityCheckCorrect")
+    _post_task_graph.parallel(_post_calibrate_task_graph)
+    _post_task_graph.prepend(
+        cdr_quality_check_task_gen(
+            distance_tolerance=kwargs.get("distance_tolerance", 0.1),
+            calibration_fraction=kwargs.get("calibration_fraction", 0.5),
+        )
+    )
+
+    _experiment_taskgraph.prepend(
+        ccl_state_task_gen(
+            n_non_cliffords,
+            n_pairs,
+            total_state_circuits,
+            simulator_backend=simulator_backend,
+            tolerance=kwargs.get("tolerance", 0.01),
+            max_state_circuits_attempts=kwargs.get("max_state_circuits_attempts", 10),
+        )
+    )
+    _experiment_taskgraph.append(_post_task_graph)
     _experiment_taskgraph.append(cdr_correction_task_gen(device_backend))
 
     return MitEx(device_backend).from_TaskGraph(_experiment_taskgraph)

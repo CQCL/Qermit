@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pytket.passes import BasePass  # type: ignore
 from pytket.backends import Backend
 from qermit import (
     MitEx,
@@ -22,17 +21,27 @@ from qermit import (
     ObservableExperiment,
     TaskGraph,
 )
-import copy
+from copy import copy
 from pytket.pauli import QubitPauliString  # type: ignore
 from enum import Enum
 import numpy as np
 from scipy.optimize import curve_fit  # type: ignore
 from typing import List, Tuple, cast
-from pytket import Circuit
+from pytket import Circuit, OpType
 from pytket.predicates import CompilationUnit  # type: ignore
 from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial
+
+
+box_types = {
+    OpType.CircBox,
+    OpType.ExpBox,
+    OpType.PauliExpBox,
+    OpType.Unitary1qBox,
+    OpType.Unitary2qBox,
+    OpType.Unitary3qBox,
+}
 
 
 class Folding(Enum):
@@ -70,10 +79,27 @@ class Folding(Enum):
 
             # Add barrier between circuit and its inverse
             folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
-            folded_circ.add_circuit(circ.dagger(), folded_circ.qubits, folded_circ.bits)
 
+            # Add inverse circuit by iterating though commands and inverting them
+            for gate in reversed(circ.get_commands()):
+                if gate.op.type == OpType.Barrier:
+                    folded_circ.add_barrier(gate.args)
+                elif gate.op.type in box_types:
+                    raise RuntimeError("Box types not supported when folding.")
+                else:
+                    folded_circ.add_gate(gate.op.dagger, gate.args)
+
+            # Add barrier between circuit and its inverse
             folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
-            folded_circ.add_circuit(circ, folded_circ.qubits, folded_circ.bits)
+
+            # Add original circuit
+            for gate in circ.get_commands():
+                if gate.op.type == OpType.Barrier:
+                    folded_circ.add_barrier(gate.args)
+                elif gate.op.type in box_types:
+                    raise RuntimeError("Box types not supported when folding.")
+                else:
+                    folded_circ.add_gate(gate.op, gate.args)
 
         return folded_circ
 
@@ -104,11 +130,20 @@ class Folding(Enum):
         c_dict = circ.to_dict()
         num_commands = len(c_dict["commands"])
 
-        # Calculate the number of gates that need to be folded
-        num_additional_commands = (noise_scaling - 1) * num_commands
+        # Count and locate the number of commands that are not barriers
+        c_dict_commands_non_barrier = [
+            (i, command)
+            for (i, command) in enumerate(c_dict["commands"])
+            if command["op"]["type"] != "Barrier"
+        ]
+        num_non_barrier_commands = len(c_dict_commands_non_barrier)
+
+        # Calculate the number of gates that need to be folded. Note that only
+        # non barrier commands should be folded so only these are counted.
+        num_additional_commands = (noise_scaling - 1) * num_non_barrier_commands
         num_folded_commands = int(num_additional_commands // 2)
 
-        true_noise_scaling = 1 + ((num_folded_commands * 2) / num_commands)
+        true_noise_scaling = 1 + ((num_folded_commands * 2) / num_non_barrier_commands)
         # This check isolates the case where the noise folding that can be achieved is different
         # from that requested. While noise_scaling can be any real value, as the gates increase
         # the noise by discrete values, not all folding values are possible.
@@ -120,9 +155,10 @@ class Folding(Enum):
             )
 
         # Choose a random selection of commands to fold. Commands are referenced by their index.
-        # These are chosen with replacement.
+        # These are chosen with replacement. Only non barrier commands should
+        # be folded, and so only the index of those are added here.
         commands_to_fold = np.random.choice(
-            [i for i in range(num_commands)], num_folded_commands
+            [i[0] for i in c_dict_commands_non_barrier], num_folded_commands
         )
         # Calculate how many times each individual command needs to be folded
         num_folds = {i: list(commands_to_fold).count(i) for i in range(num_commands)}
@@ -139,10 +175,14 @@ class Folding(Enum):
             command_circ_dict.update({"commands": [command]})
             command_circ = Circuit().from_dict(command_circ_dict)
 
-            # Find the inverse of the command
-            inverse_command_circ = command_circ.dagger()
-            inverse_command_circ_dict = inverse_command_circ.to_dict()
-            inverse_command = inverse_command_circ_dict["commands"]
+            # Commands which are not to be folded may not be invertible (for
+            # example barriers) and so the inverse is not calculated in that
+            # case.
+            if num_folds[command_index] > 0:
+                # Find the inverse of the command
+                inverse_command_circ = command_circ.dagger()
+                inverse_command_circ_dict = inverse_command_circ.to_dict()
+                inverse_command = inverse_command_circ_dict["commands"]
 
             # Append command and inverse the appropriate number of times.
             folded_command_list.append(command)
@@ -198,7 +238,13 @@ class Folding(Enum):
 
         for command in c_dict["commands"]:
 
-            if fold:
+            # Barriers are added to the circuit but otherwise effectively
+            # skipped.
+            if command["op"]["type"] == "Barrier":
+
+                folded_command_list.append(command)
+
+            elif fold:
                 command_circ_dict.update({"commands": [command]})
                 command_circ = Circuit.from_dict(command_circ_dict)
 
@@ -230,10 +276,12 @@ class Folding(Enum):
                         }
                     )
                     folded_command_list.append(command)
+
+                fold = not fold
             else:
                 folded_command_list.append(command)
 
-            fold = not fold
+                fold = not fold
 
         c_dict.update({"commands": folded_command_list})
         folded_c = Circuit.from_dict(c_dict)
@@ -503,7 +551,6 @@ def plot_fit(
 
 def digital_folding_task_gen(
     backend: Backend,
-    rebase_pass: BasePass,
     noise_scaling: float,
     _folding_type: Folding,
     _allow_approx_fold: bool,
@@ -515,8 +562,6 @@ def digital_folding_task_gen(
     :param backend: This will be used to compile the circuit after folding to ensure
         that the gate set matches those available on the backend.
     :type backend: Backend
-    :param rebase_pass: BasePass to rebase circuits to the native gates of backend
-    :type rebase_pass: BasePass
     :param noise_scaling: The factor by which the noise is increased.
     :type noise_scaling: float
     :param _folding_type: The means by which the noise should be increased.
@@ -557,7 +602,7 @@ def digital_folding_task_gen(
 
             # This compilation pass was added to account for the case that
             # the inverse of a gate is not in the gateset of the backend.
-            rebase_pass.apply(zne_circ)
+            backend.rebase_pass().apply(zne_circ)
 
             folded_circuits.append(
                 ObservableExperiment(
@@ -644,6 +689,32 @@ def extrapolation_task_gen(
     )
 
 
+def copy_mitex_wire(wire: ObservableExperiment) -> ObservableExperiment:
+    """Returns a single copy of the inputted wire
+
+    :param wire: Pair of ansatz circuit and ObservableTracker
+    :type wire: ObservableExperiment
+    :return: single copy of inputted wire
+    :rtype: ObservableExperiment
+    """
+
+    # Copy ansatz circuit
+    new_ansatz_circuit = AnsatzCircuit(
+        Circuit=wire.AnsatzCircuit.Circuit.copy(),
+        Shots=copy(wire.AnsatzCircuit.Shots),
+        SymbolsDict=copy(wire.AnsatzCircuit.SymbolsDict),
+    )
+
+    # copy qps and instantiate new measurement setup
+    new_ot = ObservableTracker(
+        QubitPauliOperator(copy(wire.ObservableTracker._qubit_pauli_operator._dict))
+    )
+    new_wire = ObservableExperiment(
+        AnsatzCircuit=new_ansatz_circuit, ObservableTracker=new_ot
+    )
+    return new_wire
+
+
 def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
     """Duplicate the inputted experiment wire
 
@@ -669,33 +740,6 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
             raise ValueError(
                 "The number of duplications must be greater than or equal to 1."
             )
-
-        def copy_mitex_wire(wire: ObservableExperiment) -> ObservableExperiment:
-            """Returns a single copy of the inputted wire
-
-            :param wire: Pair of ansatz circuit and ObservableTracker
-            :type wire: ObservableExperiment
-            :return: single copy of inputted wire
-            :rtype: ObservableExperiment
-            """
-
-            # Copy ansatz circuit
-            new_ansatz_circuit = AnsatzCircuit(
-                Circuit=wire.AnsatzCircuit.Circuit.copy(),
-                Shots=copy.copy(wire.AnsatzCircuit.Shots),
-                SymbolsDict=copy.copy(wire.AnsatzCircuit.SymbolsDict),
-            )
-
-            # copy qps and instantiate new measurement setup
-            new_ot = ObservableTracker(
-                QubitPauliOperator(
-                    copy.copy(wire.ObservableTracker._qubit_pauli_operator._dict)
-                )
-            )
-            new_wire = ObservableExperiment(
-                AnsatzCircuit=new_ansatz_circuit, ObservableTracker=new_ot
-            )
-            return new_wire
 
         # Compose coppies into wire format
         if duplicates == 1:
@@ -794,30 +838,26 @@ def gen_initial_compilation_task(
 
 
 # TODO: Backend does not appear as input in documentation
-def gen_ZNE_MitEx(
-    backend: Backend, rebase_pass: BasePass, noise_scaling_list: List[float], **kwargs
-) -> MitEx:
+def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -> MitEx:
     """Generates MitEx object which mitigates for noise using Zero Noise Extrapolation. This is the
     process by which noise is amplified incrementally, and the zero noise case arrived at by
     extrapolating backwards. For further explanantion see https://arxiv.org/abs/2005.10921.
 
     :param backend: Backend on which the circuits are to be run.
     :type backend: Backend
-    :param rebase_pass: BasePass rebasing to the gateset of the backend.
-    :type rebase_pass: BasePass
     :param noise_scaling_list: A list of the amounts by which the noise should be scaled.
     :type noise_scaling_list: List[float]
     :return: MitEx object performing noise mitigation by ZNE.
     :rtype: MitEx
     """
-    _experiment_mitres = copy.copy(
+    _experiment_mitres = copy(
         kwargs.get(
             "experiment_mitres",
             MitRes(backend),
         )
     )
 
-    _experiment_mitex = copy.copy(
+    _experiment_mitex = copy(
         kwargs.get(
             "experiment_mitex",
             MitEx(backend, _label="ExperimentMitex", mitres=_experiment_mitres),
@@ -827,8 +867,8 @@ def gen_ZNE_MitEx(
 
     _optimisation_level = kwargs.get("optimisation_level", 0)
     _show_fit = kwargs.get("show_fit", False)
-    _folding_type = copy.copy(kwargs.get("folding_type", Folding.circuit))
-    _fit_type = copy.copy(kwargs.get("fit_type", Fit.linear))
+    _folding_type = kwargs.get("folding_type", Folding.circuit)
+    _fit_type = kwargs.get("fit_type", Fit.linear)
     _deg = kwargs.get("deg", len(noise_scaling_list) - 1)
     _seed = kwargs.get("seed", None)
     _allow_approx_fold = kwargs.get("allow_approx_fold", True)
@@ -839,14 +879,14 @@ def gen_ZNE_MitEx(
 
         _label = str(fold) + "FoldMitEx"
 
-        _fold_mitres = copy.copy(
+        _fold_mitres = copy(
             kwargs.get(
                 "experiment_mitres",
                 MitRes(backend),
             )
         )
 
-        _fold_mitex = copy.copy(
+        _fold_mitex = copy(
             kwargs.get(
                 "experiment_mitex",
                 MitEx(backend, _label=_label, mitres=_fold_mitres),
@@ -854,7 +894,7 @@ def gen_ZNE_MitEx(
         )
 
         digital_folding_task = digital_folding_task_gen(
-            backend, rebase_pass, fold, _folding_type, _allow_approx_fold
+            backend, fold, _folding_type, _allow_approx_fold
         )
         _fold_mitex.prepend(digital_folding_task)
         _experiment_taskgraph.parallel(_fold_mitex)

@@ -38,6 +38,8 @@ import numpy as np
 from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
 import qiskit.providers.aer.noise as noise
 from pytket.circuit import OpType
+from qiskit import IBMQ  # type: ignore
+import pytest
 
 n_qubits = 2
 
@@ -56,6 +58,11 @@ for node in [i for i in range(n_qubits)]:
     noise_model.add_quantum_error(error_1, ["h", "rx", "u3"], [node])
 
 noisy_backend = AerBackend(noise_model)
+
+from pytket.extensions.qiskit import IBMQEmulatorBackend
+
+skip_remote_tests: bool = not IBMQ.stored_account()
+REASON = "IBMQ account not configured"
 
 
 def test_gen_initial_compilation_task():
@@ -180,6 +187,38 @@ def test_extrapolation_task_gen():
     )
 
 
+@pytest.mark.skipif(skip_remote_tests, reason=REASON)
+def test_folding_compiled_circuit():
+
+    emulator_backend = IBMQEmulatorBackend("ibmq_bogota")
+
+    n_folds_1 = 3
+
+    task_1 = digital_folding_task_gen(
+        emulator_backend,
+        n_folds_1,
+        Folding.circuit,
+        _allow_approx_fold=False,
+    )
+
+    assert task_1.n_in_wires == 1
+    assert task_1.n_out_wires == 1
+
+    c_1 = Circuit(1).Rz(3.5, 0)
+    c_1 = emulator_backend.get_compiled_circuit(c_1)
+
+    ac_1 = AnsatzCircuit(c_1, 10000, {})
+
+    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+
+    experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
+
+    folded_experiment_1 = task_1([[experiment_1]])[0][0]
+    assert OpType.Reset not in [
+        com.op.type for com in folded_experiment_1.AnsatzCircuit.Circuit.get_commands()
+    ]
+
+
 def test_digital_folding_task_gen():
 
     be = AerBackend()
@@ -190,16 +229,22 @@ def test_digital_folding_task_gen():
     n_folds_4 = 2
 
     task_1 = digital_folding_task_gen(
-        be, be._rebase_pass, n_folds_1, Folding.circuit, _allow_approx_fold=False
+        be, n_folds_1, Folding.circuit, _allow_approx_fold=False
     )
     task_2 = digital_folding_task_gen(
-        be, be._rebase_pass, n_folds_2, Folding.gate, _allow_approx_fold=False
+        be, n_folds_2, Folding.gate, _allow_approx_fold=False
     )
     task_3 = digital_folding_task_gen(
-        noisy_backend, noisy_backend._rebase_pass, n_folds_3, Folding.gate, _allow_approx_fold=False
+        noisy_backend,
+        n_folds_3,
+        Folding.gate,
+        _allow_approx_fold=False,
     )
     task_4 = digital_folding_task_gen(
-        noisy_backend, noisy_backend._rebase_pass, n_folds_4, Folding.odd_gate, _allow_approx_fold=False
+        noisy_backend,
+        n_folds_4,
+        Folding.odd_gate,
+        _allow_approx_fold=False,
     )
 
     assert task_1.n_in_wires == 1
@@ -215,11 +260,13 @@ def test_digital_folding_task_gen():
     c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
     c_3 = Circuit(2).CX(0, 1).H(0).Rx(0.3, 1).Rz(0.6, 1)
     c_4 = Circuit(2).CX(0, 1).H(0).Rz(0.3, 1)
+    c_5 = Circuit(2).H(0).add_barrier([0, 1]).CX(0, 1)
 
     ac_1 = AnsatzCircuit(c_1, 10000, {})
     ac_2 = AnsatzCircuit(c_2, 10000, {})
     ac_3 = AnsatzCircuit(c_3, 10000, {})
     ac_4 = AnsatzCircuit(c_4, 10000, {})
+    ac_5 = AnsatzCircuit(c_5, 10000, {})
 
     qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
     qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
@@ -232,22 +279,32 @@ def test_digital_folding_task_gen():
     experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_2))
     experiment_3 = ObservableExperiment(ac_3, ObservableTracker(qpo_3))
     experiment_4 = ObservableExperiment(ac_4, ObservableTracker(qpo_4))
+    experiment_5 = ObservableExperiment(ac_5, ObservableTracker(qpo_3))
 
     folded_experiment_1 = task_1([[experiment_1]])[0][0]
     folded_experiment_2 = task_2([[experiment_2]])[0][0]
     folded_experiment_3 = task_3([[experiment_3]])[0][0]
     folded_experiment_4 = task_4([[experiment_4]])[0][0]
+    folded_experiment_5 = task_1([[experiment_5]])[0][0]
+    folded_experiment_6 = task_2([[experiment_5]])[0][0]
+    folded_experiment_7 = task_4([[experiment_5]])[0][0]
 
     folded_c_1 = folded_experiment_1[0][0]
     folded_c_2 = folded_experiment_2[0][0]
     folded_c_3 = folded_experiment_3[0][0]
     folded_c_4 = folded_experiment_4[0][0]
+    folded_c_5 = folded_experiment_5[0][0]
+    folded_c_6 = folded_experiment_6[0][0]
+    folded_c_7 = folded_experiment_7[0][0]
 
     # TODO: Add a backend with a more restricted gateset
     assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_1)
     assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_2)
     assert GateSetPredicate(noisy_backend.backend_info.gate_set).verify(folded_c_3)
     assert GateSetPredicate(noisy_backend.backend_info.gate_set).verify(folded_c_4)
+    assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_5)
+    assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_6)
+    assert GateSetPredicate(noisy_backend.backend_info.gate_set).verify(folded_c_7)
 
     # Checks that the number of gates has been increased correctly.
     # Note that in both cases barriers are added. This is why there is the
@@ -255,28 +312,51 @@ def test_digital_folding_task_gen():
     assert folded_c_1.n_gates == c_1.n_gates * n_folds_1 + n_folds_1 - 1
     assert folded_c_2.n_gates == c_2.n_gates * n_folds_2 + c_2.n_gates * (n_folds_2 - 1)
     assert folded_c_3.n_gates == c_3.n_gates * n_folds_3 + c_3.n_gates * (n_folds_3 - 1)
-    assert folded_c_4.n_gates == c_4.n_gates + n_folds_4 * (2 * (c_4.n_gates + 1) // 2)
+    assert folded_c_4.n_gates == c_4.n_gates + n_folds_4 * 2 * ((c_4.n_gates + 1) // 2)
+    assert folded_c_5.n_gates == c_5.n_gates * n_folds_1 + n_folds_1 - 1
+    assert folded_c_6.n_gates == (
+        c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)
+    ) * n_folds_2 + (c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)) * (
+        n_folds_2 - 1
+    ) + c_5.n_gates_of_type(
+        OpType.Barrier
+    )
+    assert folded_c_7.n_gates == c_5.n_gates + n_folds_4 * 2 * (
+        ((c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)) + 1) // 2
+    )
 
     c_1_unitary = c_1.get_unitary()
     c_2_unitary = c_2.get_unitary()
     c_3_unitary = c_3.get_unitary()
     c_4_unitary = c_4.get_unitary()
+    c_5_unitary = c_5.get_unitary()
     folded_c_1_unitary = folded_c_1.get_unitary()
     folded_c_2_unitary = folded_c_2.get_unitary()
     folded_c_3_unitary = folded_c_3.get_unitary()
     folded_c_4_unitary = folded_c_4.get_unitary()
+    folded_c_5_unitary = folded_c_5.get_unitary()
+    folded_c_6_unitary = folded_c_6.get_unitary()
+    folded_c_7_unitary = folded_c_7.get_unitary()
 
     assert np.allclose(c_1_unitary, folded_c_1_unitary)
     assert np.allclose(c_2_unitary, folded_c_2_unitary)
     assert np.allclose(c_3_unitary, folded_c_3_unitary)
     assert np.allclose(c_4_unitary, folded_c_4_unitary)
+    assert np.allclose(c_5_unitary, folded_c_5_unitary)
+    assert np.allclose(c_5_unitary, folded_c_6_unitary)
+    assert np.allclose(c_5_unitary, folded_c_7_unitary)
 
 
 def test_zne_identity():
 
     backend = AerBackend()
 
-    me = gen_ZNE_MitEx(backend, backend._rebase_pass, [7, 5, 3], _label="TestZNEMitEx", optimisation_level=0)
+    me = gen_ZNE_MitEx(
+        backend,
+        [7, 5, 3],
+        _label="TestZNEMitEx",
+        optimisation_level=0,
+    )
 
     c = Circuit(3)
     for _ in range(10):
@@ -298,7 +378,6 @@ def test_simple_run_end_to_end():
 
     me = gen_ZNE_MitEx(
         be,
-        be._rebase_pass,
         [2, 3, 4],
         _label="TestZNEMitEx",
         optimisation_level=0,

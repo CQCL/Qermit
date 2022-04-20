@@ -1,78 +1,38 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>qermit.zero_noise_extrapolation &mdash; qermit 0.1.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="qermit.probabilistic_error_cancellation" href="probabilistic_error_cancellation.html" />
     <link rel="prev" title="qermit.clifford_noise_characterisation" href="clifford_noise_characterisation.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> qermit
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
                 0.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -80,19 +40,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">API Reference:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="taskgraph.html">qermit.taskgraph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mitres.html">qermit.mitres</a></li>
@@ -107,76 +56,35 @@
 <li class="toctree-l1"><a class="reference internal" href="probabilistic_error_cancellation.html">qermit.probabilistic_error_cancellation</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">qermit</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>qermit.zero_noise_extrapolation</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/zero_noise_extrapolation.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="qermit-zero-noise-extrapolation">
-<h1>qermit.zero_noise_extrapolation<a class="headerlink" href="#qermit-zero-noise-extrapolation" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="qermit-zero-noise-extrapolation">
+<h1>qermit.zero_noise_extrapolation<a class="headerlink" href="#qermit-zero-noise-extrapolation" title="Permalink to this headline"></a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.gen_ZNE_MitEx">
-<span class="sig-prename descclassname"><span class="pre">zne.</span></span><span class="sig-name descname"><span class="pre">gen_ZNE_MitEx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rebase_pass</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.passes.BasePass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_scaling_list</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx"><span class="pre">qermit.taskgraph.mitex.MitEx</span></a><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.gen_ZNE_MitEx" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">zne.</span></span><span class="sig-name descname"><span class="pre">gen_ZNE_MitEx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_scaling_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx"><span class="pre">qermit.taskgraph.mitex.MitEx</span></a></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.gen_ZNE_MitEx" title="Permalink to this definition"></a></dt>
 <dd><p>Generates MitEx object which mitigates for noise using Zero Noise Extrapolation. This is the
 process by which noise is amplified incrementally, and the zero noise case arrived at by
 extrapolating backwards. For further explanantion see <a class="reference external" href="https://arxiv.org/abs/2005.10921">https://arxiv.org/abs/2005.10921</a>.</p>
@@ -184,7 +92,6 @@ extrapolating backwards. For further explanantion see <a class="reference extern
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>backend</strong> (<em>Backend</em>) – Backend on which the circuits are to be run.</p></li>
-<li><p><strong>rebase_pass</strong> (<em>BasePass</em>) – BasePass rebasing to the gateset of the backend.</p></li>
 <li><p><strong>noise_scaling_list</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – A list of the amounts by which the noise should be scaled.</p></li>
 </ul>
 </dd>
@@ -199,7 +106,7 @@ extrapolating backwards. For further explanantion see <a class="reference extern
 
 <dl class="py class">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.Folding">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qermit.zero_noise_extrapolation.zne.</span></span><span class="sig-name descname"><span class="pre">Folding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Folding" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qermit.zero_noise_extrapolation.zne.</span></span><span class="sig-name descname"><span class="pre">Folding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Folding" title="Permalink to this definition"></a></dt>
 <dd><p>Folding techniques used to increase the noise levels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -212,7 +119,7 @@ circuit has not changed.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.Folding.circuit">
-<span class="sig-name descname"><span class="pre">circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_scaling</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pytket._tket.circuit.Circuit</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Folding.circuit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_scaling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pytket._tket.circuit.Circuit</span></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Folding.circuit" title="Permalink to this definition"></a></dt>
 <dd><p>Noise scaling by circuit folding. In this case the folded circuit is of
 the form <span class="math notranslate nohighlight">\(CC^{-1}CC^{-1}...C\)</span> where <span class="math notranslate nohighlight">\(C\)</span> is the original circuit. As such noise may be scaled by
 odd integers. The Unitary implemented is unchanged by this process.</p>
@@ -237,7 +144,7 @@ odd integers. The Unitary implemented is unchanged by this process.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.Folding.gate">
-<span class="sig-name descname"><span class="pre">gate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_scaling</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pytket._tket.circuit.Circuit</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Folding.gate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">gate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_scaling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pytket._tket.circuit.Circuit</span></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Folding.gate" title="Permalink to this definition"></a></dt>
 <dd><p>Noise scaling by gate folding. In this case gates <span class="math notranslate nohighlight">\(G\)</span> are replaced at random
 with <span class="math notranslate nohighlight">\(GG^{-1}G\)</span> until the number of gates is sufficiently scaled.</p>
 <dl class="field-list simple">
@@ -269,7 +176,7 @@ avoided by appropriately setting _allow_approx_fold.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.Folding.odd_gate">
-<span class="sig-name descname"><span class="pre">odd_gate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_scaling</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pytket._tket.circuit.Circuit</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Folding.odd_gate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">odd_gate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_scaling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pytket._tket.circuit.Circuit</span></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Folding.odd_gate" title="Permalink to this definition"></a></dt>
 <dd><p>Noise scaling by gate folding. In this case odd gates <span class="math notranslate nohighlight">\(G\)</span> are
 replaced <span class="math notranslate nohighlight">\(GG^{-1}G\)</span> until the number of gates is sufficiently
 scaled.</p>
@@ -293,7 +200,7 @@ scaled.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.Fit">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qermit.zero_noise_extrapolation.zne.</span></span><span class="sig-name descname"><span class="pre">Fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qermit.zero_noise_extrapolation.zne.</span></span><span class="sig-name descname"><span class="pre">Fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit" title="Permalink to this definition"></a></dt>
 <dd><p>Functions to fit to expectation values as they change with noise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -305,7 +212,7 @@ scaled.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.Fit.cube_root">
-<span class="sig-name descname"><span class="pre">cube_root</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">float</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit.cube_root" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">cube_root</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit.cube_root" title="Permalink to this definition"></a></dt>
 <dd><p>Fit data to a cube root function. This is to say a function of the form <span class="math notranslate nohighlight">\(a + b(x+c)^{1/3}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -326,7 +233,7 @@ scaled.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.Fit.exponential">
-<span class="sig-name descname"><span class="pre">exponential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">float</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit.exponential" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">exponential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit.exponential" title="Permalink to this definition"></a></dt>
 <dd><p>Fit data to an exponential function. This is to say a function of the form <span class="math notranslate nohighlight">\(a+e^{(b+x)}\)</span>.
 Note that this is a special case of the poly-exponential function.</p>
 <dl class="field-list simple">
@@ -348,7 +255,7 @@ Note that this is a special case of the poly-exponential function.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.Fit.linear">
-<span class="sig-name descname"><span class="pre">linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">float</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit.linear" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit.linear" title="Permalink to this definition"></a></dt>
 <dd><p>Fit data to a linear function. This is to say a function of the form <span class="math notranslate nohighlight">\(ax+b\)</span>.
 Note that this is a special case of the polynomial fitting function.</p>
 <dl class="field-list simple">
@@ -370,7 +277,7 @@ Note that this is a special case of the polynomial fitting function.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.Fit.poly_exponential">
-<span class="sig-name descname"><span class="pre">poly_exponential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">float</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit.poly_exponential" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">poly_exponential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit.poly_exponential" title="Permalink to this definition"></a></dt>
 <dd><p>Fit data to a poly-exponential, which is to say a function of the
 form <span class="math notranslate nohighlight">\(a+e^{z}\)</span>, where <span class="math notranslate nohighlight">\(z\)</span> is a polynomial.</p>
 <dl class="field-list simple">
@@ -398,7 +305,7 @@ poly-exponential function of the specified degree.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.Fit.polynomial">
-<span class="sig-name descname"><span class="pre">polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">float</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit.polynomial" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit.polynomial" title="Permalink to this definition"></a></dt>
 <dd><p>Fit data to a polynomial function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -425,7 +332,7 @@ function of the specified degree.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.Fit.richardson">
-<span class="sig-name descname"><span class="pre">richardson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">float</span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit.richardson" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">richardson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Fit.richardson" title="Permalink to this definition"></a></dt>
 <dd><p>Use richardson extrapolation. This amounts to fitting to a polynomial of
 degree one less than the number of data points.</p>
 <dl class="field-list simple">
@@ -449,7 +356,7 @@ degree one less than the number of data points.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.digital_folding_task_gen">
-<span class="sig-prename descclassname"><span class="pre">zne.</span></span><span class="sig-name descname"><span class="pre">digital_folding_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rebase_pass</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pytket._tket.passes.BasePass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_scaling</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_folding_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#qermit.zero_noise_extrapolation.zne.Folding" title="qermit.zero_noise_extrapolation.zne.Folding"><span class="pre">qermit.zero_noise_extrapolation.zne.Folding</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">_allow_approx_fold</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.digital_folding_task_gen" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">zne.</span></span><span class="sig-name descname"><span class="pre">digital_folding_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_scaling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_folding_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qermit.zero_noise_extrapolation.zne.Folding" title="qermit.zero_noise_extrapolation.zne.Folding"><span class="pre">qermit.zero_noise_extrapolation.zne.Folding</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">_allow_approx_fold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.digital_folding_task_gen" title="Permalink to this definition"></a></dt>
 <dd><p>Generates task transforming a circuit in order to amplify the noise. The noise
 is increased by a factor noise_scaling using the inputted folding method.</p>
 <dl class="field-list simple">
@@ -457,7 +364,6 @@ is increased by a factor noise_scaling using the inputted folding method.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>backend</strong> (<em>Backend</em>) – This will be used to compile the circuit after folding to ensure
 that the gate set matches those available on the backend.</p></li>
-<li><p><strong>rebase_pass</strong> (<em>BasePass</em>) – BasePass to rebase circuits to the native gates of backend</p></li>
 <li><p><strong>noise_scaling</strong> (<em>float</em>) – The factor by which the noise is increased.</p></li>
 <li><p><strong>_folding_type</strong> (<a class="reference internal" href="#qermit.zero_noise_extrapolation.zne.Folding" title="qermit.zero_noise_extrapolation.zne.Folding"><em>Folding</em></a>) – The means by which the noise should be increased.</p></li>
 <li><p><strong>_allow_approx_fold</strong> (<em>bool</em>) – Allows for the noise to be increased by an amount close to that requested, as
@@ -472,7 +378,7 @@ amounts by which the noise can be increased (i.e. the discrete amount by which o
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.extrapolation_task_gen">
-<span class="sig-prename descclassname"><span class="pre">zne.</span></span><span class="sig-name descname"><span class="pre">extrapolation_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_fit_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#qermit.zero_noise_extrapolation.zne.Fit" title="qermit.zero_noise_extrapolation.zne.Fit"><span class="pre">qermit.zero_noise_extrapolation.zne.Fit</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.extrapolation_task_gen" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">zne.</span></span><span class="sig-name descname"><span class="pre">extrapolation_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_fit_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qermit.zero_noise_extrapolation.zne.Fit" title="qermit.zero_noise_extrapolation.zne.Fit"><span class="pre">qermit.zero_noise_extrapolation.zne.Fit</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">_show_fit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.extrapolation_task_gen" title="Permalink to this definition"></a></dt>
 <dd><p>Generates task extrapolating to the zero noise limit using results from many folded circuits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -486,54 +392,37 @@ amounts by which the noise can be increased (i.e. the discrete amount by which o
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="probabilistic_error_cancellation.html" class="btn btn-neutral float-right" title="qermit.probabilistic_error_cancellation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="clifford_noise_characterisation.html" class="btn btn-neutral float-left" title="qermit.clifford_noise_characterisation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="probabilistic_error_cancellation.html" class="btn btn-neutral float-right" title="qermit.probabilistic_error_cancellation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Cambridge Quantum Computing Ltd.
-
-    </p>
+    <p>&#169; Copyright 2021, Cambridge Quantum Computing Ltd.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -7,6 +7,8 @@ qermit.mitex
     :members:
 
 .. automethod:: qermit.taskgraph.mitex.gen_compiled_MitRes
+
+.. automethod:: qermit.taskgraph.mitex.gen_compiled_shot_split_MitRes
     
 .. automethod:: qermit.taskgraph.mitex.get_basic_measurement_circuit
 

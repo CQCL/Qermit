@@ -21,7 +21,7 @@ from .mittask import (
 import networkx as nx  # type: ignore
 import graphviz as gv  # type: ignore
 from typing import List, Union, Tuple, cast
-import copy
+from copy import copy, deepcopy
 from tempfile import NamedTemporaryFile
 
 
@@ -63,7 +63,7 @@ class TaskGraph:
         :return: Copied TaskGraph
         :rtype: TaskGraph
         """
-        self._task_graph = copy.deepcopy(task_graph._task_graph)
+        self._task_graph = deepcopy(task_graph._task_graph)
         self._label = task_graph._label
         return self
 
@@ -166,7 +166,11 @@ class TaskGraph:
         :type task: MitTask
         """
         assert self.check_prepend_wires(task)
-        task_copy = copy.copy(task)
+        # It's possible a single generated MitTask object could be used in different TaskGraph objects
+        # via prepend which may lead to a task address expecting input wires from different graphs
+        # use of copy here prevents this and task graph generation is not the bottleneck in running mitigation
+        # schemes so fine
+        task_copy = copy(task)
 
         for i, edge in enumerate(list(self._task_graph.out_edges(self._i, keys=True))):
             self._task_graph.add_edge(
@@ -187,7 +191,11 @@ class TaskGraph:
         :type task: MitTask
         """
         assert self.check_append_wires(task)
-        task_copy = copy.copy(task)
+        # It's possible a single generated MitTask object could be used in different TaskGraph objects
+        # via append which may lead to a task address expecting input wires from different graphs
+        # use of copy here prevents this and task graph generation is not the bottleneck in running mitigation
+        # schemes so fine
+        task_copy = copy(task)
         for edge in list(self._task_graph.in_edges(self._o, keys=True)):
             self._task_graph.add_edge(edge[0], task_copy, key=edge[2], data=None)
 
@@ -290,23 +298,6 @@ class TaskGraph:
                     check_for_decompose = True
                     break
 
-    # eat, yum,
-    def sandwich(
-        self,
-        prepend_task: Union[MitTask, "TaskGraph"],
-        append_task: Union[MitTask, "TaskGraph"],
-    ):
-        """
-        Does TaskGraph.prepend(prepend_task) and TaskGraph.append(append_task). Archaic but delicious.
-
-        :param prepend_task: New task to be prepended.
-        :type prepend_task: MitTask
-        :param append_task: New task to be appended.
-        :type append_task: MitTask
-        """
-        self.prepend(prepend_task)
-        self.append(append_task)
-
     def parallel(self, task: Union[MitTask, "TaskGraph"]):
         """
         Adds new MitTask/TaskGraph to TaskGraph object in parallel. All task in edges wired as out edges from Input vertex. All task out_Edges wired as in edges to Output Vertex.
@@ -314,7 +305,7 @@ class TaskGraph:
         :param task: New task to be added in parallel.
         :type task: MitTask
         """
-        task = copy.copy(task)
+        task = copy(task)
         base_n_input_outs = len(self._task_graph.out_edges(self._i))
         for port in range(task.n_in_wires):
             self._task_graph.add_edge(
@@ -361,23 +352,27 @@ class TaskGraph:
         ):
             edge[2]["data"] = wire
 
-        # TODO Parallelism an option here, async an option for doing so.
+        # topological_sort fixes any dependency issues so can iterate and assume
+        # input wires all realised before a task is reached
         node_list = list(nx.topological_sort(self._task_graph))
 
         self._cache = []
 
         for task in node_list:
+            # nothing to process
             if task in (self._i, self._o):
                 continue
+            # get all input data and store on inputs for task
             in_edges = self._task_graph.in_edges(task, data=True, keys=True)
             inputs = [None] * len(in_edges)
             for _, _, ports, i_data in in_edges:
                 assert i_data["data"] is not None
                 inputs[ports[1]] = i_data["data"]
-            out_edges = self._task_graph.out_edges(task, data=True, keys=True)
-
+            # run held task
             outputs = task(inputs)
             self._cache.append((task._label, task, outputs))
+            # assign outputs ot out_edges of task
+            out_edges = self._task_graph.out_edges(task, data=True, keys=True)
             assert len(out_edges) == len(outputs)
             for _, _, ports, o_data in out_edges:
                 o_data["data"] = outputs[ports[0]]

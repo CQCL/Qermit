@@ -60,7 +60,7 @@ def count_rzs(circuit):
 
 def test_gen_state_circuits():
     # create dummy test circuit
-    c = Circuit(4).Rz(0.9, 3).Rz(0.63, 1).Rx(0.2, 0).Rx(0.1, 2)
+    c = Circuit(4).Rz(0.9, 3).Rz(0.63, 1).Rx(0.2, 0).Rx(0.1, 2).Rz(3, 1)
     state_circuits0 = gen_state_circuits(
         c, n_non_cliffords=1, n_pairs=1, total_state_circuits=3, seed=197
     )
@@ -73,24 +73,24 @@ def test_gen_state_circuits():
     # manually assert angles of gates are expected for given state circuits for given seed
     # state circuit 0
     assert s_0_coms[5].op.params == [0.63]
-    assert s_0_coms[7].op.params == [1.0]
+    assert s_0_coms[7].op.params == [0.0]
     assert s_0_coms[8].op.params == [0.0]
     assert s_0_coms[10].op.params == [0.5]
     # state circuit 1
     assert s_1_coms[5].op.params == [2.0]
-    assert s_1_coms[7].op.params == [0.5]
+    assert s_1_coms[7].op.params == [0.0]
     assert s_1_coms[8].op.params == [0.0]
     assert s_1_coms[10].op.params == [0.1]
     # state circuit 2
     assert s_2_coms[5].op.params == [2.0]
-    assert s_2_coms[7].op.params == [1.0]
-    assert s_2_coms[8].op.params == [0.2]
+    assert s_2_coms[7].op.params == [0.9]
+    assert s_2_coms[8].op.params == [0.0]
     assert s_2_coms[10].op.params == [0.5]
 
     rz_counts_0 = count_rzs(state_circuits0[0])
     # 0th element number of rz cliffs, 1st element number of rz non cliffs
     assert rz_counts_0[0] == 3
-    assert rz_counts_0[1] == 1
+    assert rz_counts_0[1] == 2
 
     state_circuits1 = gen_state_circuits(
         c, n_non_cliffords=2, n_pairs=2, total_state_circuits=2, seed=197
@@ -98,9 +98,9 @@ def test_gen_state_circuits():
     rz_counts_10 = count_rzs(state_circuits1[0])
     rz_counts_11 = count_rzs(state_circuits1[1])
     assert rz_counts_10[0] == 2
-    assert rz_counts_10[1] == 2
+    assert rz_counts_10[1] == 3
     assert rz_counts_11[0] == 2
-    assert rz_counts_11[1] == 2
+    assert rz_counts_11[1] == 3
 
     big_c = Circuit(10)
     for _ in range(10):
@@ -140,13 +140,16 @@ def test_ccl_state_task_gen():
         n_non_cliffords=num_non_cliffs,
         n_pairs=2,
         total_state_circuits=tot_state_circuits,
+        simulator_backend=AerBackend(),
+        tolerance=0.01,
+        max_state_circuits_attempts=10,
     )
     assert task.n_in_wires == 1
     assert task.n_out_wires == 3
 
     c = Circuit(3).Rz(0.63, 1).Rz(0.2, 0).Rz(0.1, 2)
     c.Rz(0.43, 1).Rz(0.5, 0).Rz(0.8, 2)
-    c.Rz(1.23, 1).Rz(1.2, 0).Rz(1.1, 2)
+    c.Rz(1.23, 1).Rz(1.2, 0).add_barrier([0, 1]).Rz(1.1, 2)
     c.Rz(9.63, 1).Rz(8.2, 0).Rz(10.1, 2)
 
     qps_012 = QubitPauliString(
@@ -192,11 +195,18 @@ def test_result_batching_task_gen():
     t1 = ObservableTracker(QubitPauliOperator({qps_01: 0.5}))
     ac1 = AnsatzCircuit(c.copy(), 10, SymbolsDict())
 
+    b = AerBackend()
+
     n_state_circuits = 10
     res = ccl_state_task_gen(
-        n_non_cliffords=2, n_pairs=2, total_state_circuits=n_state_circuits
+        n_non_cliffords=2,
+        n_pairs=2,
+        total_state_circuits=n_state_circuits,
+        simulator_backend=b,
+        tolerance=0.01,
+        max_state_circuits_attempts=10,
     )([[ObservableExperiment(ac0, t0), ObservableExperiment(ac1, t1)]])
-    mitex = MitEx(backend=AerBackend())
+    mitex = MitEx(backend=b)
     qpos_noiseless = mitex.run(res[1])
     qpos_noisy = mitex.run(res[2])
 

@@ -25,14 +25,19 @@ from qermit import (
 from qermit.taskgraph.mitex import backend_compile_circuit_shots_task_gen
 from pytket import Circuit, Bit
 from pytket.transform import Transform  # type: ignore
-import copy
+from copy import copy
 from math import ceil
 from pytket.backends import Backend
 from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 from pytket.tailoring import UniversalFrameRandomisation, PauliFrameRandomisation  # type: ignore
-from pytket.passes import RebaseUFR  # type: ignore
 from enum import Enum
+from pytket import OpType
+from pytket.passes import auto_rebase_pass
+
+
+ufr_gateset = {OpType.CX, OpType.Rz, OpType.H}
+ufr_rebase = auto_rebase_pass(ufr_gateset)
 
 
 class FrameRandomisation(Enum):
@@ -52,7 +57,7 @@ class FrameRandomisation(Enum):
         """
         pfr = PauliFrameRandomisation()
         pfr_shots = ceil(shots / samples)
-        RebaseUFR().apply(circuit)
+        ufr_rebase.apply(circuit)
         Transform.RebaseToCliffordSingles().apply(circuit)
         pfr_circuits = pfr.sample_circuits(circuit, samples)
         return [CircuitShots(Circuit=c, Shots=pfr_shots) for c in pfr_circuits]
@@ -77,7 +82,7 @@ class FrameRandomisation(Enum):
         """
         ufr = UniversalFrameRandomisation()
         ufr_shots = ceil(shots / samples)
-        RebaseUFR().apply(circuit)
+        ufr_rebase.apply(circuit)
         ufr_circuits = ufr.sample_circuits(circuit, samples)
         return [CircuitShots(Circuit=c, Shots=ufr_shots) for c in ufr_circuits]
 
@@ -180,17 +185,17 @@ def gen_Frame_Randomisation_MitRes(backend: Backend, samples: int, **kwargs) -> 
     :key frame_randomisation: FrameRandomisation Enum passed to specify method used.
         Default set to FrameRandomisation.UniversalFrameRandomisation.
     """
-    _mitres = copy.copy(
+    _mitres = copy(
         kwargs.get("mitres", MitRes(backend, _label="FrameRandomisationMitRes"))
     )
-    _fr_type = copy.copy(
+    _fr_type = copy(
         kwargs.get(
             "frame_randomisation", FrameRandomisation.UniversalFrameRandomisation
         )
     )
     _mitres.prepend(backend_compile_circuit_shots_task_gen(backend))
-    _mitres.sandwich(
-        frame_randomisation_circuits_task_gen(samples, _fr_type),
+    _mitres.prepend(frame_randomisation_circuits_task_gen(samples, _fr_type))
+    _mitres.append(
         frame_randomisation_result_task_gen(samples),
     )
     for n in _mitres._task_graph.nodes:

@@ -29,19 +29,21 @@ from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
 
+from sympy.core.expr import Expr
+
 from pytket.passes import RebaseTket, DecomposeBoxes  # type: ignore
 from pytket.utils import QubitPauliOperator, get_pauli_expectation_value
 from pytket.backends import Backend
 from pytket.transform import Transform  # type: ignore
 from pytket.circuit import Op, CircBox, OpType, Circuit, Node  # type: ignore
-from pytket.routing import place_with_map  # type: ignore
+from pytket.placement import place_with_map  # type: ignore
 
 from pytket.pauli import QubitPauliString  # type: ignore
 from pytket.predicates import CliffordCircuitPredicate  # type: ignore
 
 import re
 from typing import List, Tuple, Dict, cast, Union, Any
-import copy
+from copy import copy
 import numpy as np
 
 QuasiProbabilities = List[float]
@@ -111,16 +113,13 @@ def random_commuting_clifford(
     # of iterations is exceeded.
     expect_val = complex(0)
     while round(abs(expect_val)) == 0:
-
         rand_cliff_circ = circ.copy()
 
         # Retrieve a list of random Clifford gates, one for each of
         # the Computing gates in the original circuit. Note this is in the form of a
         # CircBox so that the opgroup labels persist after substitution
         # (they would not do so if circuits were used instead of CircBox)
-        rand_cliff_list = [
-            CircBox(random_clifford_circ(1)) for opgroup in comp_opgroup_list
-        ]
+        rand_cliff_list = [CircBox(random_clifford_circ(1)) for _ in comp_opgroup_list]
         # Replace Computing gates with Clifford gates.
         for opgroup, rand_cliff in zip(comp_opgroup_list, rand_cliff_list):
             rand_cliff_circ.substitute_named(rand_cliff, opgroup)
@@ -144,17 +143,16 @@ def random_commuting_clifford(
 
         new_qps = QubitPauliString(new_qps_qbs, qps_paulis)
 
-        rand_cliff_circ_copy = rand_cliff_circ.copy()
-        place_with_map(rand_cliff_circ_copy, n_q_map)
+        place_with_map(rand_cliff_circ, n_q_map)
 
         # Check if state is supported, otherwise use shots, otherwise raise error
         if simulator_backend.supports_state:
             expect_val = get_pauli_expectation_value(
-                rand_cliff_circ_copy, new_qps, simulator_backend
+                rand_cliff_circ, new_qps, simulator_backend
             )
         elif simulator_backend.supports_shots or simulator_backend.supports_counts:
             expect_val = get_pauli_expectation_value(
-                rand_cliff_circ_copy, new_qps, simulator_backend, n_shots=n_shots
+                rand_cliff_circ, new_qps, simulator_backend, n_shots=n_shots
             )
         else:
             raise RuntimeError(
@@ -373,7 +371,7 @@ def gen_run_with_quasi_prob() -> MitTask:
                 for j, prob in enumerate(circuit_prob[i]):
                     em_expect[qps] += prob * circuit_results[j][qps]
             em_expect_qpo = QubitPauliOperator(
-                cast(Dict[Any, Union[int, float, complex]], em_expect)
+                cast(Dict[Any, Union[int, float, complex, Expr]], em_expect)
             )
             em_expect_list.append(em_expect_qpo)
 
@@ -695,7 +693,7 @@ def label_gates(circ: Circuit) -> Circuit:
     """Label all of the gates in the circuit as with "Frame" or "Computing".
     The label includes an index to describe the ordering of the gates
 
-    :param circ: Circuit which should be in the tk1, CX basis
+    :param circ: Circuit which should be in the TK1, CX basis
     :type circ: Circuit
     :raises RuntimeError: Raised if the circuit is not in the required basis.
     :return: Identical circuit, but with gates assigned opgroups.
@@ -712,7 +710,7 @@ def label_gates(circ: Circuit) -> Circuit:
     frame_count = 0
     for command in command_list:
         labelled_command = command.copy()
-        if labelled_command["op"]["type"] in ("tk1"):
+        if labelled_command["op"]["type"] in ("TK1"):
             labelled_command["opgroup"] = "Computing %i" % comp_count
             comp_count += 1
         elif labelled_command["op"]["type"] in ("CX"):
@@ -720,7 +718,7 @@ def label_gates(circ: Circuit) -> Circuit:
             frame_count += 1
         else:
             raise RuntimeError(
-                'This gate is not one of either "tk1" or "CX". Please ensure you have run PECRebase before using this function.'
+                'This gate is not one of either "TK1" or "CX". Please ensure you have run PECRebase before using this function.'
             )
         labelled_command_list.append(labelled_command)
 
@@ -988,11 +986,10 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
                     pauli_circ, optimisation_level=0
                 )
 
-                # TODO: Replace with a copy of MeasurementSetup rather than new object
                 new_ansatz_circuit = AnsatzCircuit(
                     Circuit=pauli_circ,
-                    Shots=copy.copy(experiment.AnsatzCircuit.Shots),
-                    SymbolsDict=copy.copy(experiment.AnsatzCircuit.SymbolsDict),
+                    Shots=copy(experiment.AnsatzCircuit.Shots),
+                    SymbolsDict=copy(experiment.AnsatzCircuit.SymbolsDict),
                 )
                 new_tracker = ObservableTracker(
                     experiment.ObservableTracker.qubit_pauli_operator
@@ -1055,14 +1052,14 @@ def gen_PEC_learning_based_MitEx(
     # TODO: Change to a number of clifford circuits which varies with the size of the circuit
     num_cliff_circ = kwargs.get("num_cliff", 10)
 
-    sim_mitex = copy.copy(
+    sim_mitex = copy(
         kwargs.get(
             "simulator_mitex", MitEx(simulator_backend, _label="IdealCliffordMitEx")
         )
     )
 
     device_mitres = MitRes(device_backend)
-    device_mitex = copy.copy(
+    device_mitex = copy(
         kwargs.get(
             "device_mitex",
             MitEx(device_backend, _label="NoisyMitex", mitres=device_mitres),

@@ -59,7 +59,7 @@ the observable being measured and the measurement circuits required to do so.
     sym = fresh_symbol("test")
     circuit = Circuit(3,3).X(0).X(1).Rz(sym, 2)
     shots = 300
-    symbols = SymbolsDict.symbols_from_dict({test: 0.0})
+    symbols = SymbolsDict.symbols_from_dict({sym: 0.0})
     ansatz_circuit = AnsatzCircuit(Circuit=circuit, Shots=shots, SymbolsDict=symbols)
 
 ::
@@ -268,7 +268,7 @@ in ``BackendResult`` to 0 if their Bitstring has some Bit in a specific state.
 ::
 
     from qermit.taskgraph import backend_compile_circuit_shots_task_gen
-
+    from qermit import MitRes
 
     mitres_discard = MitRes(backend = sim_backend)  
     mitres_discard.append(discard_task)
@@ -283,7 +283,7 @@ Lets create a new ``MitEx`` object constructed from ``mitres_discard`` and then 
 ::
 
     combined_mitex = MitEx(sim_backend, mitres = mitres_discard)
-    combined_mitex.prepend(add_ancillas_task_gen([(Qubit(0), Qubit(3), Bit(3))])
+    combined_mitex.prepend(add_ancillas_task_gen([(Qubit(0), Qubit(3), Bit(3))]))
     combined_mitex.decompose_TaskGraph_nodes()
     combined_mitex.get_task_graph()
 
@@ -295,12 +295,12 @@ Lets create a new ``MitEx`` object constructed from ``mitres_discard`` and then 
     circuit_discard = Circuit(3,3).H(0).X(1).Rz(sym_discard, 2)
     shots = 500
     symbols = SymbolsDict.symbols_from_dict({sym_discard: 0.0})
-    ansatz_circuit_discard = AnsatzCircuit(Circuit=circuit_discard, Shots=shots, SymbolsDict=symbols)
+    ansatz_circuit_discard = AnsatzCircuit(Circuit=circuit_discard.copy(), Shots=shots, SymbolsDict=symbols)
 
     qps = QubitPauliString([Qubit(0), Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z, Pauli.Z])
     qpo_discard = QubitPauliOperator({qps: 1.0})
     
-    discard_results = discard_mitex.run([ObservableExperiment(ansatz_circuit_discard, ObservableTracker(qpo_discard))])
+    discard_results = combined_mitex.run([ObservableExperiment(ansatz_circuit_discard, ObservableTracker(qpo_discard))])
     print(discard_results)
     
 ::  
@@ -333,13 +333,15 @@ if its value is within some passed range. A more realistic example may modify th
 
 ::
 
-    discard_mitex.append(modify_operator_task_gen(0.1))
-    discard_mitex.get_task_graph()
+    combined_mitex.append(modify_operator_task_gen(0.1))
+    combined_mitex.get_task_graph()
 
 
 .. image:: combined_mitex_final_taskgraph.png
 
 ::
+    
+    ansatz_circuit_discard = AnsatzCircuit(Circuit=circuit_discard.copy(), Shots=shots, SymbolsDict=symbols)
 
     print(discard_mitex.run([ObservableExperiment(ansatz_circuit_discard, ObservableTracker(qpo_discard))]))
 
@@ -383,10 +385,18 @@ the  ``qermit.probabilistic_error_cancellation`` `module <https://cqcl.github.io
  
 ::
 
-    from qermit.probabilistic_error_cancellation import gen_PEC_Mitex
+    from qermit.probabilistic_error_cancellation import gen_PEC_learning_based_MitEx
     from pytket.extensions.qiskit import IBMQEmulatorBackend, AerBackend
-    
-    pec_mitex = gen_PEC_MitEx(device_backend = casablanca_backend, simulator_backend = noiseless_backend)
+
+    noiseless_backend = AerBackend()
+    casablanca_backend = IBMQEmulatorBackend(
+      "ibmq_casablanca",
+      hub='partner-cqc',
+      group='internal',
+      project='default',
+    )  
+
+    pec_mitex = gen_PEC_learning_based_MitEx(device_backend = casablanca_backend, simulator_backend = noiseless_backend)
     pec_mitex.get_task_graph()
 
 .. image:: PEC_taskgraph.png
@@ -460,17 +470,15 @@ the ``qermit.zero_noise_extrapolation`` `module <https://cqcl.github.io/qermit/z
 
     from qermit.zero_noise_extrapolation import gen_ZNE_MitEx
     from pytket.extensions.qiskit import IBMQEmulatorBackend
-    from pytket.extensions.qiskit.backends.ibm import _rebase_pass
 
-    zne_mitex = gen_ZNE_MitEx(backend=casablanca_backend, rebase_pass=_rebase_pass, noise_scaling_list = [3,5,7])
+    zne_mitex = gen_ZNE_MitEx(backend=casablanca_backend, noise_scaling_list = [3,5,7])
     zne_mitex.get_task_graph()
 
 
 .. image:: zne_taskgraph.png
 
 Here the three inputs are: ``backend``, the backend on which the circuits will 
-be run; ``rebase_pass``, a rebase pass which rebases to the gates native to the 
-backend; and ``noise_scaling_list``, a list of integer multiples by which the 
+be run; and ``noise_scaling_list``, a list of integer multiples by which the 
 noise will be scaled. For each noise scaling value a different ``MitEx`` object is 
 constructed. Let's construct a test case with expected value 1.0 and run the 
 error-mitigation ``MitEx``.
@@ -544,7 +552,7 @@ Generators for Clifford-Data-Regression ``MitEx`` objects are available in the `
 
 ::
 
-    from qermit.clifford_noise_characteisation import gen_CDR_MitEx
+    from qermit.clifford_noise_characterisation import gen_CDR_MitEx
     from pytket.extensions.qiskit import AerBackend, IBMQBackend
 
     
