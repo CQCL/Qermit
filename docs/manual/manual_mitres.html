@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MitRes &mdash; qermit-manual  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
+      <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="MitEx" href="manual_mitex.html" />
+    <link rel="prev" title="What is qermit?" href="manual_intro.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> qermit-manual
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="manual_intro.html">What is qermit?</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MitRes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#error-mitigation-with-mitres">Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitRes</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#extending-mitres-with-mittask">Extending <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> with <code class="docutils literal notranslate"><span class="pre">MitTask</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#constructing-mitres-from-taskgraph">Constructing <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> from <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spam-mitigation-in-qermit">SPAM Mitigation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#frame-randomisation-in-qermit">Frame-Randomisation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#combining-mitres-methods">Combining <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="manual_mitex.html">MitEx</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qermit-manual</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>MitRes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/manual_mitres.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mitres">
+<h1>MitRes<a class="headerlink" href="#mitres" title="Permalink to this headline"></a></h1>
+<p>A typical process for running experiments on quantum devices is as follows: first
+a logical quantum circuit is constructed, next it is compiled to fit to the constraints of
+the quantum device of choice (such as the connectivity graph or set of gate primitives) before
+being sent to the device via the hardware manufacturers language of choice. Finally
+results are returned, typically as a sequence of <em>Shots</em>, each shot being a single set of bit
+corresponding to the measurement result of each qubit.</p>
+<p>In its basic capacity the <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/mitres.html">method</a> will run
+each of these tasks sequentially.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit</span> <span class="kn">import</span> <span class="n">MitRes</span><span class="p">,</span> <span class="n">CircuitShots</span>
+<span class="kn">from</span> <span class="nn">pytket</span> <span class="kn">import</span> <span class="n">Circuit</span>
+<span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">AerBackend</span>
+
+<span class="n">mitres</span> <span class="o">=</span> <span class="n">MitRes</span><span class="p">(</span><span class="n">backend</span> <span class="o">=</span> <span class="n">AerBackend</span><span class="p">())</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">H</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">Rz</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">CX</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">mitres</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">CircuitShots</span><span class="p">(</span><span class="n">Circuit</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span> <span class="n">Shots</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Counter</span><span class="p">({(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">25</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">25</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>In the above code snippet a Bell circuit is simulated on the <code class="docutils literal notranslate"><span class="pre">AerBackend</span></code>, returning a
+<code class="docutils literal notranslate"><span class="pre">pytket</span></code> BackendResult object.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object holds a graph of <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> (or <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code>, see later clarification) objects (a <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code>).
+A <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> object is a pure function that computes some basic step in a typical experiment.
+When the run function is called, a topological sort is applied to the graph to order these tasks. Each is then run sequentially.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects held in a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> can be visualised with the <code class="docutils literal notranslate"><span class="pre">MitRes.get_task_graph</span></code> method.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mitres</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/mitresgraph.png" src="_images/mitresgraph.png" />
+<p>It is also possible to import and use the <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects directly.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.taskgraph</span> <span class="kn">import</span> <span class="n">backend_handle_task_gen</span><span class="p">,</span> <span class="n">backend_res_task_gen</span>
+
+<span class="n">sim_backend</span> <span class="o">=</span> <span class="n">AerBackend</span><span class="p">()</span>
+<span class="n">circuits_to_handles_task</span> <span class="o">=</span> <span class="n">backend_handle_task_gen</span><span class="p">(</span><span class="n">sim_backend</span><span class="p">)</span>
+<span class="n">handles_to_results_task</span> <span class="o">=</span> <span class="n">backend_res_task_gen</span><span class="p">(</span><span class="n">sim_backend</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">circuits_to_handles_task</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">handles_to_results_task</span><span class="p">)</span>
+
+
+<span class="n">handles</span> <span class="o">=</span> <span class="n">circuits_to_handles_task</span><span class="p">(([</span><span class="n">CircuitShots</span><span class="p">(</span><span class="n">Circuit</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span> <span class="n">Shots</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)],))</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">handles_to_results_task</span><span class="p">(</span><span class="n">handles</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">MitTask</span><span class="p">::</span><span class="n">CircuitsToHandles</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">MitTask</span><span class="p">::</span><span class="n">HandlesToResults</span><span class="o">&gt;</span>
+<span class="n">Counter</span><span class="p">({(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">30</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">20</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>You may notice that the arguments of the <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects are different, requiring
+<code class="docutils literal notranslate"><span class="pre">Tuple</span></code> type objects. This is necessary for the execution in the <code class="docutils literal notranslate"><span class="pre">TaskGraph.run</span></code> method.
+All typing information is accessible via the <code class="docutils literal notranslate"><span class="pre">qermit</span></code> documentation.</p>
+<section id="error-mitigation-with-mitres">
+<h2>Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitRes</span></code><a class="headerlink" href="#error-mitigation-with-mitres" title="Permalink to this headline"></a></h2>
+<p>To produce a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object that executes an error-mitigation protocol when the <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code>
+method is called, additional <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects need to be added to its task graph.</p>
+<p>The defining characteristic of a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object is that the first <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> object
+in its sorted graph requires a <code class="docutils literal notranslate"><span class="pre">List[CircuitShots]</span></code> object as its sole argument and that
+the final <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> object in its sorted graph returns a <code class="docutils literal notranslate"><span class="pre">List[BackendResult]</span></code> object.
+This is a crucial type constraint required for the combining of error-mitigation methods.</p>
+<p>Given this, there are two viable approaches to producing error-mitigation <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects, either
+extending a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object with new <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects under strict type constraints, or constructing
+a <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code> object with relaxed type constraints on internal tasks and then casting to a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object at completion.</p>
+</section>
+<section id="extending-mitres-with-mittask">
+<h2>Extending <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> with <code class="docutils literal notranslate"><span class="pre">MitTask</span></code><a class="headerlink" href="#extending-mitres-with-mittask" title="Permalink to this headline"></a></h2>
+<p>We have already seen that the basic construction of a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object has two <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects, one
+submitting Circuit to a <code class="docutils literal notranslate"><span class="pre">pytket</span></code> Backend to retrieve unique handles, the other submitting these handles
+back to the Backend to retrieve <code class="docutils literal notranslate"><span class="pre">BackendResult</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">MitRes.append</span></code> and <code class="docutils literal notranslate"><span class="pre">MitRes.prepend</span></code> methods can be used to extend the
+<code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects the <code class="docutils literal notranslate"><span class="pre">MitRes._task_graph</span></code> attribute holds.</p>
+<p>As an example, Let’s construct a basic <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object and then prepend a task that compiles circuits. While a common
+task in any experiment workflow,  the basic <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> constructor does not add a <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> for compilation.
+This is because error-mitigation methods often produce circuits with very specific structures that need to be retained.
+Even basic compilation may destroy these structures.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit</span> <span class="kn">import</span> <span class="n">MitTask</span>
+</pre></div>
+</div>
+<p>A <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> object is defined by four attributes: a name, a function it computes, the number of arguments to said
+function and the number of elements in a Tuple it returns.</p>
+<p>Let’s define a basic function that compiles Circuits to a given Backend.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pytket</span> <span class="kn">import</span> <span class="n">Circuit</span>
+<span class="kn">from</span> <span class="nn">pytket.backends</span> <span class="kn">import</span> <span class="n">Backend</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="k">def</span> <span class="nf">compile_circuits</span><span class="p">(</span><span class="n">backend</span><span class="p">:</span> <span class="n">Backend</span><span class="p">,</span> <span class="n">circuits</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Circuit</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Circuit</span><span class="p">]:</span>
+   <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">circuits</span><span class="p">:</span>
+      <span class="n">backend</span><span class="o">.</span><span class="n">compile_circuit</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+   <span class="k">return</span> <span class="n">circuits</span>
+</pre></div>
+</div>
+<p>This is a straightforward function definition for those familiar with <code class="docutils literal notranslate"><span class="pre">pytket</span></code> and completes our goal.
+However, this will require some minor modification before we can add it to our <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object.</p>
+<p>We have already noted that a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object is defined by the property that the <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code> method
+takes a <code class="docutils literal notranslate"><span class="pre">List[CircuitShots]</span></code> as an argument and returns a <code class="docutils literal notranslate"><span class="pre">List[BackendResult]</span></code>. Considering this,
+the <code class="docutils literal notranslate"><span class="pre">MitRes.append</span></code> and <code class="docutils literal notranslate"><span class="pre">MitRes.prepend</span></code> methods have restrictions on what <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects they can
+add to a task graph.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">MitRes.append</span></code> method can only append tasks that have one out wire and return <code class="docutils literal notranslate"><span class="pre">Tuple[List[BackendResult]]</span></code> from
+the internal method, while the <code class="docutils literal notranslate"><span class="pre">MitRes.prepend</span></code> method can only prepend tasks that have one in wire and expects a
+single argument of type <code class="docutils literal notranslate"><span class="pre">List[CircuitShots]</span></code> to its internal method. The <code class="docutils literal notranslate"><span class="pre">Tuple</span></code> type is necessary for piping data
+through the internal graph.</p>
+<p>Let’s rework the <code class="docutils literal notranslate"><span class="pre">compile_circuits</span></code> method to fit the <code class="docutils literal notranslate"><span class="pre">List[CircuitShots]</span></code> constraint.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit</span> <span class="kn">import</span> <span class="n">CircuitShots</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="k">def</span> <span class="nf">compile_circuit_shots</span><span class="p">(</span><span class="n">backend</span><span class="p">:</span> <span class="n">Backend</span><span class="p">,</span> <span class="n">circuit_shots</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">CircuitShots</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">CircuitShots</span><span class="p">]]:</span>
+  <span class="n">compiled_circuit_shots</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">circuit_shots</span><span class="p">:</span>
+        <span class="n">compiled_circuit</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_compiled_circuit</span><span class="p">(</span><span class="n">cs</span><span class="o">.</span><span class="n">Circuit</span><span class="p">)</span>
+        <span class="n">compiled_circuit_shots</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">compiled_circuit</span><span class="p">,</span> <span class="n">cs</span><span class="o">.</span><span class="n">Shots</span><span class="p">))</span>
+  <span class="k">return</span> <span class="p">(</span><span class="n">compiled_circuit_shots</span><span class="p">,)</span>
+</pre></div>
+</div>
+<p>Notice that <code class="docutils literal notranslate"><span class="pre">MitRes.prepend</span></code> does not allow tasks that pass <code class="docutils literal notranslate"><span class="pre">Backend</span></code> objects as arguments. When the <code class="docutils literal notranslate"><span class="pre">MitRes</span></code>
+class constructor is called with a given <code class="docutils literal notranslate"><span class="pre">Backend</span></code>, this same <code class="docutils literal notranslate"><span class="pre">Backend</span></code> is used to construct <code class="docutils literal notranslate"><span class="pre">&lt;MitTask::CircuitsToHandles&gt;</span></code>
+and <code class="docutils literal notranslate"><span class="pre">&lt;MitTask::HandlesToResults&gt;</span></code> objects via <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> generator functions. In this way each method references the same
+<code class="docutils literal notranslate"><span class="pre">Backend</span></code> object, meaning it can be used to store and pass basic information such as device characteristics.</p>
+<p>Let’s work the <code class="docutils literal notranslate"><span class="pre">compile_circuit_shots</span></code> method here into a similar generator function for a <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> object.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">backend_compile_circuit_shots_task_gen</span><span class="p">(</span>
+   <span class="n">backend</span><span class="p">:</span> <span class="n">Backend</span>
+   <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MitTask</span><span class="p">:</span>
+   <span class="k">def</span> <span class="nf">compile_circuit_shots</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">circuit_shots</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">CircuitShots</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">CircuitShots</span><span class="p">]]:</span>
+      <span class="n">compiled_circuit_shots</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">circuit_shots</span><span class="p">:</span>
+            <span class="n">compiled_circuit</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_compiled_circuit</span><span class="p">(</span><span class="n">cs</span><span class="o">.</span><span class="n">Circuit</span><span class="p">)</span>
+            <span class="n">compiled_circuit_shots</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">compiled_circuit</span><span class="p">,</span> <span class="n">cs</span><span class="o">.</span><span class="n">Shots</span><span class="p">))</span>
+      <span class="k">return</span> <span class="p">(</span><span class="n">compiled_circuit_shots</span><span class="p">,)</span>
+
+   <span class="k">return</span> <span class="n">MitTask</span><span class="p">(</span>
+      <span class="n">_label</span><span class="o">=</span><span class="s2">&quot;CompileCircuitShots&quot;</span><span class="p">,</span> <span class="n">_n_in_wires</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">_n_out_wires</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">_method</span><span class="o">=</span><span class="n">compile_circuit_shots</span>
+   <span class="p">)</span>
+</pre></div>
+</div>
+<p>When called, <code class="docutils literal notranslate"><span class="pre">backend_compile_circuit_shots_task_gen</span></code> will return a <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> object with a callable that
+compiles a <code class="docutils literal notranslate"><span class="pre">List[CircuitShots]</span></code> to the defined backend.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">AerBackend</span>
+
+<span class="n">sim_backend</span> <span class="o">=</span> <span class="n">AerBackend</span><span class="p">()</span>
+<span class="n">mit_task</span> <span class="o">=</span> <span class="n">backend_compile_circuit_shots_task_gen</span><span class="p">(</span><span class="n">sim_backend</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mit_task</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">MitTask</span><span class="p">::</span><span class="n">CompileCircuitShots</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The callable expects a <code class="docutils literal notranslate"><span class="pre">Tuple</span></code> of the arguments to the <code class="docutils literal notranslate"><span class="pre">MitTask._method</span></code> attribute.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">test_circuit_shots</span> <span class="o">=</span> <span class="p">[</span><span class="n">CircuitShots</span><span class="p">(</span><span class="n">Circuit</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">CZ</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">measure_all</span><span class="p">(),</span> <span class="n">Shots</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)]</span>
+<span class="n">test_results</span> <span class="o">=</span> <span class="n">mit_task</span><span class="p">((</span><span class="n">test_circuit_shots</span><span class="p">,))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">test_results</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">([</span><span class="n">CircuitShots</span><span class="p">(</span><span class="n">Circuit</span><span class="o">=</span><span class="p">[</span><span class="n">TK1</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="n">CX</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="n">Measure</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">--&gt;</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="n">TK1</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="n">Measure</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">--&gt;</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="p">],</span> <span class="n">Shots</span><span class="o">=</span><span class="mi">10</span><span class="p">)],)</span>
+</pre></div>
+</div>
+<p>We can see that the circuit has been compiled to the <code class="docutils literal notranslate"><span class="pre">AerBackend</span></code> gate set primitive and returned a suitable type - Let’s prepend it to
+the basic <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mit_res</span> <span class="o">=</span> <span class="n">MitRes</span><span class="p">(</span><span class="n">sim_backend</span><span class="p">)</span>
+<span class="n">mit_res</span><span class="o">.</span><span class="n">prepend</span><span class="p">(</span><span class="n">mit_task</span><span class="p">)</span>
+<span class="n">mit_res</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/mitres_compile_circs.png" src="_images/mitres_compile_circs.png" />
+<p>If we were to use the <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code> method now to run an experiment, all circuits would be compiled with sim_backend before
+being executed on the hardware. The <code class="docutils literal notranslate"><span class="pre">MitRes.append</span></code> method works similarly - later examples will show it in use.</p>
+</section>
+<section id="constructing-mitres-from-taskgraph">
+<h2>Constructing <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> from <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code><a class="headerlink" href="#constructing-mitres-from-taskgraph" title="Permalink to this headline"></a></h2>
+<p>Error-mitigation methods can involve complicated sequences of tasks to work. The strict type requirements of the
+<code class="docutils literal notranslate"><span class="pre">MitRes</span></code> prepend and append rules preserve properties required for combining error-mitigation methods, but restrict
+the possible structure and order of tasks.</p>
+<p>If a more complicated structure of tasks is required to perform the mitigation, a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object can be cast
+as a <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code> object without the same restrictions. If the final object after construction respects the
+<code class="docutils literal notranslate"><span class="pre">MitRes</span></code> type constraints then it can be cast back as a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object later.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit</span> <span class="kn">import</span> <span class="n">TaskGraph</span>
+
+<span class="n">sim_backend</span> <span class="o">=</span> <span class="n">AerBackend</span><span class="p">()</span>
+<span class="n">task_graph</span> <span class="o">=</span> <span class="n">TaskGraph</span><span class="p">()</span><span class="o">.</span><span class="n">from_TaskGraph</span><span class="p">(</span><span class="n">MitRes</span><span class="p">(</span><span class="n">sim_backend</span><span class="p">))</span>
+<span class="n">task_graph</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/mitresgraph.png" src="_images/mitresgraph.png" />
+<p>Additionally to the relaxed type constraints of <code class="docutils literal notranslate"><span class="pre">TaskGraph.prepend</span></code> and <code class="docutils literal notranslate"><span class="pre">TaskGraph.append</span></code> in relation to <code class="docutils literal notranslate"><span class="pre">MitRes</span></code>,
+the <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code> class has additional construction methods: <code class="docutils literal notranslate"><span class="pre">TaskGraph.add_n_wires</span></code> and <code class="docutils literal notranslate"><span class="pre">TaskGraph.parallel</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_graph</span><span class="o">.</span><span class="n">add_n_wires</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">task_graph</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/addnwiresdiagram.png" src="_images/addnwiresdiagram.png" />
+<p>The <code class="docutils literal notranslate"><span class="pre">TaskGraph.add_n_wires</span></code> method adds n new edges between the input and output vertices.
+Similarly, the <code class="docutils literal notranslate"><span class="pre">TaskGraph.parallel</span></code> method adds a new path between the input and output vertices,
+but with a <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> or <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code> object (or child) inserted.</p>
+<p>We can add another <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object in parallel:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_graph</span><span class="o">.</span><span class="n">parallel</span><span class="p">(</span><span class="n">MitRes</span><span class="p">(</span><span class="n">sim_backend</span><span class="p">))</span>
+<span class="n">task_graph</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/taskgraphparallel.png" src="_images/taskgraphparallel.png" />
+<p>The <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object is added to the graph as its own callable. The <code class="docutils literal notranslate"><span class="pre">MitRes.decompose_TaskGraph_nodes</span></code> method will
+recursively substitute any graph node with a <code class="docutils literal notranslate"><span class="pre">_task_graph</span></code> attribute with said <code class="docutils literal notranslate"><span class="pre">_task_graph</span></code>, adding unique names
+to aid understanding.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_graph</span><span class="o">.</span><span class="n">decompose_TaskGraph_nodes</span><span class="p">()</span>
+<span class="n">task_graph</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/taskgraphdecomposenodes.png" src="_images/taskgraphdecomposenodes.png" />
+<p>Any <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> object we want to pass to <code class="docutils literal notranslate"><span class="pre">TaskGraph.prepend</span></code> must have four output wires and any number of input wires, while
+any <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> object we want to pass to <code class="docutils literal notranslate"><span class="pre">TaskGraph.append</span></code> must have four input wires and any number of output wires. Every wire
+must have a type defined <code class="docutils literal notranslate"><span class="pre">Wire</span></code>.</p>
+<p>Furthermore, each <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> would also be expected to match the types of the edges being added to them, though <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code> only checks this during
+<code class="docutils literal notranslate"><span class="pre">TaskGraph.run</span></code> and not at graph construction as with <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> and <code class="docutils literal notranslate"><span class="pre">MitEx</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.taskgraph</span> <span class="kn">import</span> <span class="n">Wire</span>
+
+<span class="k">def</span> <span class="nf">prepend_task_gen</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MitTask</span><span class="p">:</span>
+   <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">wire0</span><span class="p">:</span> <span class="n">Wire</span><span class="p">,</span> <span class="n">wire1</span><span class="p">:</span> <span class="n">Wire</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">CircuitShots</span><span class="p">],</span> <span class="n">Wire</span><span class="p">,</span> <span class="n">Wire</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">CircuitShots</span><span class="p">]]:</span>
+      <span class="n">c0</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+      <span class="n">c1</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">CX</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+      <span class="k">return</span> <span class="p">([</span><span class="n">CircuitShots</span><span class="p">(</span><span class="n">Circuit</span><span class="o">=</span><span class="n">c0</span><span class="p">,</span> <span class="n">Shots</span><span class="o">=</span><span class="mi">15</span><span class="p">)],</span> <span class="n">wire0</span><span class="p">,</span> <span class="n">wire1</span><span class="p">,</span> <span class="p">[</span><span class="n">CircuitShots</span><span class="p">(</span><span class="n">Circuit</span><span class="o">=</span><span class="n">c1</span><span class="p">,</span> <span class="n">Shots</span><span class="o">=</span><span class="mi">10</span><span class="p">)])</span>
+   <span class="k">return</span> <span class="n">MitTask</span><span class="p">(</span>
+      <span class="n">_label</span><span class="o">=</span><span class="s2">&quot;PrependTask&quot;</span><span class="p">,</span> <span class="n">_n_in_wires</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">_n_out_wires</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">_method</span><span class="o">=</span><span class="n">task</span>
+   <span class="p">)</span>
+
+<span class="n">prepend_task</span> <span class="o">=</span> <span class="n">prepend_task_gen</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">prepend_task</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">prepend_task</span><span class="p">((</span><span class="s2">&quot;nO nietsniE&quot;</span><span class="p">,</span> <span class="s2">&quot;hcaeB ehT&quot;</span><span class="p">)):</span>
+   <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;MitTask::PrependTask&gt;
+[CircuitShots(Circuit=[Measure q[1] --&gt; c[1]; Measure q[2] --&gt; c[2]; X q[0]; Measure q[0] --&gt; c[0]; ], Shots=15)]
+nO nietsniE
+hcaeB ehT
+[CircuitShots(Circuit=[Measure q[1] --&gt; c[1]; X q[2]; CX q[2], q[0]; Measure q[0] --&gt; c[0]; X q[2]; Measure q[2] --&gt; c[2]; ], Shots=10)]
+We can add this ``MitTask`` to our ``TaskGraph`` object.
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_graph</span><span class="o">.</span><span class="n">prepend</span><span class="p">(</span><span class="n">prepend_task</span><span class="p">)</span>
+<span class="n">task_graph</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/prependtaskgraphimage.png" src="_images/prependtaskgraphimage.png" />
+<p>We can construct a similar <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> for <code class="docutils literal notranslate"><span class="pre">TaskGraph.append</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">pytket.backends.backendresult</span> <span class="kn">import</span> <span class="n">BackendResult</span>
+
+
+<span class="k">def</span> <span class="nf">append_task_gen</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MitTask</span><span class="p">:</span>
+   <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">results0</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BackendResult</span><span class="p">],</span> <span class="n">wire0</span><span class="p">:</span> <span class="n">Wire</span><span class="p">,</span> <span class="n">wire1</span><span class="p">:</span> <span class="n">Wire</span><span class="p">,</span> <span class="n">results1</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BackendResult</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Wire</span><span class="p">,</span> <span class="n">Counter</span><span class="p">]:</span>
+       <span class="n">both_counts</span> <span class="o">=</span> <span class="p">[</span><span class="n">results0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">(),</span> <span class="n">results1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">()]</span>
+       <span class="n">combined_counts</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">both_counts</span><span class="p">)</span>
+       <span class="k">return</span> <span class="p">(</span><span class="n">wire0</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">wire1</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">combined_counts</span><span class="p">)</span>
+   <span class="k">return</span> <span class="n">MitTask</span><span class="p">(</span>
+      <span class="n">_label</span><span class="o">=</span><span class="s2">&quot;AppendTask&quot;</span><span class="p">,</span> <span class="n">_n_in_wires</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">_n_out_wires</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">_method</span><span class="o">=</span><span class="n">task</span>
+   <span class="p">)</span>
+
+<span class="n">task_graph</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">append_task_gen</span><span class="p">())</span>
+<span class="n">task_graph</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">task_graph</span><span class="o">.</span><span class="n">run</span><span class="p">((</span><span class="s2">&quot;nO nietsniE&quot;</span><span class="p">,</span> <span class="s2">&quot;hcaeB ehT&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<img alt="_images/appendtaskgraphimage.png" src="_images/appendtaskgraphimage.png" />
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="s1">&#39;Einstein On The Beach&#39;</span><span class="p">,</span> <span class="n">Counter</span><span class="p">({(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">25</span><span class="p">}))</span>
+</pre></div>
+</div>
+<p>While this example is nonsensical in regards to actual, useful, experiments, it displays how more useful
+structures of <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code> can be produced.</p>
+<p>In its current format however, we can not cast this <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code> object as a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MitRes</span><span class="p">(</span><span class="n">sim_backend</span><span class="p">)</span><span class="o">.</span><span class="n">from_TaskGraph</span><span class="p">(</span><span class="n">task_graph</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ne">TypeError</span><span class="p">:</span> <span class="n">Type</span> <span class="n">signature</span> <span class="n">of</span> <span class="n">passed</span> <span class="n">task_graph</span><span class="o">.</span><span class="n">run</span> <span class="n">method</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">equal</span> <span class="n">MitRun</span><span class="o">.</span><span class="n">run</span> <span class="nb">type</span> <span class="n">signature</span><span class="o">.</span> <span class="n">Number</span> <span class="n">of</span> <span class="ow">in</span> <span class="ow">and</span> <span class="n">out</span> <span class="n">wires</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">match</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>To produce a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object from this <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code> we need to append and prepend <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> in such a way that
+the <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> type constraints are respected.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pytket.utils.outcomearray</span> <span class="kn">import</span> <span class="n">OutcomeArray</span>
+
+<span class="k">def</span> <span class="nf">type_constraint_prepend_task_gen</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MitTask</span><span class="p">:</span>
+      <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">cs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">CircuitShots</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Wire</span><span class="p">,</span> <span class="n">Wire</span><span class="p">]:</span>
+         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;nO nietsniE&quot;</span><span class="p">,</span> <span class="s2">&quot;hcaeB ehT&quot;</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">MitTask</span><span class="p">(</span>
+         <span class="n">_label</span><span class="o">=</span><span class="s2">&quot;TypePrependTask&quot;</span><span class="p">,</span> <span class="n">_n_in_wires</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">_n_out_wires</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">_method</span><span class="o">=</span><span class="n">task</span>
+      <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">type_constraint_append_task_gen</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MitTask</span><span class="p">:</span>
+      <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">anything_comb</span><span class="p">:</span> <span class="n">Wire</span><span class="p">,</span> <span class="n">counter</span><span class="p">:</span> <span class="n">Counter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">BackendResult</span><span class="p">]]:</span>
+         <span class="n">counter</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span>
+               <span class="p">{</span>
+                  <span class="n">OutcomeArray</span><span class="o">.</span><span class="n">from_readouts</span><span class="p">([</span><span class="n">key</span><span class="p">]):</span> <span class="n">val</span>
+                  <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">counter</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+               <span class="p">}</span>
+         <span class="p">)</span>
+         <span class="k">return</span><span class="p">([</span><span class="n">BackendResult</span><span class="p">(</span><span class="n">counts</span> <span class="o">=</span> <span class="n">counter</span><span class="p">)],)</span>
+      <span class="k">return</span> <span class="n">MitTask</span><span class="p">(</span>
+         <span class="n">_label</span><span class="o">=</span><span class="s2">&quot;TypeAppendTask&quot;</span><span class="p">,</span> <span class="n">_n_in_wires</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">_n_out_wires</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">_method</span><span class="o">=</span><span class="n">task</span>
+      <span class="p">)</span>
+
+<span class="n">task_graph</span><span class="o">.</span><span class="n">prepend</span><span class="p">(</span><span class="n">type_constraint_prepend_task_gen</span><span class="p">())</span>
+<span class="n">task_graph</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">type_constraint_append_task_gen</span><span class="p">())</span>
+
+<span class="n">cast_mitres</span> <span class="o">=</span> <span class="n">MitRes</span><span class="p">(</span><span class="n">sim_backend</span><span class="p">)</span><span class="o">.</span><span class="n">from_TaskGraph</span><span class="p">(</span><span class="n">task_graph</span><span class="p">)</span>
+
+<span class="n">cast_mitres</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">cast_mitres</span><span class="o">.</span><span class="n">run</span><span class="p">(([],)))</span>
+</pre></div>
+</div>
+<img alt="_images/taskgraphtomitresimage.png" src="_images/taskgraphtomitresimage.png" />
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">BackendResult</span><span class="p">(</span><span class="n">q_bits</span><span class="o">=</span><span class="p">{},</span><span class="n">c_bits</span><span class="o">=</span><span class="p">{</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="mi">2</span><span class="p">},</span><span class="n">counts</span><span class="o">=</span><span class="n">Counter</span><span class="p">({</span><span class="n">OutcomeArray</span><span class="p">([[</span><span class="mi">128</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">uint8</span><span class="p">):</span> <span class="mi">25</span><span class="p">}),</span><span class="n">shots</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">unitary</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">density_matrix</span><span class="o">=</span><span class="kc">None</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>With this illustrative introduction to constructing advanced <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code> objects complete, Let’s move on to
+actual error-mitigation techniques available in <code class="docutils literal notranslate"><span class="pre">qermit</span></code>.</p>
+<p>There are two <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> error-mitigation methods available in <code class="docutils literal notranslate"><span class="pre">qermit</span></code>; SPAM correction and Frame Randomisation. Error-mitigation methods
+are available via a selection of generator functions. When called, the error-mitigation method of choice is constructed by
+acting on a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object with the construction methods just discussed. In this manner composition is facilitated, as each generator
+method allows the error-mitigation method to be constructed around custom <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects using keyword arguments.</p>
+</section>
+<section id="spam-mitigation-in-qermit">
+<h2>SPAM Mitigation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#spam-mitigation-in-qermit" title="Permalink to this headline"></a></h2>
+<p>A prominent source of noise is that occurring during State Preparation and Measurement (SPAM).</p>
+<p>SPAM error-mitigation methods can correct for such noise through a post-processing step that modifies the output
+distribution measured from repeatedly sampling shots. This is possible given the assumption that SPAM noise is not
+dependent on the quantum computation run.</p>
+<p>By repeatedly preparing and measuring a basis state, a distribution over basis states is procured.
+While for a perfect device the distribution would be the prepared basis state with probability 1, for devices
+prone to SPAM noise this distribution is perturbed and other basis states may be returned with (expected) small probability.</p>
+<p>If this process is repeated for all (or a suitable subset given many qubits won’t experience correlated SPAM errors)
+basis states, a transition matrix can be derived that describes the noisy SPAM process. Simply applying
+the inverse of this transition matrix to the distribution of a quantum state from some desired quantum computation
+can effectively uncompute the errors caused by SPAM noise.</p>
+<p>Generators for SPAM <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects are available in the <code class="docutils literal notranslate"><span class="pre">qermit.spam</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/spam.html">module</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.spam</span> <span class="kn">import</span> <span class="n">gen_UnCorrelated_SPAM_MitRes</span>
+<span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQEmulatorBackend</span>
+
+<span class="n">lagos_backend</span> <span class="o">=</span> <span class="n">IBMQEmulatorBackend</span><span class="p">(</span>
+   <span class="s2">&quot;ibm_lagos&quot;</span><span class="p">,</span>
+   <span class="n">hub</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+   <span class="n">group</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+   <span class="n">project</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">uc_spam_mitres</span> <span class="o">=</span> <span class="n">gen_UnCorrelated_SPAM_MitRes</span><span class="p">(</span>
+   <span class="n">backend</span> <span class="o">=</span> <span class="n">lagos_backend</span><span class="p">,</span>
+   <span class="n">calibration_shots</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="p">)</span>
+<span class="n">uc_spam_mitres</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/spam_mitres_decompose_taskgraph.png" src="_images/spam_mitres_decompose_taskgraph.png" />
+<p>The <code class="docutils literal notranslate"><span class="pre">gen_UnCorrelated_SPAM_MitRes</span></code> generator function returns a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object for performing SPAM mitigation with
+the assumption that readout errors are not correlated between qubits. As in practice this is not always the case,
+another generator function <code class="docutils literal notranslate"><span class="pre">gen_FullyCorrelated_SPAM_MitRes</span></code> allows correlations to be specified using <code class="docutils literal notranslate"><span class="pre">Node</span></code>
+from the <code class="docutils literal notranslate"><span class="pre">Backend.device</span></code> attribute.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.spam</span> <span class="kn">import</span> <span class="n">gen_FullyCorrelated_SPAM_MitRes</span>
+
+<span class="n">lagos_nodes</span> <span class="o">=</span> <span class="n">lagos_backend</span><span class="o">.</span><span class="n">backend_info</span><span class="o">.</span><span class="n">architecture</span><span class="o">.</span><span class="n">nodes</span>
+<span class="n">correlated_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">lagos_nodes</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">lagos_nodes</span><span class="p">[</span><span class="mi">3</span><span class="p">:]]</span>
+<span class="n">spam_mitres_fc</span> <span class="o">=</span> <span class="n">gen_FullyCorrelated_SPAM_MitRes</span><span class="p">(</span><span class="n">backend</span> <span class="o">=</span> <span class="n">lagos_backend</span><span class="p">,</span>
+                                                   <span class="n">correlations</span> <span class="o">=</span> <span class="n">correlated_nodes</span><span class="p">,</span>
+                                                   <span class="n">calibration_shots</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The correlation keyword argument expects a <code class="docutils literal notranslate"><span class="pre">List[List[Node]]</span></code> object, where each sub-list specifies correlated device qubits.
+The method will raise an error if a qubit is multiple sub-list.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">uc_spam_mitres</span></code> object can run experiments like any other <code class="docutils literal notranslate"><span class="pre">MitRes</span></code>. Let’s run an experiment both with and without both error-mitigation
+and none to compare usage and results.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.taskgraph</span> <span class="kn">import</span> <span class="n">gen_compiled_MitRes</span>
+
+<span class="n">compile_mitres</span> <span class="o">=</span> <span class="n">gen_compiled_MitRes</span><span class="p">(</span><span class="n">backend</span> <span class="o">=</span> <span class="n">lagos_backend</span><span class="p">)</span>
+<span class="n">compile_mitres</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/compile_mitres_gen.png" src="_images/compile_mitres_gen.png" />
+<p>The <code class="docutils literal notranslate"><span class="pre">gen_compiled_MitRes</span></code> generator function returns a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object with a compilation task prepended, as with the <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> we constructed earlier.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pytket</span> <span class="kn">import</span> <span class="n">Circuit</span>
+<span class="kn">from</span> <span class="nn">qermit</span> <span class="kn">import</span> <span class="n">CircuitShots</span>
+
+<span class="n">test_c_0</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+<span class="n">test_c_1</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+
+<span class="n">test_experiment</span> <span class="o">=</span> <span class="p">[</span><span class="n">CircuitShots</span><span class="p">(</span><span class="n">Circuit</span> <span class="o">=</span> <span class="n">test_c_0</span><span class="p">,</span> <span class="n">Shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">),</span> <span class="n">CircuitShots</span><span class="p">(</span><span class="n">Circuit</span> <span class="o">=</span> <span class="n">test_c_1</span><span class="p">,</span> <span class="n">Shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)]</span>
+<span class="n">basic_results</span> <span class="o">=</span> <span class="n">compile_mitres</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">test_experiment</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">basic_results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">basic_results</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Counter</span><span class="p">({(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">916</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">31</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">21</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">18</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">13</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">Counter</span><span class="p">({(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">910</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">54</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">17</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">12</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">3</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>While the circuits constructed should have deterministic outputs, (1, 0, 1, 0) and (0, 1, 0, 1) respectively, we can
+see that the counts are returning some shots for other basis states.
+The lagos_backend used for these examples is a simulator <code class="docutils literal notranslate"><span class="pre">Backend</span></code> run with a noise model to emulate
+the properties of the Lagos device available through IBMQ, including readout errors.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spam_mitigated_results</span> <span class="o">=</span> <span class="n">uc_spam_mitres</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">test_experiment</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">spam_mitigated_results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">spam_mitigated_results</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Counter</span><span class="p">({(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">981</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">15</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">Counter</span><span class="p">({(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">992</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>The device SPAM characterisation produced is stored inside the characterisation attribute of the <code class="docutils literal notranslate"><span class="pre">Backend</span></code> the <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> is generated with. If a
+characterisation is already available for a given method when <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code> is called, then it will not be characterised again.</p>
+<p>Naively comparing counts, we can see that by using the <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object returned by <code class="docutils literal notranslate"><span class="pre">gen_UnCorrelated_SPAM_MitRes</span></code> a greater proportion of the returned
+shots are the deterministic outputs we expected. We can not make any grand peformance claims based off this example alone, but we can see how
+SPAM error-mitigation can improve results. However as emphasised earlier, <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects can work with any <code class="docutils literal notranslate"><span class="pre">pytket</span></code> <code class="docutils literal notranslate"><span class="pre">Backend</span></code> object, meaning
+we can easily run this experiment again using the real IBMQ Lagos device simply by switching the <code class="docutils literal notranslate"><span class="pre">Backend</span></code> object passed to the generator function.</p>
+<p>Also note that there is some statistical noise and the returned set of counts for SPAM error-mitigation has slightly more counts than specified. This
+is an artifact of the correction procedure, but importantly we can see that the returned distribution is closer to the ideal.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQBackend</span>
+
+<span class="n">lagos_real</span> <span class="o">=</span> <span class="n">IBMQBackend</span><span class="p">(</span>
+   <span class="s2">&quot;ibm_lagos&quot;</span><span class="p">,</span>
+   <span class="n">hub</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+   <span class="n">group</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+   <span class="n">project</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">compile_mitres_real</span> <span class="o">=</span> <span class="n">gen_compiled_MitRes</span><span class="p">(</span><span class="n">backend</span> <span class="o">=</span> <span class="n">lagos_real</span><span class="p">)</span>
+<span class="n">uc_spam_mitres_real</span> <span class="o">=</span> <span class="n">gen_UnCorrelated_SPAM_MitRes</span><span class="p">(</span><span class="n">backend</span> <span class="o">=</span> <span class="n">lagos_real</span><span class="p">,</span> <span class="n">calibration_shots</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span>
+
+<span class="n">basic_results_real</span> <span class="o">=</span> <span class="n">compile_mitres_real</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">test_experiment</span><span class="p">)</span>
+<span class="n">spam_mitigated_results_real</span> <span class="o">=</span> <span class="n">uc_spam_mitres_real</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">test_experiment</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To complete our comparison on real hardware, results from the Lagos device without SPAM error-mitigation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">basic_results_real</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">basic_results_real</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Counter</span><span class="p">({(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">808</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">98</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">50</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">22</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">8</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">Counter</span><span class="p">({(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">891</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">60</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">26</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">11</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">9</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Results from the Lagos device with SPAM error-mitigation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">spam_mitigated_results_real</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">spam_mitigated_results_real</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Counter</span><span class="p">({(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">993</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">Counter</span><span class="p">({(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">984</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>As with the emulator <code class="docutils literal notranslate"><span class="pre">Backend</span></code>, the distribution of results returned with SPAM error-mitigation for this simple test case is improved.</p>
+</section>
+<section id="frame-randomisation-in-qermit">
+<h2>Frame-Randomisation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#frame-randomisation-in-qermit" title="Permalink to this headline"></a></h2>
+<p>While it is not possible to efficiently characterise and suppress all device noise, it can be advantageous to transform some adverse type of noise into a less damaging type.</p>
+<p>Coherent errors are additional unwanted unitary rotations that may appear throughout a quantum computation. Their effect can be damaging due to a possible faster rate of error accumulation than in the case of probabilistic (incoherent) errors.</p>
+<p>Randomisation protocols can be used to tailor the form of the noise profile. By averaging the n-qubit noise channel over all elements from a group (specifically some subgroup of the full unitary group on n qubits), the resulting noise is invariant under the action of any element from this group.</p>
+<p>For example, averaging a noise channel over the n-qubit Pauli group has the effect of producing an n-qubit stochastic Pauli channel – this is a probabilistic linear combination of n-qubit Pauli unitary errors.</p>
+<p>In this manner, an n-qubit coherent noise channel can be tailored into an n-qubit stochastic Pauli noise channel. For Pauli channels, the worst case error rate is similar to the average error rate, whilst for coherent noise the worst case error rate scales as a square root of the average error rate.</p>
+<p>Generator functions in the <code class="docutils literal notranslate"><span class="pre">qermit.frame_randomisation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/frame_randomisation.html">module</a> return <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects for automatically using randomised protocols
+when running experiments.</p>
+<p>Randomised compilation <a class="reference internal" href="#wallman2015" id="id2"><span>[Wallman2015]</span></a> is a well known example of such a procedure.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.frame_randomisation</span> <span class="kn">import</span> <span class="n">gen_Frame_Randomisation_MitRes</span>
+
+<span class="n">fr_mitres</span> <span class="o">=</span> <span class="n">gen_Frame_Randomisation_MitRes</span><span class="p">(</span><span class="n">lagos_backend</span><span class="p">,</span> <span class="n">samples</span> <span class="o">=</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="n">fr_mitres</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/frame_randomisation_taskgraph.png" src="_images/frame_randomisation_taskgraph.png" />
+<p>The returned <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object uses <code class="docutils literal notranslate"><span class="pre">FrameRandomisation</span></code> methods as available
+in the <code class="docutils literal notranslate"><span class="pre">pytket.tailoring</span></code> <a class="reference external" href="https://cqcl.github.io/pytket/build/html/tailoring.html">module</a>.</p>
+<p>The frame randomisation method used can be changed with the <code class="docutils literal notranslate"><span class="pre">frame_randomisation</span></code> keyword argument,
+which accepts methods defined in the <code class="docutils literal notranslate"><span class="pre">FrameRandomisation</span></code> enum class, supporting <code class="docutils literal notranslate"><span class="pre">PauliFrameRandomisation</span></code>
+and <code class="docutils literal notranslate"><span class="pre">UniversalFrameRandomisation</span></code> as defined in <code class="docutils literal notranslate"><span class="pre">pytket</span></code>. Without specification, the
+method will default use <code class="docutils literal notranslate"><span class="pre">UniversalFrameRandomisation</span></code>.</p>
+<p>An extended explanation of these methods is available in the <code class="docutils literal notranslate"><span class="pre">pytket</span></code> <a class="reference external" href="https://cqcl.github.io/pytket/build/html/manual/manual_noise.html#noise-tailoring-methods">manual</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.frame_randomisation</span> <span class="kn">import</span> <span class="n">FrameRandomisation</span>
+
+<span class="n">pfr_mitres</span> <span class="o">=</span> <span class="n">gen_Frame_Randomisation_MitRes</span><span class="p">(</span><span class="n">lagos_</span><span class="p">,</span>
+                                          <span class="n">samples</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+                                          <span class="n">frame_randomisation</span> <span class="o">=</span> <span class="n">FrameRandomisation</span><span class="o">.</span><span class="n">PauliFrameRandomisation</span><span class="p">,</span>
+                                          <span class="n">optimisation_level</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">ufr_mitres</span> <span class="o">=</span> <span class="n">gen_Frame_Randomisation_MitRes</span><span class="p">(</span><span class="n">lagos_real</span><span class="p">,</span>
+                                          <span class="n">samples</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+                                          <span class="n">frame_randomisation</span> <span class="o">=</span> <span class="n">FrameRandomisation</span><span class="o">.</span><span class="n">UniversalFrameRandomisation</span><span class="p">,</span>
+                                          <span class="n">optimisation_level</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">gen_Frame_Randomisation_MitRes</span></code> generator has an additional keyword argument for the optimisation_level
+used in the internal compilation task. For the purpose of this example we will keep this to its minimum 0, meaning
+that any Circuit objects will only be compiled to fit basic device constraints i.e. the gate set and fixed
+physical qubit connectivity.</p>
+<p>Let’s compare performance, between a noiseless simulator, the Lagos device without any mitigation and
+the Lagos device with universal frame-randomisation.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">AerBackend</span>
+
+<span class="n">test_fr_circuit</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">test_fr_circuit</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">H</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">CX</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">Rz</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test_fr_circuit</span><span class="o">.</span><span class="n">CX</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">H</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">CX</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">Rz</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">CX</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+<span class="n">test_fr_experiment</span> <span class="o">=</span> <span class="p">[</span><span class="n">CircuitShots</span><span class="p">(</span><span class="n">Circuit</span> <span class="o">=</span> <span class="n">test_fr_circuit</span><span class="p">,</span> <span class="n">Shots</span> <span class="o">=</span> <span class="mi">3000</span><span class="p">)]</span>
+
+<span class="n">ideal_mitres</span> <span class="o">=</span> <span class="n">gen_compiled_MitRes</span><span class="p">(</span><span class="n">AerBackend</span><span class="p">())</span>
+<span class="n">ideal_res</span> <span class="o">=</span> <span class="n">ideal_mitres</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">test_fr_experiment</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ideal_res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Counter</span><span class="p">({(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">2366</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">634</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compile_mitres_0</span> <span class="o">=</span> <span class="n">gen_compiled_MitRes</span><span class="p">(</span><span class="n">lagos_real</span><span class="p">,</span> <span class="n">optimisation_level</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">basic_results</span> <span class="o">=</span> <span class="n">compile_mitres_0</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">test_fr_experiment</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">basic_results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Counter</span><span class="p">({(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">2415</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">501</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">63</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">21</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ufr_results</span> <span class="o">=</span> <span class="n">ufr_mitres</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">test_fr_experiment</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ufr_results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Counter</span><span class="p">({(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">2521</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">616</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">52</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">11</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pfr_results</span> <span class="o">=</span> <span class="n">pfr_mitres</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">test_fr_experiment</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pfr_results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Counter</span><span class="p">({(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">2490</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">634</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">59</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">17</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Universal and Pauli Frame-Randomisation are expected to help suppress coherent errors that would usually build up over
+large circuits during their execution on some device. Considering these results, we could speculate that
+the results returned when using the mitigation <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object are closer to the ideal, but there
+aren’t enough shots here to say anything conclusive.</p>
+<p>However, we have shown that it is as straightforward to execute any Circuit with frame-randomisation as it is
+without, or as it was with SPAM error-mitigation.</p>
+</section>
+<section id="combining-mitres-methods">
+<h2>Combining <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> methods<a class="headerlink" href="#combining-mitres-methods" title="Permalink to this headline"></a></h2>
+<p>One of the key features of <code class="docutils literal notranslate"><span class="pre">qermit</span></code> is how it easily facilitates running combinations of error-mitigation protocols.
+While each error-mitigated <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> generator will have different options for what combinations can be done, for
+this example we will consider combining the frame-randomisation and SPAM mitigation methods we’ve previously looked at.</p>
+<p>As we have seen, when a generator function for a mitigated <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> method is called, it builds the desired mitigation
+scheme by passing various combinations of <code class="docutils literal notranslate"><span class="pre">MitTask</span> <span class="pre">to</span> <span class="pre">``TaskGraph</span></code> construction methods. In both the SPAM
+and frame-randomisation <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> generators, the starting building block is a basic <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object - combining
+mitigation methods is possible by simply starting this construction from a mitigated <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">gen_UnCorrelated_SPAM_MitRes</span></code> generator has two keywords for achieving this, <code class="docutils literal notranslate"><span class="pre">calibration_mitres</span></code> and
+<code class="docutils literal notranslate"><span class="pre">correction_mitres</span></code>.  The <code class="docutils literal notranslate"><span class="pre">calibration_mitres</span></code> keyword corresponds to the <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object through which
+characteriastion circuits are executed on the backend for characterisating SPAM errors, the <code class="docutils literal notranslate"><span class="pre">correction_mitres</span></code>
+keyword corresponds to the <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object through which experiment circuits are run (i.e. those passed to the <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code> method).</p>
+<p>To show this, Let’s create a SPAM mitigation <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object that also runs frame-randomisation on experiment circuits.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ufr_mitres</span> <span class="o">=</span> <span class="n">gen_Frame_Randomisation_MitRes</span><span class="p">(</span><span class="n">lagos_real</span><span class="p">,</span>
+                                            <span class="n">samples</span> <span class="o">=</span> <span class="mi">400</span><span class="p">)</span>
+
+<span class="n">ufr_spam_mitres</span> <span class="o">=</span> <span class="n">gen_UnCorrelated_SPAM_MitRes</span><span class="p">(</span><span class="n">lagos_real</span><span class="p">,</span>
+<span class="n">calibration_shots</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+<span class="n">correction_mitres</span> <span class="o">=</span> <span class="n">ufr_mitres</span><span class="p">)</span>
+
+<span class="n">ufr_spam_mitres</span><span class="o">.</span><span class="n">decompose_TaskGraph_nodes</span><span class="p">()</span>
+<span class="n">ufr_spam_mitres</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/ufr_spam_taskgraph.png" src="_images/ufr_spam_taskgraph.png" />
+<p>Let’s compare this task graph to the SPAM and frame-randomisation task graphs:</p>
+<img alt="_images/spam_mitres_decompose_taskgraph.png" src="_images/spam_mitres_decompose_taskgraph.png" />
+<img alt="_images/frame_randomisation_taskgraph.png" src="_images/frame_randomisation_taskgraph.png" />
+<p>Comparing both images, we can see that where the default SPAM <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> has a subgraph
+with a <code class="docutils literal notranslate"><span class="pre">&lt;MitTask::CircuitsToHandles&gt;</span></code> followed by a <code class="docutils literal notranslate"><span class="pre">&lt;MitTask::HandlesToResults&gt;</span></code>, the
+combined <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> here has this subgraph subsituted with the frame-randomisation <code class="docutils literal notranslate"><span class="pre">MitRes</span></code>.</p>
+<p>Running experiments with this combined <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> is identical to any other <code class="docutils literal notranslate"><span class="pre">MitRes</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ufr_spam_res</span> <span class="o">=</span> <span class="n">ufr_spam_mitres</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">test_fr_experiment</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ufr_spam_res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Counter</span><span class="p">({(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">2526</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">614</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">41</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">21</span><span class="p">})</span>
+</pre></div>
+</div>
+<dl class="citation">
+<dt class="label" id="wallman2015"><span class="brackets"><a class="fn-backref" href="#id2">Wallman2015</a></span></dt>
+<dd><p>Wallman, J., Emerson, J., 2015. Noise tailoring for scalable quantum computation via randomized compiling. Phys. Rev. A 94, 052325 (2016).</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="manual_intro.html" class="btn btn-neutral float-left" title="What is qermit?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="manual_mitex.html" class="btn btn-neutral float-right" title="MitEx" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2021 Cambridge Quantum Computing Ltd.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
