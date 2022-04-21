@@ -44,22 +44,32 @@ import pytest
 skip_remote_tests: bool = not IBMQ.stored_account()
 REASON = "IBMQ account not configured"
 
+
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
 def test_no_qubit_relabel():
 
     noiseless_backend = AerBackend()
-    casablanca_backend = IBMQEmulatorBackend("ibm_lagos", hub='partner-cqc', group='internal', project='default')
-    pec_mitex = gen_PEC_learning_based_MitEx(device_backend = casablanca_backend, simulator_backend = noiseless_backend)
+    casablanca_backend = IBMQEmulatorBackend(
+        "ibm_lagos", hub="partner-cqc", group="internal", project="default"
+    )
+    pec_mitex = gen_PEC_learning_based_MitEx(
+        device_backend=casablanca_backend, simulator_backend=noiseless_backend
+    )
 
     c = Circuit(3)
-    c.CZ(0,2).CZ(1,2)
+    c.CZ(0, 2).CZ(1, 2)
 
     qubit_pauli_string = QubitPauliString(
         [Qubit(0), Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z, Pauli.Z]
     )
     ansatz_circuit = AnsatzCircuit(c, 2000, SymbolsDict())
 
-    exp = [ObservableExperiment(ansatz_circuit, ObservableTracker(QubitPauliOperator({qubit_pauli_string: 1.0})))]
+    exp = [
+        ObservableExperiment(
+            ansatz_circuit,
+            ObservableTracker(QubitPauliOperator({qubit_pauli_string: 1.0})),
+        )
+    ]
     result = pec_mitex.run(exp)[0]
     assert result.all_qubits == {Qubit(0), Qubit(1), Qubit(2)}
 

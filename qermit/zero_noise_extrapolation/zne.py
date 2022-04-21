@@ -763,7 +763,7 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
     )
 
 
-def qpo_node_relabel(qpo:QubitPauliOperator, node_map:Dict[Node,Node]):
+def qpo_node_relabel(qpo: QubitPauliOperator, node_map: Dict[Node, Node]):
     """Relabel the nodes of qpo according to node_map
 
     :param qpo: Original qubit pauli operator
@@ -783,7 +783,7 @@ def qpo_node_relabel(qpo:QubitPauliOperator, node_map:Dict[Node,Node]):
             new_qps_dict[node_map[q]] = orig_qps_dict[q]
         new_qps = QubitPauliString(new_qps_dict)
         new_qpo_dict[new_qps] = orig_qpo_dict[orig_qps]
-    
+
     return QubitPauliOperator(new_qpo_dict)
 
 
@@ -844,7 +844,10 @@ def gen_initial_compilation_task(
                 )
             )
 
-        return (mapped_wire, node_map, )
+        return (
+            mapped_wire,
+            node_map,
+        )
 
     return MitTask(
         _label="CompileToBackend",
@@ -852,6 +855,7 @@ def gen_initial_compilation_task(
         _n_in_wires=1,
         _method=task,
     )
+
 
 def gen_qubit_relabel_task() -> MitTask:
     """Task reversing the relabelling of qubits performed during compilation.
@@ -862,7 +866,8 @@ def gen_qubit_relabel_task() -> MitTask:
     """
 
     def task(
-        obj, qpo_list:List[QubitPauliOperator], compilation_map:Dict[Node, Node]) -> Tuple[List[QubitPauliOperator]]:
+        obj, qpo_list: List[QubitPauliOperator], compilation_map: Dict[Node, Node]
+    ) -> Tuple[List[QubitPauliOperator]]:
         """Use node map returned by compilation unit to undo the relabelling
         performed by gen_initial_compilation_task
 
@@ -875,9 +880,9 @@ def gen_qubit_relabel_task() -> MitTask:
         :rtype: Tuple[List[QubitPauliOperator]]
         """
 
-        node_map = {value:key for key, value in compilation_map.items()}
+        node_map = {value: key for key, value in compilation_map.items()}
         new_qpo_list = [qpo_node_relabel(qpo, node_map) for qpo in qpo_list]
-        
+
         return (new_qpo_list,)
 
     return MitTask(
