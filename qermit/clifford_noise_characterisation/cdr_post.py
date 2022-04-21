@@ -17,14 +17,14 @@ from abc import ABC, abstractmethod
 from typing import List, Tuple, cast, Dict, Union
 
 import numpy as np  #  type: ignore
-import copy
-
 from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator
 from pytket.pauli import QubitPauliString  # type: ignore
 from qermit import MitTask
+from copy import copy
 import math
 import warnings
+from sympy.core.expr import Expr
 
 
 class _BaseExCorrectModel(ABC):
@@ -65,7 +65,7 @@ class _PolyCDRCorrect(_BaseExCorrectModel):
         return cast(
             float,
             sum(
-                coef * (noisy_expectation ** power)
+                coef * (noisy_expectation**power)
                 for coef, power in zip(self.params, range(self.degree, -1, -1))
             ),
         )
@@ -134,7 +134,7 @@ def cdr_quality_check_task_gen(
             # expectation value far from the original circuit.
             if is_far_count > len(calibration) * calibration_fraction:
                 warnings.warn(
-                    "Training data regularly differs significantly from original circuit. Fit may be poor."
+                    "Training data regularly differs significantly from original circuit, fit and results may be poor."
                 )
 
         return (
@@ -181,8 +181,7 @@ def cdr_calibration_task_gen(
         counter = 0
         for calibration in calibration_results:
             # dict from QubitPauliString to Tuple[List[float], List[float]]
-            # facilitates characteriastion of different QubitPauliStrings
-            # for different experiments
+            # facilitates characterisation of different QubitPauliStrings from different experiments
             noisy_char_dict: Dict[QubitPauliString, List[float]] = dict()
             exact_char_dict: Dict[QubitPauliString, List[float]] = dict()
 
@@ -211,7 +210,8 @@ def cdr_calibration_task_gen(
             # for each qubit pauli string in operator, add model for calibrating
             for key in noisy_char_dict:
                 model.calibrate(noisy_char_dict[key], exact_char_dict[key])
-                backend.backend_info.misc["CDR_" + str(counter)][key] = copy.copy(model)
+                # calibrate creates new model, copy it in to backend
+                backend.backend_info.misc["CDR_" + str(counter)][key] = copy(model)
             counter += 1
 
         return (True,)
@@ -261,12 +261,13 @@ def cdr_correction_task_gen(backend: Backend) -> MitTask:
             for qps in noisy_expectation[i]._dict:
                 if qps in models:
                     new_qpo_dict[qps] = cast(
-                        Union[int, float, complex],
+                        Union[int, float, complex, Expr],
                         models[qps].correct(float(noisy_expectation[i]._dict[qps])),
                     )
                 else:
                     new_qpo_dict[qps] = cast(
-                        Union[int, float, complex], noisy_expectation[i]._dict[qps]
+                        Union[int, float, complex, Expr],
+                        noisy_expectation[i]._dict[qps],
                     )
             corrected_expectations.append(QubitPauliOperator(new_qpo_dict))
 

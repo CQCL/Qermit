@@ -12,7 +12,7 @@ on a device, calculates their expectation values,
 and then modifies them by some coefficients, leaving an estimation of the expectation value of the observable.
 
 
-In its basic capacity, the ``MitEx.run`` `method <https://cqcl.github.io/qermit/mitex.html>`_ will run each of these
+In its basic capacity, the ``MitEx.run`` `method <https://cqcl.github.io/Qermit/mitex.html>`_ will run each of these
 tasks sequentially, automating the procedure.
 
 ::
@@ -188,7 +188,6 @@ will lack physical meaning, it will display how such a method could be written.
                     c.add_bit(b)
                     c.CX(q0, q1)
                     c.Measure(q1, b)
-                print(c.get_commands())
             return (experiment_wire,)
         return MitTask(_label="AddMeasureAncillas", _n_in_wires=1, _n_out_wires=1, _method=task)
 
@@ -211,7 +210,7 @@ adding measured ancilla ``Qubit``.
     sim_backend = AerBackend()
     mitex_discard = MitEx(backend = sim_backend)
     mitex_discard.prepend(ancillas_task)
-    mitex.get_task_graph()
+    mitex_discard.get_task_graph()
 
 
 .. image:: ancilla_mitex_taskgraph.png
@@ -343,7 +342,7 @@ if its value is within some passed range. A more realistic example may modify th
     
     ansatz_circuit_discard = AnsatzCircuit(Circuit=circuit_discard.copy(), Shots=shots, SymbolsDict=symbols)
 
-    print(discard_mitex.run([ObservableExperiment(ansatz_circuit_discard, ObservableTracker(qpo_discard))]))
+    print(combined_mitex.run([ObservableExperiment(ansatz_circuit_discard, ObservableTracker(qpo_discard))]))
 
 ::
 
@@ -381,7 +380,7 @@ using a classical simulator, and so can be compared to the results from noisy ru
 It is on this approach that the implementation of PEC in ``qermit`` is based.
 
 Generators for Probabilistic-Error-Cancellation ``MitEx`` objects are available in 
-the  ``qermit.probabilistic_error_cancellation`` `module <https://cqcl.github.io/qermit/probabilistic_error_cancellation.html>`_.
+the  ``qermit.probabilistic_error_cancellation`` `module <https://cqcl.github.io/Qermit/probabilistic_error_cancellation.html>`_.
  
 ::
 
@@ -389,14 +388,14 @@ the  ``qermit.probabilistic_error_cancellation`` `module <https://cqcl.github.io
     from pytket.extensions.qiskit import IBMQEmulatorBackend, AerBackend
 
     noiseless_backend = AerBackend()
-    casablanca_backend = IBMQEmulatorBackend(
-      "ibmq_casablanca",
-      hub='partner-cqc',
-      group='internal',
-      project='default',
+    lagos_backend = IBMQEmulatorBackend(
+      "ibm_lagos",
+      hub='',
+      group='',
+      project='',
     )  
 
-    pec_mitex = gen_PEC_learning_based_MitEx(device_backend = casablanca_backend, simulator_backend = noiseless_backend)
+    pec_mitex = gen_PEC_learning_based_MitEx(device_backend = lagos_backend, simulator_backend = noiseless_backend)
     pec_mitex.get_task_graph()
 
 .. image:: PEC_taskgraph.png
@@ -428,7 +427,7 @@ Let's construct a test case with expected value 1.0 and run the error-mitigation
 
 ::
 
-    [{(Znode[5], Znode[6]): 1.01978876035084}]
+    [{(Zq[0], Zq[1]): 1.07030397481665}]
 
 
 Zero-Noise-Extrapolation in ``qermit``
@@ -464,14 +463,14 @@ regression problem. There are several ansatz provided by ``qermit``. Each may ha
 advantages depending on: the device, dominant noise channel, etc.
 
 Generators for Zero-Noise-Extrapolation ``MitEx`` objects are available in 
-the ``qermit.zero_noise_extrapolation`` `module <https://cqcl.github.io/qermit/zero_noise_extrapolation.html>`_.
+the ``qermit.zero_noise_extrapolation`` `module <https://cqcl.github.io/Qermit/zero_noise_extrapolation.html>`_.
  
 ::
 
     from qermit.zero_noise_extrapolation import gen_ZNE_MitEx
     from pytket.extensions.qiskit import IBMQEmulatorBackend
 
-    zne_mitex = gen_ZNE_MitEx(backend=casablanca_backend, noise_scaling_list = [3,5,7])
+    zne_mitex = gen_ZNE_MitEx(backend=lagos_backend, noise_scaling_list = [3,5,7])
     zne_mitex.get_task_graph()
 
 
@@ -513,7 +512,7 @@ error-mitigation ``MitEx``.
 
 ::
 
-    [{(Znode[4], Znode[5], Znode[6]): 0.897650000000000}]
+    [{(Zq[0], Zq[1], Zq[2]): 0.882900000000000}]
 
 There are many customisation options available when using the zero-noise-extrapolation ``MitEx`` generator
 in ``qermit``, all can be seen via the documentation. 
@@ -548,7 +547,7 @@ In this sense, "Clifford-Circuit-Learning" refers to the general noise character
 efficiently simulated classically Clifford circuits and "Clifford-Data-Regression" refers to the noise correction
 technique used here.
 
-Generators for Clifford-Data-Regression ``MitEx`` objects are available in the ``qermit.clifford_noise_characterisation`` `module <https://cqcl.github.io/qermit/clifford_noise_characterisation.html>`_.
+Generators for Clifford-Data-Regression ``MitEx`` objects are available in the ``qermit.clifford_noise_characterisation`` `module <https://cqcl.github.io/Qermit/clifford_noise_characterisation.html>`_.
 
 ::
 
@@ -557,10 +556,10 @@ Generators for Clifford-Data-Regression ``MitEx`` objects are available in the `
 
     
     noisy_backend = IBMQBackend(
-      "ibmq_casablanca",
-      hub='partner-cqc',
-      group='internal',
-      project='default',
+      "ibm_lagos",
+      hub='',
+      group='',
+      project='',
     )  
     noiseless_backend = AerBackend()
 
@@ -656,7 +655,7 @@ For comparison we can run the same experiment without error-mitigation.
 
     [{(Zq[0], Zq[1], Zq[2]): 0.729000000000000}]
 
-For the basic example constructed, fairly small 2000 shots and the ibmq_casablanca device available
+For the basic example constructed, fairly small 2000 shots and the ibm_lagos device available
 through IBMQ, we see that the error-mitigated expectation value is closer to the expected value 1.0 than 
 without error-mitigation.
 
@@ -693,7 +692,7 @@ variational algorithm to adaptively account for these types of errors within the
 minimal additional quantum compute time.
 
 Generators for Depolarisation-Factor-Supression-For-Nearest-Clifford ``MitEx`` objects are available 
-in the ``qermit.clifford_noise_characterisation`` `module <https://cqcl.github.io/qermit/clifford_noise_characterisation.html>`_.
+in the ``qermit.clifford_noise_characterisation`` `module <https://cqcl.github.io/Qermit/clifford_noise_characterisation.html>`_.
 
 
 ::
@@ -701,13 +700,13 @@ in the ``qermit.clifford_noise_characterisation`` `module <https://cqcl.github.i
     from qermit.clifford_noise_characterisation import gen_DFSC_MitEx
     from pytket.extensions.qiskit import IBMQBackend
 
-    casablanca_backend = IBMQEmulatorBackend(
-      "ibmq_casablanca",
-      hub='partner-cqc',
-      group='internal',
-      project='default',
+    lagos_backend = IBMQEmulatorBackend(
+      "ibm_lagos",
+      hub='',
+      group='',
+      project='',
     )  
-    dfsc_mitex = gen_DFSC_MitEx(casablanca_backend)
+    dfsc_mitex = gen_DFSC_MitEx(lagos_backend)
     dfsc_mitex.get_task_graph()
 
 

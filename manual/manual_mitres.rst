@@ -9,7 +9,7 @@ being sent to the device via the hardware manufacturers language of choice. Fina
 results are returned, typically as a sequence of *Shots*, each shot being a single set of bit
 corresponding to the measurement result of each qubit.
 
-In its basic capacity the ``MitRes.run`` `method <https://cqcl.github.io/qermit/mitres.html>`_ will run
+In its basic capacity the ``MitRes.run`` `method <https://cqcl.github.io/Qermit/mitres.html>`_ will run
 each of these tasks sequentially. 
 
 ::
@@ -144,9 +144,11 @@ Let's rework the ``compile_circuits`` method to fit the ``List[CircuitShots]`` c
    from typing import Tuple
 
    def compile_circuit_shots(backend: Backend, circuit_shots: List[CircuitShots]) -> Tuple[List[CircuitShots]]:
-      for cs in circuit_shots:
-         backend.compile_circuit(cs.Circuit)
-      return (circuit_shots,)
+     compiled_circuit_shots = []
+     for cs in circuit_shots:
+           compiled_circuit = backend.get_compiled_circuit(cs.Circuit)
+           compiled_circuit_shots.append((compiled_circuit, cs.Shots))
+     return (compiled_circuit_shots,)
 
 Notice that ``MitRes.prepend`` does not allow tasks that pass ``Backend`` objects as arguments. When the ``MitRes`` 
 class constructor is called with a given ``Backend``, this same ``Backend`` is used to construct ``<MitTask::CircuitsToHandles>``
@@ -159,11 +161,13 @@ Let's work the ``compile_circuit_shots`` method here into a similar generator fu
 
    def backend_compile_circuit_shots_task_gen(
       backend: Backend
-   ) -> MitTask:
+      ) -> MitTask:
       def compile_circuit_shots(obj, circuit_shots: List[CircuitShots]) -> Tuple[List[CircuitShots]]:
+         compiled_circuit_shots = []
          for cs in circuit_shots:
-               backend.compile_circuit(cs.Circuit)
-         return (circuit_shots,)
+               compiled_circuit = backend.get_compiled_circuit(cs.Circuit)
+               compiled_circuit_shots.append((compiled_circuit, cs.Shots))
+         return (compiled_circuit_shots,)
 
       return MitTask(
          _label="CompileCircuitShots", _n_in_wires=1, _n_out_wires=1, _method=compile_circuit_shots
@@ -422,21 +426,21 @@ basis states, a transition matrix can be derived that describes the noisy SPAM p
 the inverse of this transition matrix to the distribution of a quantum state from some desired quantum computation 
 can effectively uncompute the errors caused by SPAM noise.
 
-Generators for SPAM ``MitRes`` objects are available in the ``qermit.spam`` `module <https://cqcl.github.io/qermit/spam.html>`_.
+Generators for SPAM ``MitRes`` objects are available in the ``qermit.spam`` `module <https://cqcl.github.io/Qermit/spam.html>`_.
 
 ::
 
    from qermit.spam import gen_UnCorrelated_SPAM_MitRes
    from pytket.extensions.qiskit import IBMQEmulatorBackend
 
-   casablanca_backend = IBMQEmulatorBackend(
-      "ibmq_casablanca",
-      hub='partner-cqc',
-      group='internal',
-      project='default',
+   lagos_backend = IBMQEmulatorBackend(
+      "ibm_lagos",
+      hub='',
+      group='',
+      project='',
    )  
    uc_spam_mitres = gen_UnCorrelated_SPAM_MitRes(
-      backend = casablanca_backend, 
+      backend = lagos_backend, 
       calibration_shots = 500
    )
    uc_spam_mitres.get_task_graph()
@@ -452,9 +456,9 @@ from the ``Backend.device`` attribute.
 
    from qermit.spam import gen_FullyCorrelated_SPAM_MitRes
 
-   casablanca_nodes = casablanca_backend.backend_info.architecture.nodes
-   correlated_nodes = [casablanca_nodes[:3], casablanca_nodes[3:]]
-   spam_mitres_fc = gen_FullyCorrelated_SPAM_MitRes(backend = casablanca_backend, 
+   lagos_nodes = lagos_backend.backend_info.architecture.nodes
+   correlated_nodes = [lagos_nodes[:3], lagos_nodes[3:]]
+   spam_mitres_fc = gen_FullyCorrelated_SPAM_MitRes(backend = lagos_backend, 
                                                       correlations = correlated_nodes, 
                                                       calibration_shots = 500)
 
@@ -469,7 +473,7 @@ and none to compare usage and results.
 
    from qermit.taskgraph import gen_compiled_MitRes
 
-   compile_mitres = gen_compiled_MitRes(backend = casablanca_backend)
+   compile_mitres = gen_compiled_MitRes(backend = lagos_backend)
    compile_mitres.get_task_graph()
 
 .. image:: compile_mitres_gen.png
@@ -500,8 +504,8 @@ The ``gen_compiled_MitRes`` generator function returns a ``MitRes`` object with 
 
 While the circuits constructed should have deterministic outputs, (1, 0, 1, 0) and (0, 1, 0, 1) respectively, we can 
 see that the counts are returning some shots for other basis states.
-The casablanca_backend used for these examples is a simulator ``Backend`` run with a noise model to emulate
-the properties of the Casablanca device available through IBMQ, including readout errors.
+The lagos_backend used for these examples is a simulator ``Backend`` run with a noise model to emulate
+the properties of the Lagos device available through IBMQ, including readout errors.
 
 ::
 
@@ -522,7 +526,7 @@ characterisation is already available for a given method when ``MitRes.run`` is 
 Naively comparing counts, we can see that by using the ``MitRes`` object returned by ``gen_UnCorrelated_SPAM_MitRes`` a greater proportion of the returned
 shots are the deterministic outputs we expected. We can not make any grand peformance claims based off this example alone, but we can see how
 SPAM error-mitigation can improve results. However as emphasised earlier, ``MitRes`` objects can work with any ``pytket`` ``Backend`` object, meaning
-we can easily run this experiment again using the real IBMQ Casablanca device simply by switching the ``Backend`` object passed to the generator function.
+we can easily run this experiment again using the real IBMQ Lagos device simply by switching the ``Backend`` object passed to the generator function.
 
 Also note that there is some statistical noise and the returned set of counts for SPAM error-mitigation has slightly more counts than specified. This 
 is an artifact of the correction procedure, but importantly we can see that the returned distribution is closer to the ideal.
@@ -531,19 +535,19 @@ is an artifact of the correction procedure, but importantly we can see that the 
 
    from pytket.extensions.qiskit import IBMQBackend
 
-   casablanca_real = IBMQBackend(
-      "ibmq_casablanca",
-      hub='partner-cqc',
-      group='internal',
-      project='default',
+   lagos_real = IBMQBackend(
+      "ibm_lagos",
+      hub='',
+      group='',
+      project='',
    )
-   compile_mitres_real = gen_compiled_MitRes(backend = casablanca_real)
-   uc_spam_mitres_real = gen_UnCorrelated_SPAM_MitRes(backend = casablanca_real, calibration_shots = 500)
+   compile_mitres_real = gen_compiled_MitRes(backend = lagos_real)
+   uc_spam_mitres_real = gen_UnCorrelated_SPAM_MitRes(backend = lagos_real, calibration_shots = 500)
 
    basic_results_real = compile_mitres_real.run(test_experiment)
    spam_mitigated_results_real = uc_spam_mitres_real.run(test_experiment)
 
-To complete our comparison on real hardware, results from the Casablanca device without SPAM error-mitigation:
+To complete our comparison on real hardware, results from the Lagos device without SPAM error-mitigation:
 
 ::
 
@@ -556,7 +560,7 @@ To complete our comparison on real hardware, results from the Casablanca device 
    Counter({(0, 1, 0, 1): 891, (0, 0, 0, 1): 60, (0, 1, 0, 0): 26, (0, 1, 1, 1): 11, (1, 1, 0, 1): 9, (0, 0, 0, 0): 2, (0, 1, 1, 0): 1})
 
 
-Results from the Casablanca device with SPAM error-mitigation:
+Results from the Lagos device with SPAM error-mitigation:
 
 ::
 
@@ -584,7 +588,7 @@ For example, averaging a noise channel over the n-qubit Pauli group has the effe
 
 In this manner, an n-qubit coherent noise channel can be tailored into an n-qubit stochastic Pauli noise channel. For Pauli channels, the worst case error rate is similar to the average error rate, whilst for coherent noise the worst case error rate scales as a square root of the average error rate.
 
-Generator functions in the ``qermit.frame_randomisation`` `module <https://cqcl.github.io/qermit/frame_randomisation.html>`_ return ``MitRes`` objects for automatically using randomised protocols
+Generator functions in the ``qermit.frame_randomisation`` `module <https://cqcl.github.io/Qermit/frame_randomisation.html>`_ return ``MitRes`` objects for automatically using randomised protocols
 when running experiments.
 
 Randomised compilation [Wallman2015]_ is a well known example of such a procedure.
@@ -593,7 +597,7 @@ Randomised compilation [Wallman2015]_ is a well known example of such a procedur
 
    from qermit.frame_randomisation import gen_Frame_Randomisation_MitRes
 
-   fr_mitres = gen_Frame_Randomisation_MitRes(casablanca_backend, samples = 200)
+   fr_mitres = gen_Frame_Randomisation_MitRes(lagos_backend, samples = 200)
 
    fr_mitres.get_task_graph()
 
@@ -613,12 +617,12 @@ An extended explanation of these methods is available in the ``pytket`` `manual 
 
    from qermit.frame_randomisation import FrameRandomisation
 
-   pfr_mitres = gen_Frame_Randomisation_MitRes(casablanca_real, 
+   pfr_mitres = gen_Frame_Randomisation_MitRes(lagos_real, 
                                              samples = 200, 
                                              frame_randomisation = FrameRandomisation.PauliFrameRandomisation,
                                              optimisation_level = 0)
 
-   ufr_mitres = gen_Frame_Randomisation_MitRes(casablanca_real, 
+   ufr_mitres = gen_Frame_Randomisation_MitRes(lagos_real, 
                                              samples = 200, 
                                              frame_randomisation = FrameRandomisation.UniversalFrameRandomisation,
                                              optimisation_level = 0)
@@ -629,8 +633,8 @@ used in the internal compilation task. For the purpose of this example we will k
 that any Circuit objects will only be compiled to fit basic device constraints i.e. the gate set and fixed 
 physical qubit connectivity.
 
-Let's compare performance, between a noiseless simulator, the Casablanca device without any mitigation and
-the Casablanca device with universal frame-randomisation.
+Let's compare performance, between a noiseless simulator, the Lagos device without any mitigation and
+the Lagos device with universal frame-randomisation.
 
 ::
 
@@ -651,7 +655,7 @@ the Casablanca device with universal frame-randomisation.
 
 ::
 
-   compile_mitres_0 = gen_compiled_MitRes(casablanca_real, optimisation_level = 0)
+   compile_mitres_0 = gen_compiled_MitRes(lagos_real, optimisation_level = 0)
    basic_results = compile_mitres_0.run(test_fr_experiment)
    print(basic_results[0].get_counts())
 
@@ -707,10 +711,10 @@ To show this, Let's create a SPAM mitigation ``MitRes`` object that also runs fr
 
 ::
 
-   ufr_mitres = gen_Frame_Randomisation_MitRes(casablanca_real, 
+   ufr_mitres = gen_Frame_Randomisation_MitRes(lagos_real, 
                                                samples = 400)
 
-   ufr_spam_mitres = gen_UnCorrelated_SPAM_MitRes(casablanca_real, 
+   ufr_spam_mitres = gen_UnCorrelated_SPAM_MitRes(lagos_real, 
    calibration_shots = 500,
    correction_mitres = ufr_mitres)
 

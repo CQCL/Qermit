@@ -12,18 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import networkx as nx  # type: ignore
+from typing import List, Union, OrderedDict, Tuple, cast, TYPE_CHECKING
 from .mittask import (
     MitTask,
     IOTask,
     Wire,
 )
-import networkx as nx  # type: ignore
-import graphviz as gv  # type: ignore
-from typing import List, Union, Tuple, cast
-import copy
+from .graphviz import _taskgraph_to_graphviz
+from copy import copy, deepcopy
 from tempfile import NamedTemporaryFile
 
+if TYPE_CHECKING:
+    import graphviz as gv  # type: ignore
 
 class TaskGraph:
     """
@@ -51,6 +52,9 @@ class TaskGraph:
         self._i, self._o = IOTask.Input, IOTask.Output
         self._task_graph.add_edge(self._i, self._o, key=(0, 0), data=None)
 
+        # if requested, all data is held in cache and can be accessed after running
+        self._cache: OrderedDict[str, Tuple[MitTask, List[Wire]]] = OrderedDict()
+
     def from_TaskGraph(self, task_graph: "TaskGraph"):
         """
         Returns a new TaskGraph object from another TaskGraph object.
@@ -61,7 +65,7 @@ class TaskGraph:
         :return: Copied TaskGraph
         :rtype: TaskGraph
         """
-        self._task_graph = copy.deepcopy(task_graph._task_graph)
+        self._task_graph = deepcopy(task_graph._task_graph)
         self._label = task_graph._label
         return self
 
@@ -81,7 +85,7 @@ class TaskGraph:
         return self._label
 
     @property
-    def n_in_wires(self):
+    def n_in_wires(self) -> int:
         """
         The number of in wires to a TaskGraph object is defined as the number
         of out edges from the Input Vertex, as when called, a TaskGraph object
@@ -91,7 +95,7 @@ class TaskGraph:
         return len(self._task_graph.out_edges(self._i))
 
     @property
-    def n_out_wires(self):
+    def n_out_wires(self) -> int:
         """
         The number of out wires to a TaskGraph object is defined as the number
         of in edges to the Input Vertex, as when called, a TaskGraph object
@@ -164,7 +168,11 @@ class TaskGraph:
         :type task: MitTask
         """
         assert self.check_prepend_wires(task)
-        task_copy = copy.copy(task)
+        # It's possible a single generated MitTask object could be used in different TaskGraph objects
+        # via prepend which may lead to a task address expecting input wires from different graphs
+        # use of copy here prevents this and task graph generation is not the bottleneck in running mitigation
+        # schemes so fine
+        task_copy = copy(task)
 
         for i, edge in enumerate(list(self._task_graph.out_edges(self._i, keys=True))):
             self._task_graph.add_edge(
@@ -185,7 +193,11 @@ class TaskGraph:
         :type task: MitTask
         """
         assert self.check_append_wires(task)
-        task_copy = copy.copy(task)
+        # It's possible a single generated MitTask object could be used in different TaskGraph objects
+        # via append which may lead to a task address expecting input wires from different graphs
+        # use of copy here prevents this and task graph generation is not the bottleneck in running mitigation
+        # schemes so fine
+        task_copy = copy(task)
         for edge in list(self._task_graph.in_edges(self._o, keys=True)):
             self._task_graph.add_edge(edge[0], task_copy, key=edge[2], data=None)
 
@@ -288,23 +300,6 @@ class TaskGraph:
                     check_for_decompose = True
                     break
 
-    # eat, yum,
-    def sandwich(
-        self,
-        prepend_task: Union[MitTask, "TaskGraph"],
-        append_task: Union[MitTask, "TaskGraph"],
-    ):
-        """
-        Does TaskGraph.prepend(prepend_task) and TaskGraph.append(append_task). Archaic but delicious.
-
-        :param prepend_task: New task to be prepended.
-        :type prepend_task: MitTask
-        :param append_task: New task to be appended.
-        :type append_task: MitTask
-        """
-        self.prepend(prepend_task)
-        self.append(append_task)
-
     def parallel(self, task: Union[MitTask, "TaskGraph"]):
         """
         Adds new MitTask/TaskGraph to TaskGraph object in parallel. All task in edges wired as out edges from Input vertex. All task out_Edges wired as in edges to Output Vertex.
@@ -312,7 +307,7 @@ class TaskGraph:
         :param task: New task to be added in parallel.
         :type task: MitTask
         """
-        task = copy.copy(task)
+        task = copy(task)
         base_n_input_outs = len(self._task_graph.out_edges(self._i))
         for port in range(task.n_in_wires):
             self._task_graph.add_edge(
@@ -330,7 +325,7 @@ class TaskGraph:
                 data=None,
             )
 
-    def run(self, input_wires: List[Wire]) -> Tuple[List[Wire]]:
+    def run(self, input_wires: List[Wire], cache: bool = False) -> Tuple[List[Wire]]:
         """
         Each task in TaskGraph is a pure function that produces output data
         from input data to some specification. Data is stored on edges of the
@@ -349,6 +344,10 @@ class TaskGraph:
         :param input_wires: Each Wire holds information assigned as data to an output edge
             from the input vertex of the _task_graph.
         :type input_wires: List[Wire]
+        :param cache: If True each Tasks output data is stored in an OrderedDict with the
+            Task.label_ attribute as its key.
+        :type cache: bool
+
 
         :return: Data from input edges to output vertex, assigned as wires.
         :rtype: Tuple[List[Wire]]
@@ -359,20 +358,40 @@ class TaskGraph:
         ):
             edge[2]["data"] = wire
 
-        # TODO Parallelism an option here, async an option for doing so.
+        # topological_sort fixes any dependency issues so can iterate and assume
+        # input wires all realised before a task is reached
         node_list = list(nx.topological_sort(self._task_graph))
 
+        # clear cache of held data if required
+        # also check that all mittask label are unique else dict will fail
+        if cache == True:
+            unique_labels = set()
+            for task in node_list:
+                if task not in (self._i, self._o):
+                    unique_labels.add(task._label)
+            if len(unique_labels) != len(self._task_graph) - 2:
+                raise ValueError(
+                    "Cache can't store all information as not all MitTask labels are unique."
+                )
+            else:
+                self._cache.clear()
+
         for task in node_list:
+            # nothing to process
             if task in (self._i, self._o):
                 continue
+            # get all input data and store on inputs for task
             in_edges = self._task_graph.in_edges(task, data=True, keys=True)
             inputs = [None] * len(in_edges)
             for _, _, ports, i_data in in_edges:
                 assert i_data["data"] is not None
                 inputs[ports[1]] = i_data["data"]
-            out_edges = self._task_graph.out_edges(task, data=True, keys=True)
-
+            # run held task
             outputs = task(inputs)
+            if cache == True:
+                self._cache[task._label] = (task, outputs)
+            # assign outputs ot out_edges of task
+            out_edges = self._task_graph.out_edges(task, data=True, keys=True)
             assert len(out_edges) == len(outputs)
             for _, _, ports, o_data in out_edges:
                 o_data["data"] = outputs[ports[0]]
@@ -383,123 +402,23 @@ class TaskGraph:
         ]
         return cast(Tuple[List[Wire]], tuple(output_wire))
 
-    def get_task_graph(self) -> gv.Digraph:
+    def get_cache(self) -> OrderedDict[str, Tuple[MitTask, List[Wire]]]:
+        """
+        :returns: Dictionary holding all output data from all MitTask.
+            This is only full after run is called with the cache argument set
+            to True. Keys are stored in graph topological order.
+        :rtype: Dict[str, Tuple[MitTask, List[Wire]]]
+        """
+        return self._cache
+
+    def get_task_graph(self) -> "gv.Digraph":
         """
         Return a visual representation of the DAG as a graphviz object.
 
         :returns:   Representation of the DAG
         :rtype:     graphviz.DiGraph
         """
-        G = gv.Digraph(
-            "MEME",
-            strict=True,
-        )
-
-        G.attr(rankdir="LR", ranksep="0.3", nodesep="0.15", margin="0")
-        wire_color = "red"
-        task_color = "darkolivegreen3"
-        io_color = "green"
-        out_color = "black"
-        in_color = "white"
-
-        boundary_node_attr = {"fontname": "Courier", "fontsize": "8"}
-        boundary_nodes = {self._i, self._o}
-
-        with G.subgraph(name="cluster_input") as c:
-            c.attr(rank="source")
-            c.node_attr.update(shape="point", color=io_color)
-            for i in range(len(self._task_graph.out_edges(self._i))):
-                c.node(
-                    name=str(((str(self._i) + "out").replace("::", "_"), i)),
-                    xlabel="Input" + str(i),
-                    **boundary_node_attr,
-                )
-
-        with G.subgraph(name="cluster_output") as c:
-            c.attr(rank="sink")
-            c.node_attr.update(shape="point", color=io_color)
-            for i in range(len(self._task_graph.in_edges(self._o))):
-                c.node(
-                    name=str(((str(self._o) + "in").replace("::", "_"), i)),
-                    xlabel="Output",
-                    **boundary_node_attr,
-                )
-
-        node_cluster_attr = {
-            "style": "rounded, filled",
-            "color": task_color,
-            "fontname": "Times-Roman",
-            "fontsize": "10",
-            "margin": "5",
-            "lheight": "100",
-        }
-        in_port_node_attr = {
-            "color": in_color,
-            "shape": "point",
-            "weight": "2",
-            "fontname": "Helvetica",
-            "fontsize": "8",
-            "rank": "source",
-        }
-        out_port_node_attr = {
-            "color": out_color,
-            "shape": "point",
-            "weight": "2",
-            "fontname": "Helvetica",
-            "fontsize": "8",
-            "rank": "sink",
-        }
-        count = 0
-        for node, ndata in self._task_graph.nodes.items():
-            if node not in boundary_nodes:
-                with G.subgraph(name="cluster_" + node._label + str(count)) as c:
-                    count = count + 1
-                    c.attr(label=str(node._label), **node_cluster_attr)
-
-                    n_in_ports = self._task_graph.in_degree(node)
-                    if n_in_ports == 1:
-                        c.node(
-                            name=str(((str(node) + "in").replace("::", "-"), 0)),
-                            **in_port_node_attr,
-                        )
-                    else:
-                        for i in range(n_in_ports):
-                            c.node(
-                                name=str(((str(node) + "in").replace("::", "-"), i)),
-                                xlabel=str(i),
-                                **in_port_node_attr,
-                            )
-
-                    n_out_ports = self._task_graph.out_degree(node)
-                    if n_out_ports == 1:
-                        c.node(
-                            name=str(((str(node) + "out").replace("::", "-"), 0)),
-                            **out_port_node_attr,
-                        )
-                    else:
-                        for i in range(n_out_ports):
-                            c.node(
-                                name=str(((str(node) + "out").replace("::", "-"), i)),
-                                xlabel=str(i),
-                                **out_port_node_attr,
-                            )
-
-        edge_attr = {
-            "weight": "2",
-            "arrowhead": "vee",
-            "arrowsize": "0.2",
-            "headclip": "true",
-            "tailclip": "true",
-        }
-        for edge, edata in self._task_graph.edges.items():
-            src_node, tgt_node, _ = edge
-            src_port = edge[2][0]
-            tgt_port = edge[2][1]
-            src_nodename = str(((str(src_node) + "out").replace("::", "-"), src_port))
-            tgt_nodename = str(((str(tgt_node) + "in").replace("::", "-"), tgt_port))
-            G.edge(src_nodename, tgt_nodename, color=wire_color, **edge_attr)
-        self.G = G
-        return G
+        return _taskgraph_to_graphviz(self._task_graph, None, self._label)
 
     def view_task_graph(self) -> None:
         """

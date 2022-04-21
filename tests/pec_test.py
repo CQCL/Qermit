@@ -37,6 +37,41 @@ from pytket import Circuit, Qubit, OpType
 import math
 from pytket.predicates import GateSetPredicate, CliffordCircuitPredicate  # type: ignore
 from qermit import AnsatzCircuit, ObservableExperiment
+from pytket.extensions.qiskit import IBMQEmulatorBackend
+from qiskit import IBMQ  # type: ignore
+import pytest
+
+skip_remote_tests: bool = not IBMQ.stored_account()
+REASON = "IBMQ account not configured"
+
+
+@pytest.mark.skipif(skip_remote_tests, reason=REASON)
+def test_no_qubit_relabel():
+
+    noiseless_backend = AerBackend()
+    lagos_backend = IBMQEmulatorBackend(
+        "ibm_lagos", hub="partner-cqc", group="internal", project="default"
+    )
+    pec_mitex = gen_PEC_learning_based_MitEx(
+        device_backend=lagos_backend, simulator_backend=noiseless_backend
+    )
+
+    c = Circuit(3)
+    c.CZ(0, 2).CZ(1, 2)
+
+    qubit_pauli_string = QubitPauliString(
+        [Qubit(0), Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z, Pauli.Z]
+    )
+    ansatz_circuit = AnsatzCircuit(c, 2000, SymbolsDict())
+
+    exp = [
+        ObservableExperiment(
+            ansatz_circuit,
+            ObservableTracker(QubitPauliOperator({qubit_pauli_string: 1.0})),
+        )
+    ]
+    result = pec_mitex.run(exp)[0]
+    assert result.all_qubits == {Qubit(0), Qubit(1), Qubit(2)}
 
 
 def test_gen_run_with_quasi_prob():
@@ -562,6 +597,7 @@ def test_gen_PEC_learning_based_MitEx():
 
 
 if __name__ == "__main__":
+    test_no_qubit_relabel()
     test_gen_run_with_quasi_prob()
     test_collate_results_task_gen()
     test_learn_quasi_probs_task_gen()

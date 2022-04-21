@@ -19,7 +19,7 @@
         <script src="_static/doctools.js"></script>
         <script src="_static/thebelab-helper.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -43,7 +43,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="manual_intro.html">What is qermit?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="manual_intro.html">What is Qermit?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="manual_mitres.html">MitRes</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">MitEx</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#error-mitigation-with-mitex">Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitEx</span></code></a></li>
@@ -89,7 +89,7 @@ the bit strings returned by measured qubit shots.</p>
 produces an appropriate set of measurement circuits, executes all these measurement circuits
 on a device, calculates their expectation values,
 and then modifies them by some coefficients, leaving an estimation of the expectation value of the observable.</p>
-<p>In its basic capacity, the <code class="docutils literal notranslate"><span class="pre">MitEx.run</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/mitex.html">method</a> will run each of these
+<p>In its basic capacity, the <code class="docutils literal notranslate"><span class="pre">MitEx.run</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/mitex.html">method</a> will run each of these
 tasks sequentially, automating the procedure.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit</span> <span class="kn">import</span> <span class="n">MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">AerBackend</span>
@@ -229,7 +229,6 @@ will lack physical meaning, it will display how such a method could be written.<
                 <span class="n">c</span><span class="o">.</span><span class="n">add_bit</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
                 <span class="n">c</span><span class="o">.</span><span class="n">CX</span><span class="p">(</span><span class="n">q0</span><span class="p">,</span> <span class="n">q1</span><span class="p">)</span>
                 <span class="n">c</span><span class="o">.</span><span class="n">Measure</span><span class="p">(</span><span class="n">q1</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_commands</span><span class="p">())</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">experiment_wire</span><span class="p">,)</span>
     <span class="k">return</span> <span class="n">MitTask</span><span class="p">(</span><span class="n">_label</span><span class="o">=</span><span class="s2">&quot;AddMeasureAncillas&quot;</span><span class="p">,</span> <span class="n">_n_in_wires</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">_n_out_wires</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">_method</span><span class="o">=</span><span class="n">task</span><span class="p">)</span>
 </pre></div>
@@ -247,7 +246,7 @@ adding measured ancilla <code class="docutils literal notranslate"><span class="
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sim_backend</span> <span class="o">=</span> <span class="n">AerBackend</span><span class="p">()</span>
 <span class="n">mitex_discard</span> <span class="o">=</span> <span class="n">MitEx</span><span class="p">(</span><span class="n">backend</span> <span class="o">=</span> <span class="n">sim_backend</span><span class="p">)</span>
 <span class="n">mitex_discard</span><span class="o">.</span><span class="n">prepend</span><span class="p">(</span><span class="n">ancillas_task</span><span class="p">)</span>
-<span class="n">mitex</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
+<span class="n">mitex_discard</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="_images/ancilla_mitex_taskgraph.png" src="_images/ancilla_mitex_taskgraph.png" />
@@ -355,7 +354,7 @@ if its value is within some passed range. A more realistic example may modify th
 <img alt="_images/combined_mitex_final_taskgraph.png" src="_images/combined_mitex_final_taskgraph.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansatz_circuit_discard</span> <span class="o">=</span> <span class="n">AnsatzCircuit</span><span class="p">(</span><span class="n">Circuit</span><span class="o">=</span><span class="n">circuit_discard</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">Shots</span><span class="o">=</span><span class="n">shots</span><span class="p">,</span> <span class="n">SymbolsDict</span><span class="o">=</span><span class="n">symbols</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">discard_mitex</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">ObservableExperiment</span><span class="p">(</span><span class="n">ansatz_circuit_discard</span><span class="p">,</span> <span class="n">ObservableTracker</span><span class="p">(</span><span class="n">qpo_discard</span><span class="p">))]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">combined_mitex</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">ObservableExperiment</span><span class="p">(</span><span class="n">ansatz_circuit_discard</span><span class="p">,</span> <span class="n">ObservableTracker</span><span class="p">(</span><span class="n">qpo_discard</span><span class="p">))]))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{(</span><span class="n">Zq</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Zq</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Zq</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span> <span class="mf">1.00000000000000</span><span class="p">}]</span>
@@ -388,19 +387,19 @@ primary circuit. The expectation of these Clifford circuits can be calculated ef
 using a classical simulator, and so can be compared to the results from noisy runs.
 It is on this approach that the implementation of PEC in <code class="docutils literal notranslate"><span class="pre">qermit</span></code> is based.</p>
 <p>Generators for Probabilistic-Error-Cancellation <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in
-the  <code class="docutils literal notranslate"><span class="pre">qermit.probabilistic_error_cancellation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/probabilistic_error_cancellation.html">module</a>.</p>
+the  <code class="docutils literal notranslate"><span class="pre">qermit.probabilistic_error_cancellation</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/probabilistic_error_cancellation.html">module</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.probabilistic_error_cancellation</span> <span class="kn">import</span> <span class="n">gen_PEC_learning_based_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQEmulatorBackend</span><span class="p">,</span> <span class="n">AerBackend</span>
 
 <span class="n">noiseless_backend</span> <span class="o">=</span> <span class="n">AerBackend</span><span class="p">()</span>
-<span class="n">casablanca_backend</span> <span class="o">=</span> <span class="n">IBMQEmulatorBackend</span><span class="p">(</span>
-  <span class="s2">&quot;ibmq_casablanca&quot;</span><span class="p">,</span>
-  <span class="n">hub</span><span class="o">=</span><span class="s1">&#39;partner-cqc&#39;</span><span class="p">,</span>
-  <span class="n">group</span><span class="o">=</span><span class="s1">&#39;internal&#39;</span><span class="p">,</span>
-  <span class="n">project</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+<span class="n">lagos_backend</span> <span class="o">=</span> <span class="n">IBMQEmulatorBackend</span><span class="p">(</span>
+  <span class="s2">&quot;ibm_lagos&quot;</span><span class="p">,</span>
+  <span class="n">hub</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="n">group</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="n">project</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">pec_mitex</span> <span class="o">=</span> <span class="n">gen_PEC_learning_based_MitEx</span><span class="p">(</span><span class="n">device_backend</span> <span class="o">=</span> <span class="n">casablanca_backend</span><span class="p">,</span> <span class="n">simulator_backend</span> <span class="o">=</span> <span class="n">noiseless_backend</span><span class="p">)</span>
+<span class="n">pec_mitex</span> <span class="o">=</span> <span class="n">gen_PEC_learning_based_MitEx</span><span class="p">(</span><span class="n">device_backend</span> <span class="o">=</span> <span class="n">lagos_backend</span><span class="p">,</span> <span class="n">simulator_backend</span> <span class="o">=</span> <span class="n">noiseless_backend</span><span class="p">)</span>
 <span class="n">pec_mitex</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -428,7 +427,7 @@ the  <code class="docutils literal notranslate"><span class="pre">qermit.probabi
 <span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{(</span><span class="n">Znode</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">Znode</span><span class="p">[</span><span class="mi">6</span><span class="p">]):</span> <span class="mf">1.01978876035084</span><span class="p">}]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{(</span><span class="n">Zq</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Zq</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span> <span class="mf">1.07030397481665</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -461,11 +460,11 @@ collections of values, and an anzats for the relation between the two, this redu
 regression problem. There are several ansatz provided by <code class="docutils literal notranslate"><span class="pre">qermit</span></code>. Each may have its
 advantages depending on: the device, dominant noise channel, etc.</p>
 <p>Generators for Zero-Noise-Extrapolation <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in
-the <code class="docutils literal notranslate"><span class="pre">qermit.zero_noise_extrapolation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/zero_noise_extrapolation.html">module</a>.</p>
+the <code class="docutils literal notranslate"><span class="pre">qermit.zero_noise_extrapolation</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/zero_noise_extrapolation.html">module</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.zero_noise_extrapolation</span> <span class="kn">import</span> <span class="n">gen_ZNE_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQEmulatorBackend</span>
 
-<span class="n">zne_mitex</span> <span class="o">=</span> <span class="n">gen_ZNE_MitEx</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">casablanca_backend</span><span class="p">,</span> <span class="n">noise_scaling_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">])</span>
+<span class="n">zne_mitex</span> <span class="o">=</span> <span class="n">gen_ZNE_MitEx</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">lagos_backend</span><span class="p">,</span> <span class="n">noise_scaling_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">])</span>
 <span class="n">zne_mitex</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -502,7 +501,7 @@ error-mitigation <code class="docutils literal notranslate"><span class="pre">Mi
 <span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{(</span><span class="n">Znode</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">Znode</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">Znode</span><span class="p">[</span><span class="mi">6</span><span class="p">]):</span> <span class="mf">0.897650000000000</span><span class="p">}]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{(</span><span class="n">Zq</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Zq</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Zq</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span> <span class="mf">0.882900000000000</span><span class="p">}]</span>
 </pre></div>
 </div>
 <p>There are many customisation options available when using the zero-noise-extrapolation <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> generator
@@ -531,16 +530,16 @@ circuit is then run on the device and its observable estimate corrected by the m
 <p>In this sense, “Clifford-Circuit-Learning” refers to the general noise characterisation approach defined by
 efficiently simulated classically Clifford circuits and “Clifford-Data-Regression” refers to the noise correction
 technique used here.</p>
-<p>Generators for Clifford-Data-Regression <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in the <code class="docutils literal notranslate"><span class="pre">qermit.clifford_noise_characterisation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/clifford_noise_characterisation.html">module</a>.</p>
+<p>Generators for Clifford-Data-Regression <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in the <code class="docutils literal notranslate"><span class="pre">qermit.clifford_noise_characterisation</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/clifford_noise_characterisation.html">module</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.clifford_noise_characterisation</span> <span class="kn">import</span> <span class="n">gen_CDR_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">AerBackend</span><span class="p">,</span> <span class="n">IBMQBackend</span>
 
 
 <span class="n">noisy_backend</span> <span class="o">=</span> <span class="n">IBMQBackend</span><span class="p">(</span>
-  <span class="s2">&quot;ibmq_casablanca&quot;</span><span class="p">,</span>
-  <span class="n">hub</span><span class="o">=</span><span class="s1">&#39;partner-cqc&#39;</span><span class="p">,</span>
-  <span class="n">group</span><span class="o">=</span><span class="s1">&#39;internal&#39;</span><span class="p">,</span>
-  <span class="n">project</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+  <span class="s2">&quot;ibm_lagos&quot;</span><span class="p">,</span>
+  <span class="n">hub</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="n">group</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="n">project</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">noiseless_backend</span> <span class="o">=</span> <span class="n">AerBackend</span><span class="p">()</span>
 
@@ -624,7 +623,7 @@ than as originally specified.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{(</span><span class="n">Zq</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Zq</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Zq</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span> <span class="mf">0.729000000000000</span><span class="p">}]</span>
 </pre></div>
 </div>
-<p>For the basic example constructed, fairly small 2000 shots and the ibmq_casablanca device available
+<p>For the basic example constructed, fairly small 2000 shots and the ibm_lagos device available
 through IBMQ, we see that the error-mitigated expectation value is closer to the expected value 1.0 than
 without error-mitigation.</p>
 <p>For combining schemes, the <code class="docutils literal notranslate"><span class="pre">StatesSimulatorMitex</span></code> keyword argument defines the <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> object
@@ -654,17 +653,17 @@ purity in the state preparation and incoherent errors dominate. It may be used, 
 variational algorithm to adaptively account for these types of errors within the optimisation loop using
 minimal additional quantum compute time.</p>
 <p>Generators for Depolarisation-Factor-Supression-For-Nearest-Clifford <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available
-in the <code class="docutils literal notranslate"><span class="pre">qermit.clifford_noise_characterisation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/clifford_noise_characterisation.html">module</a>.</p>
+in the <code class="docutils literal notranslate"><span class="pre">qermit.clifford_noise_characterisation</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/clifford_noise_characterisation.html">module</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.clifford_noise_characterisation</span> <span class="kn">import</span> <span class="n">gen_DFSC_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQBackend</span>
 
-<span class="n">casablanca_backend</span> <span class="o">=</span> <span class="n">IBMQEmulatorBackend</span><span class="p">(</span>
-  <span class="s2">&quot;ibmq_casablanca&quot;</span><span class="p">,</span>
-  <span class="n">hub</span><span class="o">=</span><span class="s1">&#39;partner-cqc&#39;</span><span class="p">,</span>
-  <span class="n">group</span><span class="o">=</span><span class="s1">&#39;internal&#39;</span><span class="p">,</span>
-  <span class="n">project</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+<span class="n">lagos_backend</span> <span class="o">=</span> <span class="n">IBMQEmulatorBackend</span><span class="p">(</span>
+  <span class="s2">&quot;ibm_lagos&quot;</span><span class="p">,</span>
+  <span class="n">hub</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="n">group</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="n">project</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">dfsc_mitex</span> <span class="o">=</span> <span class="n">gen_DFSC_MitEx</span><span class="p">(</span><span class="n">casablanca_backend</span><span class="p">)</span>
+<span class="n">dfsc_mitex</span> <span class="o">=</span> <span class="n">gen_DFSC_MitEx</span><span class="p">(</span><span class="n">lagos_backend</span><span class="p">)</span>
 <span class="n">dfsc_mitex</span><span class="o">.</span><span class="n">get_task_graph</span><span class="p">()</span>
 </pre></div>
 </div>
