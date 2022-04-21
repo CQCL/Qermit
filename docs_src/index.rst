@@ -1,4 +1,4 @@
-qermit
+Qermit
 ======
 
 .. image:: CQCLogo.png

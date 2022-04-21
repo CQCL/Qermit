@@ -20,5 +20,3 @@ qermit.mitex
 
 .. automethod:: qermit.taskgraph.mitex.get_expectations_task_gen
 
-.. automethod:: qermit.taskgraph.mitex.run_basic
-

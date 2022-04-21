@@ -1,5 +1,5 @@
 ***************
-What is qermit?
+What is Qermit?
 ***************
 
 .. Two-sentence overview
@@ -17,7 +17,7 @@ a comprehensive tour of the ``qermit`` platform, from running basic unmitigated 
 as much performance out of devices as possible.
 
 
-What is Error-Mitigation and how does qermit perform it?
+What is Error-Mitigation and how does Qermit perform it?
 --------------------------------------------------------
 
 It is common knowledge that we are currently in the NISQ-era of Quantum Computers; Noisy, Intermediate-Scale
