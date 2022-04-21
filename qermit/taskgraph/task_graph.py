@@ -85,7 +85,7 @@ class TaskGraph:
         return self._label
 
     @property
-    def n_in_wires(self):
+    def n_in_wires(self) -> int:
         """
         The number of in wires to a TaskGraph object is defined as the number
         of out edges from the Input Vertex, as when called, a TaskGraph object
@@ -95,7 +95,7 @@ class TaskGraph:
         return len(self._task_graph.out_edges(self._i))
 
     @property
-    def n_out_wires(self):
+    def n_out_wires(self) -> int:
         """
         The number of out wires to a TaskGraph object is defined as the number
         of in edges to the Input Vertex, as when called, a TaskGraph object
