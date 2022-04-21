@@ -134,7 +134,7 @@ def cdr_quality_check_task_gen(
             # expectation value far from the original circuit.
             if is_far_count > len(calibration) * calibration_fraction:
                 warnings.warn(
-                    "Training data regularly differs significantly from original circuit. Fit may be poor."
+                    "Training data regularly differs significantly from original circuit, fit and results may be poor."
                 )
 
         return (
@@ -181,8 +181,7 @@ def cdr_calibration_task_gen(
         counter = 0
         for calibration in calibration_results:
             # dict from QubitPauliString to Tuple[List[float], List[float]]
-            # facilitates characteriastion of different QubitPauliStrings
-            # for different experiments
+            # facilitates characterisation of different QubitPauliStrings from different experiments
             noisy_char_dict: Dict[QubitPauliString, List[float]] = dict()
             exact_char_dict: Dict[QubitPauliString, List[float]] = dict()
 

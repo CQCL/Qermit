@@ -18,6 +18,7 @@ from qermit import (  # type: ignore
     SymbolsDict,
     ObservableTracker,
     CircuitShots,
+    AnsatzCircuit,
 )
 from qermit.taskgraph.mitex import (  # type: ignore
     filter_observable_tracker_task_gen,
@@ -41,8 +42,8 @@ def gen_test_wire_objs():
     sd0 = SymbolsDict.symbols_from_dict({sym_0: 0.5, sym_1: 1})
     sd1 = SymbolsDict.symbols_from_dict({sym_0: 0.4, sym_1: 0.6})
 
-    ansatz_circuit0 = (c.copy(), 50, sd0)
-    ansatz_circuit1 = (c.copy(), 60, sd1)
+    ansatz_circuit0 = AnsatzCircuit(c.copy(), 50, sd0)
+    ansatz_circuit1 = AnsatzCircuit(c.copy(), 60, sd1)
 
     # make observable tracker
     qps_0 = QubitPauliString(
@@ -192,9 +193,7 @@ def test_get_expectations_task_gen():
     split_output = collate_task([original_circuits])
     # simulate results
     backend = AerBackend()
-    just_circuits = []
-    for c in split_output[0]:
-        just_circuits.append(backend.get_compiled_circuit(c[0]))
+    just_circuits = [backend.get_compiled_circuit(c[0]) for c in split_output[0]]
     handles = backend.process_circuits(just_circuits, 5)
     results = backend.get_results(handles)
 
@@ -226,8 +225,8 @@ def test_get_expectations_task_gen():
 # test specific MitEx methods
 def test_mitex_run():
     # create ansatz circuit objefts
-    c0 = (Circuit(3).X(0).X(1), 10, SymbolsDict())
-    c1 = (Circuit(3).X(1).X(2), 10, SymbolsDict())
+    c0 = AnsatzCircuit(Circuit(3).X(0).X(1), 10, SymbolsDict())
+    c1 = AnsatzCircuit(Circuit(3).X(1).X(2), 10, SymbolsDict())
     # create operator stirngs
     qps_12 = QubitPauliString([Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z])
     qps_01 = QubitPauliString([Qubit(0), Qubit(1)], [Pauli.Z, Pauli.Z])

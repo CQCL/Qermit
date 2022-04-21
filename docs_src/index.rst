@@ -1,4 +1,4 @@
-qermit
+Qermit
 ======
 
 .. image:: CQCLogo.png
@@ -13,7 +13,7 @@ CQC's python module for interfacing with `CQC <https://cambridgequantum.com/>`_ 
 it is practically straightforward to run an experiment with multiple forms of error-mitigation 
 where appropriate.
 
-``qermit`` is compatible with ``pytket`` 1.0.1.
+``qermit`` is compatible with ``pytket`` 1~.
 
 To install, run
 
@@ -104,7 +104,7 @@ the ``pytket`` ``Backend`` the ``MitEx`` object is defined by.
 
 
 
-See the Qermit `user manual <https://cqcl.github.io/qermit/manual/>`_ for an extended tutorial on using ``qermit``, including
+See the Qermit `user manual <https://cqcl.github.io/Qermit/manual/>`_ for an extended tutorial on using ``qermit``, including
 pre-defined error-mitigation methods and composing error-mitigation methods.
 
 ``qermit`` currently provides the following error-mitigation schemes (under their commonly known names):
@@ -120,10 +120,10 @@ pre-defined error-mitigation methods and composing error-mitigation methods.
 User Support
 ~~~~~~~~~~~~
 
-If you have problems with the use of qermit or you think you have found a bug, there 
+If you have problems with the use of Qermit or you think you have found a bug, there 
 are several ways to contact us:
 - Write an email to tket-support@cambridgequantum.com and ask for help with your problem.
-- You can write a bug report on the `CQC github <https://github.com/CQCL/qermit/issues>`_ with details of the problem and we will pick that up. You can also have a look on that page so see if your problem has already been reported by someone else.
+- You can write a bug report on the `CQC github <https://github.com/CQCL/Qermit/issues>`_ with details of the problem and we will pick that up. You can also have a look on that page so see if your problem has already been reported by someone else.
 
 .. toctree::
    :caption: API Reference:

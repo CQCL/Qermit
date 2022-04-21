@@ -167,8 +167,8 @@ def gen_state_circuits(
 
     state_circuits: List[Circuit] = []
     if len(rz_ops) == 1:
-        # make special case, just constantly
-        # keep on producing state circuits until limit reached
+        # make special case where its not possible to swap pairs
+        # produce state circuits until limit reached
         while len(state_circuits) < total_state_circuits:
             new_circuit = Circuit(c.n_qubits, len(c.bits))
             for i in range(len(all_coms)):
@@ -192,9 +192,10 @@ def gen_state_circuits(
             state_circuits.append(new_circuit)
         return state_circuits
 
+    # reassign variables where appropriate to guarantee there is always one pair of non-Clifford Clifford
+    # that can be resampled
     n_non_cliffords = min(n_non_cliffords, len(rz_ops) - 1)
     n_cliffords = len(rz_ops) - n_non_cliffords
-
     n_pairs = min(n_cliffords, n_non_cliffords, n_pairs)
 
     # non_cliffords are indices for gates to be left non Clifford

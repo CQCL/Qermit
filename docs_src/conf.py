@@ -17,14 +17,14 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "qermit"
+project = "Qermit"
 copyright = "2021, Cambridge Quantum Computing Ltd"
 author = "Cambridge Quantum Computing Ltd"
 
 # The short X.Y version
-version = "0.1"
+version = "0.2.0"
 # The full version, including alpha/beta/rc tags
-release = "0.1.0"
+release = "0.2.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -86,4 +86,4 @@ html_theme = "sphinx_rtd_theme"
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "qermitdoc"
+htmlhelp_basename = "Qermitdoc"

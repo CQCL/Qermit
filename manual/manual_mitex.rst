@@ -12,7 +12,7 @@ on a device, calculates their expectation values,
 and then modifies them by some coefficients, leaving an estimation of the expectation value of the observable.
 
 
-In its basic capacity, the ``MitEx.run`` `method <https://cqcl.github.io/qermit/mitex.html>`_ will run each of these
+In its basic capacity, the ``MitEx.run`` `method <https://cqcl.github.io/Qermit/mitex.html>`_ will run each of these
 tasks sequentially, automating the procedure.
 
 ::
@@ -380,7 +380,7 @@ using a classical simulator, and so can be compared to the results from noisy ru
 It is on this approach that the implementation of PEC in ``qermit`` is based.
 
 Generators for Probabilistic-Error-Cancellation ``MitEx`` objects are available in 
-the  ``qermit.probabilistic_error_cancellation`` `module <https://cqcl.github.io/qermit/probabilistic_error_cancellation.html>`_.
+the  ``qermit.probabilistic_error_cancellation`` `module <https://cqcl.github.io/Qermit/probabilistic_error_cancellation.html>`_.
  
 ::
 
@@ -463,7 +463,7 @@ regression problem. There are several ansatz provided by ``qermit``. Each may ha
 advantages depending on: the device, dominant noise channel, etc.
 
 Generators for Zero-Noise-Extrapolation ``MitEx`` objects are available in 
-the ``qermit.zero_noise_extrapolation`` `module <https://cqcl.github.io/qermit/zero_noise_extrapolation.html>`_.
+the ``qermit.zero_noise_extrapolation`` `module <https://cqcl.github.io/Qermit/zero_noise_extrapolation.html>`_.
  
 ::
 
@@ -547,7 +547,7 @@ In this sense, "Clifford-Circuit-Learning" refers to the general noise character
 efficiently simulated classically Clifford circuits and "Clifford-Data-Regression" refers to the noise correction
 technique used here.
 
-Generators for Clifford-Data-Regression ``MitEx`` objects are available in the ``qermit.clifford_noise_characterisation`` `module <https://cqcl.github.io/qermit/clifford_noise_characterisation.html>`_.
+Generators for Clifford-Data-Regression ``MitEx`` objects are available in the ``qermit.clifford_noise_characterisation`` `module <https://cqcl.github.io/Qermit/clifford_noise_characterisation.html>`_.
 
 ::
 
@@ -692,7 +692,7 @@ variational algorithm to adaptively account for these types of errors within the
 minimal additional quantum compute time.
 
 Generators for Depolarisation-Factor-Supression-For-Nearest-Clifford ``MitEx`` objects are available 
-in the ``qermit.clifford_noise_characterisation`` `module <https://cqcl.github.io/qermit/clifford_noise_characterisation.html>`_.
+in the ``qermit.clifford_noise_characterisation`` `module <https://cqcl.github.io/Qermit/clifford_noise_characterisation.html>`_.
 
 
 ::
