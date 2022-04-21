@@ -43,7 +43,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="manual_intro.html">What is qermit?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="manual_intro.html">What is Qermit?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="manual_mitres.html">MitRes</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">MitEx</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#error-mitigation-with-mitex">Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitEx</span></code></a></li>
@@ -89,7 +89,7 @@ the bit strings returned by measured qubit shots.</p>
 produces an appropriate set of measurement circuits, executes all these measurement circuits
 on a device, calculates their expectation values,
 and then modifies them by some coefficients, leaving an estimation of the expectation value of the observable.</p>
-<p>In its basic capacity, the <code class="docutils literal notranslate"><span class="pre">MitEx.run</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/mitex.html">method</a> will run each of these
+<p>In its basic capacity, the <code class="docutils literal notranslate"><span class="pre">MitEx.run</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/mitex.html">method</a> will run each of these
 tasks sequentially, automating the procedure.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit</span> <span class="kn">import</span> <span class="n">MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">AerBackend</span>
@@ -387,7 +387,7 @@ primary circuit. The expectation of these Clifford circuits can be calculated ef
 using a classical simulator, and so can be compared to the results from noisy runs.
 It is on this approach that the implementation of PEC in <code class="docutils literal notranslate"><span class="pre">qermit</span></code> is based.</p>
 <p>Generators for Probabilistic-Error-Cancellation <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in
-the  <code class="docutils literal notranslate"><span class="pre">qermit.probabilistic_error_cancellation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/probabilistic_error_cancellation.html">module</a>.</p>
+the  <code class="docutils literal notranslate"><span class="pre">qermit.probabilistic_error_cancellation</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/probabilistic_error_cancellation.html">module</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.probabilistic_error_cancellation</span> <span class="kn">import</span> <span class="n">gen_PEC_learning_based_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQEmulatorBackend</span><span class="p">,</span> <span class="n">AerBackend</span>
 
@@ -460,7 +460,7 @@ collections of values, and an anzats for the relation between the two, this redu
 regression problem. There are several ansatz provided by <code class="docutils literal notranslate"><span class="pre">qermit</span></code>. Each may have its
 advantages depending on: the device, dominant noise channel, etc.</p>
 <p>Generators for Zero-Noise-Extrapolation <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in
-the <code class="docutils literal notranslate"><span class="pre">qermit.zero_noise_extrapolation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/zero_noise_extrapolation.html">module</a>.</p>
+the <code class="docutils literal notranslate"><span class="pre">qermit.zero_noise_extrapolation</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/zero_noise_extrapolation.html">module</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.zero_noise_extrapolation</span> <span class="kn">import</span> <span class="n">gen_ZNE_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQEmulatorBackend</span>
 
@@ -530,7 +530,7 @@ circuit is then run on the device and its observable estimate corrected by the m
 <p>In this sense, “Clifford-Circuit-Learning” refers to the general noise characterisation approach defined by
 efficiently simulated classically Clifford circuits and “Clifford-Data-Regression” refers to the noise correction
 technique used here.</p>
-<p>Generators for Clifford-Data-Regression <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in the <code class="docutils literal notranslate"><span class="pre">qermit.clifford_noise_characterisation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/clifford_noise_characterisation.html">module</a>.</p>
+<p>Generators for Clifford-Data-Regression <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available in the <code class="docutils literal notranslate"><span class="pre">qermit.clifford_noise_characterisation</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/clifford_noise_characterisation.html">module</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.clifford_noise_characterisation</span> <span class="kn">import</span> <span class="n">gen_CDR_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">AerBackend</span><span class="p">,</span> <span class="n">IBMQBackend</span>
 
@@ -653,7 +653,7 @@ purity in the state preparation and incoherent errors dominate. It may be used, 
 variational algorithm to adaptively account for these types of errors within the optimisation loop using
 minimal additional quantum compute time.</p>
 <p>Generators for Depolarisation-Factor-Supression-For-Nearest-Clifford <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> objects are available
-in the <code class="docutils literal notranslate"><span class="pre">qermit.clifford_noise_characterisation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/clifford_noise_characterisation.html">module</a>.</p>
+in the <code class="docutils literal notranslate"><span class="pre">qermit.clifford_noise_characterisation</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/clifford_noise_characterisation.html">module</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.clifford_noise_characterisation</span> <span class="kn">import</span> <span class="n">gen_DFSC_MitEx</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQBackend</span>
 

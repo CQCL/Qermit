@@ -24,7 +24,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="MitEx" href="manual_mitex.html" />
-    <link rel="prev" title="What is qermit?" href="manual_intro.html" /> 
+    <link rel="prev" title="What is Qermit?" href="manual_intro.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,7 +43,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="manual_intro.html">What is qermit?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="manual_intro.html">What is Qermit?</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">MitRes</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#error-mitigation-with-mitres">Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitRes</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#extending-mitres-with-mittask">Extending <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> with <code class="docutils literal notranslate"><span class="pre">MitTask</span></code></a></li>
@@ -88,7 +88,7 @@ the quantum device of choice (such as the connectivity graph or set of gate prim
 being sent to the device via the hardware manufacturers language of choice. Finally
 results are returned, typically as a sequence of <em>Shots</em>, each shot being a single set of bit
 corresponding to the measurement result of each qubit.</p>
-<p>In its basic capacity the <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/mitres.html">method</a> will run
+<p>In its basic capacity the <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/mitres.html">method</a> will run
 each of these tasks sequentially.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit</span> <span class="kn">import</span> <span class="n">MitRes</span><span class="p">,</span> <span class="n">CircuitShots</span>
 <span class="kn">from</span> <span class="nn">pytket</span> <span class="kn">import</span> <span class="n">Circuit</span>
@@ -417,7 +417,7 @@ prone to SPAM noise this distribution is perturbed and other basis states may be
 basis states, a transition matrix can be derived that describes the noisy SPAM process. Simply applying
 the inverse of this transition matrix to the distribution of a quantum state from some desired quantum computation
 can effectively uncompute the errors caused by SPAM noise.</p>
-<p>Generators for SPAM <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects are available in the <code class="docutils literal notranslate"><span class="pre">qermit.spam</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/spam.html">module</a>.</p>
+<p>Generators for SPAM <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects are available in the <code class="docutils literal notranslate"><span class="pre">qermit.spam</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/spam.html">module</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.spam</span> <span class="kn">import</span> <span class="n">gen_UnCorrelated_SPAM_MitRes</span>
 <span class="kn">from</span> <span class="nn">pytket.extensions.qiskit</span> <span class="kn">import</span> <span class="n">IBMQEmulatorBackend</span>
 
@@ -540,7 +540,7 @@ is an artifact of the correction procedure, but importantly we can see that the 
 <p>Randomisation protocols can be used to tailor the form of the noise profile. By averaging the n-qubit noise channel over all elements from a group (specifically some subgroup of the full unitary group on n qubits), the resulting noise is invariant under the action of any element from this group.</p>
 <p>For example, averaging a noise channel over the n-qubit Pauli group has the effect of producing an n-qubit stochastic Pauli channel – this is a probabilistic linear combination of n-qubit Pauli unitary errors.</p>
 <p>In this manner, an n-qubit coherent noise channel can be tailored into an n-qubit stochastic Pauli noise channel. For Pauli channels, the worst case error rate is similar to the average error rate, whilst for coherent noise the worst case error rate scales as a square root of the average error rate.</p>
-<p>Generator functions in the <code class="docutils literal notranslate"><span class="pre">qermit.frame_randomisation</span></code> <a class="reference external" href="https://cqcl.github.io/qermit/frame_randomisation.html">module</a> return <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects for automatically using randomised protocols
+<p>Generator functions in the <code class="docutils literal notranslate"><span class="pre">qermit.frame_randomisation</span></code> <a class="reference external" href="https://cqcl.github.io/Qermit/frame_randomisation.html">module</a> return <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects for automatically using randomised protocols
 when running experiments.</p>
 <p>Randomised compilation <a class="reference internal" href="#wallman2015" id="id2"><span>[Wallman2015]</span></a> is a well known example of such a procedure.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qermit.frame_randomisation</span> <span class="kn">import</span> <span class="n">gen_Frame_Randomisation_MitRes</span>
@@ -673,7 +673,7 @@ combined <code class="docutils literal notranslate"><span class="pre">MitRes</sp
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="manual_intro.html" class="btn btn-neutral float-left" title="What is qermit?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="manual_intro.html" class="btn btn-neutral float-left" title="What is Qermit?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="manual_mitex.html" class="btn btn-neutral float-right" title="MitEx" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

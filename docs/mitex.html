@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qermit.mitex &mdash; qermit 0.1.0 documentation</title>
+  <title>qermit.mitex &mdash; Qermit 0.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,10 +27,10 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> qermit
+            <a href="index.html" class="icon icon-home"> Qermit
           </a>
               <div class="version">
-                0.1
+                0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -61,7 +61,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">qermit</a>
+          <a href="index.html">Qermit</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -213,8 +213,7 @@ Not permitted for MitEx, raises TypeError.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitex.MitEx.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mitex_wires</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.ObservableExperiment</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket.utils.operators.QubitPauliOperator</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.run" title="Permalink to this definition"></a></dt>
-<dd><p>Overloaded run method to allow type checking
-on input arguments and output.
+<dd><p>Overloaded run method.
 A single observable experiment is defined by a Tuple containg an Ansatz
 Circuit object and an ObservableTracker object.
 An AnsatzCircuit is a tuple containing a Circuit without measures (the ansatz circuit), the number
@@ -230,6 +229,26 @@ objects for running on devices.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>mitex_wires</strong> (<em>List</em><em>[</em><em>ObservableExperiment</em><em>]</em>) – Each Tuple pertains to a different Observable measuring experiment, and contains
 the minimum amount of information to run an Mitigated Experiment for calculating observables.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Observable experiment results as QubitPauliOperator, where values are expectations.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[QubitPauliOperator]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.taskgraph.mitex.MitEx.run_basic">
+<span class="sig-name descname"><span class="pre">run_basic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mitex_wires</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.utils.operators.QubitPauliOperator</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket.utils.operators.QubitPauliOperator</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.run_basic" title="Permalink to this definition"></a></dt>
+<dd><p>Additional run option for MitEx which simplifies the arguments required for basic experiments.
+An experiment is defined here as just the ansatz circuit, number of shots and the operator being measured.
+This method converts these into the arguments for using run, calls run and then returns the
+desired operator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mitex_wires</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>CircuitShots</em><em>, </em><em>QubitPauliOperator</em><em>]</em><em>]</em>) – Each tuple pertains to a different basic observable measuring experiment.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Observable experiment results as QubitPauliOperator, where values are expectations.</p>
