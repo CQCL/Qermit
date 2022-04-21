@@ -32,6 +32,7 @@ from pytket.predicates import CompilationUnit  # type: ignore
 from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial
+from pytket.circuit import Node
 
 
 box_types = {
@@ -762,6 +763,21 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
     )
 
 
+def qpo_node_relabel(qpo, node_map):
+
+    orig_qpo_dict = qpo._dict.copy()
+    new_qpo_dict = {}
+    for orig_qps in orig_qpo_dict:
+        orig_qps_dict = orig_qps.map
+        new_qps_dict = {}
+        for q in orig_qps_dict:
+            new_qps_dict[node_map[q]] = orig_qps_dict[q]
+        new_qps = QubitPauliString(new_qps_dict)
+        new_qpo_dict[new_qps] = orig_qpo_dict[orig_qps]
+    
+    return QubitPauliOperator(new_qpo_dict)
+
+
 def gen_initial_compilation_task(
     backend: Backend, optimisation_level: int = 1
 ) -> MitTask:
@@ -775,7 +791,7 @@ def gen_initial_compilation_task(
 
     def task(
         obj, wire: List[ObservableExperiment]
-    ) -> Tuple[List[ObservableExperiment]]:
+    ) -> Tuple[List[ObservableExperiment], dict[Node, Node]]:
         """Performs initial compilation before folding. This is to ensure minimal compilation
         after folding, as this could disrupt by how much the noise is increased.
 
@@ -797,23 +813,11 @@ def gen_initial_compilation_task(
             backend.default_compilation_pass(
                 optimisation_level=optimisation_level
             ).apply(cu)
-            final_map = cu.final_map
-
-            # TODO: This map needs to be used at the end of the
-            # process in order to map the output pauli string back
-            # to the pauli strings inputted by the user
+            node_map = cu.final_map
 
             # Alter the qubit pauli operator so that it maps to the new physical qubits.
-            orig_qpo_dict = obs_exp[1]._qubit_pauli_operator._dict.copy()
-            new_qpo_dict = {}
-            for orig_qps in orig_qpo_dict:
-                orig_qps_dict = orig_qps.map
-                new_qps_dict = {}
-                for q in orig_qps_dict:
-                    new_qps_dict[final_map[q]] = orig_qps_dict[q]
-                new_qps = QubitPauliString(new_qps_dict)
-                new_qpo_dict[new_qps] = orig_qpo_dict[orig_qps]
-            new_qpo = QubitPauliOperator(new_qpo_dict)
+            qpo = obs_exp[1]._qubit_pauli_operator
+            new_qpo = qpo_node_relabel(qpo, node_map)
 
             # Construct new list of experiments, but with compiled circuits.
             mapped_wire.append(
@@ -827,12 +831,29 @@ def gen_initial_compilation_task(
                 )
             )
 
-        return (mapped_wire,)
+        return (mapped_wire, node_map, )
 
     return MitTask(
         _label="CompileToBackend",
-        _n_out_wires=1,
+        _n_out_wires=2,
         _n_in_wires=1,
+        _method=task,
+    )
+
+def gen_qubit_relabel_task() -> MitTask:
+
+    def task(
+        obj, qpo_list:List[QubitPauliOperator], compilation_map:dict[Node, Node]) -> Tuple[List[QubitPauliOperator]]:
+
+        node_map = {value:key for key, value in compilation_map.items()}
+        new_qpo_list = [qpo_node_relabel(qpo, node_map) for qpo in qpo_list]
+        
+        return (new_qpo_list,)
+
+    return MitTask(
+        _label="RelabelQubits",
+        _n_out_wires=1,
+        _n_in_wires=2,
         _method=task,
     )
 
@@ -903,9 +924,13 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
         noise_scaling_list, _fit_type, _show_fit, _deg
     )
 
-    _experiment_taskgraph.append(extrapolation_task)
     _experiment_taskgraph.prepend(gen_duplication_task(len(noise_scaling_list) + 1))
+    _experiment_taskgraph.append(extrapolation_task)
+
+    _experiment_taskgraph.add_wire()
+
     _experiment_taskgraph.prepend(
         gen_initial_compilation_task(backend, _optimisation_level)
     )
+    _experiment_taskgraph.append(gen_qubit_relabel_task())
     return MitEx(backend).from_TaskGraph(_experiment_taskgraph)

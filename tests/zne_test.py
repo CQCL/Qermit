@@ -72,7 +72,7 @@ def test_gen_initial_compilation_task():
     task = gen_initial_compilation_task(be, optimisation_level=1)
 
     assert task.n_in_wires == 1
-    assert task.n_out_wires == 1
+    assert task.n_out_wires == 2
 
     c_1 = Circuit(2).CZ(0, 1).T(1)
     c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
@@ -478,3 +478,4 @@ if __name__ == "__main__":
     test_zne_identity()
     test_simple_run_end_to_end()
     test_odd_gate_folding()
+    test_circuit_folding_TK1()
