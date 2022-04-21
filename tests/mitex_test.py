@@ -247,6 +247,29 @@ def test_mitex_run():
     assert res[1][qps_012] == 0.7
 
 
+def test_mitex_run_basic():
+    # create ansatz circuit objects
+    c0 = CircuitShots(Circuit(3).X(0).X(1), 10)
+    c1 = CircuitShots(Circuit(3).X(1).X(2), 10)
+    # create operator stirngs
+    qps_12 = QubitPauliString([Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z])
+    qps_01 = QubitPauliString([Qubit(0), Qubit(1)], [Pauli.Z, Pauli.Z])
+    qps_012 = QubitPauliString(
+        [Qubit(0), Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z, Pauli.Z]
+    )
+    # create observable tracker objects
+    qpo0 = QubitPauliOperator({qps_01: 0.5, qps_12: 1.0})
+    qpo1 = QubitPauliOperator({qps_012: 0.7})
+    # run experiments
+    experiment = [(c0, qpo0), (c1, qpo1)]
+    me = MitEx(AerBackend())
+    res = me.run_basic(experiment)
+    assert len(res) == 2
+    assert res[0][qps_01] == 0.5
+    assert res[0][qps_12] == -1.0
+    assert res[1][qps_012] == 0.7
+
+
 def test_gen_compiled_shot_split_MitRes():
 
     backend = AerBackend()
@@ -274,3 +297,5 @@ if __name__ == "__main__":
     test_collate_and_split_circuit_shots_task_gen()
     test_get_expectations_task_gen()
     test_mitex_run()
+    test_mitex_run_basic()
+    test_gen_compiled_shot_split_MitRes()
