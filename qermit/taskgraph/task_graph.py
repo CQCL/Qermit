@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import networkx as nx  # type: ignore
-from typing import List, Union, Tuple, cast, TYPE_CHECKING
+from typing import List, Union, OrderedDict, Tuple, cast, TYPE_CHECKING
 from .mittask import (
     MitTask,
     IOTask,
@@ -51,6 +51,9 @@ class TaskGraph:
 
         self._i, self._o = IOTask.Input, IOTask.Output
         self._task_graph.add_edge(self._i, self._o, key=(0, 0), data=None)
+
+        # if requested, all data is held in cache and can be accessed after running
+        self._cache: OrderedDict[str, Tuple[MitTask, List[Wire]]] = OrderedDict()
 
     def from_TaskGraph(self, task_graph: "TaskGraph"):
         """
@@ -322,7 +325,7 @@ class TaskGraph:
                 data=None,
             )
 
-    def run(self, input_wires: List[Wire]) -> Tuple[List[Wire]]:
+    def run(self, input_wires: List[Wire], cache: bool = False) -> Tuple[List[Wire]]:
         """
         Each task in TaskGraph is a pure function that produces output data
         from input data to some specification. Data is stored on edges of the
@@ -341,6 +344,10 @@ class TaskGraph:
         :param input_wires: Each Wire holds information assigned as data to an output edge
             from the input vertex of the _task_graph.
         :type input_wires: List[Wire]
+        :param cache: If True each Tasks output data is stored in an OrderedDict with the
+            Task.label_ attribute as its key.
+        :type cache: bool
+
 
         :return: Data from input edges to output vertex, assigned as wires.
         :rtype: Tuple[List[Wire]]
@@ -354,6 +361,21 @@ class TaskGraph:
         # topological_sort fixes any dependency issues so can iterate and assume
         # input wires all realised before a task is reached
         node_list = list(nx.topological_sort(self._task_graph))
+
+        # clear cache of held data if required
+        # also check that all mittask label are unique else dict will fail
+        if cache == True:
+            unique_labels = set()
+            for task in node_list:
+                if task not in (self._i, self._o):
+                    unique_labels.add(task._label)
+            if len(unique_labels) != len(self._task_graph) - 2:
+                raise ValueError(
+                    "Cache can't store all information as not all MitTask labels are unique."
+                )
+            else:
+                self._cache.clear()
+
         for task in node_list:
             # nothing to process
             if task in (self._i, self._o):
@@ -366,6 +388,8 @@ class TaskGraph:
                 inputs[ports[1]] = i_data["data"]
             # run held task
             outputs = task(inputs)
+            if cache == True:
+                self._cache[task._label] = (task, outputs)
             # assign outputs ot out_edges of task
             out_edges = self._task_graph.out_edges(task, data=True, keys=True)
             assert len(out_edges) == len(outputs)
@@ -377,6 +401,15 @@ class TaskGraph:
             for edge in list(self._task_graph.in_edges(self._o, data=True))
         ]
         return cast(Tuple[List[Wire]], tuple(output_wire))
+
+    def get_cache(self) -> OrderedDict[str, Tuple[MitTask, List[Wire]]]:
+        """
+        :returns: Dictionary holding all output data from all MitTask.
+            This is only full after run is called with the cache argument set
+            to True. Keys are stored in graph topological order.
+        :rtype: Dict[str, Tuple[MitTask, List[Wire]]]
+        """
+        return self._cache
 
     def get_task_graph(self) -> "gv.Digraph":
         """

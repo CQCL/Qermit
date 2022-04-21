@@ -24,21 +24,24 @@ from .mittask import (
     IOTask,
     CircuitShots,
     Wire,
+    AnsatzCircuit,
     ObservableExperiment,
 )
-from .utils import ObservableTracker, MeasurementCircuit, MeasurementInfo
+from .utils import ObservableTracker, MeasurementCircuit, MeasurementInfo, SymbolsDict
 from pytket.utils import QubitPauliOperator
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket import Bit, Circuit
 from pytket.backends.backendresult import BackendResult
-from typing import Tuple, List, Union, cast
+from typing import Tuple, List, OrderedDict, Union, cast
 import networkx as nx  # type: ignore
 from pytket.backends import Backend  # type: ignore
 import inspect
 from copy import deepcopy
 
 
-def gen_compiled_shot_split_MitRes(backend: Backend, max_shots: int, optimisation_level: int = 1) -> MitRes:
+def gen_compiled_shot_split_MitRes(
+    backend: Backend, max_shots: int, optimisation_level: int = 1
+) -> MitRes:
     """
     Returns a shot splitting MitRes object with a compilation task prepended that compiles
     circuit wires via backend.compile_circuit. Optimisation level can be optionally
@@ -57,6 +60,7 @@ def gen_compiled_shot_split_MitRes(backend: Backend, max_shots: int, optimisatio
     mr = gen_shot_split_MitRes(backend, max_shots)
     mr.prepend(backend_compile_circuit_shots_task_gen(backend, optimisation_level))
     return mr
+
 
 def gen_compiled_MitRes(backend: Backend, optimisation_level: int = 1) -> MitRes:
     """
@@ -292,6 +296,9 @@ class MitEx(TaskGraph):
         self._task_graph = nx.MultiDiGraph()
         self._i, self._o = IOTask.Input, IOTask.Output
 
+        # if requested, all data is held in cache and can be accessed after running
+        self._cache: OrderedDict[str, Tuple[MitTask, List[Wire]]] = OrderedDict()
+
         # add edge from input to filtering task to generate measurement circuits
         filter_observable_tracker_task = filter_observable_tracker_task_gen()
         self._task_graph.add_edge(
@@ -463,8 +470,7 @@ class MitEx(TaskGraph):
         self, mitex_wires: List[ObservableExperiment]
     ) -> List[QubitPauliOperator]:
         """
-        Overloaded run method to allow type checking
-        on input arguments and output.
+        Overloaded run method.
         A single observable experiment is defined by a Tuple containg an Ansatz
         Circuit object and an ObservableTracker object.
         An AnsatzCircuit is a tuple containing a Circuit without measures (the ansatz circuit), the number
@@ -485,3 +491,27 @@ class MitEx(TaskGraph):
         :rtype: List[QubitPauliOperator]
         """
         return self([mitex_wires])[0]
+
+    def run_basic(
+        self, mitex_wires: List[Tuple[CircuitShots, QubitPauliOperator]]
+    ) -> List[QubitPauliOperator]:
+        """
+        Additional run option for MitEx which simplifies the arguments required for basic experiments.
+        An experiment is defined here as just the ansatz circuit, number of shots and the operator being measured.
+        This method converts these into the arguments for using run, calls run and then returns the
+        desired operator.
+
+        :param mitex_wires: Each tuple pertains to a different basic observable measuring experiment.
+        :type mitex_wires: List[Tuple[CircuitShots, QubitPauliOperator]]
+
+        :return: Observable experiment results as QubitPauliOperator, where values are expectations.
+        :rtype: List[QubitPauliOperator]
+        """
+        run_wires = [
+            ObservableExperiment(
+                AnsatzCircuit(m[0].Circuit, m[0].Shots, SymbolsDict()),
+                ObservableTracker(m[1]),
+            )
+            for m in mitex_wires
+        ]
+        return self.run(run_wires)

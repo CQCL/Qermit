@@ -212,10 +212,10 @@ def calculate_correlation_matrices(
                 # update characterisation matrix
                 subsets_matrix_map[qb_sub][
                     measured_state_index, prepared_state_index
-                ] += count
+                ] += count  # type: ignore
 
     # normalise everything
-    normalised_mats = [mat / np.sum(mat, axis=0) for mat in subsets_matrix_map.values()]
+    normalised_mats = [mat / np.sum(mat, axis=0) for mat in subsets_matrix_map.values()]  # type: ignore
     return FullCorrelatedNoiseCharacterisation(
         correlations, node_index_dict, normalised_mats
     )

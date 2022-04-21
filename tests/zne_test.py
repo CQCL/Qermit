@@ -27,8 +27,8 @@ from qermit.zero_noise_extrapolation.zne import (  # type: ignore
     extrapolation_task_gen,
     digital_folding_task_gen,
 )
-from pytket.predicates import GateSetPredicate
-from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.predicates import GateSetPredicate  # type: ignore
+from pytket.extensions.qiskit import AerBackend, IBMQEmulatorBackend  # type: ignore
 from pytket import Circuit, Qubit
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.utils import QubitPauliOperator
@@ -36,8 +36,8 @@ from numpy.polynomial.polynomial import polyval
 import math
 import numpy as np
 from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
-import qiskit.providers.aer.noise as noise
-from pytket.circuit import OpType
+import qiskit.providers.aer.noise as noise  # type: ignore
+from pytket.circuit import OpType  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
 
@@ -59,7 +59,6 @@ for node in [i for i in range(n_qubits)]:
 
 noisy_backend = AerBackend(noise_model)
 
-from pytket.extensions.qiskit import IBMQEmulatorBackend
 
 skip_remote_tests: bool = not IBMQ.stored_account()
 REASON = "IBMQ account not configured"
