@@ -26,6 +26,7 @@ from qermit.zero_noise_extrapolation.zne import (  # type: ignore
     gen_duplication_task,
     extrapolation_task_gen,
     digital_folding_task_gen,
+    gen_qubit_relabel_task,
 )
 from pytket.predicates import GateSetPredicate
 from pytket.extensions.qiskit import AerBackend  # type: ignore
@@ -40,6 +41,7 @@ import qiskit.providers.aer.noise as noise
 from pytket.circuit import OpType
 from qiskit import IBMQ  # type: ignore
 import pytest
+from pytket.circuit import Node, PauliExpBox
 
 n_qubits = 2
 
@@ -64,6 +66,41 @@ from pytket.extensions.qiskit import IBMQEmulatorBackend
 skip_remote_tests: bool = not IBMQ.stored_account()
 REASON = "IBMQ account not configured"
 
+@pytest.mark.skipif(skip_remote_tests, reason=REASON)
+def test_no_qubit_relabel():
+
+    casablanca_backend = IBMQEmulatorBackend("ibm_lagos", hub='partner-cqc', group='internal', project='default')
+    zne_mitex = gen_ZNE_MitEx(backend=casablanca_backend, noise_scaling_list = [3,5,7])
+
+    c = Circuit(3)
+    c.CZ(0,2).CZ(1,2)
+
+    qubit_pauli_string = QubitPauliString(
+        [Qubit(0), Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z, Pauli.Z]
+    )
+    ansatz_circuit = AnsatzCircuit(c, 2000, SymbolsDict())
+
+    exp = [ObservableExperiment(ansatz_circuit, ObservableTracker(QubitPauliOperator({qubit_pauli_string: 1.0})))]
+    result = zne_mitex.run(exp)[0]
+    assert result.all_qubits == {Qubit(0), Qubit(1), Qubit(2)}
+
+def test_gen_qubit_relabel_task():
+    
+    task = gen_qubit_relabel_task()
+
+    assert task.n_in_wires == 2
+    assert task.n_out_wires == 1
+
+    qubit_pauli_string = QubitPauliString([Qubit(0), Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z, Pauli.Z])
+    qubit_pauli_operator = QubitPauliOperator({qubit_pauli_string: 1.0})
+
+    compilation_map = {Node(0):Qubit(0), Node(1):Qubit(1), Node(2):Qubit(2)}
+
+    relabeled_qubit_pauli_string = QubitPauliString([Node(0), Node(1), Node(2)], [Pauli.Z, Pauli.Z, Pauli.Z])
+    relabeled_qubit_pauli_operator = QubitPauliOperator({relabeled_qubit_pauli_string: 1.0})
+
+    result = task(([qubit_pauli_operator], compilation_map))[0][0]
+    assert result == relabeled_qubit_pauli_operator
 
 def test_gen_initial_compilation_task():
 
@@ -471,6 +508,7 @@ def test_odd_gate_folding():
 
 
 if __name__ == "__main__":
+    test_no_qubit_relabel()
     test_extrapolation_task_gen()
     test_gen_duplication_task()
     test_digital_folding_task_gen()
@@ -479,3 +517,4 @@ if __name__ == "__main__":
     test_simple_run_end_to_end()
     test_odd_gate_folding()
     test_circuit_folding_TK1()
+    test_gen_qubit_relabel_task()

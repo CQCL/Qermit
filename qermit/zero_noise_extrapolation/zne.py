@@ -763,7 +763,16 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
     )
 
 
-def qpo_node_relabel(qpo, node_map):
+def qpo_node_relabel(qpo:QubitPauliOperator, node_map:Dict[Node,Node]):
+    """Relabel the nodes of qpo according to node_map
+
+    :param qpo: Original qubit pauli operator
+    :type qpo: QubitPauliOperator
+    :param node_map: Map between nodes
+    :type node_map: Dict[Node,Node]
+    :return: Relabeled qubit pauli operator
+    :rtype: QubitPauliOperator
+    """
 
     orig_qpo_dict = qpo._dict.copy()
     new_qpo_dict = {}
