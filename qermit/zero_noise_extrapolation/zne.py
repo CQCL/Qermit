@@ -26,13 +26,13 @@ from pytket.pauli import QubitPauliString  # type: ignore
 from enum import Enum
 import numpy as np
 from scipy.optimize import curve_fit  # type: ignore
-from typing import List, Tuple, cast
+from typing import List, Tuple, cast, Dict
 from pytket import Circuit, OpType
 from pytket.predicates import CompilationUnit  # type: ignore
 from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial
-from pytket.circuit import Node
+from pytket.circuit import Node  # type: ignore
 
 
 box_types = {
@@ -791,7 +791,7 @@ def gen_initial_compilation_task(
 
     def task(
         obj, wire: List[ObservableExperiment]
-    ) -> Tuple[List[ObservableExperiment], dict[Node, Node]]:
+    ) -> Tuple[List[ObservableExperiment], Dict[Node, Node]]:
         """Performs initial compilation before folding. This is to ensure minimal compilation
         after folding, as this could disrupt by how much the noise is increased.
 
@@ -843,7 +843,7 @@ def gen_initial_compilation_task(
 def gen_qubit_relabel_task() -> MitTask:
 
     def task(
-        obj, qpo_list:List[QubitPauliOperator], compilation_map:dict[Node, Node]) -> Tuple[List[QubitPauliOperator]]:
+        obj, qpo_list:List[QubitPauliOperator], compilation_map:Dict[Node, Node]) -> Tuple[List[QubitPauliOperator]]:
 
         node_map = {value:key for key, value in compilation_map.items()}
         new_qpo_list = [qpo_node_relabel(qpo, node_map) for qpo in qpo_list]
