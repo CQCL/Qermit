@@ -781,7 +781,9 @@ def qpo_node_relabel(qpo, node_map):
 def gen_initial_compilation_task(
     backend: Backend, optimisation_level: int = 1
 ) -> MitTask:
-    """Perform compilation before folding.
+    """Perform compilation to the backend. Note that this will relabel the
+    nodes of the device, and so should be followed by gen_qubit_relabel_task
+    in the task graph.
 
     :param backend: Backend to compile to
     :type backend: Backend
@@ -797,8 +799,10 @@ def gen_initial_compilation_task(
 
         :param wire: List of experiments
         :type wire: List[ObservableExperiment]
-        :return: List of experiments compiled to run on the inputted backend
-        :rtype: Tuple[List[ObservableExperiment]]
+        :return: List of experiments compiled to run on the inputted backend.
+        Additionally a dictionary describing how the nodes have been mapped
+        by compilation.
+        :rtype: Tuple[List[ObservableExperiment], Dict[Node, Node]]
         """
 
         mapped_wire = []
@@ -841,9 +845,26 @@ def gen_initial_compilation_task(
     )
 
 def gen_qubit_relabel_task() -> MitTask:
+    """Task reversing the relabelling of qubits performed during compilation.
+    This should follow gen_initial_compilation_task
+
+    :return: Task performing relabelling.
+    :rtype: MitTask
+    """
 
     def task(
         obj, qpo_list:List[QubitPauliOperator], compilation_map:Dict[Node, Node]) -> Tuple[List[QubitPauliOperator]]:
+        """Use node map returned by compilation unit to undo the relabelling
+        performed by gen_initial_compilation_task
+
+        :param qpo_list: List of QubitPauliOperator
+        :type qpo_list: List[QubitPauliOperator]
+        :param compilation_map: Dictionary mapping nodes as returned by
+        gen_initial_compilation_task task
+        :type compilation_map: Dict[Node, Node]
+        :return: List of QubitPauliOperator with relabeled nodes.
+        :rtype: Tuple[List[QubitPauliOperator]]
+        """
 
         node_map = {value:key for key, value in compilation_map.items()}
         new_qpo_list = [qpo_node_relabel(qpo, node_map) for qpo in qpo_list]
