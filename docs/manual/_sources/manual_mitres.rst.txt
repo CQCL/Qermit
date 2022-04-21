@@ -617,7 +617,7 @@ An extended explanation of these methods is available in the ``pytket`` `manual 
 
    from qermit.frame_randomisation import FrameRandomisation
 
-   pfr_mitres = gen_Frame_Randomisation_MitRes(lagos_, 
+   pfr_mitres = gen_Frame_Randomisation_MitRes(lagos_real, 
                                              samples = 200, 
                                              frame_randomisation = FrameRandomisation.PauliFrameRandomisation,
                                              optimisation_level = 0)
