@@ -26,12 +26,13 @@ from pytket.pauli import QubitPauliString  # type: ignore
 from enum import Enum
 import numpy as np
 from scipy.optimize import curve_fit  # type: ignore
-from typing import List, Tuple, cast
+from typing import List, Tuple, cast, Dict
 from pytket import Circuit, OpType
 from pytket.predicates import CompilationUnit  # type: ignore
 from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial
+from pytket.circuit import Node  # type: ignore
 
 
 box_types = {
@@ -762,10 +763,36 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
     )
 
 
+def qpo_node_relabel(qpo: QubitPauliOperator, node_map: Dict[Node, Node]):
+    """Relabel the nodes of qpo according to node_map
+
+    :param qpo: Original qubit pauli operator
+    :type qpo: QubitPauliOperator
+    :param node_map: Map between nodes
+    :type node_map: Dict[Node,Node]
+    :return: Relabeled qubit pauli operator
+    :rtype: QubitPauliOperator
+    """
+
+    orig_qpo_dict = qpo._dict.copy()
+    new_qpo_dict = {}
+    for orig_qps in orig_qpo_dict:
+        orig_qps_dict = orig_qps.map
+        new_qps_dict = {}
+        for q in orig_qps_dict:
+            new_qps_dict[node_map[q]] = orig_qps_dict[q]
+        new_qps = QubitPauliString(new_qps_dict)
+        new_qpo_dict[new_qps] = orig_qpo_dict[orig_qps]
+
+    return QubitPauliOperator(new_qpo_dict)
+
+
 def gen_initial_compilation_task(
     backend: Backend, optimisation_level: int = 1
 ) -> MitTask:
-    """Perform compilation before folding.
+    """Perform compilation to the backend. Note that this will relabel the
+    nodes of the device, and so should be followed by gen_qubit_relabel_task
+    in the task graph.
 
     :param backend: Backend to compile to
     :type backend: Backend
@@ -775,14 +802,16 @@ def gen_initial_compilation_task(
 
     def task(
         obj, wire: List[ObservableExperiment]
-    ) -> Tuple[List[ObservableExperiment]]:
+    ) -> Tuple[List[ObservableExperiment], Dict[Node, Node]]:
         """Performs initial compilation before folding. This is to ensure minimal compilation
         after folding, as this could disrupt by how much the noise is increased.
 
         :param wire: List of experiments
         :type wire: List[ObservableExperiment]
-        :return: List of experiments compiled to run on the inputted backend
-        :rtype: Tuple[List[ObservableExperiment]]
+        :return: List of experiments compiled to run on the inputted backend.
+        Additionally a dictionary describing how the nodes have been mapped
+        by compilation.
+        :rtype: Tuple[List[ObservableExperiment], Dict[Node, Node]]
         """
 
         mapped_wire = []
@@ -797,23 +826,11 @@ def gen_initial_compilation_task(
             backend.default_compilation_pass(
                 optimisation_level=optimisation_level
             ).apply(cu)
-            final_map = cu.final_map
-
-            # TODO: This map needs to be used at the end of the
-            # process in order to map the output pauli string back
-            # to the pauli strings inputted by the user
+            node_map = cu.final_map
 
             # Alter the qubit pauli operator so that it maps to the new physical qubits.
-            orig_qpo_dict = obs_exp[1]._qubit_pauli_operator._dict.copy()
-            new_qpo_dict = {}
-            for orig_qps in orig_qpo_dict:
-                orig_qps_dict = orig_qps.map
-                new_qps_dict = {}
-                for q in orig_qps_dict:
-                    new_qps_dict[final_map[q]] = orig_qps_dict[q]
-                new_qps = QubitPauliString(new_qps_dict)
-                new_qpo_dict[new_qps] = orig_qpo_dict[orig_qps]
-            new_qpo = QubitPauliOperator(new_qpo_dict)
+            qpo = obs_exp[1]._qubit_pauli_operator
+            new_qpo = qpo_node_relabel(qpo, node_map)
 
             # Construct new list of experiments, but with compiled circuits.
             mapped_wire.append(
@@ -827,12 +844,51 @@ def gen_initial_compilation_task(
                 )
             )
 
-        return (mapped_wire,)
+        return (
+            mapped_wire,
+            node_map,
+        )
 
     return MitTask(
         _label="CompileToBackend",
-        _n_out_wires=1,
+        _n_out_wires=2,
         _n_in_wires=1,
+        _method=task,
+    )
+
+
+def gen_qubit_relabel_task() -> MitTask:
+    """Task reversing the relabelling of qubits performed during compilation.
+    This should follow gen_initial_compilation_task
+
+    :return: Task performing relabelling.
+    :rtype: MitTask
+    """
+
+    def task(
+        obj, qpo_list: List[QubitPauliOperator], compilation_map: Dict[Node, Node]
+    ) -> Tuple[List[QubitPauliOperator]]:
+        """Use node map returned by compilation unit to undo the relabelling
+        performed by gen_initial_compilation_task
+
+        :param qpo_list: List of QubitPauliOperator
+        :type qpo_list: List[QubitPauliOperator]
+        :param compilation_map: Dictionary mapping nodes as returned by
+        gen_initial_compilation_task task
+        :type compilation_map: Dict[Node, Node]
+        :return: List of QubitPauliOperator with relabeled nodes.
+        :rtype: Tuple[List[QubitPauliOperator]]
+        """
+
+        node_map = {value: key for key, value in compilation_map.items()}
+        new_qpo_list = [qpo_node_relabel(qpo, node_map) for qpo in qpo_list]
+
+        return (new_qpo_list,)
+
+    return MitTask(
+        _label="RelabelQubits",
+        _n_out_wires=1,
+        _n_in_wires=2,
         _method=task,
     )
 
@@ -903,9 +959,13 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
         noise_scaling_list, _fit_type, _show_fit, _deg
     )
 
-    _experiment_taskgraph.append(extrapolation_task)
     _experiment_taskgraph.prepend(gen_duplication_task(len(noise_scaling_list) + 1))
+    _experiment_taskgraph.append(extrapolation_task)
+
+    _experiment_taskgraph.add_wire()
+
     _experiment_taskgraph.prepend(
         gen_initial_compilation_task(backend, _optimisation_level)
     )
+    _experiment_taskgraph.append(gen_qubit_relabel_task())
     return MitEx(backend).from_TaskGraph(_experiment_taskgraph)

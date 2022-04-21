@@ -427,7 +427,7 @@ Let's construct a test case with expected value 1.0 and run the error-mitigation
 
 ::
 
-    [{(Znode[5], Znode[6]): 1.01978876035084}]
+    [{(Zq[0], Zq[1]): 1.07030397481665}]
 
 
 Zero-Noise-Extrapolation in ``qermit``
@@ -512,7 +512,7 @@ error-mitigation ``MitEx``.
 
 ::
 
-    [{(Znode[4], Znode[5], Znode[6]): 0.897650000000000}]
+    [{(Zq[0], Zq[1], Zq[2]): 0.882900000000000}]
 
 There are many customisation options available when using the zero-noise-extrapolation ``MitEx`` generator
 in ``qermit``, all can be seen via the documentation. 

@@ -24,6 +24,7 @@ from qermit import (
 from qermit.zero_noise_extrapolation.zne import (
     gen_duplication_task,
     gen_initial_compilation_task,
+    gen_qubit_relabel_task,
 )
 from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
@@ -1116,6 +1117,9 @@ def gen_PEC_learning_based_MitEx(
     _experiment_taskgraph.prepend(wrap_frame_gates)
     _experiment_taskgraph.prepend(label_gates)
     _experiment_taskgraph.prepend(compile_to_frames_and_computing)
+
+    _experiment_taskgraph.add_wire()
     _experiment_taskgraph.prepend(initial_compilation)
+    _experiment_taskgraph.append(gen_qubit_relabel_task())
 
     return MitEx(device_backend).from_TaskGraph(_experiment_taskgraph)
