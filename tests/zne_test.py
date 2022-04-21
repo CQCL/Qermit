@@ -70,10 +70,10 @@ REASON = "IBMQ account not configured"
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
 def test_no_qubit_relabel():
 
-    casablanca_backend = IBMQEmulatorBackend(
+    lagos_backend = IBMQEmulatorBackend(
         "ibm_lagos", hub="partner-cqc", group="internal", project="default"
     )
-    zne_mitex = gen_ZNE_MitEx(backend=casablanca_backend, noise_scaling_list=[3, 5, 7])
+    zne_mitex = gen_ZNE_MitEx(backend=lagos_backend, noise_scaling_list=[3, 5, 7])
 
     c = Circuit(3)
     c.CZ(0, 2).CZ(1, 2)
