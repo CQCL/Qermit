@@ -26,7 +26,7 @@ Please file bugs on the Github
 
 ## How to cite
 
-If you wish to cite Qermit in any academic publications, we generally recommend citing our [benchmarking paper]("") for most cases.
+If you wish to cite Qermit in any academic publications, we generally recommend citing our [benchmarking paper](https://doi.org/10.48550/arXiv.2204.09725) for most cases.
 
 ## Contributing
 
