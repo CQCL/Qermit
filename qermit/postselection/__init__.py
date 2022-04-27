@@ -18,4 +18,8 @@ The postselection module provides generator methods for producing MitRes objects
 that automatically run postselection protocols.
 """
 
-from .postselection import gen_Postselection_MitRes
+from .postselection import (
+    gen_Postselection_MitRes,
+    postselection_circuits_task_gen,
+    postselection_results_task_gen,
+)

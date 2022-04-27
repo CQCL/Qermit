@@ -16,7 +16,7 @@ from pytket import Circuit, Qubit, Bit, OpType
 from pytket.backends import Backend
 from pytket.backends.backendresult import BackendResult
 from copy import copy
-from pyket.utils.outcomearray import OutcomeArray  # type: ignore
+from pytket.utils.outcomearray import OutcomeArray  # type: ignore
 from typing import List, Tuple, Counter, Dict, Set, cast, Sequence
 from itertools import combinations
 from qermit import MitTask, MitRes, CircuitShots
@@ -36,7 +36,7 @@ def transform_circuit(
         new_circuit.add_bit(b)
 
     end_circuit_measures: Dict[Qubit, Bit] = {}
-    for com in base_circuit:
+    for com in base_circuit.get_commands():
         if com.op.type == OpType.Measure:
             # can assume it only has one Qubit and one Bit as a Measure op
             # if mid measure then will be rewritten
@@ -56,6 +56,7 @@ def transform_circuit(
             {a[0]: a[1] for a in zip(logical_qubits, comb)}
         )
         # TODO: If needed, relabel ancilla Qubit and Bit to not clash with original circuit
+        # TODO: Logical qubit inpostselection_circuit should not have Measure, check this...
         new_circuit.append(postselection_circuit_copy)
     # add back end of circuit measures
     for q in end_circuit_measures:
@@ -90,7 +91,6 @@ def postselection_circuits_task_gen(
         :return: Postselection circuits
         :rtype: Tuple[List[CircuitShots]]
         """
-
         all_postselection_circs_shots = []
         for circ, shots in circs_shots:
             new_circuit = transform_circuit(
@@ -136,13 +136,12 @@ def postselection_results_task_gen(
         """
         postselected_results: List[BackendResult] = []
         for r in all_results:
+
             counts: Counter[Tuple[int, ...]] = r.get_counts()
             for k in counts:
-                if [
-                    k[i] for i in [r.c_bits[b] for b in postselection_bits]
-                ] in banned_results:
+                thing = tuple([k[i] for i in [r.c_bits[b] for b in postselection_bits]])
+                if thing in banned_results:
                     counts[k] = 0
-
             outcome_array = {
                 OutcomeArray.from_readouts([key]): val for key, val in counts.items()
             }
