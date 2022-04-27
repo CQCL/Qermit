@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Cambridge Quantum Computing
+# Copyright 2019-2022 Cambridge Quantum Computing
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -101,9 +101,9 @@ def frame_randomisation_circuits_task_gen(
         """
         :param circ_shots: A list of tuple of circuits and shots. Each circuit has frame randomisation applied.
         The number of shots of each frame randomisation circuit is ceil(shots/samples)
-        :type circ_shots: List[CircuiShots]
+        :type circ_shots: List[CircuitShots]
 
-        :return: Frame Randomisation circutis
+        :return: Frame Randomisation circuits
         :rtype: Tuple[List[CircuitShots]]
         """
 
