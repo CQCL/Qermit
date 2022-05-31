@@ -265,29 +265,6 @@ set as defined by backend.compile_circuit.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="qermit.taskgraph.mitex.gen_compiled_shot_split_MitRes">
-<span class="sig-prename descclassname"><span class="pre">mitex.</span></span><span class="sig-name descname"><span class="pre">gen_compiled_shot_split_MitRes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimisation_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes"><span class="pre">qermit.taskgraph.mitres.MitRes</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.mitex.gen_compiled_shot_split_MitRes" title="Permalink to this definition"></a></dt>
-<dd><p>Returns a shot splitting MitRes object with a compilation task prepended that compiles
-circuit wires via backend.compile_circuit. Optimisation level can be optionally
-set as defined by backend.compile_circuit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> (<em>Backend</em>) – Backend with circuits are compiled for.</p></li>
-<li><p><strong>max_shots</strong> (<em>int</em>) – The maximum number of shots that each job should request.</p></li>
-<li><p><strong>optimisation_level</strong> (<em>int</em>) – Sets options in compile_circuit method</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>shot splitting MitRes object with compilation task prepended.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes">MitRes</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitex.get_basic_measurement_circuit">
 <span class="sig-prename descclassname"><span class="pre">mitex.</span></span><span class="sig-name descname"><span class="pre">get_basic_measurement_circuit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Circuit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.pauli.QubitPauliString</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Bit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.mitex.get_basic_measurement_circuit" title="Permalink to this definition"></a></dt>
 <dd><p>Given a Qubit Pauli String, returns a circuit for measuring qubits in given basis
