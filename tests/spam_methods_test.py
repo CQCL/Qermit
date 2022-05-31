@@ -19,6 +19,7 @@ from pytket.circuit import Node  # type: ignore
 from pytket.architecture import Architecture  # type: ignore
 from qermit.spam import (  # type: ignore
     gen_FullyCorrelated_SPAM_MitRes,
+    gen_PartialCorrelated_SPAM_MitRes,
     gen_UnCorrelated_SPAM_MitRes,
     CorrectionMethod,
 )
@@ -70,6 +71,27 @@ def test_gen_UC_mr():
     assert res[1].get_counts()[(0, 1, 0, 1, 0)] == 20
 
 
+def test_gen_PC_mr():
+    experiment_wire = gen_test_wire()
+    b = AerBackend()
+    conn = [
+        (Node("q", 0), Node("q", 1)),
+        (Node("q", 2), Node("q", 1)),
+        (Node("q", 0), Node("q", 3)),
+        (Node("q", 3), Node("q", 4)),
+        (Node("q", 4), Node("q", 5)),
+        (Node("q", 2), Node("q", 5)),
+        (Node("q", 1), Node("q", 4)),
+    ]
+    b.backend_info.architecture = Architecture(conn)
+    mr = gen_PartialCorrelated_SPAM_MitRes(b, 100, 1)
+    res = mr.run(experiment_wire)
+    assert len(res) == 2
+    assert res[0].get_counts()[(1, 0, 1, 0)] == 20
+    assert res[1].get_counts()[(0, 1, 0, 1, 0)] == 20
+
+
 if __name__ == "__main__":
     test_gen_FC_mr()
+    test_gen_PC_mr()
     test_gen_UC_mr()
