@@ -23,7 +23,7 @@ from qermit.spam.partial_spam_correction import (  # type: ignore
     correct_partial_correlated_spam_task_gen,
 )
 from pytket.circuit import Qubit, CircBox, Circuit, Node  # type: ignore
-from pytket.architecture import Architecture  # type: ignore
+from pytket.routing import Architecture  # type: ignore
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 from numpy import identity
 

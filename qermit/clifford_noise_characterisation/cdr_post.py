@@ -25,7 +25,6 @@ from pytket.pauli import QubitPauliString  # type: ignore
 from qermit import MitTask
 import math
 import warnings
-from sympy.core.expr import Expr
 
 
 class _BaseExCorrectModel(ABC):
@@ -66,7 +65,7 @@ class _PolyCDRCorrect(_BaseExCorrectModel):
         return cast(
             float,
             sum(
-                coef * (noisy_expectation**power)
+                coef * (noisy_expectation ** power)
                 for coef, power in zip(self.params, range(self.degree, -1, -1))
             ),
         )
@@ -262,13 +261,12 @@ def cdr_correction_task_gen(backend: Backend) -> MitTask:
             for qps in noisy_expectation[i]._dict:
                 if qps in models:
                     new_qpo_dict[qps] = cast(
-                        Union[int, float, complex, Expr],
+                        Union[int, float, complex],
                         models[qps].correct(float(noisy_expectation[i]._dict[qps])),
                     )
                 else:
                     new_qpo_dict[qps] = cast(
-                        Union[int, float, complex, Expr],
-                        noisy_expectation[i]._dict[qps],
+                        Union[int, float, complex], noisy_expectation[i]._dict[qps]
                     )
             corrected_expectations.append(QubitPauliOperator(new_qpo_dict))
 

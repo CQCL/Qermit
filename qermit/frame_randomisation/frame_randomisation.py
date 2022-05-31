@@ -31,13 +31,8 @@ from pytket.backends import Backend
 from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 from pytket.tailoring import UniversalFrameRandomisation, PauliFrameRandomisation  # type: ignore
+from pytket.passes import RebaseUFR  # type: ignore
 from enum import Enum
-from pytket import OpType
-from pytket.passes import auto_rebase_pass
-
-
-ufr_gateset = {OpType.CX, OpType.Rz, OpType.H}
-ufr_rebase = auto_rebase_pass(ufr_gateset)
 
 
 class FrameRandomisation(Enum):
@@ -57,7 +52,7 @@ class FrameRandomisation(Enum):
         """
         pfr = PauliFrameRandomisation()
         pfr_shots = ceil(shots / samples)
-        ufr_rebase.apply(circuit)
+        RebaseUFR().apply(circuit)
         Transform.RebaseToCliffordSingles().apply(circuit)
         pfr_circuits = pfr.sample_circuits(circuit, samples)
         return [CircuitShots(Circuit=c, Shots=pfr_shots) for c in pfr_circuits]
@@ -82,7 +77,7 @@ class FrameRandomisation(Enum):
         """
         ufr = UniversalFrameRandomisation()
         ufr_shots = ceil(shots / samples)
-        ufr_rebase.apply(circuit)
+        RebaseUFR().apply(circuit)
         ufr_circuits = ufr.sample_circuits(circuit, samples)
         return [CircuitShots(Circuit=c, Shots=ufr_shots) for c in ufr_circuits]
 

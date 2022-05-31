@@ -16,7 +16,7 @@
 from pytket import Circuit, Qubit
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 from pytket.circuit import Node  # type: ignore
-from pytket.architecture import Architecture  # type: ignore
+from pytket.routing import Architecture  # type: ignore
 from qermit.spam import (  # type: ignore
     gen_FullyCorrelated_SPAM_MitRes,
     gen_PartialCorrelated_SPAM_MitRes,

@@ -29,14 +29,12 @@ from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
 
-from sympy.core.expr import Expr
-
 from pytket.passes import RebaseTket, DecomposeBoxes  # type: ignore
 from pytket.utils import QubitPauliOperator, get_pauli_expectation_value
 from pytket.backends import Backend
 from pytket.transform import Transform  # type: ignore
 from pytket.circuit import Op, CircBox, OpType, Circuit, Node  # type: ignore
-from pytket.placement import place_with_map  # type: ignore
+from pytket.routing import place_with_map  # type: ignore
 
 from pytket.pauli import QubitPauliString  # type: ignore
 from pytket.predicates import CliffordCircuitPredicate  # type: ignore
@@ -375,7 +373,7 @@ def gen_run_with_quasi_prob() -> MitTask:
                 for j, prob in enumerate(circuit_prob[i]):
                     em_expect[qps] += prob * circuit_results[j][qps]
             em_expect_qpo = QubitPauliOperator(
-                cast(Dict[Any, Union[int, float, complex, Expr]], em_expect)
+                cast(Dict[Any, Union[int, float, complex]], em_expect)
             )
             em_expect_list.append(em_expect_qpo)
 
