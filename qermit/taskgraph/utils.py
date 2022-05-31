@@ -20,7 +20,7 @@ from pytket.utils import (
 )
 from pytket.pauli import QubitPauliString  # type: ignore
 from pytket.backends.backendresult import BackendResult
-import copy
+from copy import copy
 from sympy import Symbol  # type: ignore
 from typing import Iterable, Dict, Union, Tuple, List
 from collections import OrderedDict
@@ -248,7 +248,7 @@ class ObservableTracker:
         :type qubit_pauli_strings: List[QubitPauliString]
         """
         self._qubit_pauli_operator = qubit_pauli_operator
-        # indices being inde in measurement circuits
+        # indices being index in measurement circuits
         self._qps_to_indices: Dict[
             QubitPauliString, List[Tuple[int, List[Bit], bool]]
         ] = dict()
@@ -266,11 +266,14 @@ class ObservableTracker:
 
         :return: New ObservableTracker object
         """
-        new_obj = ObservableTracker(copy.copy(to_copy._qubit_pauli_operator))
+        # these variables could be mutated in the first ObservableTracker and effect
+        # this one
+        # To fix, copy everything
+        new_obj = ObservableTracker(copy(to_copy._qubit_pauli_operator))
 
-        new_obj._qps_to_indices = copy.copy(to_copy._qps_to_indices)
-        new_obj._measurement_circuits = copy.copy(to_copy._measurement_circuits)
-        new_obj._partitions = copy.copy(to_copy._partitions)
+        new_obj._qps_to_indices = copy(to_copy._qps_to_indices)
+        new_obj._measurement_circuits = copy(to_copy._measurement_circuits)
+        new_obj._partitions = copy(to_copy._partitions)
         return new_obj
 
     def __str__(self):
@@ -280,6 +283,16 @@ class ObservableTracker:
 
     def __repr__(self):
         return str(self)
+
+    def clear(self):
+        """
+        Erases all held information that is not the qubit pauli operator.
+        """
+        self._qps_to_indices = dict()
+        for k in self._qubit_pauli_operator._dict.keys():
+            self._qps_to_indices[k] = list()
+        self._measurement_circuits: List[MeasurementCircuit] = list()
+        self._partitions: List[QubitPauliString] = list()
 
     def modify_coefficients(
         self, new_coefficients: List[Tuple[QubitPauliString, float]]
@@ -414,8 +427,6 @@ class ObservableTracker:
         """
         return self._measurement_circuits
 
-    # TODO: QSE derives expectations differently for measurement circuits
-    # Method will need to be renamed once this is suppported
     def get_expectations(self, results: List[BackendResult]) -> QubitPauliOperator:
         """
         For given list of results, returns a QubitPauliOperator giving an expectation for each QubitPauliString

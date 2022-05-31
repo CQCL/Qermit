@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qermit.taskgraph &mdash; qermit 0.1.0 documentation</title>
+  <title>qermit.taskgraph &mdash; Qermit 0.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="qermit.mitres" href="mitres.html" />
-    <link rel="prev" title="qermit" href="index.html" /> 
+    <link rel="prev" title="Qermit" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -27,10 +27,10 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> qermit
+            <a href="index.html" class="icon icon-home"> Qermit
           </a>
               <div class="version">
-                0.1
+                0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -61,7 +61,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">qermit</a>
+          <a href="index.html">Qermit</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -215,8 +215,23 @@ with the _task_graph structure held inside the node.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="qermit.taskgraph.task_graph.TaskGraph.get_cache">
+<span class="sig-name descname"><span class="pre">get_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">OrderedDict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket._tket.circuit.Circuit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.backends.backendresult.BackendResult</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.backends.resulthandle.ResultHandle</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qermit.taskgraph.mittask.AnsatzCircuit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qermit.taskgraph.mittask.ObservableExperiment</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.utils.operators.QubitPauliOperator</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Qubit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket._tket.circuit.Bit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.task_graph.TaskGraph.get_cache" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary holding all output data from all MitTask.
+This is only full after run is called with the cache argument set
+to True. Keys are stored in graph topological order.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Dict[str, Tuple[<a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a>, List[Wire]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.task_graph.TaskGraph.get_task_graph">
-<span class="sig-name descname"><span class="pre">get_task_graph</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">graphviz.graphs.Digraph</span></span></span><a class="headerlink" href="#qermit.taskgraph.task_graph.TaskGraph.get_task_graph" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_task_graph</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">gv.Digraph</span></span></span><a class="headerlink" href="#qermit.taskgraph.task_graph.TaskGraph.get_task_graph" title="Permalink to this definition"></a></dt>
 <dd><p>Return a visual representation of the DAG as a graphviz object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -230,7 +245,7 @@ with the _task_graph structure held inside the node.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="qermit.taskgraph.task_graph.TaskGraph.n_in_wires">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_in_wires</span></span><a class="headerlink" href="#qermit.taskgraph.task_graph.TaskGraph.n_in_wires" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_in_wires</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#qermit.taskgraph.task_graph.TaskGraph.n_in_wires" title="Permalink to this definition"></a></dt>
 <dd><p>The number of in wires to a TaskGraph object is defined as the number
 of out edges from the Input Vertex, as when called, a TaskGraph object
 calls the run method which stores input arguments as data on Input vertex
@@ -239,7 +254,7 @@ output edges.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="qermit.taskgraph.task_graph.TaskGraph.n_out_wires">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_out_wires</span></span><a class="headerlink" href="#qermit.taskgraph.task_graph.TaskGraph.n_out_wires" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_out_wires</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#qermit.taskgraph.task_graph.TaskGraph.n_out_wires" title="Permalink to this definition"></a></dt>
 <dd><p>The number of out wires to a TaskGraph object is defined as the number
 of in edges to the Input Vertex, as when called, a TaskGraph object
 calls the run method which after running all tasks, returns
@@ -272,7 +287,7 @@ New edges also added from the Input vertex to the task (any type permitted), por
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.task_graph.TaskGraph.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_wires</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket._tket.circuit.Circuit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.backends.backendresult.BackendResult</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.backends.resulthandle.ResultHandle</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qermit.taskgraph.mittask.AnsatzCircuit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qermit.taskgraph.mittask.ObservableExperiment</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.utils.operators.QubitPauliOperator</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Qubit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket._tket.circuit.Bit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket._tket.circuit.Circuit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.backends.backendresult.BackendResult</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.backends.resulthandle.ResultHandle</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qermit.taskgraph.mittask.AnsatzCircuit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qermit.taskgraph.mittask.ObservableExperiment</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.utils.operators.QubitPauliOperator</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Qubit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket._tket.circuit.Bit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.task_graph.TaskGraph.run" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_wires</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket._tket.circuit.Circuit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.backends.backendresult.BackendResult</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.backends.resulthandle.ResultHandle</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qermit.taskgraph.mittask.AnsatzCircuit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qermit.taskgraph.mittask.ObservableExperiment</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.utils.operators.QubitPauliOperator</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Qubit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket._tket.circuit.Bit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">qermit.taskgraph.mittask.CircuitShots</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket._tket.circuit.Circuit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.backends.backendresult.BackendResult</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.backends.resulthandle.ResultHandle</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qermit.taskgraph.mittask.AnsatzCircuit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qermit.taskgraph.mittask.ObservableExperiment</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket.utils.operators.QubitPauliOperator</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Qubit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pytket._tket.circuit.Bit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.task_graph.TaskGraph.run" title="Permalink to this definition"></a></dt>
 <dd><p>Each task in TaskGraph is a pure function that produces output data
 from input data to some specification. Data is stored on edges of the
 internal _task_graph object.
@@ -288,28 +303,18 @@ This process is repeated until all tasks are run, at which point all in edges
 to the output vertex wil have data on, with each data set returned in a tuple.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>input_wires</strong> (<em>List</em><em>[</em><em>Wire</em><em>]</em>) – Each Wire holds information assigned as data to an output edge
-from the input vertex of the _task_graph.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_wires</strong> (<em>List</em><em>[</em><em>Wire</em><em>]</em>) – Each Wire holds information assigned as data to an output edge
+from the input vertex of the _task_graph.</p></li>
+<li><p><strong>cache</strong> (<em>bool</em>) – If True each Tasks output data is stored in an OrderedDict with the
+<a href="#id1"><span class="problematic" id="id2">Task.label_</span></a> attribute as its key.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Data from input edges to output vertex, assigned as wires.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tuple[List[Wire]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="qermit.taskgraph.task_graph.TaskGraph.sandwich">
-<span class="sig-name descname"><span class="pre">sandwich</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prepend_task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">qermit.taskgraph.task_graph.TaskGraph</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append_task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">qermit.taskgraph.task_graph.TaskGraph</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.task_graph.TaskGraph.sandwich" title="Permalink to this definition"></a></dt>
-<dd><p>Does TaskGraph.prepend(prepend_task) and TaskGraph.append(append_task). Archaic but delicious.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>prepend_task</strong> (<a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><em>MitTask</em></a>) – New task to be prepended.</p></li>
-<li><p><strong>append_task</strong> (<a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><em>MitTask</em></a>) – New task to be appended.</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -335,7 +340,7 @@ in the TaskGraph.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="qermit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Qermit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="mitres.html" class="btn btn-neutral float-right" title="qermit.mitres" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

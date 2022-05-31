@@ -1,29 +1,37 @@
-# qermit
+# Qermit
 
-`qermit` is a python module for running error-mitigation protocols on quantum processors using [`pytket`](https://github.com/CQCL/pytket), CQC's python module for interfacing with [CQC](https://cambridgequantum.com/) tket, a set of quantum programming tools.
+[![PyPI version](https://badge.fury.io/py/qermit.svg)](https://badge.fury.io/py/qermit)
+
+`qermit` is a python module for running error-mitigation protocols on quantum processors using [`pytket`](https://github.com/CQCL/pytket), the Cambridge Quantum python module for interfacing with [CQC](https://cambridgequantum.com/) TKET, a set of quantum programming tools.
 
 This repo containts API documentation, a user manual for getting started with `qermit` and source code.
 
 ## Getting Started
 
-`qermit` is available for ``python3.7`` or higher, on Linux, MacOS and Windows.
-To install, ensure that you have `pip` version 19 or above, and install using `pip install qermit`.
+`qermit` is compatible with the `pytket` 1.0 release and so is available for Python 3.8, 3.9, 3.10 on Linux, MacOS and Windows.
+To install, run:
 
-**Documentation** can be found at [cqcl.github.io/qermit](https://cqcl.github.io/qermit).
+``pip install qermit``
 
-A **User Manual** can be found at [cqcl.github.io/qermit/manual](https://cqcl.github.io/qermit/manual/).
+API documentation can be found at [cqcl.github.io/Qermit](https://cqcl.github.io/Qermit).
+
+To get a more in depth explanation of Qermit and its features including how to construct custom methods see the [manual](https://cqcl.github.io/Qermit/manual/) which includes examples.
 
 
-## Bugs and feature requests
 
-Please file bugs and feature requests on the Github
-[issue tracker](https://github.com/CQCL/qermit/issues).
+## Bugs
 
+Please file bugs on the Github
+[issue tracker](https://github.com/CQCL/Qermit/issues).
+
+## How to cite
+
+If you wish to cite Qermit in any academic publications, we generally recommend citing our [benchmarking paper](https://doi.org/10.48550/arXiv.2204.09725) for most cases.
 
 ## Contributing
 
-Pull requests are welcome. To make a PR, first fork the repo, make your proposed
-changes on the `master` branch, and open a PR from your fork. If it passes
+Pull requests or feature suggestions are very welcome. To make a PR, first fork the repo, make your proposed
+changes on the `main` branch, and open a PR from your fork. If it passes
 tests and is accepted after review, it will be merged in.
 
 ### Code style

@@ -22,6 +22,7 @@ from qermit.taskgraph import (  # type: ignore
     duplicate_wire_task_gen,
 )
 import networkx as nx  # type: ignore
+import pytest
 
 
 def test_task_graph_constructor():
@@ -95,8 +96,8 @@ def test_basic_task_graph_methods():
     # check results are expected also
     assert tg.run([10]) == (500, 50)
 
-    # test sandwich, and duplication of final results
-    tg.sandwich(duplicate_wire_task_gen(1, 1), duplicate_wire_task_gen(2, 2))
+    tg.prepend(duplicate_wire_task_gen(1, 1))
+    tg.append(duplicate_wire_task_gen(2, 2))
     assert len(tg.tasks) == 5
     assert tg.run([10]) == (500, 50, 500, 50)
 
@@ -145,7 +146,34 @@ def test_advanced_task_graph_methods():
     assert len(list(nx.topological_sort(tg_1._task_graph))) == 6
 
 
+def test_run_with_cache():
+    tg = TaskGraph()
+
+    def return_5(self, input):
+        return (5,)
+
+    task5_dummy0 = MitTask(
+        _label="dummy", _method=return_5, _n_in_wires=1, _n_out_wires=1
+    )
+    tg.prepend(task5_dummy0)
+
+    assert tg.run([1, 2], cache=False) == (5,)
+    assert len(tg.get_cache()) == 0
+    assert tg.run([1, 2], cache=True) == (5,)
+    c = tg.get_cache()
+    assert len(c) == 1
+    assert c["dummy"][1] == (5,)
+    task5_dummy1 = MitTask(
+        _label="dummy", _method=return_5, _n_in_wires=1, _n_out_wires=1
+    )
+    tg.append(task5_dummy1)
+    assert tg.run([1, 2], cache=False) == (5,)
+    with pytest.raises(ValueError):
+        tg.run([1, 2], cache=True)
+
+
 if __name__ == "__main__":
     test_task_graph_constructor()
     test_basic_task_graph_methods()
     test_advanced_task_graph_methods()
+    test_run_with_cache()
