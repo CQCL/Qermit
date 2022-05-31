@@ -507,12 +507,11 @@ def gen_CDR_MitEx(
     :type n_pairs: int
     :param total_state_circuits: Total number of state circuits produced for characterisation.
     :type total_state_circuits: int
-
-    :key StatesSimulatorMitex: MitEx object noiseless characterisation simulations are executed on, default
+    :key states_simulator_mitex: MitEx object noiseless characterisation simulations are executed on, default
         simulator_backend with basic compilation of circuit.
-    :key StatesDeviceMitex: MitEx object noisy characterisation circuit are executed on, default
+    :key states_device_mitex: MitEx object noisy characterisation circuit are executed on, default
         device_backend with basic compilation of circuit.
-    :key ExperimentMitex: MitEx object that actual experiment circuits are executed on, default
+    :key experiment_mitex: MitEx object that actual experiment circuits are executed on, default
         backend with some compilation of circuit.
     :key model: Model characterised by state circuits, default _PolyCDRCorrect(1) (see cdr_post.py for other options).
     :key likelihood_function: LikelihoodFunction used to filter state circuit results, given by a LikelihoodFunction Enum,
