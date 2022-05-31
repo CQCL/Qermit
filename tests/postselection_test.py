@@ -15,7 +15,6 @@
 
 from qermit.postselection import (
     gen_Postselection_MitRes,
-    postselection_results_task_gen,
     postselection_circuits_task_gen,
 )
 from qermit import CircuitShots
@@ -50,31 +49,35 @@ def test_postselection_circuits_task_gen():
 
 def test_gen_Postselection_MitRes():
     postselection_circuit = Circuit()
-    ancilla_bit = Bit("ancilla_bit", 0)
-    logical_qubit = Qubit("logical", 0)
-    ancilla_qubit = Qubit("ancilla_qubit", 1)
-    postselection_circuit.add_qubit(logical_qubit)
-    postselection_circuit.add_qubit(ancilla_qubit)
-    postselection_circuit.add_bit(ancilla_bit)
-    postselection_circuit.CX(logical_qubit, ancilla_qubit)
-    postselection_circuit.Measure(ancilla_qubit, ancilla_bit)
+    ancilla_bit0 = Bit("ancilla_bit", 0)
+    # ancilla_bit1 = Bit("ancilla_bit", 1)
+    logical_qubit0 = Qubit("logical", 0)
+    ancilla_qubit0 = Qubit("ancilla_qubit", 0)
+    # ancilla_qubit1 = Qubit("ancilla_qubit", 1)
+    postselection_circuit.add_qubit(logical_qubit0)
+    postselection_circuit.add_qubit(ancilla_qubit0)
+    postselection_circuit.add_bit(ancilla_bit0)
+    postselection_circuit.CX(logical_qubit0, ancilla_qubit0)
+    postselection_circuit.Measure(ancilla_qubit0, ancilla_bit0)
 
     backend = AerBackend()
     combo = (1,)
-    banned_results = ((ancilla_bit,), {combo})
+    banned_results = ((ancilla_bit0,), {combo})
     ps_mr = gen_Postselection_MitRes(
         backend=backend,
         postselection_circuit=postselection_circuit,
-        postselection_ancillas=[(ancilla_qubit, ancilla_bit)],
-        postselection_logical_qubits=[logical_qubit],
+        postselection_ancillas=[(ancilla_qubit0, ancilla_bit0)],
+        postselection_logical_qubits=[logical_qubit0],
         banned_results=banned_results,
     )
 
-    experiment_circuit = Circuit(1, 1).H(0).Measure(0, 0)
+    # experiment_circuit = Circuit(1,1).H(0).Measure(0,0)
+    experiment_circuit = Circuit(2, 2).H(0).H(1).Measure(0, 0).Measure(1,1)
     res = ps_mr.run([(experiment_circuit, 100)])
+    print(res[0].get_counts())
     counts_keys = res[0].get_counts().keys()
-    assert (0, 0) in counts_keys
-    assert (1, 1) not in counts_keys
+    assert (0, ) in counts_keys
+    assert (1, ) not in counts_keys
 
 
 if __name__ == "__main__":
