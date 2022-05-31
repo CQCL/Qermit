@@ -25,7 +25,7 @@ from qermit import (
 from qermit.taskgraph.mitex import backend_compile_circuit_shots_task_gen
 from pytket import Circuit, Bit
 from pytket.transform import Transform  # type: ignore
-from copy import copy
+import copy
 from math import ceil
 from pytket.backends import Backend
 from pytket.backends.backendresult import BackendResult
@@ -185,17 +185,17 @@ def gen_Frame_Randomisation_MitRes(backend: Backend, samples: int, **kwargs) -> 
     :key frame_randomisation: FrameRandomisation Enum passed to specify method used.
         Default set to FrameRandomisation.UniversalFrameRandomisation.
     """
-    _mitres = copy(
+    _mitres = copy.copy(
         kwargs.get("mitres", MitRes(backend, _label="FrameRandomisationMitRes"))
     )
-    _fr_type = copy(
+    _fr_type = copy.copy(
         kwargs.get(
             "frame_randomisation", FrameRandomisation.UniversalFrameRandomisation
         )
     )
     _mitres.prepend(backend_compile_circuit_shots_task_gen(backend))
-    _mitres.prepend(frame_randomisation_circuits_task_gen(samples, _fr_type))
-    _mitres.append(
+    _mitres.sandwich(
+        frame_randomisation_circuits_task_gen(samples, _fr_type),
         frame_randomisation_result_task_gen(samples),
     )
     for n in _mitres._task_graph.nodes:

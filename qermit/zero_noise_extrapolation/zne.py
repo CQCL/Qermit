@@ -21,7 +21,7 @@ from qermit import (
     ObservableExperiment,
     TaskGraph,
 )
-from copy import copy
+import copy
 from pytket.pauli import QubitPauliString  # type: ignore
 from enum import Enum
 import numpy as np
@@ -689,32 +689,6 @@ def extrapolation_task_gen(
     )
 
 
-def copy_mitex_wire(wire: ObservableExperiment) -> ObservableExperiment:
-    """Returns a single copy of the inputted wire
-
-    :param wire: Pair of ansatz circuit and ObservableTracker
-    :type wire: ObservableExperiment
-    :return: single copy of inputted wire
-    :rtype: ObservableExperiment
-    """
-
-    # Copy ansatz circuit
-    new_ansatz_circuit = AnsatzCircuit(
-        Circuit=wire.AnsatzCircuit.Circuit.copy(),
-        Shots=copy(wire.AnsatzCircuit.Shots),
-        SymbolsDict=copy(wire.AnsatzCircuit.SymbolsDict),
-    )
-
-    # copy qps and instantiate new measurement setup
-    new_ot = ObservableTracker(
-        QubitPauliOperator(copy(wire.ObservableTracker._qubit_pauli_operator._dict))
-    )
-    new_wire = ObservableExperiment(
-        AnsatzCircuit=new_ansatz_circuit, ObservableTracker=new_ot
-    )
-    return new_wire
-
-
 def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
     """Duplicate the inputted experiment wire
 
@@ -740,6 +714,33 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
             raise ValueError(
                 "The number of duplications must be greater than or equal to 1."
             )
+
+        def copy_mitex_wire(wire: ObservableExperiment) -> ObservableExperiment:
+            """Returns a single copy of the inputted wire
+
+            :param wire: Pair of ansatz circuit and ObservableTracker
+            :type wire: ObservableExperiment
+            :return: single copy of inputted wire
+            :rtype: ObservableExperiment
+            """
+
+            # Copy ansatz circuit
+            new_ansatz_circuit = AnsatzCircuit(
+                Circuit=wire.AnsatzCircuit.Circuit.copy(),
+                Shots=copy.copy(wire.AnsatzCircuit.Shots),
+                SymbolsDict=copy.copy(wire.AnsatzCircuit.SymbolsDict),
+            )
+
+            # copy qps and instantiate new measurement setup
+            new_ot = ObservableTracker(
+                QubitPauliOperator(
+                    copy.copy(wire.ObservableTracker._qubit_pauli_operator._dict)
+                )
+            )
+            new_wire = ObservableExperiment(
+                AnsatzCircuit=new_ansatz_circuit, ObservableTracker=new_ot
+            )
+            return new_wire
 
         # Compose coppies into wire format
         if duplicates == 1:
@@ -850,14 +851,14 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
     :return: MitEx object performing noise mitigation by ZNE.
     :rtype: MitEx
     """
-    _experiment_mitres = copy(
+    _experiment_mitres = copy.copy(
         kwargs.get(
             "experiment_mitres",
             MitRes(backend),
         )
     )
 
-    _experiment_mitex = copy(
+    _experiment_mitex = copy.copy(
         kwargs.get(
             "experiment_mitex",
             MitEx(backend, _label="ExperimentMitex", mitres=_experiment_mitres),
@@ -867,8 +868,8 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
 
     _optimisation_level = kwargs.get("optimisation_level", 0)
     _show_fit = kwargs.get("show_fit", False)
-    _folding_type = kwargs.get("folding_type", Folding.circuit)
-    _fit_type = kwargs.get("fit_type", Fit.linear)
+    _folding_type = copy.copy(kwargs.get("folding_type", Folding.circuit))
+    _fit_type = copy.copy(kwargs.get("fit_type", Fit.linear))
     _deg = kwargs.get("deg", len(noise_scaling_list) - 1)
     _seed = kwargs.get("seed", None)
     _allow_approx_fold = kwargs.get("allow_approx_fold", True)
@@ -879,14 +880,14 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
 
         _label = str(fold) + "FoldMitEx"
 
-        _fold_mitres = copy(
+        _fold_mitres = copy.copy(
             kwargs.get(
                 "experiment_mitres",
                 MitRes(backend),
             )
         )
 
-        _fold_mitex = copy(
+        _fold_mitex = copy.copy(
             kwargs.get(
                 "experiment_mitex",
                 MitEx(backend, _label=_label, mitres=_fold_mitres),

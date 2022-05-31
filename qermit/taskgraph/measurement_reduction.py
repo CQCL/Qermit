@@ -18,7 +18,7 @@ from .mitex import MitEx
 from .mittask import MitTask, ObservableExperiment
 from .utils import MeasurementCircuit
 
-from copy import copy
+import copy
 
 from pytket.backends import Backend
 from pytket.transform import CXConfigType  # type: ignore
@@ -77,7 +77,7 @@ def measurement_reduction_task_gen(
             measurement_circuits = []
             for measurement_circuit in new_setup.measurement_circs:
                 full_circ = circ.copy()
-                full_circ.append(measurement_circuit)
+                full_circ.append(measurement_circuit.copy())
                 measurement_circuits.append(MeasurementCircuit(full_circ, symbols))
             # convert MeasurementBitMap objects to MeasurementInfo for ObservableTracker
             adder_info: Dict[
@@ -123,7 +123,7 @@ def gen_MeasurementReduction_MitEx(backend: Backend, **kwargs) -> MitEx:
     :rtype: MitEx
     """
     # mitex object to built measurement reduction
-    _mitex = copy(
+    _mitex = copy.copy(
         kwargs.get("mitex", MitEx(backend, _label="MeasurementReductionMitEx"))
     )
     _mitex._label = "MeasurementReductionMitEx"

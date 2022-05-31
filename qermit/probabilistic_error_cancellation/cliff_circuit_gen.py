@@ -48,7 +48,7 @@ def sample_q_mallows(n_qubits: int) -> Tuple[List[int], List[int]]:
 
         # Sample the hadamard layer and k according to the quantum Mallows distribution
         r = np.random.uniform(0, 1)
-        index = int(2 * m - np.ceil(np.log(r * (4**m - 1) + 1) / log2))
+        index = int(2 * m - np.ceil(np.log(r * (4 ** m - 1) + 1) / log2))
         hadamard_layer[i] = 1 * (index < m)
         if index < m:
             k = index
