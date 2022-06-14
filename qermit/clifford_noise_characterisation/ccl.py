@@ -507,7 +507,6 @@ def gen_CDR_MitEx(
     :type n_pairs: int
     :param total_state_circuits: Total number of state circuits produced for characterisation.
     :type total_state_circuits: int
-
     :key states_simulator_mitex: MitEx object noiseless characterisation simulations are executed on, default
         simulator_backend with basic compilation of circuit.
     :key states_device_mitex: MitEx object noisy characterisation circuit are executed on, default
