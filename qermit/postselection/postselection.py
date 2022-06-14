@@ -20,8 +20,7 @@ from pytket.utils.outcomearray import OutcomeArray  # type: ignore
 from typing import List, Tuple, Counter, Dict, Set, cast, Sequence
 from itertools import combinations
 
-from sympy import intersection
-from qermit import MitTask, MitRes, CircuitShots
+from qermit import MitTask, MitRes, CircuitShots, TaskGraph
 
 
 def transform_circuit(
@@ -29,14 +28,19 @@ def transform_circuit(
     postselection_circuit: Circuit,
     logical_qubits: List[Qubit],
     ancillas: List[Tuple[Qubit, Bit]],
+    max_combinations: int = 20,
 ) -> Tuple[Circuit, List[Tuple[Bit, ...]]]:
-    # make a complete new circuit for adding gates to
+
+    if len(logical_qubits) > len(base_circuit.qubits):
+        raise ValueError(
+            "Postselection selects over more logical qubits than are in circuit."
+        )
+    # Construct a new circuit for adding base circuit and postselection circuit to
     new_circuit = Circuit()
     for q in base_circuit.qubits:
         new_circuit.add_qubit(q)
     postselection_bits = postselection_circuit.bits
     for b in base_circuit.bits:
-        # TODO: add handling as instead of raising error
         if b in postselection_bits:
             raise ValueError(
                 "Bit in Postselection circuit also in original experimental circuit."
@@ -45,11 +49,14 @@ def transform_circuit(
 
     end_circuit_measures: Dict[Qubit, Bit] = {}
     for com in base_circuit.get_commands():
+        # first check if a mid circuit measure needs to be readded
+        for q in com.qubits:
+            if q in end_circuit_measures:
+                new_circuit.Measure(q, end_circuit_measures.pop(q))
         if com.op.type == OpType.Measure:
-            # can assume it only has one Qubit and one Bit as a Measure op
+            # can assume it only has one Qubit and one Bit as is a Measure op
             # if mid measure then will be rewritten
             end_circuit_measures[com.qubits[0]] = com.bits[0]
-        # just add command to circuit TODO: surely a better way than this..
         elif com.op.params:
             new_circuit.add_gate(com.op.type, com.op.params, com.args)
         else:
@@ -58,20 +65,25 @@ def transform_circuit(
     # assumes that all end of circuit measures in original circuit will have postselection, if postselection
     # acts over more than one logical qubit then do for all permutations
     # TODO: n! / (n - k) ! scaling, this will get nasty, have error handling for this.
-    counter = 0
     new_postselection_bits: List[Tuple[Bit, ...]] = []
-    for comb in combinations(list(end_circuit_measures.keys()), len(logical_qubits)):
+    for index, combination in enumerate(
+        combinations(list(end_circuit_measures.keys()), len(logical_qubits))
+    ):
         postselection_circuit_copy = postselection_circuit.copy()
+        # relabel logical qubits
         postselection_circuit_copy.rename_units(
-            {a[0]: a[1] for a in zip(logical_qubits, comb)}
+            {a[0]: a[1] for a in zip(logical_qubits, combination)}
         )
-        relabelled_bits_dict = {b: Bit(b.index, b.reg_name + str(counter)) for b in postselection_bits}
+        # to avoid bit reuse, make many fresh registers and relabel ancilla bits
+        relabelled_bits_dict = {
+            b: Bit(index=b.index, name=b.reg_name + str(index))
+            for b in postselection_bits
+        }
         postselection_circuit_copy.rename_units(relabelled_bits_dict)
-        new_postselection_bits.append(list(relabelled_bits_dict.values()))
+        new_postselection_bits.append(tuple(relabelled_bits_dict.values()))
         new_circuit.append(postselection_circuit_copy)
-        counter += 1
     # add back end of circuit measures
-    for q in end_circuit_measures:
+    for q, b in end_circuit_measures.items():
         new_circuit.Measure(q, b)
     return (new_circuit, new_postselection_bits)
 
@@ -94,14 +106,16 @@ def postselection_circuits_task_gen(
     :param ancillas: Bit in circuit that are ancillas
     :type ancillas: List[Bit]
     """
-    # # if postselection circuit measures a logical qubit then invalid
-    # if (
-    #     len(intersection(postselection_circuit.qubit_to_bit_map.keys(), logical_qubits))
-    #     > 0
-    # ):
-    #     raise ValueError("Given postselection circuit has measures on logical qubit.")
+    # if postselection circuit measures a logical qubit then invalid
+    for q in list(postselection_circuit.qubit_to_bit_map.keys()):
+        if q in logical_qubits:
+            raise ValueError(
+                "Given postselection circuit has measures on logical qubit."
+            )
 
-    def task(obj, circs_shots: List[CircuitShots]) -> Tuple[List[CircuitShots]]:
+    def task(
+        obj, circs_shots: List[CircuitShots]
+    ) -> Tuple[List[CircuitShots], List[List[Tuple[Bit, ...]]]]:
         """
         :param circ_shots: A list of tuple of circuits and shots. Each circuit has postselection applied
         :type circ_shots: List[CircuitShots]
@@ -110,23 +124,27 @@ def postselection_circuits_task_gen(
         :rtype: Tuple[List[CircuitShots]]
         """
         all_postselection_circs_shots = []
+        all_postselection_bits = []
         for circ, shots in circs_shots:
-            new_circuit = transform_circuit(
+            new_circuit, postselection_bits = transform_circuit(
                 circ, postselection_circuit, logical_qubits, ancillas
             )
             all_postselection_circs_shots.append(CircuitShots(new_circuit, shots))
-        return (all_postselection_circs_shots,)
+            all_postselection_bits.append(postselection_bits)
+        return (
+            all_postselection_circs_shots,
+            all_postselection_bits,
+        )
 
     return MitTask(
         _label="GeneratePostselectionCircuits",
         _n_in_wires=1,
-        _n_out_wires=1,
+        _n_out_wires=2,
         _method=task,
     )
 
 
-def postselection_results_task_gen(banned_results: Set[Tuple[bool, ...]]
-) -> MitTask:
+def postselection_results_task_gen(banned_results: Set[Tuple[bool, ...]]) -> MitTask:
     """
     Returns a MitTask object that postselects on output results given some set
     of Bit with some banned results.
@@ -143,7 +161,7 @@ def postselection_results_task_gen(banned_results: Set[Tuple[bool, ...]]
     def task(
         obj,
         all_results: List[BackendResult],
-        all_postselection_bits: List[List[Tuple[Bit, ...]]]
+        all_postselection_bits: List[List[Tuple[Bit, ...]]],
     ) -> Tuple[List[BackendResult]]:
         """
         :param all_results: Results being postselected on
@@ -153,55 +171,54 @@ def postselection_results_task_gen(banned_results: Set[Tuple[bool, ...]]
         :rtype: Tuple[List[BackendResult]]
         """
         postselected_results: List[BackendResult] = []
-        for r, postselection_bits in zip(all_results, all_postselection_bits):
-
-            received_counts: Counter[Tuple[int, ...]] = r.get_counts()
+        for result, postselection_bits in zip(all_results, all_postselection_bits):
+            # get counts
+            received_counts: Counter[Tuple[int, ...]] = result.get_counts()
+            # make empty counter object for adding amended results to
             new_counts: Counter[Tuple[int, ...]] = Counter()
 
-            # for sub_bits in postselection_bits:
-            # need to amend counts key tuples
-            # for sub_bits in postselection_bits:
-            #     for b in 
-                # postselection_indices.append([r.c_bits[b] for b in sub_bits])
-            # postselection_indices = [r.c_bits[b] for sub_bits in postselection_bits for b in sub_bits]
-            # postselection_indices.sort(reverse=True)
+            postselection_indices: List[int] = [
+                result.c_bits[b] for sub_bits in postselection_bits for b in sub_bits
+            ]
+            postselection_indices.sort(reverse=True)
 
+            banned_bits_indices: List[List[int]] = []
+            for sub_bits in postselection_bits:
+                banned_bits_indices.append([result.c_bits[b] for b in sub_bits])
 
-            print(r.get_counts())
-            all_postselection_indices: List[int] = []
-            for k in received_counts:
-                banned = False
-                for sub_bits in postselection_bits:
-                    postselection_indices = [r.c_bits[b] for b in sub_bits]
-                    postselection_key = tuple([k[i] for i in postselection_indices])
-                    all_postselection_indices.extend(postselection_indices)
-                    if postselection_key in banned_results:
-                        banned = True
-                        break
-                experiment_key = list(k)
-                # definitely a better way of doing this...
-                for i in postselection_indices:  # note this is descending
+            for state in received_counts:
+                # first of all find the condensed state without ancilla bits
+                experiment_key = list(state)
+                for i in postselection_indices:
                     del experiment_key[i]
-                if postselection_key in banned_results:
-                    new_counts[tuple(experiment_key)] = 0
-                else:
-                    new_counts[tuple(experiment_key)] = received_counts[k]
+                experiment_key_tuple = tuple(experiment_key)
+                # set to found result, will be changed to 0 if banned
+                counts = received_counts[state]
+                new_counts.setdefault(experiment_key_tuple, 0)
+                for banned_indices in banned_bits_indices:
+                    # for each state in received_counts, we find the "sub states" that each set
+                    # of postselection bits is in
+                    # if this corresponds to a state that is "banned" we set the counts to 0
+                    if tuple([state[i] for i in banned_indices]) in banned_results:
+                        # new_counts[tuple(experiment_key)] = 0
+                        counts = 0
+                        break
+                new_counts[experiment_key_tuple] = (
+                    new_counts[experiment_key_tuple] + counts
+                )
 
-            # also need to work out remaining bits
-            remaining_bits: List[Bit] = list(r.c_bits.keys())
+            # find remaining bits
+            remaining_bits: List[Bit] = list(result.c_bits.keys())
             for i in postselection_indices:
                 del remaining_bits[i]
 
-
-            # also need to remove ancilla bit results
+            # make counter object
             outcome_array = {
                 OutcomeArray.from_readouts([key]): val
                 for key, val in new_counts.items()
             }
             outcome_counts = Counter(outcome_array)
-            # print(outcome_counts)
-            print(remaining_bits)
-            print(new_counts)
+            # add to results
             postselected_results.append(
                 BackendResult(
                     counts=outcome_counts,
@@ -212,7 +229,7 @@ def postselection_results_task_gen(banned_results: Set[Tuple[bool, ...]]
 
     return MitTask(
         _label="PostselectResults",
-        _n_in_wires=1,
+        _n_in_wires=2,
         _n_out_wires=1,
         _method=task,
     )
@@ -223,7 +240,7 @@ def gen_Postselection_MitRes(
     postselection_circuit: Circuit,
     postselection_ancillas: List[Tuple[Qubit, Bit]],
     postselection_logical_qubits: List[Qubit],
-    banned_results: Tuple[Tuple[Bit, ...], Set[Tuple[bool, ...]]],
+    banned_results: Set[Tuple[bool, ...]],
     **kwargs
 ) -> MitRes:
     """
@@ -242,15 +259,19 @@ def gen_Postselection_MitRes(
 
     :key mitres: MitRes object postselection MitRes is built around if given.
     """
-
     _mitres = copy(kwargs.get("mitres", MitRes(backend, _label="PostselectionMitRes")))
-    _mitres.prepend(
+
+    _task_graph_mitres = TaskGraph().from_TaskGraph(_mitres)
+    _task_graph_mitres.add_wire()
+
+    _task_graph_mitres.prepend(
         postselection_circuits_task_gen(
             postselection_circuit, postselection_logical_qubits, postselection_ancillas
         )
     )
-    _mitres.append(postselection_results_task_gen(banned_results[0], banned_results[1]))
+    _task_graph_mitres.append(postselection_results_task_gen(banned_results))
     for n in _mitres._task_graph.nodes:
         if hasattr(n, "_label"):
             n._label = "PS" + n._label
-    return _mitres
+
+    return MitRes(backend).from_TaskGraph(_task_graph_mitres)
