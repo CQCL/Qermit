@@ -24,7 +24,6 @@ from qermit import (
 )
 from qermit.taskgraph.mitex import backend_compile_circuit_shots_task_gen
 from pytket import Circuit, Bit
-from pytket.transform import Transform  # type: ignore
 from copy import copy
 from math import ceil
 from pytket.backends import Backend
@@ -77,7 +76,7 @@ class FrameRandomisation(Enum):
         """
         ufr = UniversalFrameRandomisation()
         ufr_shots = ceil(shots / samples)
-        
+
         ufr_gateset = auto_rebase_pass({OpType.CX, OpType.Rz, OpType.H}).apply(circuit)
         ufr_circuits = ufr.sample_circuits(circuit, samples)
         return [CircuitShots(Circuit=c, Shots=ufr_shots) for c in ufr_circuits]
