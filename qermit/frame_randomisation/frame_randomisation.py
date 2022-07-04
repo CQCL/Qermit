@@ -36,10 +36,6 @@ from pytket import OpType
 from pytket.passes import auto_rebase_pass
 
 
-ufr_gateset = {OpType.CX, OpType.Rz, OpType.H}
-ufr_rebase = auto_rebase_pass(ufr_gateset)
-
-
 class FrameRandomisation(Enum):
     def PauliFrameRandomisation(
         circuit: Circuit, shots: int, samples: int
@@ -57,8 +53,7 @@ class FrameRandomisation(Enum):
         """
         pfr = PauliFrameRandomisation()
         pfr_shots = ceil(shots / samples)
-        ufr_rebase.apply(circuit)
-        Transform.RebaseToCliffordSingles().apply(circuit)
+        auto_rebase_pass({OpType.CX, OpType.Rz, OpType.H, OpType.S}).apply(circuit)
         pfr_circuits = pfr.sample_circuits(circuit, samples)
         return [CircuitShots(Circuit=c, Shots=pfr_shots) for c in pfr_circuits]
 
@@ -82,7 +77,8 @@ class FrameRandomisation(Enum):
         """
         ufr = UniversalFrameRandomisation()
         ufr_shots = ceil(shots / samples)
-        ufr_rebase.apply(circuit)
+        
+        ufr_gateset = auto_rebase_pass({OpType.CX, OpType.Rz, OpType.H}).apply(circuit)
         ufr_circuits = ufr.sample_circuits(circuit, samples)
         return [CircuitShots(Circuit=c, Shots=ufr_shots) for c in ufr_circuits]
 
