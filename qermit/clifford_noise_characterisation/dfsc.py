@@ -23,6 +23,7 @@ from numpy import mean
 
 from typing import List, Tuple, cast, Union, Dict
 from copy import copy
+from sympy.core.expr import Expr
 
 from qermit import (
     MitEx,
@@ -252,7 +253,10 @@ def DFSC_characterisation_task_gen() -> MitTask:
             # add characterisation for DFSC to output list
             characterisation_qpos.append(
                 QubitPauliOperator(
-                    {k: mean(characterisation_dict[k]) for k in characterisation_dict}
+                    {
+                        k: cast(Union[complex, Expr], mean(characterisation_dict[k]))
+                        for k in characterisation_dict
+                    }
                 )
             )
         # number of characterisation qpos should match original number of experiments

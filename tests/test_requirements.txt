@@ -1,3 +1,2 @@
 pytket-qiskit~=0.23
-pytket~=1.0.1
 pytest
