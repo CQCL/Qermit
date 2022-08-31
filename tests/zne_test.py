@@ -53,7 +53,8 @@ noise_model = noise.NoiseModel()
 # Depolarizing quantum errors
 error_2 = noise.depolarizing_error(prob_2, 2)
 for edge in [[i, j] for i in range(n_qubits) for j in range(n_qubits)]:
-    noise_model.add_quantum_error(error_2, ["cx"], [edge[0], edge[1]])
+    if edge[0] != edge[1]:
+        noise_model.add_quantum_error(error_2, ["cx"], [edge[0], edge[1]])
 
 error_1 = noise.depolarizing_error(prob_1, 1)
 for node in [i for i in range(n_qubits)]:
@@ -242,7 +243,7 @@ def test_extrapolation_task_gen():
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
 def test_folding_compiled_circuit():
 
-    emulator_backend = IBMQEmulatorBackend("ibmq_bogota")
+    emulator_backend = IBMQEmulatorBackend("ibmq_quito")
 
     n_folds_1 = 3
 
