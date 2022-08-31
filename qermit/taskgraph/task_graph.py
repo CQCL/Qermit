@@ -26,6 +26,7 @@ from tempfile import NamedTemporaryFile
 if TYPE_CHECKING:
     import graphviz as gv  # type: ignore
 
+
 class TaskGraph:
     """
     The TaskGraph class stores a networkx graph where vertices

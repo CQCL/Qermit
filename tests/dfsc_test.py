@@ -149,14 +149,11 @@ def test_DFSC_circuit_task_gen():
     char_mc_00 = MeasurementCircuit(
         char_circuit_00, char_symbols_00
     ).get_parametric_circuit()
-    Transform.RebaseToCliffordSingles().apply(char_mc_00)
-
     char_circuit_01 = exp_0_qps_trackers[1][0][0]
     char_symbols_01 = exp_0_qps_trackers[1][0][2]
     char_mc_01 = MeasurementCircuit(
         char_circuit_01, char_symbols_01
     ).get_parametric_circuit()
-    Transform.RebaseToCliffordSingles().apply(char_mc_01)
 
     # confirm returned characteriastion state prep circuits are equal to manually created ones
     assert char_mc_00 == prep_circuit_00
