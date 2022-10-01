@@ -1,8 +1,8 @@
 import numpy as np
-import copy
+from scipy import fft
 from itertools import product
-import matplotlib.pyplot as plt
-from typing import Tuple, List
+import matplotlib.pyplot as plt  # type: ignore
+from typing import Tuple, List, Union
 from qermit.taskgraph.task_graph import TaskGraph
 from qermit.taskgraph.mittask import (
     MitTask,
@@ -14,78 +14,6 @@ from qermit.taskgraph.mitex import MitEx, gen_compiled_MitRes
 from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator
 from copy import copy, deepcopy
-
-
-def gen_result_extraction_task():
-    
-    def task(obj, results) -> Tuple[List[QubitPauliOperator]]:
-        return (results, )
-    
-    return MitTask(_label="ResultExtraction", _n_out_wires=1, _n_in_wires=1, _method=task)
-
-def gen_inv_fft_task():
-    
-    # TODO: Note that obs_exp_list is not used here
-    def task(obj, mitigated_fft_result_val_grid_list, param_grid_list, obs_exp_list):
-        
-        # Iterate through results and invert FFT
-        mitigated_result_val_grid_list = []
-        for mitigated_fft_result_val_grid, param_grid in zip(mitigated_fft_result_val_grid_list, param_grid_list):
-                        
-            mitigated_result_val_grid = np.fft.ifftn(mitigated_fft_result_val_grid)
-            mitigated_result_val_grid_list.append(mitigated_result_val_grid)
-                
-            my_plot(mitigated_result_val_grid, *param_grid)
-            
-        return (mitigated_result_val_grid_list, )
-    
-    return MitTask(_label="InvFFT", _n_out_wires=1, _n_in_wires=3, _method=task)
-
-def gen_mitigation_task(tol):
-    
-    # TODO: Note that obs_exp_list is not used here
-    def task(obj, fft_result_val_grid_list, param_grid_list, obs_exp_list):
-        
-        # Iterate through results grids and set values close to 0 to 0
-        mitigated_fft_result_val_grid_list = []
-        for fft_result_val_grid, param_grid in zip(fft_result_val_grid_list, param_grid_list):
-            
-            fft_result_val_grid[np.abs(fft_result_val_grid) < tol] = 0.0
-            mitigated_fft_result_val_grid_list.append(fft_result_val_grid)
-            
-            my_plot(fft_result_val_grid, *param_grid)
-        
-        return (mitigated_fft_result_val_grid_list, param_grid_list, obs_exp_list)
-    
-    return MitTask(_label="Mitigation", _n_out_wires=3, _n_in_wires=3, _method=task)
-
-def gen_fft_task(n_vals):
-    
-    def task(obj, result_grid_list, obs_exp_list, param_grid_list):
-        
-        fft_result_grid_list = []
-        
-        for qpo_result_grid, obs_exp, param_grid in zip(result_grid_list, obs_exp_list, param_grid_list):
-                        
-            sym_list = list(obs_exp.AnsatzCircuit.SymbolsDict.symbols_list)
-            
-            # for each point in qpo_result_grid, extract expectation value
-            result_grid = empty_array(n_vals, len(sym_list))                  
-            for grid_point in product([i for i in range(n_vals)],repeat=len(sym_list)):
-                qpo_result_dict = qpo_result_grid[grid_point]._dict
-                result = qpo_result_dict[list(qpo_result_dict.keys())[0]]
-                result_grid[grid_point] = result
-                                      
-            # Perform FFT on grid of results.
-            fft_result_grid = np.fft.fftn(result_grid) 
-            fft_result_grid_list.append(fft_result_grid)
-                        
-            my_plot(result_grid, *param_grid)
-            my_plot(fft_result_grid, *param_grid)
-            
-        return (fft_result_grid_list, param_grid_list, obs_exp_list, )
-    
-    return MitTask(_label="FFT", _n_out_wires=3, _n_in_wires=3, _method=task)
 
 def my_plot(z, *axis):
     
@@ -116,113 +44,216 @@ def plot_2d(x,y):
     
     plt.show()
 
-def gen_flatten_task(n_vals):
-    
-    def task(obj, obs_exp_grid_list, obs_exp_list):
-        
-        # ObservableExperiments, currently stored in a grid, are flattned to a single list.
-        # TODO: Is there a way of going this with the array flatten function
-        flattened_obs_exp_list = []
-        # Store strcuture of flattned grid as list of dictionaries.
-        struct_list = []
-                
-        for i, (obs_exp, obs_exp_grid) in enumerate(zip(obs_exp_list, obs_exp_grid_list)):
-            
-            sym_list = list(obs_exp.AnsatzCircuit.SymbolsDict.symbols_list)
-                        
-            # Iterate through each grid point, and add ObservableExperiment to list
-            for grid_point in product([i for i in range(n_vals)],repeat=len(sym_list)):
-                flattened_obs_exp_list.append(obs_exp_grid[grid_point])
-                struct_list.append({"experiment":i, "grid point":grid_point})
-                                            
-        return (flattened_obs_exp_list, struct_list, obs_exp_list, )
-    
-    return MitTask(_label="Flatten", _n_out_wires=3, _n_in_wires=2, _method=task)
+class SpectralFilteringCache:
 
-def gen_unflatten_task(n_vals):
+    def __init__(self):
+        self.obs_exp_sym_val_grid_list = None
+        self.mitigated_fft_result_val_grid_list = None
+        self.ifft_mitigated_result_val_grid_list = None
+        self.fft_result_grid_list = None
+        self.result_grid_list = None
+
+    def plot_mitigated_fft(self):
+
+        for fft_result_val_grid, param_grid in zip(self.mitigated_fft_result_val_grid_list, self.obs_exp_sym_val_grid_list):
+            my_plot(fft_result_val_grid, *param_grid)
+
+    def plot_mitigated_ifft(self):
+
+        for mitigated_result_val_grid, param_grid in zip(self.ifft_mitigated_result_val_grid_list, self.obs_exp_sym_val_grid_list):                    
+            my_plot(mitigated_result_val_grid, *param_grid)
+
+    def plot_fft_result_grid(self):
+
+        for fft_result_grid, param_grid in zip(self.fft_result_grid_list, self.obs_exp_sym_val_grid_list):                                    
+            my_plot(fft_result_grid, *param_grid)
+
+    def plot_result_grid(self):
+
+        for result_grid, param_grid in zip(self.result_grid_list, self.obs_exp_sym_val_grid_list):                                    
+            my_plot(result_grid, *param_grid)
+
+
+def gen_result_extraction_task():
     
-    def task(obj, result_list, struct_list, obs_exp_list) -> Tuple[List[QubitPauliOperator]]:
+    def task(obj, results) -> Tuple[List[QubitPauliOperator]]:
+        return (results, )
+    
+    return MitTask(_label="ResultExtraction", _n_out_wires=1, _n_in_wires=1, _method=task)
+
+def gen_inv_fft_task(cache):
+    
+    def task(obj, mitigated_fft_result_val_grid_list):
+        
+        # Iterate through results and invert FFT
+        mitigated_result_val_grid_list = []
+        for mitigated_fft_result_val_grid in mitigated_fft_result_val_grid_list:
+            mitigated_result_val_grid = fft.ifftn(mitigated_fft_result_val_grid)
+            mitigated_result_val_grid_list.append(mitigated_result_val_grid)
+                
+        if cache:
+            cache.ifft_mitigated_result_val_grid_list = deepcopy(mitigated_result_val_grid_list)
+            
+        return (mitigated_result_val_grid_list, )
+    
+    return MitTask(_label="InvFFT", _n_out_wires=1, _n_in_wires=1, _method=task)
+
+def gen_mitigation_task(tol, cache):
+    
+    def task(obj, fft_result_val_grid_list):
+
+        # Iterate through results grids and set values close to 0 to 0
+        mitigated_fft_result_val_grid_list = fft_result_val_grid_list.copy()
+        for mitigated_fft_result_val_grid in mitigated_fft_result_val_grid_list:
+            mitigated_fft_result_val_grid[np.abs(mitigated_fft_result_val_grid) < tol] = 0.0
+                    
+        if cache:
+            cache.mitigated_fft_result_val_grid_list = deepcopy(mitigated_fft_result_val_grid_list)
+        
+        return (mitigated_fft_result_val_grid_list, )
+    
+    return MitTask(_label="Mitigation", _n_out_wires=1, _n_in_wires=1, _method=task)
+
+def gen_fft_task(cache):
+    
+    def task(obj, result_grid_list):
+        
+        fft_result_grid_list = []
+        float_result_grid_list = []
+        
+        for qpo_result_grid in result_grid_list:
+                                    
+            result_grid = np.empty(qpo_result_grid.shape, dtype=float) 
+            grid_point_val_list = [[i for i in range(size)] for size in qpo_result_grid.shape]
+            for grid_point in product(*grid_point_val_list):
+                qpo_result_dict = qpo_result_grid[grid_point]._dict
+                result = qpo_result_dict[list(qpo_result_dict.keys())[0]]
+                result_grid[grid_point] = result
+                                      
+            # Perform FFT on grid of results.
+            fft_result_grid = fft.fftn(result_grid) 
+            fft_result_grid_list.append(fft_result_grid)
+
+            float_result_grid_list.append(result_grid)
+                        
+        if cache:
+            cache.fft_result_grid_list = deepcopy(fft_result_grid_list)
+            cache.result_grid_list = deepcopy(float_result_grid_list)
+            
+        return (fft_result_grid_list, )
+    
+    return MitTask(_label="FFT", _n_out_wires=1, _n_in_wires=1, _method=task)
+
+
+def gen_flatten_task():
+    
+    def task(obj, obs_exp_grid_list):
+        
+        # ObservableExperiments, currently stored in a grid, are flattened to a single list.
+        flattened_obs_exp_grid_list = []
+        # Store structure of flattened grid as list of dictionaries.
+        length_list = []
+        shape_list = []
+                
+        for obs_exp_grid in obs_exp_grid_list:
+            
+            obs_exp_grid_shape = obs_exp_grid.shape
+            shape_list.append(obs_exp_grid_shape)
+            flattened_obs_exp_grid = obs_exp_grid.flatten()
+            flattened_obs_exp_grid_len = len(flattened_obs_exp_grid)
+            length_list.append(flattened_obs_exp_grid_len)
+            flattened_obs_exp_grid_list += list(flattened_obs_exp_grid)
+                                            
+        return (flattened_obs_exp_grid_list, length_list, shape_list, )
+    
+    return MitTask(_label="Flatten", _n_out_wires=3, _n_in_wires=1, _method=task)
+
+def gen_unflatten_task(cache):
+    
+    def task(obj, result_list, length_list, shape_list) -> Tuple[List[QubitPauliOperator]]:
         
         result_grid_list = []
-        
-        # For each ObservableExperiment, create appropriatly sizes result grid
-        for obs_exp in obs_exp_list:
-            sym_list = list(obs_exp.AnsatzCircuit.SymbolsDict.symbols_list)
-            result_grid_list.append(empty_array(n_vals, len(sym_list)))
-        
-        # For all results, add to the appropriate grid and grid point
-        for result, struct in zip(result_list, struct_list):
-            result_grid_list[struct["experiment"]][struct["grid point"]] = result
+
+        for length, shape in zip(length_list, shape_list):
+            flattened_result_grid = result_list[:length]
+            del result_list[:length]
+            result_grid = np.reshape(flattened_result_grid, shape)
+            result_grid_list.append(result_grid)
                 
-        return (result_grid_list, obs_exp_list, )
+        return (result_grid_list, )
     
-    return MitTask(_label="Unflatten", _n_out_wires=2, _n_in_wires=3, _method=task)
+    return MitTask(_label="Unflatten", _n_out_wires=1, _n_in_wires=3, _method=task)
 
-def empty_array(n_vals, dim):
-    
-    empty = None
-    for _ in range(dim):
-        empty = [empty] * n_vals
-        
-    return np.array(empty)
 
-def gen_obs_exp_grid_gen_task(n_vals):
+def gen_obs_exp_grid_gen_task() -> MitTask:
     
-    def task(obj, obs_exp_list, param_grid_list):
+    def task(obj, obs_exp_list, obs_exp_sym_val_grid_list):
         
         # A grid of ObservableExperiment is generated for each ObservableExperiment in obs_exp_list
         obs_exp_grid_list = []
-        for obs_exp, param_grid in zip(obs_exp_list, param_grid_list):
+        for obs_exp, sym_val_grid_list in zip(obs_exp_list, obs_exp_sym_val_grid_list):
                       
             # List of symbols in circuit
             sym_list = list(obs_exp.AnsatzCircuit.SymbolsDict.symbols_list)
-            # TODO: Remove n_vals as an input here. It should be recoverable from param_grid
-            obs_exp_grid = empty_array(n_vals, len(sym_list))
-            shots = obs_exp.AnsatzCircuit.Shots
-                        
-            # Generate an ObservableExperiment for every parameter value in the grid
-            for grid_point in product([i for i in range(n_vals)],repeat=len(sym_list)):
+            # Initialise empty grid of ObservableExperiment
+            obs_exp_grid = np.empty(sym_val_grid_list[0].shape, dtype=ObservableExperiment)
+                                    
+            # Generate an ObservableExperiment for every symbol value in the grid
+            grid_point_val_list = [[i for i in range(size)] for size in sym_val_grid_list[0].shape]
+            for grid_point in product(*grid_point_val_list):
                                                 
-                sym_map = {sym:param[grid_point] for param, sym in zip(param_grid, sym_list)}  
+                # Generate dictionary mapping every symbol to it's value at the given point in the grid.
+                sym_map = {sym:sym_val_grid[grid_point] for sym_val_grid, sym in zip(sym_val_grid_list, sym_list)}  
                 sym_dict = SymbolsDict().symbols_from_dict(sym_map)
                 
                 circ = obs_exp.AnsatzCircuit.Circuit.copy()
-                
-                anz_circ = AnsatzCircuit(circ, shots, sym_dict)
+
+                anz_circ = AnsatzCircuit(circ, obs_exp.AnsatzCircuit.Shots, sym_dict)
                 obs = deepcopy(obs_exp.ObservableTracker) # This needs to be a deep copy, which is a little scary
                 
                 obs_exp_grid[grid_point] = ObservableExperiment(anz_circ, obs)
                                 
             obs_exp_grid_list.append(obs_exp_grid)
         
-        return (obs_exp_grid_list, obs_exp_list, param_grid_list, )
+        return (obs_exp_grid_list, )
     
-    return MitTask(_label="ObsExpGridGen", _n_out_wires=3, _n_in_wires=2, _method=task)
+    return MitTask(_label="ObsExpGridGen", _n_out_wires=1, _n_in_wires=2, _method=task)
 
 
-def gen_param_grid_gen_task(n_vals):
+def gen_param_grid_gen_task(n_sym_vals:int, cache:Union[None, SpectralFilteringCache]) -> MitTask:
+    """Generates task which produces a grid of values taken by the symbols in
+    the circuit. The values are generated uniformly in the interval [0,2]
+    (factors of pi give full coverage) for each symbol.
+
+    :param n_sym_vals: The number of values to be taken by each symbol in the circuit
+    :type n_sym_vals: int
+    :return: Task generating grid of symbol values.
+    :rtype: MitTask
+    """
     
-    def task(obj, obs_exp_list):
+    def task(obj, obs_exp_list: List[ObservableExperiment]) -> Tuple[List[ObservableExperiment], List[List[np.ndarray]]]:
         
-        # A parameter grid is generated for each ObservableExperiment in obs_exp_list
-        param_grid_list = []
+        # A symbol value grid is generated for each ObservableExperiment in obs_exp_list
+        obs_exp_sym_val_grid_list = []
         for obs_exp in obs_exp_list:
                         
             # List of symbols used in circuit
             sym_list = obs_exp.AnsatzCircuit.SymbolsDict.symbols_list
             
-            # Lists of values taken by parameters, in half rotations
-            param_val_list = [np.linspace(0, 2, n_vals, endpoint=False) for _ in sym_list]
+            # Lists of values taken by symbols, in half rotations
+            sym_val_list = [np.linspace(0, 2, n_sym_vals, endpoint=False) for _ in sym_list]
             
-            # Grids corresponding to paramert values
-            param_grid = np.meshgrid(*param_val_list)
-            param_grid_list.append(param_grid)
+            # Grid corresponding to symbol values
+            sym_val_grid_list = np.meshgrid(*sym_val_list)
+            obs_exp_sym_val_grid_list.append(sym_val_grid_list)
+
+        if cache:
+            cache.obs_exp_sym_val_grid_list = obs_exp_sym_val_grid_list
                     
-        return (obs_exp_list, param_grid_list,)
+        return (obs_exp_list, obs_exp_sym_val_grid_list,)
     
     return MitTask(_label="ParamGridGen", _n_out_wires=2, _n_in_wires=1, _method=task)
 
-n_vals=8
 
 def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx:
 
@@ -232,7 +263,6 @@ def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx
         kwargs.get(
             "experiment_mitres",
             gen_compiled_MitRes(backend, optimisation_level=_optimisation_level),
-            # MitRes(backend),
         )
     )
 
@@ -244,22 +274,23 @@ def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx
     )
     _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
 
+    cache = kwargs.get("cache", None)
+
     experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
     experiment_taskgraph.add_wire()
     experiment_taskgraph.add_wire()
-    experiment_taskgraph.prepend(gen_flatten_task(n_vals=n_vals))
-    experiment_taskgraph.append(gen_unflatten_task(n_vals=n_vals))
+    experiment_taskgraph.prepend(gen_flatten_task())
+    experiment_taskgraph.append(gen_unflatten_task(cache=cache))
 
-    experiment_taskgraph.add_wire()
-    experiment_taskgraph.prepend(gen_obs_exp_grid_gen_task(n_vals=n_vals))
+    experiment_taskgraph.prepend(gen_obs_exp_grid_gen_task())
 
-    experiment_taskgraph.prepend(gen_param_grid_gen_task(n_vals=n_vals))
+    experiment_taskgraph.prepend(gen_param_grid_gen_task(n_sym_vals=n_vals, cache=cache))
 
-    experiment_taskgraph.append(gen_fft_task(n_vals=n_vals))
+    experiment_taskgraph.append(gen_fft_task(cache=cache))
 
-    experiment_taskgraph.append(gen_mitigation_task(tol=5))
+    experiment_taskgraph.append(gen_mitigation_task(tol=5, cache=cache))
 
-    experiment_taskgraph.append(gen_inv_fft_task())
+    experiment_taskgraph.append(gen_inv_fft_task(cache=cache))
     experiment_taskgraph.append(gen_result_extraction_task())
 
     return MitEx(_experiment_mitex).from_TaskGraph(experiment_taskgraph)
