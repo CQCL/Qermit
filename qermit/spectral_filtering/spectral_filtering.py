@@ -14,6 +14,8 @@ from qermit.taskgraph.mitex import MitEx, gen_compiled_MitRes
 from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator
 from copy import copy, deepcopy
+from abc import ABC
+from scipy.interpolate import interpn
 
 def my_plot(z, *axis):
     
@@ -47,6 +49,7 @@ def plot_2d(x,y):
 class SpectralFilteringCache:
 
     def __init__(self):
+        self.n_vals = None 
         self.obs_exp_sym_val_grid_list = None
         self.mitigated_fft_result_val_grid_list = None
         self.ifft_mitigated_result_val_grid_list = None
@@ -56,7 +59,10 @@ class SpectralFilteringCache:
     def plot_mitigated_fft(self):
 
         for fft_result_val_grid, param_grid in zip(self.mitigated_fft_result_val_grid_list, self.obs_exp_sym_val_grid_list):
-            my_plot(fft_result_val_grid, *param_grid)
+
+            xf = fft.fftfreq(self.n_vals, 1 / self.n_vals)                                    
+            axis = np.meshgrid(*[xf for _ in range(len(param_grid))])
+            my_plot(fft_result_val_grid, *axis)
 
     def plot_mitigated_ifft(self):
 
@@ -65,8 +71,10 @@ class SpectralFilteringCache:
 
     def plot_fft_result_grid(self):
 
-        for fft_result_grid, param_grid in zip(self.fft_result_grid_list, self.obs_exp_sym_val_grid_list):                                    
-            my_plot(fft_result_grid, *param_grid)
+        for fft_result_grid, param_grid in zip(self.fft_result_grid_list, self.obs_exp_sym_val_grid_list):
+            xf = fft.fftfreq(self.n_vals, 1 / self.n_vals)                                    
+            axis = np.meshgrid(*[xf for _ in range(len(param_grid))])
+            my_plot(fft_result_grid, *axis)
 
     def plot_result_grid(self):
 
@@ -76,36 +84,40 @@ class SpectralFilteringCache:
 
 def gen_result_extraction_task():
     
-    def task(obj, results) -> Tuple[List[QubitPauliOperator]]:
-        return (results, )
-    
-    return MitTask(_label="ResultExtraction", _n_out_wires=1, _n_in_wires=1, _method=task)
+    def task(obj, result_list, points_list, obs_exp_list) -> Tuple[List[QubitPauliOperator]]:
 
-def gen_inv_fft_task(cache):
-    
-    def task(obj, mitigated_fft_result_val_grid_list):
-        
-        # Iterate through results and invert FFT
-        mitigated_result_val_grid_list = []
-        for mitigated_fft_result_val_grid in mitigated_fft_result_val_grid_list:
-            mitigated_result_val_grid = fft.ifftn(mitigated_fft_result_val_grid)
-            mitigated_result_val_grid_list.append(mitigated_result_val_grid)
-                
-        if cache:
-            cache.ifft_mitigated_result_val_grid_list = deepcopy(mitigated_result_val_grid_list)
-            
-        return (mitigated_result_val_grid_list, )
-    
-    return MitTask(_label="InvFFT", _n_out_wires=1, _n_in_wires=1, _method=task)
+        interp_result_list = []
+        for result, points, obs_exp in zip(result_list, points_list, obs_exp_list):
+            interp_point = list(obs_exp.AnsatzCircuit.SymbolsDict._symbolic_map.values())
+            interp_result_list.append(interpn(points, result, interp_point))
 
-def gen_mitigation_task(tol, cache):
+        return (interp_result_list, )
+    
+    return MitTask(_label="ResultExtraction", _n_out_wires=1, _n_in_wires=3, _method=task)
+
+class SignalFilter(ABC):
+
+    def filter(self, fft_result_val_grid):
+        pass
+
+class SmallCoefficientSignalFilter(SignalFilter):
+
+    def __init__(self, tol):
+        self.tol = tol
+
+    def filter(self, fft_result_val_grid):
+
+        mitigated_fft_result_val_grid = deepcopy(fft_result_val_grid)
+        mitigated_fft_result_val_grid[np.abs(mitigated_fft_result_val_grid) < self.tol] = 0.0
+        return mitigated_fft_result_val_grid
+
+def gen_mitigation_task(cache, signal_filter):
     
     def task(obj, fft_result_val_grid_list):
 
-        # Iterate through results grids and set values close to 0 to 0
-        mitigated_fft_result_val_grid_list = fft_result_val_grid_list.copy()
-        for mitigated_fft_result_val_grid in mitigated_fft_result_val_grid_list:
-            mitigated_fft_result_val_grid[np.abs(mitigated_fft_result_val_grid) < tol] = 0.0
+        mitigated_fft_result_val_grid_list = []
+        for fft_result_val_grid in fft_result_val_grid_list:
+            mitigated_fft_result_val_grid_list.append(signal_filter.filter(fft_result_val_grid))
                     
         if cache:
             cache.mitigated_fft_result_val_grid_list = deepcopy(mitigated_fft_result_val_grid_list)
@@ -114,7 +126,7 @@ def gen_mitigation_task(tol, cache):
     
     return MitTask(_label="Mitigation", _n_out_wires=1, _n_in_wires=1, _method=task)
 
-def gen_fft_task(cache):
+def gen_fft_task(cache=None):
     
     def task(obj, result_grid_list):
         
@@ -143,6 +155,23 @@ def gen_fft_task(cache):
         return (fft_result_grid_list, )
     
     return MitTask(_label="FFT", _n_out_wires=1, _n_in_wires=1, _method=task)
+
+def gen_inv_fft_task(cache):
+    
+    def task(obj, mitigated_fft_result_val_grid_list):
+        
+        # Iterate through results and invert FFT
+        mitigated_result_val_grid_list = []
+        for mitigated_fft_result_val_grid in mitigated_fft_result_val_grid_list:
+            mitigated_result_val_grid = fft.ifftn(mitigated_fft_result_val_grid)
+            mitigated_result_val_grid_list.append(mitigated_result_val_grid)
+                
+        if cache:
+            cache.ifft_mitigated_result_val_grid_list = deepcopy(mitigated_result_val_grid_list)
+            
+        return (mitigated_result_val_grid_list, )
+    
+    return MitTask(_label="InvFFT", _n_out_wires=1, _n_in_wires=1, _method=task)
 
 
 def gen_flatten_task():
@@ -235,6 +264,7 @@ def gen_param_grid_gen_task(n_sym_vals:int, cache:Union[None, SpectralFilteringC
         
         # A symbol value grid is generated for each ObservableExperiment in obs_exp_list
         obs_exp_sym_val_grid_list = []
+        sym_val_list_list = []
         for obs_exp in obs_exp_list:
                         
             # List of symbols used in circuit
@@ -242,6 +272,7 @@ def gen_param_grid_gen_task(n_sym_vals:int, cache:Union[None, SpectralFilteringC
             
             # Lists of values taken by symbols, in half rotations
             sym_val_list = [np.linspace(0, 2, n_sym_vals, endpoint=False) for _ in sym_list]
+            sym_val_list_list.append(sym_val_list)
             
             # Grid corresponding to symbol values
             sym_val_grid_list = np.meshgrid(*sym_val_list)
@@ -250,9 +281,9 @@ def gen_param_grid_gen_task(n_sym_vals:int, cache:Union[None, SpectralFilteringC
         if cache:
             cache.obs_exp_sym_val_grid_list = obs_exp_sym_val_grid_list
                     
-        return (obs_exp_list, obs_exp_sym_val_grid_list,)
+        return (obs_exp_list, obs_exp_sym_val_grid_list, sym_val_list_list, obs_exp_list, )
     
-    return MitTask(_label="ParamGridGen", _n_out_wires=2, _n_in_wires=1, _method=task)
+    return MitTask(_label="ParamGridGen", _n_out_wires=4, _n_in_wires=1, _method=task)
 
 
 def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx:
@@ -275,6 +306,8 @@ def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx
     _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
 
     cache = kwargs.get("cache", None)
+    if cache:
+        cache.n_vals = n_vals
 
     experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
     experiment_taskgraph.add_wire()
@@ -284,13 +317,17 @@ def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx
 
     experiment_taskgraph.prepend(gen_obs_exp_grid_gen_task())
 
-    experiment_taskgraph.prepend(gen_param_grid_gen_task(n_sym_vals=n_vals, cache=cache))
-
     experiment_taskgraph.append(gen_fft_task(cache=cache))
 
-    experiment_taskgraph.append(gen_mitigation_task(tol=5, cache=cache))
+    signal_filter = kwargs.get("signal_filter", SmallCoefficientSignalFilter(tol=5))
+
+    experiment_taskgraph.append(gen_mitigation_task(cache=cache, signal_filter=signal_filter))
 
     experiment_taskgraph.append(gen_inv_fft_task(cache=cache))
+    
+    experiment_taskgraph.add_wire()
+    experiment_taskgraph.add_wire()
+    experiment_taskgraph.prepend(gen_param_grid_gen_task(n_sym_vals=n_vals, cache=cache))
     experiment_taskgraph.append(gen_result_extraction_task())
 
     return MitEx(_experiment_mitex).from_TaskGraph(experiment_taskgraph)
