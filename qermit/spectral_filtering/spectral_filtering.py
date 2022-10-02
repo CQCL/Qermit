@@ -29,9 +29,9 @@ def plot_3d(x,y,z):
     fig = plt.figure()
     
     ax = fig.add_subplot(1, 2, 1, projection='3d')
-    ax.plot_surface(x,y, np.real(z))
+    ax.scatter(x,y, np.real(z))
     ax = fig.add_subplot(1, 2, 2, projection='3d')
-    ax.plot_surface(x,y, np.imag(z))
+    ax.scatter(x,y, np.imag(z))
     
     plt.show()
     
@@ -89,7 +89,11 @@ def gen_result_extraction_task():
         interp_result_list = []
         for result, points, obs_exp in zip(result_list, points_list, obs_exp_list):
             interp_point = list(obs_exp.AnsatzCircuit.SymbolsDict._symbolic_map.values())
-            interp_result_list.append(interpn(points, result, interp_point))
+            interp_qpo = deepcopy(obs_exp.ObservableTracker.qubit_pauli_operator)
+            # TODO: I have assumed just on string in the observable here which is, of course, wrong.
+            for qps in interp_qpo._dict.keys():
+                interp_qpo._dict[qps] = interpn(points, result, interp_point)[0]
+            interp_result_list.append(interp_qpo)
 
         return (interp_result_list, )
     
@@ -197,7 +201,7 @@ def gen_flatten_task():
     
     return MitTask(_label="Flatten", _n_out_wires=3, _n_in_wires=1, _method=task)
 
-def gen_unflatten_task(cache):
+def gen_reshape_task(cache):
     
     def task(obj, result_list, length_list, shape_list) -> Tuple[List[QubitPauliOperator]]:
         
@@ -211,7 +215,7 @@ def gen_unflatten_task(cache):
                 
         return (result_grid_list, )
     
-    return MitTask(_label="Unflatten", _n_out_wires=1, _n_in_wires=3, _method=task)
+    return MitTask(_label="Reshape", _n_out_wires=1, _n_in_wires=3, _method=task)
 
 
 def gen_obs_exp_grid_gen_task() -> MitTask:
@@ -313,7 +317,7 @@ def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx
     experiment_taskgraph.add_wire()
     experiment_taskgraph.add_wire()
     experiment_taskgraph.prepend(gen_flatten_task())
-    experiment_taskgraph.append(gen_unflatten_task(cache=cache))
+    experiment_taskgraph.append(gen_reshape_task(cache=cache))
 
     experiment_taskgraph.prepend(gen_obs_exp_grid_gen_task())
 
