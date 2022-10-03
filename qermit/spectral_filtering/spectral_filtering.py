@@ -14,77 +14,15 @@ from qermit.taskgraph.mitex import MitEx, gen_compiled_MitRes
 from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator
 from copy import copy, deepcopy
-from abc import ABC
 from scipy.interpolate import interpn
-
-def my_plot(z, *axis):
-    
-    if len(axis)==2:
-        plot_3d(*axis, z)
-    elif len(axis)==1:
-        plot_2d(*axis, z)
-
-def plot_3d(x,y,z):
-    
-    fig = plt.figure()
-    
-    ax = fig.add_subplot(1, 2, 1, projection='3d')
-    ax.scatter(x,y, np.real(z))
-    ax = fig.add_subplot(1, 2, 2, projection='3d')
-    ax.scatter(x,y, np.imag(z))
-    
-    plt.show()
-    
-def plot_2d(x,y):
-    
-    fig = plt.figure()
-    
-    ax = fig.add_subplot(1, 2, 1)
-    ax.scatter(x, np.real(y))
-    ax = fig.add_subplot(1, 2, 2)
-    ax.scatter(x, np.imag(y))
-    
-    plt.show()
-
-class SpectralFilteringCache:
-
-    def __init__(self):
-        self.n_vals = None 
-        self.obs_exp_sym_val_grid_list = None
-        self.mitigated_fft_result_val_grid_list = None
-        self.ifft_mitigated_result_val_grid_list = None
-        self.fft_result_grid_list = None
-        self.result_grid_list = None
-
-    def plot_mitigated_fft(self):
-
-        for fft_result_val_grid, param_grid in zip(self.mitigated_fft_result_val_grid_list, self.obs_exp_sym_val_grid_list):
-
-            xf = fft.fftfreq(self.n_vals, 1 / self.n_vals)                                    
-            axis = np.meshgrid(*[xf for _ in range(len(param_grid))])
-            my_plot(fft_result_val_grid, *axis)
-
-    def plot_mitigated_ifft(self):
-
-        for mitigated_result_val_grid, param_grid in zip(self.ifft_mitigated_result_val_grid_list, self.obs_exp_sym_val_grid_list):                    
-            my_plot(mitigated_result_val_grid, *param_grid)
-
-    def plot_fft_result_grid(self):
-
-        for fft_result_grid, param_grid in zip(self.fft_result_grid_list, self.obs_exp_sym_val_grid_list):
-            xf = fft.fftfreq(self.n_vals, 1 / self.n_vals)                                    
-            axis = np.meshgrid(*[xf for _ in range(len(param_grid))])
-            my_plot(fft_result_grid, *axis)
-
-    def plot_result_grid(self):
-
-        for result_grid, param_grid in zip(self.result_grid_list, self.obs_exp_sym_val_grid_list):                                    
-            my_plot(result_grid, *param_grid)
+from .results_cache import SpectralFilteringCache
+from .signal_filter import SmallCoefficientSignalFilter
+from .characterisation_cache import gen_initialise_characterisation_cache_task, gen_save_characterisation_cache_task, gen_regurgitate_cache_task
 
 
 def gen_result_extraction_task():
     
-    def task(obj, result_list, points_list, obs_exp_list) -> Tuple[List[QubitPauliOperator]]:
+    def task(obj, result_list, obs_exp_list, points_list) -> Tuple[List[QubitPauliOperator]]:
 
         interp_result_list = []
         for result, points, obs_exp in zip(result_list, points_list, obs_exp_list):
@@ -98,22 +36,6 @@ def gen_result_extraction_task():
         return (interp_result_list, )
     
     return MitTask(_label="ResultExtraction", _n_out_wires=1, _n_in_wires=3, _method=task)
-
-class SignalFilter(ABC):
-
-    def filter(self, fft_result_val_grid):
-        pass
-
-class SmallCoefficientSignalFilter(SignalFilter):
-
-    def __init__(self, tol):
-        self.tol = tol
-
-    def filter(self, fft_result_val_grid):
-
-        mitigated_fft_result_val_grid = deepcopy(fft_result_val_grid)
-        mitigated_fft_result_val_grid[np.abs(mitigated_fft_result_val_grid) < self.tol] = 0.0
-        return mitigated_fft_result_val_grid
 
 def gen_mitigation_task(cache, signal_filter):
     
@@ -182,19 +104,14 @@ def gen_flatten_task():
     
     def task(obj, obs_exp_grid_list):
         
+        # Store structure of flattened grid as list of dictionaries.
+        shape_list = [obs_exp_grid.shape for obs_exp_grid in obs_exp_grid_list]
+        length_list = []
         # ObservableExperiments, currently stored in a grid, are flattened to a single list.
         flattened_obs_exp_grid_list = []
-        # Store structure of flattened grid as list of dictionaries.
-        length_list = []
-        shape_list = []
-                
         for obs_exp_grid in obs_exp_grid_list:
-            
-            obs_exp_grid_shape = obs_exp_grid.shape
-            shape_list.append(obs_exp_grid_shape)
             flattened_obs_exp_grid = obs_exp_grid.flatten()
-            flattened_obs_exp_grid_len = len(flattened_obs_exp_grid)
-            length_list.append(flattened_obs_exp_grid_len)
+            length_list.append(len(flattened_obs_exp_grid))
             flattened_obs_exp_grid_list += list(flattened_obs_exp_grid)
                                             
         return (flattened_obs_exp_grid_list, length_list, shape_list, )
@@ -253,7 +170,7 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
     return MitTask(_label="ObsExpGridGen", _n_out_wires=1, _n_in_wires=2, _method=task)
 
 
-def gen_param_grid_gen_task(n_sym_vals:int, cache:Union[None, SpectralFilteringCache]) -> MitTask:
+def gen_param_val_gen_task(n_sym_vals:int, cache:Union[None, SpectralFilteringCache]) -> MitTask:
     """Generates task which produces a grid of values taken by the symbols in
     the circuit. The values are generated uniformly in the interval [0,2]
     (factors of pi give full coverage) for each symbol.
@@ -267,7 +184,6 @@ def gen_param_grid_gen_task(n_sym_vals:int, cache:Union[None, SpectralFilteringC
     def task(obj, obs_exp_list: List[ObservableExperiment]) -> Tuple[List[ObservableExperiment], List[List[np.ndarray]]]:
         
         # A symbol value grid is generated for each ObservableExperiment in obs_exp_list
-        obs_exp_sym_val_grid_list = []
         sym_val_list_list = []
         for obs_exp in obs_exp_list:
                         
@@ -277,17 +193,39 @@ def gen_param_grid_gen_task(n_sym_vals:int, cache:Union[None, SpectralFilteringC
             # Lists of values taken by symbols, in half rotations
             sym_val_list = [np.linspace(0, 2, n_sym_vals, endpoint=False) for _ in sym_list]
             sym_val_list_list.append(sym_val_list)
-            
+        
+        return (obs_exp_list, sym_val_list_list, )
+    
+    return MitTask(_label="ParamValGen", _n_out_wires=2, _n_in_wires=1, _method=task)
+
+def gen_wire_copy_task(n_in_wires, n_wire_copies):
+
+    def task(obj, *args):
+        out_wires = ()
+        for _ in range(n_wire_copies):
+            for wire in args:
+                out_wires = (*out_wires, wire)
+        return out_wires
+
+    return MitTask(_label="WireCopy", _n_out_wires=n_in_wires*n_wire_copies, _n_in_wires=n_in_wires, _method=task)
+
+def gen_param_grid_gen_task(cache):
+
+    def task(obj, obs_exp_list, sym_val_list_list):
+
+        obs_exp_sym_val_grid_list = []
+        for sym_val_list in sym_val_list_list:
+
             # Grid corresponding to symbol values
             sym_val_grid_list = np.meshgrid(*sym_val_list)
             obs_exp_sym_val_grid_list.append(sym_val_grid_list)
 
         if cache:
             cache.obs_exp_sym_val_grid_list = obs_exp_sym_val_grid_list
-                    
-        return (obs_exp_list, obs_exp_sym_val_grid_list, sym_val_list_list, obs_exp_list, )
-    
-    return MitTask(_label="ParamGridGen", _n_out_wires=4, _n_in_wires=1, _method=task)
+
+        return (obs_exp_list, obs_exp_sym_val_grid_list, )
+
+    return MitTask(_label="ParamGridGen", _n_out_wires=2, _n_in_wires=2, _method=task)
 
 
 def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx:
@@ -307,31 +245,48 @@ def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx
             MitEx(backend, _label="ExperimentMitex", mitres=_experiment_mitres),
         )
     )
+    
     _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
 
     cache = kwargs.get("cache", None)
     if cache:
         cache.n_vals = n_vals
+    
+    charac_cache = kwargs.get("charac_cache", None)
 
-    experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
-    experiment_taskgraph.add_wire()
-    experiment_taskgraph.add_wire()
-    experiment_taskgraph.prepend(gen_flatten_task())
-    experiment_taskgraph.append(gen_reshape_task(cache=cache))
+    characterisation_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
+    characterisation_taskgraph.add_wire()
+    characterisation_taskgraph.add_wire()
+    characterisation_taskgraph.prepend(gen_flatten_task())
+    characterisation_taskgraph.append(gen_reshape_task(cache=cache))
 
-    experiment_taskgraph.prepend(gen_obs_exp_grid_gen_task())
+    characterisation_taskgraph.prepend(gen_obs_exp_grid_gen_task())
+    characterisation_taskgraph.prepend(gen_param_grid_gen_task(cache))
 
-    experiment_taskgraph.append(gen_fft_task(cache=cache))
+    characterisation_taskgraph.append(gen_fft_task(cache=cache))
 
     signal_filter = kwargs.get("signal_filter", SmallCoefficientSignalFilter(tol=5))
 
-    experiment_taskgraph.append(gen_mitigation_task(cache=cache, signal_filter=signal_filter))
+    characterisation_taskgraph.append(gen_mitigation_task(cache=cache, signal_filter=signal_filter))
 
-    experiment_taskgraph.append(gen_inv_fft_task(cache=cache))
+    characterisation_taskgraph.append(gen_inv_fft_task(cache=cache))
+
+    if charac_cache:
+
+        if not charac_cache.characterised:
+            characterisation_taskgraph.prepend(gen_initialise_characterisation_cache_task(charac_cache=charac_cache))
+            characterisation_taskgraph.append(gen_save_characterisation_cache_task(charac_cache=charac_cache))
+        else:
+            characterisation_taskgraph = TaskGraph()
+            characterisation_taskgraph.add_wire()
+            characterisation_taskgraph.append(gen_regurgitate_cache_task(charac_cache))
+
+    experiment_taskgraph = characterisation_taskgraph
     
     experiment_taskgraph.add_wire()
     experiment_taskgraph.add_wire()
-    experiment_taskgraph.prepend(gen_param_grid_gen_task(n_sym_vals=n_vals, cache=cache))
+    experiment_taskgraph.prepend(gen_wire_copy_task(2, 2))
+    experiment_taskgraph.prepend(gen_param_val_gen_task(n_sym_vals=n_vals, cache=cache))
     experiment_taskgraph.append(gen_result_extraction_task())
 
     return MitEx(_experiment_mitex).from_TaskGraph(experiment_taskgraph)
