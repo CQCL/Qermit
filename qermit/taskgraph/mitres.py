@@ -149,6 +149,7 @@ class MitRes(TaskGraph):
         # set member variables
         self._label = _label
         self.G = None
+        self.characterisation: dict = {}
 
         # default constructor runs all circuits through passed Backend
         self._task_graph = nx.MultiDiGraph()
@@ -215,9 +216,12 @@ class MitRes(TaskGraph):
     def __str__(self) -> str:
         return f"<MitRes::{self._label}>"
 
-    def __call__(self, circuits_wire: List[List[CircuitShots]]) -> Tuple[List[BackendResult]]:  # type: ignore[override]
+    def __call__(self, circuits_wire: List[List[CircuitShots]], characterisation: dict = {}) -> Tuple[List[BackendResult]]:  # type: ignore[override]
         return cast(
-            Tuple[List[BackendResult]], super().run(cast(List[Wire], circuits_wire))
+            Tuple[List[BackendResult]],
+            super().run(
+                cast(List[Wire], circuits_wire), characterisation=characterisation
+            ),
         )
 
     def from_TaskGraph(self, task_graph: TaskGraph):
@@ -293,7 +297,7 @@ class MitRes(TaskGraph):
         """
         raise TypeError("MitRes.add_wire forbidden.")
 
-    def run(self, circuit_shots: List[CircuitShots]) -> List[BackendResult]:  # type: ignore[override]
+    def run(self, circuit_shots: List[CircuitShots], characterisation: dict = {}) -> List[BackendResult]:  # type: ignore[override]
         """
         Overloaded run method from TaskGraph class to add type checking.
         A single experiment is defined by a Tuple containing a circuit to be run
@@ -308,7 +312,7 @@ class MitRes(TaskGraph):
         :return: A BackendResult object for each combination of circuit and shots.
         :rtype: List[BackendResult]
         """
-        return self([circuit_shots])[0]
+        return self([circuit_shots], characterisation)[0]
 
 
 def split_shots_task_gen(max_shots: int) -> MitTask:

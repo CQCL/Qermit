@@ -41,7 +41,7 @@ import qiskit.providers.aer.noise as noise  # type: ignore
 from pytket.circuit import OpType  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
-from pytket.circuit import Node
+from pytket.circuit import Node  # type: ignore
 
 n_qubits = 2
 
