@@ -394,6 +394,7 @@ class TaskGraph:
             # nothing to process
             if task in (self._i, self._o):
                 continue
+            task.characterisation.update(self.characterisation)
             # get all input data and store on inputs for task
             in_edges = self._task_graph.in_edges(task, data=True, keys=True)
             inputs = [None] * len(in_edges)
@@ -402,6 +403,7 @@ class TaskGraph:
                 inputs[ports[1]] = i_data["data"]
             # run held task
             outputs = task(inputs)
+            self.characterisation.update(task.characterisation)
             if cache == True:
                 self._cache[task._label] = (task, outputs)
             # assign outputs ot out_edges of task
