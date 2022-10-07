@@ -28,7 +28,7 @@ jobs:
     - name: Run mypy
       if: github.event_name == 'pull_request'
       run: |
-        python3 -m pip install -U mypy==0.901
+        python3 -m pip install -U mypy==0.982
         mypy -p qermit 
     - name: Test qermit 
       if: github.event_name == 'pull_request'
