@@ -24,7 +24,7 @@ from copy import copy
 from sympy import Symbol  # type: ignore
 from typing import Iterable, Dict, Union, Tuple, List
 from collections import OrderedDict
-from numpy import ndarray
+from numpy import ndarray  # type: ignore
 
 
 class SymbolsDict(object):

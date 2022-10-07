@@ -45,7 +45,7 @@ from pytket.predicates import CliffordCircuitPredicate  # type: ignore
 import re
 from typing import List, Tuple, Dict, cast, Union, Any
 from copy import copy
-import numpy as np
+import numpy as np  # type: ignore
 
 QuasiProbabilities = List[float]
 

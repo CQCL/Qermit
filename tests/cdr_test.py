@@ -14,7 +14,7 @@
 
 
 from typing import cast
-import numpy as np
+import numpy as np  # type: ignore
 from qermit.clifford_noise_characterisation.cdr_post import (  # type: ignore
     _PolyCDRCorrect,
     cdr_calibration_task_gen,

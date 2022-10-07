@@ -24,7 +24,7 @@ from qermit.spam import (  # type: ignore
     CorrectionMethod,
 )
 from pytket.extensions.qiskit import AerBackend  # type: ignore
-import numpy as np
+import numpy as np  # type: ignore
 
 
 def test_gen_full_tomography_spam_circuits_task():

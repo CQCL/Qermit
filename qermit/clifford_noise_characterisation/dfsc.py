@@ -19,7 +19,7 @@ from pytket.transform import Transform  # type: ignore
 from pytket.utils import QubitPauliOperator
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.tailoring import apply_clifford_basis_change  # type: ignore
-from numpy import mean
+from numpy import mean  # type: ignore
 
 from typing import List, Tuple, cast, Union, Dict
 from copy import copy

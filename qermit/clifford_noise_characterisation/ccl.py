@@ -35,7 +35,7 @@ from .cdr_post import (
     _PolyCDRCorrect,
     cdr_quality_check_task_gen,
 )
-import numpy as np
+import numpy as np  # type: ignore
 import random
 from enum import Enum
 import warnings
