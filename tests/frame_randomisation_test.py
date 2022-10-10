@@ -39,7 +39,7 @@ def test_frame_randomisation_circuits_task_gen():
     assert ufr_res[0][0][1] == 10
     assert ufr_res[0][10][1] == 5
     # should be same number of commands, + 2 barriers + 2 frame gates each side of the single cyle
-    assert len(ufr_res[0][0][0].get_commands()) == len(c.get_commands()) + 6
+    assert len(ufr_res[0][0][0].get_commands()) == len(c.get_commands()) + 12
 
     pfr_task = frame_randomisation_circuits_task_gen(
         10, _fr_type=FrameRandomisation.PauliFrameRandomisation
