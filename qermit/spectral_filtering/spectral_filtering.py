@@ -31,7 +31,7 @@ def gen_result_extraction_task():
             interp_qpo = deepcopy(obs_exp.ObservableTracker.qubit_pauli_operator)
             # TODO: I have assumed just one string in the observable here which is, of course, wrong.
             for qps in interp_qpo._dict.keys():
-                interp_qpo._dict[qps] = interpolate.interpn(points, result, interp_point)[0]
+                interp_qpo._dict[qps] = interpolate.interpn(points, result[qps], interp_point)[0]
             interp_result_list.append(interp_qpo)
 
         return (interp_result_list, )
@@ -44,7 +44,10 @@ def gen_mitigation_task(signal_filter):
 
         mitigated_fft_result_val_grid_list = []
         for fft_result_val_grid in fft_result_val_grid_list:
-            mitigated_fft_result_val_grid_list.append(signal_filter.filter(fft_result_val_grid))
+            mitigated_fft_result_val_grid_dict = dict()
+            for key, val in fft_result_val_grid.items():
+                mitigated_fft_result_val_grid_dict[key] = signal_filter.filter(val)
+            mitigated_fft_result_val_grid_list.append(mitigated_fft_result_val_grid_dict)
         
         return (mitigated_fft_result_val_grid_list, )
     
@@ -57,7 +60,6 @@ def gen_fft_task():
     def task(obj, result_grid_list):
         
         fft_result_grid_list = []
-        float_result_grid_list = []
         
         for qpo_result_grid in result_grid_list:
 
@@ -66,20 +68,16 @@ def gen_fft_task():
             for key in zero_qpo_result_grid._dict.keys():
                 result_grid_dict[key] = np.empty(qpo_result_grid.shape, dtype=float)
                                     
-            result_grid = np.empty(qpo_result_grid.shape, dtype=float) 
             grid_point_val_list = [[i for i in range(size)] for size in qpo_result_grid.shape]
             for grid_point in product(*grid_point_val_list):
                 qpo_result_dict = qpo_result_grid[grid_point]._dict
                 for key, val in qpo_result_dict.items():
                     result_grid_dict[key][grid_point] = val
-                result = qpo_result_dict[list(qpo_result_dict.keys())[0]]
-                result_grid[grid_point] = result
                                       
-            # Perform FFT on grid of results.
-            fft_result_grid = fft.fftn(result_grid) 
-            fft_result_grid_list.append(fft_result_grid)
-
-            float_result_grid_list.append(result_grid)
+            fft_result_grid_dict = dict()
+            for key, val in result_grid_dict.items():
+                fft_result_grid_dict[key] = fft.fftn(val)
+            fft_result_grid_list.append(fft_result_grid_dict)
             
         return (fft_result_grid_list, )
     
@@ -91,9 +89,11 @@ def gen_inv_fft_task():
         
         # Iterate through results and invert FFT
         mitigated_result_val_grid_list = []
-        for mitigated_fft_result_val_grid in mitigated_fft_result_val_grid_list:
-            mitigated_result_val_grid = fft.ifftn(mitigated_fft_result_val_grid)
-            mitigated_result_val_grid_list.append(mitigated_result_val_grid)
+        for mitigated_fft_result_val_grid_dict in mitigated_fft_result_val_grid_list:
+            mitigated_result_val_grid_dict = dict()
+            for key, val in mitigated_fft_result_val_grid_dict.items():
+                mitigated_result_val_grid_dict[key] = fft.ifftn(val)
+            mitigated_result_val_grid_list.append(mitigated_result_val_grid_dict)
             
         return (mitigated_result_val_grid_list, )
     
