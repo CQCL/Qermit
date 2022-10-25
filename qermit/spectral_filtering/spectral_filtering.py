@@ -2,7 +2,7 @@ import numpy as np
 from scipy import fft, interpolate  # type: ignore
 from itertools import product
 import matplotlib.pyplot as plt  # type: ignore
-from typing import Tuple, List, Union
+from typing import Tuple, List, Union, Dict
 from qermit.taskgraph.task_graph import TaskGraph
 from qermit.taskgraph.mittask import (
     MitTask,
@@ -14,100 +14,156 @@ from qermit.taskgraph.mitex import MitEx, gen_compiled_MitRes
 from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator
 from copy import copy, deepcopy
-from .results_cache import SpectralFilteringCache
-from .signal_filter import SmallCoefficientSignalFilter
+from .signal_filter import SmallCoefficientSignalFilter, SignalFilter
 from numpy.typing import NDArray
 
 
 # TODO: This should be replaced by an approach using the fourier
 # coefficients directly.
-def gen_result_extraction_task():
+def gen_result_extraction_task() -> MitTask:
     
-    def task(obj, result_list, obs_exp_list, points_list) -> Tuple[List[QubitPauliOperator]]:
+    def task(
+        obj,
+        result_list:list[Dict[QubitPauliOperator, NDArray[float]]],
+        obs_exp_list:List[ObservableExperiment],
+        points_list:List[List[float]]
+    ) -> Tuple[List[QubitPauliOperator]]:
 
-        interp_result_list = []
+        interpolated_result_list = []
         for result, points, obs_exp in zip(result_list, points_list, obs_exp_list):
-            interp_point = list(obs_exp.AnsatzCircuit.SymbolsDict._symbolic_map.values())
-            interp_qpo = deepcopy(obs_exp.ObservableTracker.qubit_pauli_operator)
-            # TODO: I have assumed just one string in the observable here which is, of course, wrong.
-            for qps in interp_qpo._dict.keys():
-                interp_qpo._dict[qps] = interpolate.interpn(points, result[qps], interp_point)[0]
-            interp_result_list.append(interp_qpo)
 
-        return (interp_result_list, )
+            # Extract point to be interpolated to. This is the symbol values
+            # given in the initial experiment definition.
+            interpolation_point = list(
+                obs_exp.AnsatzCircuit.SymbolsDict._symbolic_map.values()
+            )
+
+            # For each QubitPauliString in the experiment QubitPauliOperator,
+            # interpolate it's value at the given point.
+            interpolated_qpo = deepcopy(
+                obs_exp.ObservableTracker.qubit_pauli_operator
+            )
+            for qps in interpolated_qpo._dict.keys():
+                interpolated_qpo._dict[qps] = interpolate.interpn(
+                    points,
+                    result[qps],
+                    interpolation_point
+                )[0]
+            interpolated_result_list.append(interpolated_qpo)
+
+        return (interpolated_result_list, )
     
-    return MitTask(_label="ResultExtraction", _n_out_wires=1, _n_in_wires=3, _method=task)
+    return MitTask(
+        _label="ResultExtraction",
+        _n_out_wires=1,
+        _n_in_wires=3,
+        _method=task
+    )
 
-def gen_mitigation_task(signal_filter):
+def gen_mitigation_task(signal_filter:SignalFilter) -> MitTask:
     
-    def task(obj, fft_result_val_grid_list):
+    def task(
+        obj,
+        result_grid_list:List[Dict[QubitPauliOperator, NDArray[float]]]
+    ) -> Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]:
 
-        mitigated_fft_result_val_grid_list = []
-        for fft_result_val_grid in fft_result_val_grid_list:
-            mitigated_fft_result_val_grid_dict = dict()
-            for key, val in fft_result_val_grid.items():
-                mitigated_fft_result_val_grid_dict[key] = signal_filter.filter(val)
-            mitigated_fft_result_val_grid_list.append(mitigated_fft_result_val_grid_dict)
+        mitigated_result_grid_list = []
+        for result_grid in result_grid_list:
+            mitigated_result_grid_dict = dict()
+            for qps, grid in result_grid.items():
+                mitigated_result_grid_dict[qps] = signal_filter.filter(grid)
+            mitigated_result_grid_list.append(mitigated_result_grid_dict)
         
-        return (mitigated_fft_result_val_grid_list, )
+        return (mitigated_result_grid_list, )
     
-    return MitTask(_label="Mitigation", _n_out_wires=1, _n_in_wires=1, _method=task)
+    return MitTask(
+        _label="Mitigation",
+        _n_out_wires=1,
+        _n_in_wires=1,
+        _method=task,
+    )
 
-# TODO: the task which extracts the results from the qubit pauli operators
-# should be separated so that the FFT step can be used more generally.
-def gen_fft_task():
+# TODO: The Reformatting part of this should probably be pulled out
+# into as separate task.
+def gen_fft_task() -> MitTask:
     
-    def task(obj, result_grid_list):
+    def task(
+        obj,
+        result_grid_list:List[NDArray[QubitPauliOperator]]
+    ) -> Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]:
         
         fft_result_grid_list = []
         
         for qpo_result_grid in result_grid_list:
 
-            zero_qpo_result_grid = qpo_result_grid[tuple(0 for _ in qpo_result_grid.shape)]
+            # Take the QubitPauliOperator that is being measured from the 0
+            # coordinate element of the grid.
+            zero_qpo_result_grid = qpo_result_grid[
+                tuple(0 for _ in qpo_result_grid.shape)
+            ]
+            # For each QubitPauliString in the QubitPauliOperator, add a
+            # key and initialise and empty grid. The new grid will contain
+            # the expectations of the individual QubitPauliStrings.
             result_grid_dict = dict()
             for key in zero_qpo_result_grid._dict.keys():
-                result_grid_dict[key] = np.empty(qpo_result_grid.shape, dtype=float)
+                result_grid_dict[key] = np.empty(
+                    qpo_result_grid.shape,
+                    dtype=float
+                )
                                     
-            grid_point_val_list = [[i for i in range(size)] for size in qpo_result_grid.shape]
+            # For each point on the grid, extract the expections of the
+            # given QubitPauliString
+            grid_point_val_list = [
+                [i for i in range(size)]
+                for size in qpo_result_grid.shape
+            ]
             for grid_point in product(*grid_point_val_list):
                 qpo_result_dict = qpo_result_grid[grid_point]._dict
-                for key, val in qpo_result_dict.items():
-                    result_grid_dict[key][grid_point] = val
-                                      
+                for qps, exp_val in qpo_result_dict.items():
+                    result_grid_dict[qps][grid_point] = exp_val
+
+            # Perform the FFT on grids corresponding to each QubitPauliString.               
             fft_result_grid_dict = dict()
-            for key, val in result_grid_dict.items():
-                fft_result_grid_dict[key] = fft.fftn(val)
+            for qps, exp_val_grid in result_grid_dict.items():
+                fft_result_grid_dict[qps] = fft.fftn(exp_val_grid)
             fft_result_grid_list.append(fft_result_grid_dict)
             
         return (fft_result_grid_list, )
     
     return MitTask(_label="FFT", _n_out_wires=1, _n_in_wires=1, _method=task)
 
-def gen_inv_fft_task():
+def gen_inv_fft_task() -> MitTask:
     
-    def task(obj, mitigated_fft_result_val_grid_list):
+    def task(
+        obj,
+        result_grid_list:List[Dict[QubitPauliOperator, NDArray[float]]]
+    ) -> Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]:
         
         # Iterate through results and invert FFT
-        mitigated_result_val_grid_list = []
-        for mitigated_fft_result_val_grid_dict in mitigated_fft_result_val_grid_list:
-            mitigated_result_val_grid_dict = dict()
-            for key, val in mitigated_fft_result_val_grid_dict.items():
-                mitigated_result_val_grid_dict[key] = fft.ifftn(val)
-            mitigated_result_val_grid_list.append(mitigated_result_val_grid_dict)
+        ifft_result_grid_list = []
+        for result_grid_dict in result_grid_list:
+            ifft_result_grid_dict = dict()
+            for qps, grid in result_grid_dict.items():
+                ifft_result_grid_dict[qps] = fft.ifftn(grid)
+            ifft_result_grid_list.append(ifft_result_grid_dict)
             
-        return (mitigated_result_val_grid_list, )
+        return (ifft_result_grid_list, )
     
     return MitTask(_label="InvFFT", _n_out_wires=1, _n_in_wires=1, _method=task)
 
 
-def gen_flatten_task():
+def gen_flatten_task() -> MitTask:
     
-    def task(obj, grid_list:list[NDArray]) -> tuple[list[ObservableExperiment], list[int], list[tuple[int]]]:
+    def task(
+        obj,
+        grid_list:List[NDArray[ObservableExperiment]]
+    ) -> Tuple[List[ObservableExperiment], List[int], List[Tuple[int, ...]]]:
         
         # Store structure of flattened grid as list of dictionaries.
         shape_list = [grid.shape for grid in grid_list]
         length_list = []
-        # ObservableExperiments, currently stored in a grid, are flattened to a single list.
+        # ObservableExperiments, currently stored in a grid,
+        # are flattened to a single list.
         flattened_grid_list = []
         for grid in grid_list:
             flattened_grid = grid.flatten()
@@ -116,11 +172,21 @@ def gen_flatten_task():
                                             
         return (flattened_grid_list, length_list, shape_list, )
     
-    return MitTask(_label="Flatten", _n_out_wires=3, _n_in_wires=1, _method=task)
+    return MitTask(
+        _label="Flatten",
+        _n_out_wires=3,
+        _n_in_wires=1,
+        _method=task,
+    )
 
-def gen_reshape_task():
+def gen_reshape_task() -> MitTask:
     
-    def task(obj, result_list, length_list, shape_list) -> Tuple[List[np.ndarray[QubitPauliOperator]]]:
+    def task(
+        obj,
+        result_list:List[ObservableExperiment],
+        length_list:List[int],
+        shape_list:List[Tuple[int]]
+    ) -> Tuple[List[NDArray[QubitPauliOperator]]]:
         
         result_grid_list = []
 
@@ -132,7 +198,12 @@ def gen_reshape_task():
                 
         return (result_grid_list, )
     
-    return MitTask(_label="Reshape", _n_out_wires=1, _n_in_wires=3, _method=task)
+    return MitTask(
+        _label="Reshape",
+        _n_out_wires=1,
+        _n_in_wires=3,
+        _method=task,
+    )
 
 
 def gen_obs_exp_grid_gen_task() -> MitTask:
@@ -320,10 +391,6 @@ def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx
     )
     
     _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
-
-    # cache = kwargs.get("cache", None)
-    # if cache:
-    #     cache.n_vals = n_vals
     
     characterisation_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
     characterisation_taskgraph.add_wire()

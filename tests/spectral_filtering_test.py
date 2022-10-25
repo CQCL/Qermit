@@ -379,10 +379,17 @@ def test_gen_result_extraction_task():
 
     result_extraction_task = gen_result_extraction_task()
 
-    result_grid_one = [[i for i in range(3)] for _ in range(3)]
-    result_grid_two = [[[i+j for i in range(3)] for j in range(3)] for _ in range(3)]
+    result_grid_one = np.array([[i for i in range(3)] for _ in range(3)])
+    result_grid_two = np.array([[[i+j for i in range(3)] for j in range(3)] for _ in range(3)])
 
-    in_wire = ([{qps_one:result_grid_one}, {qps_one:result_grid_two, qps_two:result_grid_two}], [exp_one, exp_two], [sym_vals_one, sym_vals_two])
+    in_wire = (
+        [
+            {qps_one:result_grid_one},
+            {qps_one:result_grid_two, qps_two:result_grid_two}
+        ], 
+        [exp_one, exp_two], 
+        [sym_vals_one, sym_vals_two]
+    )
     out_wire = result_extraction_task(in_wire)
 
     assert out_wire[0][0] == QubitPauliOperator({qps_one: 1.5})
