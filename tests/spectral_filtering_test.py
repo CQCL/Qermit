@@ -86,8 +86,6 @@ def test_gen_symbol_val_gen_task():
 
     param_grid_gen_task = gen_symbol_val_gen_task(n_sym_vals=n_sym_vals)
 
-    # ====== Run Method ======
-
     obs_exp_list = [exp_one, exp_two]
 
     in_wire = (obs_exp_list, )
@@ -323,9 +321,6 @@ def test_gen_inv_fft_task():
 
     _, sine_wave = generate_sine_wave(FREQUENCY, SAMPLE_RATE, DURATION)
 
-    # sine_wave_3D = [[[x for x in sine_wave] for _ in sine_wave] for _ in sine_wave]
-    # sine_wave_2D = [[x*coeff for x in sine_wave] for coeff in sine_wave]
-
     ideal_x_fft_3D = np.zeros((40, 40, 40), dtype=complex)
     ideal_x_fft_3D[0][0][2] = 0-32000j
     ideal_x_fft_3D[0][0][-2] = 0+32000j
@@ -373,11 +368,12 @@ def test_gen_mitigation_task():
     grid_two_ideal = np.zeros((40,40))
     grid_two_ideal[0][0] = 10
 
-    in_wire = ([{qps_one:grid_one}, {qps_one:grid_two}], )
+    in_wire = ([{qps_one:grid_one}, {qps_one:grid_two, qps_two:grid_two}], )
     out_wire = mitigation_task(in_wire)
 
     assert (out_wire[0][0][qps_one] == grid_one_ideal).all()
     assert (out_wire[0][1][qps_one] == grid_two_ideal).all()
+    assert (out_wire[0][1][qps_two] == grid_two_ideal).all()
 
 def test_gen_result_extraction_task():
 
@@ -390,3 +386,4 @@ def test_gen_result_extraction_task():
     out_wire = result_extraction_task(in_wire)
 
     assert out_wire[0][0] == QubitPauliOperator({qps_one: 1.5})
+    assert out_wire[0][1] == QubitPauliOperator({qps_one: 2.5, qps_two: 2.5})
