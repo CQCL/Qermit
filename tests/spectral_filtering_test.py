@@ -471,3 +471,38 @@ def test_gen_spectral_filtering_MitEx():
     assert list(out_wires[0]._dict.keys()) == [qubit_pauli_string_one, qubit_pauli_string_two]
     assert math.isclose(abs(out_wires[0]._dict[qubit_pauli_string_one]), 0.5, abs_tol=0.01)
     assert math.isclose(abs(out_wires[0]._dict[qubit_pauli_string_two]), 0, abs_tol=0.01)
+
+def test_small_coefficient_signal_filter():
+
+    tol=5
+    signal_filter = SmallCoefficientSignalFilter(tol=tol)
+
+    grid = np.array(
+        [
+            [
+                [0,1,2],
+                [3,4,5],
+                [6,7,8]
+            ],[
+                [-1,-2,-3],
+                [1,2,3],
+                [1.1,2.2,5.5]
+            ]
+        ]
+    )
+    ideal_filtered_grid = np.array(
+        [
+            [
+                [0,0,0],
+                [0,0,5],
+                [6,7,8]
+            ],[
+                [0,0,0],
+                [0,0,0],
+                [0,0,5.5]
+            ]
+        ]
+    )
+    filtered_grid = signal_filter.filter(grid)
+
+    assert (filtered_grid == ideal_filtered_grid).all()

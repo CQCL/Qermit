@@ -453,8 +453,6 @@ def gen_symbol_val_gen_task(n_sym_vals:int) -> MitTask:
         _method=task,
     )
 
-# TODO: This task should be moved to something like a utilities folder,
-# if it does not already exist.
 def gen_wire_copy_task(n_in_wires:int, n_wire_copies:int) -> MitTask:
     """Generates task which copies each of the input wires `n_wire_copies`
     times. The output wires are repeated in the same order as the input wires.
@@ -523,7 +521,11 @@ def gen_param_grid_gen_task() -> MitTask:
     )
 
 
-def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx:
+def gen_spectral_filtering_MitEx(
+    backend:Backend,
+    n_vals:int,
+    **kwargs
+) -> MitEx:
 
     _optimisation_level = kwargs.get("optimisation_level", 0)
 
@@ -558,8 +560,6 @@ def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx
 
     characterisation_taskgraph.prepend(gen_obs_exp_grid_gen_task())
     
-    # TODO: Is this the neatest way to do this? I'm basically trying to add a
-    # wire to the left of `param_grid_gen_task`.
     param_grid_gen_task = TaskGraph()
     param_grid_gen_task.parallel(gen_param_grid_gen_task())
     characterisation_taskgraph.prepend(param_grid_gen_task)
