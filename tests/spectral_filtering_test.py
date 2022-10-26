@@ -10,6 +10,8 @@ from qermit.spectral_filtering.spectral_filtering import (
     gen_obs_exp_grid_gen_task,
     gen_param_grid_gen_task,
     gen_symbol_val_gen_task,
+    gen_ndarray_to_dict_task,
+    gen_spectral_filtering_MitEx,
 )
 from qermit.spectral_filtering import SmallCoefficientSignalFilter
 import numpy as np
@@ -21,6 +23,7 @@ from qermit import AnsatzCircuit, SymbolsDict, ObservableExperiment, ObservableT
 from sympy import Symbol
 from qermit import TaskGraph
 import scipy.fft
+from pytket.extensions.qiskit import AerBackend
 
 
 def generate_sine_wave(freq, sample_rate, duration):
@@ -245,7 +248,7 @@ def test_gen_flatten_reshape_task():
     assert (out_wire[0][0] == grid_0).all()
     assert (out_wire[0][1] == grid_1).all()
 
-def test_gen_fft_task():
+def test_gen_ndarray_to_dict_task():
 
     SAMPLE_RATE = 20
     DURATION = 2
@@ -254,14 +257,47 @@ def test_gen_fft_task():
 
     result_list_one = [[[QubitPauliOperator({qps_one: coef * amp}) for coef in sine_wave] for amp in sine_wave] for _ in sine_wave]
     result_grid_one = np.array(result_list_one)
+    result_dict_one = {
+        qps_one:np.array([[[coef * amp for coef in sine_wave] for amp in sine_wave] for _ in sine_wave])
+    }
 
     result_list_two = [[QubitPauliOperator({qps_one: coef * amp , qps_two: coef}) for coef in sine_wave] for amp in sine_wave]
     result_grid_two = np.array(result_list_two)
+    result_dict_two = {
+        qps_one: np.array([[coef * amp for coef in sine_wave] for amp in sine_wave]),
+        qps_two: [[coef for coef in sine_wave] for amp in sine_wave]
+    }
 
     result_grid_list = [result_grid_one, result_grid_two]
 
-    fft_task = gen_fft_task()
+    ndarray_to_dict_task = gen_ndarray_to_dict_task()
     in_wires = (result_grid_list, )
+    out_wires = ndarray_to_dict_task(in_wires)
+
+    assert (out_wires[0][0][qps_one] == result_dict_one[qps_one]).all()
+    assert (out_wires[0][1][qps_one] == result_dict_two[qps_one]).all()
+    assert (out_wires[0][1][qps_two] == result_dict_two[qps_two]).all()
+
+def test_gen_fft_task():
+
+    SAMPLE_RATE = 20
+    DURATION = 2
+    FREQUENCY = 2
+    _, sine_wave = generate_sine_wave(FREQUENCY, SAMPLE_RATE, DURATION)
+
+    result_dict_one = {
+        qps_one:np.array([[[coef * amp for coef in sine_wave] for amp in sine_wave] for _ in sine_wave])
+    }
+
+    result_dict_two = {
+        qps_one: np.array([[coef * amp for coef in sine_wave] for amp in sine_wave]),
+        qps_two: [[coef for coef in sine_wave] for amp in sine_wave]
+    }
+
+    result_dict_list = [result_dict_one, result_dict_two]
+
+    fft_task = gen_fft_task()
+    in_wires = (result_dict_list, )
     out_wires = fft_task(in_wires)
 
     N = SAMPLE_RATE * DURATION
@@ -293,8 +329,7 @@ def test_gen_fft_task_with_sine():
     qps = QubitPauliString(
         [Qubit(0), Qubit(1)], [Pauli.Z, Pauli.Z]
     )
-    result_list = [QubitPauliOperator({qps: coef}) for coef in sine_wave]
-    result_grid = np.array(result_list)
+    result_grid = {qps:np.array([coef for coef in sine_wave])}
     result_grid_list = [result_grid]
 
     fft_task = gen_fft_task()
@@ -394,3 +429,45 @@ def test_gen_result_extraction_task():
 
     assert out_wire[0][0] == QubitPauliOperator({qps_one: 1.5})
     assert out_wire[0][1] == QubitPauliOperator({qps_one: 2.5, qps_two: 2.5})
+
+def test_gen_spectral_filtering_MitEx():
+
+    signal_filter = SmallCoefficientSignalFilter(tol=20)
+    noisy_backend = AerBackend()
+    n_vals=16
+
+    experiment_taskgraph = gen_spectral_filtering_MitEx(
+        backend=noisy_backend,
+        n_vals=n_vals,
+        signal_filter=signal_filter,
+    )
+
+    a = Symbol("alpha")
+    b = Symbol("beta")
+
+    circ = Circuit(2)
+    circ.H(0).H(1).Rz(a, 0).Rz(b, 1).H(0).H(1)
+
+    sym_dict = SymbolsDict().symbols_from_dict({a:1.01, b:1})
+
+    qubit_pauli_string_one = QubitPauliString(
+        [Qubit(0), Qubit(1)], [Pauli.Z, Pauli.Z]
+    )
+    qubit_pauli_string_two = QubitPauliString(
+        [Qubit(0), Qubit(1)], [Pauli.X, Pauli.X]
+    )
+    ansatz_circuit = AnsatzCircuit(circ, 1000, sym_dict)
+    obs_track = ObservableTracker(QubitPauliOperator({qubit_pauli_string_one: 0.5, qubit_pauli_string_two: 0.5}))
+
+    exp = ObservableExperiment(
+            ansatz_circuit,
+            obs_track,
+        )
+
+    exp_list = [exp]
+
+    out_wires = experiment_taskgraph.run(exp_list)
+
+    assert list(out_wires[0]._dict.keys()) == [qubit_pauli_string_one, qubit_pauli_string_two]
+    assert math.isclose(abs(out_wires[0]._dict[qubit_pauli_string_one]), 0.5, abs_tol=0.01)
+    assert math.isclose(abs(out_wires[0]._dict[qubit_pauli_string_two]), 0, abs_tol=0.01)
