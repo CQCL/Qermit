@@ -106,16 +106,35 @@ def gen_mitigation_task(signal_filter:SignalFilter) -> MitTask:
         _method=task,
     )
 
-# TODO: The reformatting part of this should probably be pulled out
-# into as separate task.
 def gen_fft_task() -> MitTask:
+    
+    def task(
+        obj,
+        result_grid_dict_list:List[Dict[QubitPauliOperator, NDArray[float]]]
+    ) -> Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]:
+        
+        fft_result_grid_list = []
+        
+        for result_grid_dict in result_grid_dict_list:
+
+            # Perform the FFT on grids corresponding to each QubitPauliString.               
+            fft_result_grid_dict = dict()
+            for qps, exp_val_grid in result_grid_dict.items():
+                fft_result_grid_dict[qps] = fft.fftn(exp_val_grid)
+            fft_result_grid_list.append(fft_result_grid_dict)
+            
+        return (fft_result_grid_list, )
+    
+    return MitTask(_label="FFT", _n_out_wires=1, _n_in_wires=1, _method=task)
+
+def gen_ndarray_to_dict_task() -> MitTask:
     
     def task(
         obj,
         result_grid_list:List[NDArray[QubitPauliOperator]]
     ) -> Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]:
         
-        fft_result_grid_list = []
+        result_dict_list = []
         
         for qpo_result_grid in result_grid_list:
 
@@ -145,15 +164,16 @@ def gen_fft_task() -> MitTask:
                 for qps, exp_val in qpo_result_dict.items():
                     result_grid_dict[qps][grid_point] = exp_val
 
-            # Perform the FFT on grids corresponding to each QubitPauliString.               
-            fft_result_grid_dict = dict()
-            for qps, exp_val_grid in result_grid_dict.items():
-                fft_result_grid_dict[qps] = fft.fftn(exp_val_grid)
-            fft_result_grid_list.append(fft_result_grid_dict)
+            result_dict_list.append(result_grid_dict)
             
-        return (fft_result_grid_list, )
+        return (result_dict_list, )
     
-    return MitTask(_label="FFT", _n_out_wires=1, _n_in_wires=1, _method=task)
+    return MitTask(
+        _label="NDArrayToDict",
+        _n_out_wires=1,
+        _n_in_wires=1,
+        _method=task,
+    )
 
 def gen_inv_fft_task() -> MitTask:
     """Generates task performing the inverse Fast Fourier Transform 
@@ -433,7 +453,7 @@ def gen_symbol_val_gen_task(n_sym_vals:int) -> MitTask:
         _method=task,
     )
 
-# TODO: This task should be moved to somthing like a utilities folder,
+# TODO: This task should be moved to something like a utilities folder,
 # if it does not already exist.
 def gen_wire_copy_task(n_in_wires:int, n_wire_copies:int) -> MitTask:
     """Generates task which copies each of the input wires `n_wire_copies`
@@ -449,8 +469,7 @@ def gen_wire_copy_task(n_in_wires:int, n_wire_copies:int) -> MitTask:
     :rtype: MitTask
     """
 
-    # TODO: I'm not sure what to do about the typing of this function.
-    def task(obj, *in_wires):
+    def task(obj, *in_wires:Tuple[Any, ...]):
         """Task copying `in_wires`. The output wires are repeated in the
         same order as the input wires. This is to say that input wires
         1,2,...n will be outputted as 1,2,...,n,...,1,2,...n.
@@ -545,6 +564,7 @@ def gen_spectral_filtering_MitEx(backend:Backend, n_vals:int, **kwargs) -> MitEx
     param_grid_gen_task.parallel(gen_param_grid_gen_task())
     characterisation_taskgraph.prepend(param_grid_gen_task)
 
+    characterisation_taskgraph.append(gen_ndarray_to_dict_task())
     characterisation_taskgraph.append(gen_fft_task())
 
     signal_filter = kwargs.get(
