@@ -26,7 +26,7 @@ def gen_result_extraction_task() -> MitTask:
     
     def task(
         obj,
-        result_list:list[Dict[QubitPauliString, NDArray[float]]],  # type: ignore
+        result_list:list[Dict[QubitPauliString, NDArray[np.float64]]],  # type: ignore
         obs_exp_list:List[ObservableExperiment],
         points_list:List[List[float]]
     ) -> Tuple[List[QubitPauliOperator]]:
@@ -101,8 +101,8 @@ def gen_mitigation_task(signal_filter:SignalFilter) -> MitTask:
     
     def task(
         obj,
-        result_grid_list:List[Dict[QubitPauliString, NDArray[float]]]
-    ) -> Tuple[List[Dict[QubitPauliString, NDArray[float]]]]:
+        result_grid_list:List[Dict[QubitPauliString, NDArray[np.float64]]]
+    ) -> Tuple[List[Dict[QubitPauliString, NDArray[np.float64]]]]:
         """Task acting `signal_filter` on the value of the dictionaries in
         `result_grid_list`.
 
@@ -138,8 +138,8 @@ def gen_fft_task() -> MitTask:
     
     def task(
         obj,
-        result_grid_dict_list:List[Dict[QubitPauliString, NDArray[float]]]
-    ) -> Tuple[List[Dict[QubitPauliString, NDArray[float]]]]:
+        result_grid_dict_list:List[Dict[QubitPauliString, NDArray[np.float64]]]
+    ) -> Tuple[List[Dict[QubitPauliString, NDArray[np.float64]]]]:
         """Task performing FFT on each value of the dictionaries in the list
         `result_grid_dict_list`.
 
@@ -179,7 +179,7 @@ def gen_ndarray_to_dict_task() -> MitTask:
     def task(
         obj,
         result_grid_list:List[NDArray[QubitPauliOperator]]  # type: ignore
-    ) -> Tuple[List[Dict[QubitPauliString, NDArray[float]]]]:
+    ) -> Tuple[List[Dict[QubitPauliString, NDArray[np.float64]]]]:
         """Task reshaping an arrays of QubitPauliOperator in the list
         `result_grid_list` into dictionaries with QubitPauliStrings as keys
         and an array of the appropriate coefficients as values. 
@@ -241,8 +241,8 @@ def gen_inv_fft_task() -> MitTask:
     
     def task(
         obj,
-        result_grid_list:List[Dict[QubitPauliString, NDArray[float]]]
-    ) -> Tuple[List[Dict[QubitPauliString, NDArray[float]]]]:
+        result_grid_list:List[Dict[QubitPauliString, NDArray[np.float64]]]
+    ) -> Tuple[List[Dict[QubitPauliString, NDArray[np.float64]]]]:
         """Task performing the inverse Fast Fourier Transform on each
         value in the list of dictionaries `result_grid_list`.
         The dictionary keys are unchanged by this task.
@@ -335,7 +335,7 @@ def gen_reshape_task() -> MitTask:
         result_list:List[QubitPauliOperator],
         length_list:List[int],
         shape_list:List[Tuple[int]]
-    ) -> Tuple[List[NDArray[QubitPauliOperator]]]:
+    ) -> Tuple[List[NDArray[QubitPauliOperator]]]:  # type: ignore
         """Task which reshapes a list of QubitPauliOperator into
         a list of ndarrays of QubitPauliOperator.
 
@@ -379,7 +379,7 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
     def task(
         obj,
         obs_exp_list:List[ObservableExperiment],
-        obs_exp_sym_val_grid_list:List[NDArray[float]]
+        obs_exp_sym_val_grid_list:List[NDArray[np.float64]]
     ) -> Tuple[List[NDArray[ObservableExperiment]]]:
         """Task generating a grid of ObservableExperiments.
         Each point in the grid corresponds to substituting the symbols in
@@ -466,7 +466,7 @@ def gen_symbol_val_gen_task(n_sym_vals:int) -> MitTask:
     def task(
         obj,
         obs_exp_list: List[ObservableExperiment]
-        ) -> Tuple[List[ObservableExperiment], List[List[np.ndarray]]]:
+        ) -> Tuple[List[ObservableExperiment], List[List[NDArray[np.float64]]]]:
         """Produces a grid of values taken by the symbols in
         the circuit. The values are generated uniformly in the interval [0,2]
         (factors of pi give full coverage) for each symbol. The points on the

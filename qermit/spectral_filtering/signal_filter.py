@@ -7,7 +7,10 @@ class SignalFilter(ABC):
     """Base class for signal filtering.
     """
 
-    def filter(self, fft_result_val_grid:NDArray[float]) -> NDArray[float]:
+    def filter(
+        self,
+        fft_result_val_grid:NDArray[np.float64]
+    ) -> NDArray[np.float64]:
         """Method transforming array of floats into filtered array of floats.
         """
         pass
@@ -25,7 +28,10 @@ class SmallCoefficientSignalFilter(SignalFilter):
         """
         self.tol = tol
 
-    def filter(self, fft_result_val_grid:NDArray[float]) -> NDArray[float]:  # type: ignore
+    def filter(
+        self,
+        fft_result_val_grid:NDArray[np.float64]
+    ) -> NDArray[np.float64]:
         """Filter method reducing values in `fft_result_val_grid` to 0 if
         they are less than `tol`.
 
