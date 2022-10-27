@@ -1,14 +1,9 @@
 import numpy as np
 from scipy import fft, interpolate  # type: ignore
 from itertools import product
-import matplotlib.pyplot as plt  # type: ignore
-from typing import Tuple, List, Union, Dict, Any
+from typing import Tuple, List, Dict, Any
 from qermit.taskgraph.task_graph import TaskGraph
-from qermit.taskgraph.mittask import (
-    MitTask,
-    CircuitShots,
-    Wire,
-)
+from qermit.taskgraph.mittask import MitTask
 from qermit import SymbolsDict, AnsatzCircuit, ObservableExperiment
 from qermit.taskgraph.mitex import MitEx, gen_compiled_MitRes
 from pytket.backends import Backend
@@ -30,16 +25,16 @@ def gen_result_extraction_task() -> MitTask:
     
     def task(
         obj,
-        result_list:list[Dict[QubitPauliOperator, NDArray[float]]],
+        result_list:list[Dict[QubitPauliOperator, NDArray[float]]],  # type: ignore
         obs_exp_list:List[ObservableExperiment],
         points_list:List[List[float]]
     ) -> Tuple[List[QubitPauliOperator]]:
         """Task interpolating result at point specified by symbol values
-        in the circuits of obs_exp_list. Elements of result_list are used
+        in the circuits of obs_exp_list. Elements of `result_list` are used
         as discrete grid for interpolation. `points_list` are the axis
         of the grid.
 
-        :param result_list: List of results grid.
+        :param result_list: List of results grids.
         :type result_list: list[Dict[QubitPauliOperator, NDArray[float]]]
         :param obs_exp_list: List of observable experiments. The value of
             the symbols in these circuits are used as the points to
@@ -84,11 +79,28 @@ def gen_result_extraction_task() -> MitTask:
     )
 
 def gen_mitigation_task(signal_filter:SignalFilter) -> MitTask:
+    """Generates task acting `signal_filter` on the fourier coefficients
+    of a grid of results.
+
+    :param signal_filter: Method of filtering the signal.
+    :type signal_filter: SignalFilter
+    :return: Task performing filtering.
+    :rtype: MitTask
+    """
     
     def task(
         obj,
         result_grid_list:List[Dict[QubitPauliOperator, NDArray[float]]]
     ) -> Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]:
+        """Task acting `signal_filter` on the value of the dictionaries in
+        `result_grid_list`.
+
+        :param result_grid_list: List of dictionaries mapping 
+            QubitPauliOperator to arrays.
+        :type result_grid_list: List[Dict[QubitPauliOperator, NDArray[float]]]
+        :return: Grids having had filter applied.
+        :rtype: Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]
+        """
 
         mitigated_result_grid_list = []
         for result_grid in result_grid_list:
@@ -107,11 +119,27 @@ def gen_mitigation_task(signal_filter:SignalFilter) -> MitTask:
     )
 
 def gen_fft_task() -> MitTask:
+    """Generates task which performs FFT of grids of results.
+
+    :return: Task performing FFT
+    :rtype: MitTask
+    """
     
     def task(
         obj,
         result_grid_dict_list:List[Dict[QubitPauliOperator, NDArray[float]]]
     ) -> Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]:
+        """Task performing FFT on each value of the dictionaries in the list
+        `result_grid_dict_list`.
+
+        :param result_grid_dict_list: List of dictionaries mapping
+            QubitPauliOperators to arrays of results.
+        :type result_grid_dict_list: List[Dict[QubitPauliOperator, NDArray[float]]]
+        :return: List of dictionaries mapping
+            QubitPauliOperators to the FFT of the values in the dictionaries
+            of `result_grid_dict_list`.
+        :rtype: Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]
+        """
         
         fft_result_grid_list = []
         
@@ -128,11 +156,28 @@ def gen_fft_task() -> MitTask:
     return MitTask(_label="FFT", _n_out_wires=1, _n_in_wires=1, _method=task)
 
 def gen_ndarray_to_dict_task() -> MitTask:
+    """Generates task reshaping an array of QubitPauliOperator into a
+    dictionary with QubitPauliStrings as keys and an array of the appropriate
+    coefficients as values.
+
+    :return: Task reshaping 
+    :rtype: MitTask
+    """
     
     def task(
         obj,
-        result_grid_list:List[NDArray[QubitPauliOperator]]
+        result_grid_list:List[NDArray[QubitPauliOperator]]  # type: ignore
     ) -> Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]:
+        """Task reshaping an arrays of QubitPauliOperator in the list
+        `result_grid_list` into dictionaries with QubitPauliStrings as keys
+        and an array of the appropriate coefficients as values. 
+
+        :param result_grid_list: List of QubitPauliOperators to be reshaped.
+        :type result_grid_list: List[NDArray[QubitPauliOperator]]
+        :return: List of QubitPauliOperators reshaped as dictionaries from
+            QubitPauliStrings to arrays of coefficients.
+        :rtype: Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]
+        """
         
         result_dict_list = []
         
@@ -229,7 +274,7 @@ def gen_flatten_task() -> MitTask:
     
     def task(
         obj,
-        grid_list:List[NDArray[ObservableExperiment]]
+        grid_list:List[NDArray[ObservableExperiment]]  # type: ignore
     ) -> Tuple[List[ObservableExperiment], List[int], List[Tuple[int, ...]]]:
         """Task which transforms a list of ndarrays of
         ObservableExperiments into a list of ObservableExperiments
@@ -294,12 +339,11 @@ def gen_reshape_task() -> MitTask:
         :rtype: Tuple[List[NDArray[QubitPauliOperator]]]
         """
         
-        result_grid_list:List[NDArray[QubitPauliOperator]] = []
-
+        result_grid_list = []
         for length, shape in zip(length_list, shape_list):
             flattened_result_grid = result_list[:length]
             del result_list[:length]
-            result_grid = np.reshape(flattened_result_grid, shape)
+            result_grid = np.reshape(flattened_result_grid, shape)  # type: ignore
             result_grid_list.append(result_grid)
                 
         return (result_grid_list, )
@@ -474,7 +518,7 @@ def gen_wire_copy_task(n_in_wires:int, n_wire_copies:int) -> MitTask:
 
         :return: Coppied wires
         """
-        out_wires = tuple()
+        out_wires:Tuple = tuple()
         for _ in range(n_wire_copies):
             for wire in in_wires:
                 out_wires = (*out_wires, copy(wire))
@@ -549,9 +593,7 @@ def gen_spectral_filtering_MitEx(
             ),
         )
     )
-    
-    _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
-    
+        
     characterisation_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
     characterisation_taskgraph.add_wire()
     characterisation_taskgraph.add_wire()
@@ -560,7 +602,7 @@ def gen_spectral_filtering_MitEx(
 
     characterisation_taskgraph.prepend(gen_obs_exp_grid_gen_task())
     
-    param_grid_gen_task = TaskGraph()
+    param_grid_gen_task = TaskGraph(_label="ParamGridGen")
     param_grid_gen_task.parallel(gen_param_grid_gen_task())
     characterisation_taskgraph.prepend(param_grid_gen_task)
 

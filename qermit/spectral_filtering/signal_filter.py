@@ -1,6 +1,6 @@
 from abc import ABC
 import numpy as np
-from copy import copy, deepcopy
+from copy import deepcopy
 from numpy.typing import NDArray
 
 class SignalFilter(ABC):
@@ -21,7 +21,7 @@ class SmallCoefficientSignalFilter(SignalFilter):
         """
         self.tol = tol
 
-    def filter(self, fft_result_val_grid:NDArray[float]) -> NDArray[float]:
+    def filter(self, fft_result_val_grid:NDArray[float]) -> NDArray[float]:  # type: ignore
         """Filter method reducing values in `fft_result_val_grid` to 0 if
         they are less than `tol`.
 
