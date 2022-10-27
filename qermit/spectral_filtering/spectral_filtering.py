@@ -29,7 +29,7 @@ def gen_result_extraction_task() -> MitTask:
     
     def task(
         obj,
-        result_list:list[Dict[QubitPauliString, NDArray]],
+        result_list:List[Dict[QubitPauliString, NDArray]],
         obs_exp_list:List[ObservableExperiment],
         points_list:List[List[float]]
     ) -> Tuple[List[QubitPauliOperator]]:
