@@ -11,6 +11,7 @@ from pytket.utils import QubitPauliOperator
 from copy import copy, deepcopy
 from .signal_filter import SmallCoefficientSignalFilter, SignalFilter
 from numpy.typing import NDArray
+from pytket.pauli import QubitPauliString  # type: ignore
 
 
 # TODO: This should be replaced by an approach using the fourier
@@ -25,7 +26,7 @@ def gen_result_extraction_task() -> MitTask:
     
     def task(
         obj,
-        result_list:list[Dict[QubitPauliOperator, NDArray[float]]],  # type: ignore
+        result_list:list[Dict[QubitPauliString, NDArray[float]]],  # type: ignore
         obs_exp_list:List[ObservableExperiment],
         points_list:List[List[float]]
     ) -> Tuple[List[QubitPauliOperator]]:
@@ -34,11 +35,14 @@ def gen_result_extraction_task() -> MitTask:
         as discrete grid for interpolation. `points_list` are the axis
         of the grid.
 
-        :param result_list: List of results grids.
-        :type result_list: list[Dict[QubitPauliOperator, NDArray[float]]]
+        :param result_list: List of dictionaries or results grids.
+        :type result_list: list[Dict[QubitPauliString, NDArray[float]]]
         :param obs_exp_list: List of observable experiments. The value of
             the symbols in these circuits are used as the points to
-            interpolate to.
+            interpolate to. Note that the QubitPauliString which comprise
+            the measurement QubitPauliOperator in each ObservableExperiment
+            should match those in the corresponding dictionary of
+            `result_list`.
         :type obs_exp_list: List[ObservableExperiment]
         :param points_list: List of values taken by each symbol on the
             result grid.
@@ -61,6 +65,13 @@ def gen_result_extraction_task() -> MitTask:
             interpolated_qpo = deepcopy(
                 obs_exp.ObservableTracker.qubit_pauli_operator
             )
+
+            if not (set(interpolated_qpo._dict.keys()) == set(result.keys())):
+                raise Exception(
+                    "The QubitPauliStrings in `obs_exp_list`, " +
+                    "and those in the `result_list` do not match."
+                )
+
             for qps in interpolated_qpo._dict.keys():
                 interpolated_qpo._dict[qps] = interpolate.interpn(
                     points,
@@ -90,16 +101,16 @@ def gen_mitigation_task(signal_filter:SignalFilter) -> MitTask:
     
     def task(
         obj,
-        result_grid_list:List[Dict[QubitPauliOperator, NDArray[float]]]
-    ) -> Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]:
+        result_grid_list:List[Dict[QubitPauliString, NDArray[float]]]
+    ) -> Tuple[List[Dict[QubitPauliString, NDArray[float]]]]:
         """Task acting `signal_filter` on the value of the dictionaries in
         `result_grid_list`.
 
         :param result_grid_list: List of dictionaries mapping 
-            QubitPauliOperator to arrays.
-        :type result_grid_list: List[Dict[QubitPauliOperator, NDArray[float]]]
-        :return: Grids having had filter applied.
-        :rtype: Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]
+            QubitPauliString to arrays.
+        :type result_grid_list: List[Dict[QubitPauliString, NDArray[float]]]
+        :return: Grids having had `signal_filter` applied.
+        :rtype: Tuple[List[Dict[QubitPauliString, NDArray[float]]]]
         """
 
         mitigated_result_grid_list = []
@@ -119,7 +130,7 @@ def gen_mitigation_task(signal_filter:SignalFilter) -> MitTask:
     )
 
 def gen_fft_task() -> MitTask:
-    """Generates task which performs FFT of grids of results.
+    """Generates task which performs FFT of grids of values.
 
     :return: Task performing FFT
     :rtype: MitTask
@@ -127,22 +138,21 @@ def gen_fft_task() -> MitTask:
     
     def task(
         obj,
-        result_grid_dict_list:List[Dict[QubitPauliOperator, NDArray[float]]]
-    ) -> Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]:
+        result_grid_dict_list:List[Dict[QubitPauliString, NDArray[float]]]
+    ) -> Tuple[List[Dict[QubitPauliString, NDArray[float]]]]:
         """Task performing FFT on each value of the dictionaries in the list
         `result_grid_dict_list`.
 
         :param result_grid_dict_list: List of dictionaries mapping
-            QubitPauliOperators to arrays of results.
-        :type result_grid_dict_list: List[Dict[QubitPauliOperator, NDArray[float]]]
+            QubitPauliString to arrays of results.
+        :type result_grid_dict_list: List[Dict[QubitPauliString, NDArray[float]]]
         :return: List of dictionaries mapping
-            QubitPauliOperators to the FFT of the values in the dictionaries
+            QubitPauliString to the FFT of the values in the dictionaries
             of `result_grid_dict_list`.
-        :rtype: Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]
+        :rtype: Tuple[List[Dict[QubitPauliString, NDArray[float]]]]
         """
         
         fft_result_grid_list = []
-        
         for result_grid_dict in result_grid_dict_list:
 
             # Perform the FFT on grids corresponding to each QubitPauliString.               
@@ -160,14 +170,16 @@ def gen_ndarray_to_dict_task() -> MitTask:
     dictionary with QubitPauliStrings as keys and an array of the appropriate
     coefficients as values.
 
-    :return: Task reshaping 
+    :return: Task reshaping QubitPauliOperator into a
+        dictionary with QubitPauliStrings as keys and an array of
+        the appropriate coefficients as values.
     :rtype: MitTask
     """
     
     def task(
         obj,
         result_grid_list:List[NDArray[QubitPauliOperator]]  # type: ignore
-    ) -> Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]:
+    ) -> Tuple[List[Dict[QubitPauliString, NDArray[float]]]]:
         """Task reshaping an arrays of QubitPauliOperator in the list
         `result_grid_list` into dictionaries with QubitPauliStrings as keys
         and an array of the appropriate coefficients as values. 
@@ -176,11 +188,10 @@ def gen_ndarray_to_dict_task() -> MitTask:
         :type result_grid_list: List[NDArray[QubitPauliOperator]]
         :return: List of QubitPauliOperators reshaped as dictionaries from
             QubitPauliStrings to arrays of coefficients.
-        :rtype: Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]
+        :rtype: Tuple[List[Dict[QubitPauliString, NDArray[float]]]]
         """
         
         result_dict_list = []
-        
         for qpo_result_grid in result_grid_list:
 
             # Take the QubitPauliOperator that is being measured from the 0
@@ -189,7 +200,7 @@ def gen_ndarray_to_dict_task() -> MitTask:
                 tuple(0 for _ in qpo_result_grid.shape)
             ]
             # For each QubitPauliString in the QubitPauliOperator, add a
-            # key and initialise and empty grid. The new grid will contain
+            # key and initialise an empty grid. The new grid will contain
             # the expectations of the individual QubitPauliStrings.
             result_grid_dict = dict()
             for key in zero_qpo_result_grid._dict.keys():
@@ -230,18 +241,18 @@ def gen_inv_fft_task() -> MitTask:
     
     def task(
         obj,
-        result_grid_list:List[Dict[QubitPauliOperator, NDArray[float]]]
-    ) -> Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]:
+        result_grid_list:List[Dict[QubitPauliString, NDArray[float]]]
+    ) -> Tuple[List[Dict[QubitPauliString, NDArray[float]]]]:
         """Task performing the inverse Fast Fourier Transform on each
         value in the list of dictionaries `result_grid_list`.
         The dictionary keys are unchanged by this task.
 
         :param result_grid_list: List of dictionaries, where values are
-            to have the inverse FFT performed on.
-        :type result_grid_list: List[Dict[QubitPauliOperator, NDArray[float]]]
+            to have the inverse FFT performed on them.
+        :type result_grid_list: List[Dict[QubitPauliString, NDArray[float]]]
         :return: List of dictionaries, where all values are the FFT of
             the values of `result_grid_list`
-        :rtype: Tuple[List[Dict[QubitPauliOperator, NDArray[float]]]]
+        :rtype: Tuple[List[Dict[QubitPauliString, NDArray[float]]]]
         """
         
         # Iterate through results and invert FFT
@@ -311,7 +322,8 @@ def gen_flatten_task() -> MitTask:
 
 def gen_reshape_task() -> MitTask:
     """Generates task which reshapes a list of QubitPauliOperator into
-    a list of ndarrays of QubitPauliOperator.
+    a list of ndarrays of QubitPauliOperator. This can be used to have the effect for 
+    reversing the task generated by `gen_flatten_task`.
 
     :return: Task which reshapes a list of QubitPauliOperator into
     a list of ndarrays of QubitPauliOperator.
@@ -369,7 +381,7 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
         obs_exp_list:List[ObservableExperiment],
         obs_exp_sym_val_grid_list:List[NDArray[float]]
     ) -> Tuple[List[NDArray[ObservableExperiment]]]:
-        """Task generating a grid of observable experiments.
+        """Task generating a grid of ObservableExperiments.
         Each point in the grid corresponds to substituting the symbols in
         the circuit of each `ObservableExperiment` for a value in the
         meshgrids of `obs_exp_sym_val_grid_list`.
@@ -377,12 +389,12 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
         :param obs_exp_list: A list of `ObservableExperiments`.
         :type obs_exp_list: list[ObservableExperiment]
         :param obs_exp_sym_val_grid_list: A list of collections of meshgrids.
-        Each symbol in the Circuit of each `ObservableExperiment` is
-        represented in the meshgrids of `obs_exp_sym_val_grid_list`.
+            Each symbol in the Circuit of each `ObservableExperiment` is
+            represented in the meshgrids of `obs_exp_sym_val_grid_list`.
         :type obs_exp_sym_val_grid_list: list[NDArray[float]]
         :return: A grid of `ObservableExperiments`. Each `ObservableExperiment`
-        includes a `SymbolDict` evaluated at a point in the grid of
-        `obs_exp_sym_val_grid_list`.
+            includes a `SymbolDict` evaluated at a point in the grid of
+            `obs_exp_sym_val_grid_list`.
         :rtype: tuple[list[NDArray[ObservableExperiment]]]
         """
         
@@ -402,9 +414,7 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
             # Generate an ObservableExperiment for every symbol
             # value in the grid
             grid_point_val_list = [
-                [
-                    i for i in range(size)
-                ]
+                [i for i in range(size)]
                 for size in sym_val_grid_list[0].shape
             ]
             for grid_point in product(*grid_point_val_list):
@@ -416,9 +426,7 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
                     for sym_val_grid, sym in zip(sym_val_grid_list, sym_list)
                 }  
                 sym_dict = SymbolsDict().symbols_from_dict(sym_map)
-                
                 circ = obs_exp.AnsatzCircuit.Circuit.copy()
-
                 anz_circ = AnsatzCircuit(
                     circ,
                     obs_exp.AnsatzCircuit.Shots,
@@ -444,9 +452,9 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
 def gen_symbol_val_gen_task(n_sym_vals:int) -> MitTask:
     """Generates task which produces a grid of values taken by the symbols in
     the circuit. The values are generated uniformly in the interval [0,2]
-    (factors of pi give full coverage) for each symbol. The points on the
-    grid are equally spaces, and the number of values is the same in
-    each dimension.
+    (factors of pi give full coverage of the Bloch sphere) for each symbol.
+    The points on the grid are equally spaces, and the number of values
+    is the same in each dimension.
 
     :param n_sym_vals: The number of values to be taken by each symbol
         in the circuit.
@@ -538,7 +546,7 @@ def gen_param_grid_gen_task() -> MitTask:
     :rtype: MitTask
     """
 
-    def task(obj, sym_vals_list:List[List[float]]) -> Tuple[List[list]]:
+    def task(obj, sym_vals_list:List[List[float]]) -> Tuple[List[List]]:
         """Task converting list of symbol values into a meshgrid.
 
         :param sym_vals_list: List of values each symbol should take on
