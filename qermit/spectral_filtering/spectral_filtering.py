@@ -366,9 +366,9 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
     
     def task(
         obj,
-        obs_exp_list:list[ObservableExperiment],
-        obs_exp_sym_val_grid_list:list[NDArray[float]]
-    ) -> tuple[list[NDArray[ObservableExperiment]]]:
+        obs_exp_list:List[ObservableExperiment],
+        obs_exp_sym_val_grid_list:List[NDArray[float]]
+    ) -> Tuple[List[NDArray[ObservableExperiment]]]:
         """Task generating a grid of observable experiments.
         Each point in the grid corresponds to substituting the symbols in
         the circuit of each `ObservableExperiment` for a value in the
@@ -538,7 +538,7 @@ def gen_param_grid_gen_task() -> MitTask:
     :rtype: MitTask
     """
 
-    def task(obj, sym_vals_list:list[list[float]]) -> Tuple[list[list]]:
+    def task(obj, sym_vals_list:List[List[float]]) -> Tuple[List[list]]:
         """Task converting list of symbol values into a meshgrid.
 
         :param sym_vals_list: List of values each symbol should take on
