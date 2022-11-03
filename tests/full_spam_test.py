@@ -64,13 +64,13 @@ def test_full_tomography_spam_characterisation_task_gen():
     handles = b.process_circuits(spam_circs, 5)
     results = b.get_results(handles)
 
-    task = gen_full_tomography_spam_characterisation_task(b, qb_subsets)
+    task = gen_full_tomography_spam_characterisation_task(qb_subsets)
     assert task.n_in_wires == 2
     assert task.n_out_wires == 1
 
     task_res = task([results, spam_info[2]])
     assert task_res == (True,)
-    char = b.backend_info.misc["FullCorrelatedSpamCorrection"]
+    char = task.characterisation["FullCorrelatedSpamCorrection"]
     assert char[0] == qb_subsets
     assert char[1] == {
         Qubit(0): (0, 0),
@@ -113,19 +113,19 @@ def test_gen_full_tomography_spam_correction_task():
     handles = b.process_circuits(spam_circs, 5)
     results = b.get_results(handles)
     # just returns bool
-    gen_full_tomography_spam_characterisation_task(b, qb_subsets)(
-        [results, spam_info[2]]
-    )
+    char_task = gen_full_tomography_spam_characterisation_task(qb_subsets)
+    char_task([results, spam_info[2]])
 
     handles1 = b.process_circuits([c0, c1], 20)
     results1 = b.get_results(handles1)
     q_b_maps = [(c0.qubit_to_bit_map, {}), (c1.qubit_to_bit_map, {Bit(0): Qubit(0)})]
-    task = gen_full_tomography_spam_correction_task(b, CorrectionMethod.Invert)
-    assert task.n_in_wires == 3
-    assert task.n_out_wires == 1
+    correct_task = gen_full_tomography_spam_correction_task(CorrectionMethod.Invert)
+    assert correct_task.n_in_wires == 3
+    assert correct_task.n_out_wires == 1
 
     wire = [results1, q_b_maps, True]
-    corrected_results = task(wire)[0]
+    correct_task.characterisation = char_task.characterisation
+    corrected_results = correct_task(wire)[0]
     assert len(corrected_results) == 2
     assert corrected_results[0].get_counts()[(0, 0, 1)] == 20
     assert corrected_results[1].get_counts()[(1, 1)] == 20
