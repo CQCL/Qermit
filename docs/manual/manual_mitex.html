@@ -16,10 +16,12 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/thebelab-helper.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -69,8 +71,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>MitEx</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">MitEx</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/manual_mitex.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -81,7 +83,7 @@
            <div itemprop="articleBody">
              
   <section id="mitex">
-<h1>MitEx<a class="headerlink" href="#mitex" title="Permalink to this headline"></a></h1>
+<h1>MitEx<a class="headerlink" href="#mitex" title="Permalink to this heading"></a></h1>
 <p>A core process of many NISQ applications, such as variational algorithms, is the evaluation of the
 average value of observables for some circuit. This corresponds to measuring the expected value of
 the bit strings returned by measured qubit shots.</p>
@@ -178,7 +180,7 @@ the expectation value for each <code class="docutils literal notranslate"><span 
 <p>The <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> constructor has a <code class="docutils literal notranslate"><span class="pre">mitres</span></code> keyword, which if passed a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object will construct the resulting <code class="docutils literal notranslate"><span class="pre">MitEx</span></code>
 from it. This is similar in spirit to the combining of error-mitigation methods discussed in “Combining <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> methods”.</p>
 <section id="error-mitigation-with-mitex">
-<h2>Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitEx</span></code><a class="headerlink" href="#error-mitigation-with-mitex" title="Permalink to this headline"></a></h2>
+<h2>Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitEx</span></code><a class="headerlink" href="#error-mitigation-with-mitex" title="Permalink to this heading"></a></h2>
 <p>As with <code class="docutils literal notranslate"><span class="pre">MitRes</span></code>, to produce a <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> object that executes an error-mitigation
 protocol when <code class="docutils literal notranslate"><span class="pre">MitEx.run</span></code> is called, additional <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects need to be added
 to the task graph.</p>
@@ -195,7 +197,7 @@ of the manual. However, we will consider extending a <code class="docutils liter
 to show the type constraints explicitly.</p>
 </section>
 <section id="extending-mitex-with-mittask">
-<h2>Extending <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> with <code class="docutils literal notranslate"><span class="pre">MitTask</span></code><a class="headerlink" href="#extending-mitex-with-mittask" title="Permalink to this headline"></a></h2>
+<h2>Extending <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> with <code class="docutils literal notranslate"><span class="pre">MitTask</span></code><a class="headerlink" href="#extending-mitex-with-mittask" title="Permalink to this heading"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">MitEx.append</span></code> and <code class="docutils literal notranslate"><span class="pre">MitEx.prepend</span></code> methods can be used to extend the
 <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects the <code class="docutils literal notranslate"><span class="pre">MitEx._task_graph</span></code> attribute holds.</p>
 <p>In some estimation experiments, a priori knowledge about the circuit structure and observable measured can be utilised to discard Shots.
@@ -367,7 +369,7 @@ Depolarisation-Factor-Supression-For-Nearest-Clifford (an internal method).
 As with <code class="docutils literal notranslate"><span class="pre">MitRes</span></code>, each is available via a selection of generator functions.</p>
 </section>
 <section id="probabilistic-error-cancellation-in-qermit">
-<h2>Probabilistic-Error-Cancellation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#probabilistic-error-cancellation-in-qermit" title="Permalink to this headline"></a></h2>
+<h2>Probabilistic-Error-Cancellation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#probabilistic-error-cancellation-in-qermit" title="Permalink to this heading"></a></h2>
 <p>Probabilistic-Error-Cancellation (PEC), introduced in <a class="reference internal" href="#temme2016" id="id5"><span>[Temme2016]</span></a>, utilises that it is
 possible to mitigate for the effect of errors by sampling from a set of erroneous circuits.
 In particular, a linear combination of the expectation values of an observable measured
@@ -432,7 +434,7 @@ the  <code class="docutils literal notranslate"><span class="pre">qermit.probabi
 </div>
 </section>
 <section id="zero-noise-extrapolation-in-qermit">
-<h2>Zero-Noise-Extrapolation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#zero-noise-extrapolation-in-qermit" title="Permalink to this headline"></a></h2>
+<h2>Zero-Noise-Extrapolation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#zero-noise-extrapolation-in-qermit" title="Permalink to this heading"></a></h2>
 <p>Zero-Noise-Extrapolation (ZNE), introduced concurrently in <a class="reference internal" href="#li2017" id="id9"><span>[Li2017]</span></a> and <a class="reference internal" href="#temme2016" id="id10"><span>[Temme2016]</span></a>, utilises
 differing effective device noise levels to perform error correction. In particular,
 the results of a computation at a variety of noise levels are used to extrapolate to the
@@ -513,7 +515,7 @@ The fit used to extrapolate results can be specified via the <code class="docuti
 This expects a <code class="docutils literal notranslate"><span class="pre">Fit</span></code> object, which default has support for a variety of fits.</p>
 </section>
 <section id="clifford-circuit-learning-and-clifford-data-regression-in-qermit">
-<h2>Clifford-Circuit-Learning and Clifford-Data-Regression in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#clifford-circuit-learning-and-clifford-data-regression-in-qermit" title="Permalink to this headline"></a></h2>
+<h2>Clifford-Circuit-Learning and Clifford-Data-Regression in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#clifford-circuit-learning-and-clifford-data-regression-in-qermit" title="Permalink to this heading"></a></h2>
 <p>Correcting device noise typically requires some characterisation of what the noise is, while characterising
 noise typically requires an understanding of what data would look like <em>without</em> noise.</p>
 <p>Clifford-Circuit-Learning uses quantum circuits composed primarily of Clifford gates to characterise and correct
@@ -632,7 +634,7 @@ defines the <code class="docutils literal notranslate"><span class="pre">MitEx</
 defines the <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> object all experiment circuits are executed on.</p>
 </section>
 <section id="depolarisation-factor-supression-for-nearest-clifford-in-qermit">
-<h2>Depolarisation-Factor-Supression-For-Nearest-Clifford in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#depolarisation-factor-supression-for-nearest-clifford-in-qermit" title="Permalink to this headline"></a></h2>
+<h2>Depolarisation-Factor-Supression-For-Nearest-Clifford in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#depolarisation-factor-supression-for-nearest-clifford-in-qermit" title="Permalink to this heading"></a></h2>
 <p>This method estimates the averaged incoherent noise component affecting the entire circuit structure
 and reduces its effect on computing expectation values. The main advantage of DFSC is that it does
 not require significant quantum resource overhead (no additional ancillas and no increased depth)
