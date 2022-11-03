@@ -572,7 +572,6 @@ def gen_CDR_MitEx(
     )
     _post_calibrate_task_graph.append(
         cdr_calibration_task_gen(
-            device_backend,
             kwargs.get("model", _PolyCDRCorrect(1)),
         )
     )
@@ -597,6 +596,6 @@ def gen_CDR_MitEx(
         )
     )
     _experiment_taskgraph.append(_post_task_graph)
-    _experiment_taskgraph.append(cdr_correction_task_gen(device_backend))
+    _experiment_taskgraph.append(cdr_correction_task_gen())
 
     return MitEx(device_backend).from_TaskGraph(_experiment_taskgraph)
