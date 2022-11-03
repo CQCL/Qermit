@@ -72,7 +72,7 @@ def gen_FullyCorrelated_SPAM_MitRes(
 
     _task_graph_spam_calib.add_wire()
     _task_graph_spam_calib.append(
-        gen_full_tomography_spam_characterisation_task(backend, correlations)
+        gen_full_tomography_spam_characterisation_task(correlations)
     )
 
     _task_graph_spam_correction.parallel(_task_graph_spam_calib)
@@ -81,7 +81,7 @@ def gen_FullyCorrelated_SPAM_MitRes(
     )
     _task_graph_spam_correction.append(
         gen_full_tomography_spam_correction_task(
-            backend, kwargs.get("correction_method", CorrectionMethod.Invert)
+            kwargs.get("correction_method", CorrectionMethod.Invert)
         )
     )
     return MitRes(backend).from_TaskGraph(_task_graph_spam_correction)
