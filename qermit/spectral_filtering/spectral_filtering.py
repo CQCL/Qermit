@@ -17,8 +17,6 @@ from pytket.pauli import QubitPauliString  # type: ignore
 # versions of python are supported. Reference the documentation
 # for the 'true' typing.
 
-# TODO: This should be replaced by an approach using the fourier
-# coefficients directly, rather than interpolation.
 def gen_result_extraction_task() -> MitTask:
     """Generates task which extracts a result at coordinates specified
     by symbol values from grid of results.
@@ -38,8 +36,14 @@ def gen_result_extraction_task() -> MitTask:
         as discrete grid for interpolation. `points_list` are the axis
         of the grid.
 
-        :param result_list: List of dictionaries or results grids.
-        :type result_list: list[Dict[QubitPauliString, NDArray[float]]]
+        :param result_list: List of dictionaries or results grids. Entries in
+            result_list correspond to experiments in obs_exp_list. Keys of
+            each entry correspond to the pauli strings in each observable
+            of the corresponding experiment. Values of each entry are grids
+            with axis defined by points_list. Each point on the grid
+            corresponds to the circuit in obs_exp_list with symbols substituted
+            for the grid point value.
+        :type result_list: List[Dict[QubitPauliString, NDArray[float]]]
         :param obs_exp_list: List of observable experiments. The value of
             the symbols in these circuits are used as the points to
             interpolate to. Note that the QubitPauliString which comprise
@@ -581,6 +585,26 @@ def gen_spectral_filtering_MitEx(
     n_vals:int,
     **kwargs
 ) -> MitEx:
+    """Generator function for the spectral filtering MitEx. This method
+    acts on symbolic circuits, evaluating the circuit on a grid of symbol
+    values and performing mitigation on the resulting landscape.
+
+    :param backend: Backend on which all experiments are run.
+    :type backend: Backend
+    :param n_vals: The number of values each symbol should take. Each symbol
+        will take n_vals equally spaced values in the range
+        :math:`[-2 \pi, 2 \pi]`. The circuit will be evaluate at every
+        permutation of the symbols evaluated at these points, giving a grid
+        of circuit evaluations.
+    :type n_vals: int
+
+    :key signal_filter: Method for filtering the landscape of circuit
+        evaluations. Defaults to SmallCoefficientSignalFilter.
+    :type signal_filter: SignalFilter
+
+    :return: MitEx implementing spectral filtering.
+    :rtype: MitEx
+    """
 
     _optimisation_level = kwargs.get("optimisation_level", 0)
 
@@ -606,8 +630,7 @@ def gen_spectral_filtering_MitEx(
     )
         
     characterisation_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
-    characterisation_taskgraph.add_wire()
-    characterisation_taskgraph.add_wire()
+    characterisation_taskgraph.add_n_wires(2)
     characterisation_taskgraph.prepend(gen_flatten_task())
     characterisation_taskgraph.append(gen_reshape_task())
 
