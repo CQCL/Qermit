@@ -31,61 +31,86 @@ def generate_sine_wave(freq, sample_rate, duration):
     y = np.sin((2 * np.pi) * x * freq)
     return x, y
 
-n_shots = 16
-n_sym_vals = 3
+def gen_experiment_symbols():
 
-a = Symbol("alpha")
-b = Symbol("beta")
-c = Symbol("gamma")
+    a = Symbol("alpha")
+    b = Symbol("beta")
+    c = Symbol("gamma")
+    
+    n_sym_vals = 3
 
-sym_vals = np.linspace(0, 2, n_sym_vals, endpoint=False)
+    sym_vals = np.linspace(0, 2, n_sym_vals, endpoint=False)
 
-# ====== Experiment One ======
+    return n_sym_vals, a, b, c, sym_vals
 
-circ_one = Circuit(2)
-circ_one.H(0).H(1).Rz(a, 0).Rz(b, 1).H(0).H(1)
-sym_dict_one = SymbolsDict().symbols_from_dict({a:1.01, b:1})
-ansatz_circuit_one = AnsatzCircuit(circ_one, n_shots, sym_dict_one)
+def gen_experiment_qps():
 
-qps_one = QubitPauliString(
-    [Qubit(0), Qubit(1)], [Pauli.Z, Pauli.Z]
-)
-qpo_one = QubitPauliOperator({qps_one: 1.0})
-obs_track_one = ObservableTracker(qpo_one)
-
-exp_one = ObservableExperiment(
-        ansatz_circuit_one,
-        obs_track_one,
+    qps_one = QubitPauliString(
+        [Qubit(0), Qubit(1)], [Pauli.Z, Pauli.Z]
+    )
+    qps_two = QubitPauliString(
+        [Qubit(0), Qubit(2)], [Pauli.Z, Pauli.X]
     )
 
-sym_vals_one = [sym_vals for _ in sym_dict_one._symbolic_map.keys()]
+    return qps_one, qps_two
 
-# ====== Experiment Two ======
+def gen_experiment_one():
 
-circ_two = Circuit(3)
-circ_two.H(0).H(2).Rx(a, 0).Rz(b, 1).Rx(c, 2).H(0).H(2)
-sym_dict_two = SymbolsDict().symbols_from_dict({a:1, b:1, c:2/3})
-ansatz_circuit_two = AnsatzCircuit(circ_two, n_shots, sym_dict_two)
+    _, a, b, _, sym_vals = gen_experiment_symbols()
+    n_shots = 16
 
-qps_two = QubitPauliString(
-    [Qubit(0), Qubit(2)], [Pauli.Z, Pauli.X]
-)
-qpo_two = QubitPauliOperator(
-    {
-        qps_one: 0.5,
-        qps_two: 0.5
-    }
-)
-obs_track_two = ObservableTracker(qpo_two) 
+    circ_one = Circuit(2)
+    circ_one.H(0).H(1).Rz(a, 0).Rz(b, 1).H(0).H(1)
+    sym_dict_one = SymbolsDict().symbols_from_dict({a:1.01, b:1})
+    ansatz_circuit_one = AnsatzCircuit(circ_one, n_shots, sym_dict_one)
 
-exp_two = ObservableExperiment(
-        ansatz_circuit_two,
-        obs_track_two,
+    qps_one, _ = gen_experiment_qps()
+    
+    qpo_one = QubitPauliOperator({qps_one: 1.0})
+    obs_track_one = ObservableTracker(qpo_one)
+
+    exp_one = ObservableExperiment(
+            ansatz_circuit_one,
+            obs_track_one,
+        )
+
+    sym_vals_one = [sym_vals for _ in sym_dict_one._symbolic_map.keys()]
+
+    return exp_one, circ_one, sym_vals_one
+
+def gen_experiment_two():
+
+    _, a, b, c, sym_vals = gen_experiment_symbols()
+    n_shots = 16
+
+    circ_two = Circuit(3)
+    circ_two.H(0).H(2).Rx(a, 0).Rz(b, 1).Rx(c, 2).H(0).H(2)
+    sym_dict_two = SymbolsDict().symbols_from_dict({a:1, b:1, c:2/3})
+    ansatz_circuit_two = AnsatzCircuit(circ_two, n_shots, sym_dict_two)
+
+    qps_one, qps_two = gen_experiment_qps()
+    qpo_two = QubitPauliOperator(
+        {
+            qps_one: 0.5,
+            qps_two: 0.5
+        }
     )
+    obs_track_two = ObservableTracker(qpo_two) 
 
-sym_vals_two = [sym_vals for _ in sym_dict_two._symbolic_map.keys()]
+    exp_two = ObservableExperiment(
+            ansatz_circuit_two,
+            obs_track_two,
+        )
+
+    sym_vals_two = [sym_vals for _ in sym_dict_two._symbolic_map.keys()]
+
+    return exp_two, circ_two, sym_vals_two
 
 def test_gen_symbol_val_gen_task():
+
+    n_sym_vals, _, _, _, sym_vals = gen_experiment_symbols()
+    exp_one, _, _ = gen_experiment_one()
+    exp_two, _, _ = gen_experiment_two()
 
     param_grid_gen_task = gen_symbol_val_gen_task(n_sym_vals=n_sym_vals)
 
@@ -111,6 +136,9 @@ def test_gen_wire_copy_task():
 
     # A couple of tests that the task works with unfamiliar inputs.
     wire_copy_task = gen_wire_copy_task(n_in_wires=2, n_wire_copies=2)
+
+    exp_one, circ_one, sym_vals_one = gen_experiment_one()
+    exp_two, circ_two, sym_vals_two = gen_experiment_two()
 
     in_wires = (circ_one, circ_two)
     out_wire = wire_copy_task(in_wires)
@@ -148,6 +176,10 @@ def test_gen_wire_copy_task():
 
 def test_gen_param_grid_gen_task():
 
+    _, _, sym_vals_one = gen_experiment_one()
+    _, _, sym_vals_two = gen_experiment_two()
+    n_sym_vals, _, _, _, _ = gen_experiment_symbols()
+
     param_grid_gen_task = gen_param_grid_gen_task()
 
     # Test in expected context
@@ -170,6 +202,10 @@ def test_gen_param_grid_gen_task():
     assert out_wire[0][0][1][1][0] == 4
 
 def test_gen_obs_exp_grid_gen_task():
+
+    _, a, b, c, _ = gen_experiment_symbols()
+    exp_one, _, _ = gen_experiment_one()
+    exp_two, _, _ = gen_experiment_two()
 
     obs_exp_grid_gen_task = gen_obs_exp_grid_gen_task()
 
@@ -250,10 +286,11 @@ def test_gen_flatten_reshape_task():
 
 def test_gen_ndarray_to_dict_task():
 
-    SAMPLE_RATE = 20
-    DURATION = 2
-    FREQUENCY = 2
-    _, sine_wave = generate_sine_wave(FREQUENCY, SAMPLE_RATE, DURATION)
+    sample_rate = 20
+    duration = 2
+    frequency = 2
+    _, sine_wave = generate_sine_wave(frequency, sample_rate, duration)
+    qps_one, qps_two = gen_experiment_qps()
 
     result_list_one = [[[QubitPauliOperator({qps_one: coef * amp}) for coef in sine_wave] for amp in sine_wave] for _ in sine_wave]
     result_grid_one = np.array(result_list_one)
@@ -280,10 +317,11 @@ def test_gen_ndarray_to_dict_task():
 
 def test_gen_fft_task():
 
-    SAMPLE_RATE = 20
-    DURATION = 2
-    FREQUENCY = 2
-    _, sine_wave = generate_sine_wave(FREQUENCY, SAMPLE_RATE, DURATION)
+    sample_rate = 20
+    duration = 2
+    frequency = 2
+    _, sine_wave = generate_sine_wave(frequency, sample_rate, duration)
+    qps_one, qps_two = gen_experiment_qps()
 
     result_dict_one = {
         qps_one:np.array([[[coef * amp for coef in sine_wave] for amp in sine_wave] for _ in sine_wave])
@@ -300,7 +338,7 @@ def test_gen_fft_task():
     in_wires = (result_dict_list, )
     out_wires = fft_task(in_wires)
 
-    N = SAMPLE_RATE * DURATION
+    N = sample_rate * duration
 
     yf = out_wires[0]
 
@@ -319,10 +357,10 @@ def test_gen_fft_task():
 
 def test_gen_fft_task_with_sine():
     
-    SAMPLE_RATE = 20
-    DURATION = 2
-    FREQUENCY = 2
-    _, sine_wave = generate_sine_wave(FREQUENCY, SAMPLE_RATE, DURATION)
+    sample_rate = 20
+    duration = 2
+    frequency = 2
+    _, sine_wave = generate_sine_wave(frequency, sample_rate, duration)
 
     # Note that the QubitPauliString is being generated just to make the
     # input types match up. It's not used at any point.
@@ -336,25 +374,25 @@ def test_gen_fft_task_with_sine():
     in_wires = (result_grid_list, )
     out_wires = fft_task(in_wires)
 
-    N = SAMPLE_RATE * DURATION
+    N = sample_rate * duration
 
     yf = out_wires[0][0][qps]
-    xf = scipy.fft.fftfreq(N, 1 / SAMPLE_RATE)
+    xf = scipy.fft.fftfreq(N, 1 / sample_rate)
     fft_dict = {x:y for x, y in zip(xf, yf)}
 
     # N division by two as amplitude is split accross positive and negative
-    assert math.isclose(abs(fft_dict[FREQUENCY]), N/2)
-    assert math.isclose(abs(fft_dict[-FREQUENCY]), N/2)
+    assert math.isclose(abs(fft_dict[frequency]), N/2)
+    assert math.isclose(abs(fft_dict[-frequency]), N/2)
 
 def test_gen_inv_fft_task():
 
     inv_fft_task = gen_inv_fft_task()
 
-    SAMPLE_RATE = 20
-    DURATION = 2
-    FREQUENCY = 1
+    sample_rate = 20
+    duration = 2
+    frequency = 1
 
-    _, sine_wave = generate_sine_wave(FREQUENCY, SAMPLE_RATE, DURATION)
+    _, sine_wave = generate_sine_wave(frequency, sample_rate, duration)
 
     ideal_x_fft_3D = np.zeros((40, 40, 40), dtype=complex)
     ideal_x_fft_3D[0][0][2] = 0-32000j
@@ -365,6 +403,8 @@ def test_gen_inv_fft_task():
     ideal_x_fft_2D_one[2][-2] = 400
     ideal_x_fft_2D_one[-2][2] = 400
     ideal_x_fft_2D_one[-2][-2] = -400
+
+    qps_one, qps_two = gen_experiment_qps()
 
     in_wire = ([{qps_one:ideal_x_fft_3D}, {qps_one:ideal_x_fft_2D_one, qps_two:ideal_x_fft_2D_one}], )
     out_wire = inv_fft_task(in_wire)
@@ -403,6 +443,8 @@ def test_gen_mitigation_task():
     grid_two_ideal = np.zeros((40,40))
     grid_two_ideal[0][0] = 10
 
+    qps_one, qps_two = gen_experiment_qps()
+
     in_wire = ([{qps_one:grid_one}, {qps_one:grid_two, qps_two:grid_two}], )
     out_wire = mitigation_task(in_wire)
 
@@ -412,10 +454,15 @@ def test_gen_mitigation_task():
 
 def test_gen_result_extraction_task():
 
+    exp_one, _, sym_vals_one = gen_experiment_one()
+    exp_two, _, sym_vals_two = gen_experiment_two()
+
     result_extraction_task = gen_result_extraction_task()
 
     result_grid_one = np.array([[i for i in range(3)] for _ in range(3)])
     result_grid_two = np.array([[[i+j for i in range(3)] for j in range(3)] for _ in range(3)])
+
+    qps_one, qps_two = gen_experiment_qps()
 
     in_wire = (
         [
@@ -506,3 +553,18 @@ def test_small_coefficient_signal_filter():
     filtered_grid = signal_filter.filter(grid)
 
     assert (filtered_grid == ideal_filtered_grid).all()
+
+if __name__ == "__main__":
+    test_small_coefficient_signal_filter()
+    test_gen_spectral_filtering_MitEx()
+    test_gen_result_extraction_task()
+    test_gen_mitigation_task()
+    test_gen_inv_fft_task()
+    test_gen_fft_task_with_sine()
+    test_gen_fft_task()
+    test_gen_ndarray_to_dict_task()
+    test_gen_flatten_reshape_task()
+    test_gen_obs_exp_grid_gen_task()
+    test_gen_param_grid_gen_task()
+    test_gen_wire_copy_task()
+    test_gen_symbol_val_gen_task()

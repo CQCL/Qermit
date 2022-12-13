@@ -73,10 +73,10 @@ def gen_result_extraction_task() -> MitTask:
                 obs_exp.ObservableTracker.qubit_pauli_operator
             )
 
-            if not (set(interpolated_qpo._dict.keys()) == set(result.keys())):
+            if set(interpolated_qpo._dict.keys()) != set(result.keys()):
                 raise Exception(
-                    "The QubitPauliStrings in `obs_exp_list`, " +
-                    "and those in the `result_list` do not match."
+                    "The QubitPauliStrings in `obs_exp_list`, \
+                        and those in the `result_list` do not match."
                 )
 
             for qps in interpolated_qpo._dict.keys():
@@ -130,16 +130,17 @@ def gen_mitigation_task(signal_filter:SignalFilter) -> MitTask:
         return (mitigated_result_grid_list, )
     
     return MitTask(
-        _label="Mitigation",
+        _label="SignalFilterMitigation",
         _n_out_wires=1,
         _n_in_wires=1,
         _method=task,
     )
 
 def gen_fft_task() -> MitTask:
-    """Generates task which performs FFT of grids of values.
+    """Generates task which performs Fast Fourier Transform
+    of grids of values.
 
-    :return: Task performing FFT
+    :return: Task performing Fast Fourier Transform
     :rtype: MitTask
     """
     
@@ -147,15 +148,16 @@ def gen_fft_task() -> MitTask:
         obj,
         result_grid_dict_list:List[Dict[QubitPauliString, NDArray]]
     ) -> Tuple[List[Dict[QubitPauliString, NDArray]]]:
-        """Task performing FFT on each value of the dictionaries in the list
-        `result_grid_dict_list`.
+        """Task performing Fast Fourier Transform on each value of
+        the dictionaries in the list `result_grid_dict_list`. This uses fft,
+        which is a scipy method.
 
         :param result_grid_dict_list: List of dictionaries mapping
             QubitPauliString to arrays of results.
         :type result_grid_dict_list: List[Dict[QubitPauliString, NDArray[float]]]
         :return: List of dictionaries mapping
-            QubitPauliString to the FFT of the values in the dictionaries
-            of `result_grid_dict_list`.
+            QubitPauliString to the Fast Fourier Transform of the values
+            in the dictionaries of `result_grid_dict_list`.
         :rtype: Tuple[List[Dict[QubitPauliString, NDArray[float]]]]
         """
         
@@ -242,7 +244,7 @@ def gen_inv_fft_task() -> MitTask:
     """Generates task performing the inverse Fast Fourier Transform 
     on each value in the list of dictionaries.
 
-    :return: Task performing FFT.
+    :return: Task performing Fast Fourier Transform.
     :rtype: MitTask
     """
     
@@ -252,13 +254,14 @@ def gen_inv_fft_task() -> MitTask:
     ) -> Tuple[List[Dict[QubitPauliString, NDArray]]]:
         """Task performing the inverse Fast Fourier Transform on each
         value in the list of dictionaries `result_grid_list`.
-        The dictionary keys are unchanged by this task.
+        The dictionary keys are unchanged by this task. This uses fft,
+        which is a scipy method.
 
         :param result_grid_list: List of dictionaries, where values are
-            to have the inverse FFT performed on them.
+            to have the inverse Fast Fourier Transform performed on them.
         :type result_grid_list: List[Dict[QubitPauliString, NDArray[float]]]
-        :return: List of dictionaries, where all values are the FFT of
-            the values of `result_grid_list`
+        :return: List of dictionaries, where all values are the
+            Fast Fourier Transform of the values of `result_grid_list`
         :rtype: Tuple[List[Dict[QubitPauliString, NDArray[float]]]]
         """
         
@@ -308,7 +311,7 @@ def gen_flatten_task() -> MitTask:
         """
         
         # Store structure of flattened grid as list of dictionaries.
-        shape_list = [grid.shape for grid in grid_list]
+        shape_list = []
         length_list = []
         # ObservableExperiments, currently stored in a grid,
         # are flattened to a single list.
@@ -317,6 +320,7 @@ def gen_flatten_task() -> MitTask:
             flattened_grid = grid.flatten()
             length_list.append(len(flattened_grid))
             flattened_grid_list += list(flattened_grid)
+            shape_list.append(grid.shape)
                                             
         return (flattened_grid_list, length_list, shape_list, )
     
@@ -357,13 +361,10 @@ def gen_reshape_task() -> MitTask:
         :return: The reshaped list of ndarrays.
         :rtype: Tuple[List[NDArray[QubitPauliOperator]]]
         """
-        
-        result_grid_list = []
-        for length, shape in zip(length_list, shape_list):
-            flattened_result_grid = result_list[:length]
-            del result_list[:length]
-            result_grid = np.reshape(flattened_result_grid, shape)  # type: ignore
-            result_grid_list.append(result_grid)
+
+        position_list = [sum(sub_list) for sub_list in [length_list[:i] for i in range(len(length_list)+1)]]
+        flattened_result_grid_list = [result_list[start:end] for start, end in zip(position_list[:-1], position_list[1:])]
+        result_grid_list = [np.reshape(flattened_result_grid, shape) for flattened_result_grid, shape in zip(flattened_result_grid_list, shape_list)]
                 
         return (result_grid_list, )
     
@@ -377,7 +378,7 @@ def gen_reshape_task() -> MitTask:
 
 def gen_obs_exp_grid_gen_task() -> MitTask:
     """Generates task creating an ObservableExperiment for each point in the 
-    inputted meshgrid.
+    input meshgrid.
 
     :return: Task generating grid of experiments.
     :rtype: MitTask
@@ -393,8 +394,10 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
         the circuit of each `ObservableExperiment` for a value in the
         meshgrids of `obs_exp_sym_val_grid_list`.
 
-        :param obs_exp_list: A list of `ObservableExperiments`.
-        :type obs_exp_list: list[ObservableExperiment]
+        :param obs_exp_list: A list of `ObservableExperiments`. This is
+            this list of experiments to be mitigated, as requested by
+            the user.
+        :type obs_exp_list: List[ObservableExperiment]
         :param obs_exp_sym_val_grid_list: A list of collections of meshgrids.
             Each symbol in the Circuit of each `ObservableExperiment` is
             represented in the meshgrids of `obs_exp_sym_val_grid_list`.
@@ -410,8 +413,6 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
         obs_exp_grid_list = []
         for obs_exp, sym_val_grid_list in zip(obs_exp_list, obs_exp_sym_val_grid_list):
                       
-            # List of symbols in circuit
-            sym_list = list(obs_exp.AnsatzCircuit.SymbolsDict.symbols_list)
             # Initialise empty grid of ObservableExperiment
             obs_exp_grid = np.empty(
                 sym_val_grid_list[0].shape,
@@ -430,7 +431,7 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
                 # the given point in the grid.
                 sym_map = {
                     sym:sym_val_grid[grid_point]
-                    for sym_val_grid, sym in zip(sym_val_grid_list, sym_list)
+                    for sym_val_grid, sym in zip(sym_val_grid_list, obs_exp.AnsatzCircuit.SymbolsDict.symbols_list)
                 }  
                 sym_dict = SymbolsDict().symbols_from_dict(sym_map)
                 circ = obs_exp.AnsatzCircuit.Circuit.copy()
@@ -439,10 +440,8 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
                     obs_exp.AnsatzCircuit.Shots,
                     sym_dict
                 )
-                # This needs to be a deep copy
-                obs = deepcopy(obs_exp.ObservableTracker)
                 
-                obs_exp_grid[grid_point] = ObservableExperiment(anz_circ, obs)
+                obs_exp_grid[grid_point] = ObservableExperiment(anz_circ, obs_exp.ObservableTracker)
                                 
             obs_exp_grid_list.append(obs_exp_grid)
         
@@ -457,11 +456,14 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
 
 
 def gen_symbol_val_gen_task(n_sym_vals:int) -> MitTask:
-    """Generates task which produces a grid of values taken by the symbols in
-    the circuit. The values are generated uniformly in the interval [0,2]
+    """Generates task which produces a grid of values. The values are
+    generated uniformly in the interval [0,2]
     (factors of pi give full coverage of the Bloch sphere) for each symbol.
     The points on the grid are equally spaces, and the number of values
-    is the same in each dimension.
+    is the same in each dimension. In the context of the spectral filtering
+    MitEx, the given circuit will be evaluated at each point in the grid.
+    This is to say that the symbols in the circuit will be substituted for
+    the values at each point in the grid.
 
     :param n_sym_vals: The number of values to be taken by each symbol
         in the circuit.
@@ -490,20 +492,16 @@ def gen_symbol_val_gen_task(n_sym_vals:int) -> MitTask:
         # A collection of symbol value lists is generated for each
         # ObservableExperiment in obs_exp_list. Within each collection of
         # lists, there is a list for each of the symbols.
-        sym_vals_list = []
-        for obs_exp in obs_exp_list:
-                        
-            # List of symbols used in circuit
-            sym_list = obs_exp.AnsatzCircuit.SymbolsDict.symbols_list
-            
-            # Lists of values taken by symbols, in half rotations
-            sym_vals = [
-                np.linspace(0, 2, n_sym_vals, endpoint=False)
-                for _ in sym_list
-            ]
-            sym_vals_list.append(sym_vals)
-        
-        return (obs_exp_list, sym_vals_list, )
+        return (
+            obs_exp_list, 
+            [
+                [
+                    np.linspace(0, 2, n_sym_vals, endpoint=False)
+                    for _ in obs_exp.AnsatzCircuit.SymbolsDict.symbols_list
+                ]
+                for obs_exp in obs_exp_list
+            ],
+        )
     
     return MitTask(
         _label="SymbolValGen",
@@ -547,13 +545,13 @@ def gen_wire_copy_task(n_in_wires:int, n_wire_copies:int) -> MitTask:
     )
 
 def gen_param_grid_gen_task() -> MitTask:
-    """Generates task converting lists of symbol values into a mesgrid.
+    """Generates task converting lists of symbol values into a meshgrid.
 
     :return: Task converting list of symbol values into a meshgrid.
     :rtype: MitTask
     """
 
-    def task(obj, sym_vals_list:List[List[float]]) -> Tuple[List[List]]:
+    def task(obj, sym_vals_list:List[List[float]]) -> Tuple[List[NDArray]]:
         """Task converting list of symbol values into a meshgrid.
 
         :param sym_vals_list: List of values each symbol should take on
@@ -563,14 +561,7 @@ def gen_param_grid_gen_task() -> MitTask:
         :rtype: Tuple[list[list]]
         """
 
-        obs_exp_sym_val_grid_list = []
-        for sym_val_list in sym_vals_list:
-
-            # Grid corresponding to symbol values
-            sym_val_grid_list = np.meshgrid(*sym_val_list, indexing='ij')
-            obs_exp_sym_val_grid_list.append(sym_val_grid_list)
-
-        return (obs_exp_sym_val_grid_list, )
+        return ([np.meshgrid(*sym_val_list, indexing='ij') for sym_val_list in sym_vals_list],)
 
     return MitTask(
         _label="ParamGridGen",
@@ -593,7 +584,7 @@ def gen_spectral_filtering_MitEx(
     :type backend: Backend
     :param n_vals: The number of values each symbol should take. Each symbol
         will take n_vals equally spaced values in the range
-        :math:`[-2 \pi, 2 \pi]`. The circuit will be evaluate at every
+        :math:`[0, 2 \pi]`. The circuit will be evaluate at every
         permutation of the symbols evaluated at these points, giving a grid
         of circuit evaluations.
     :type n_vals: int
@@ -653,13 +644,10 @@ def gen_spectral_filtering_MitEx(
     )
 
     characterisation_taskgraph.append(gen_inv_fft_task())
-
-    experiment_taskgraph = characterisation_taskgraph
     
-    experiment_taskgraph.add_wire()
-    experiment_taskgraph.add_wire()
-    experiment_taskgraph.prepend(gen_wire_copy_task(2, 2))
-    experiment_taskgraph.prepend(gen_symbol_val_gen_task(n_sym_vals=n_vals))
-    experiment_taskgraph.append(gen_result_extraction_task())
+    characterisation_taskgraph.add_n_wires(2)
+    characterisation_taskgraph.prepend(gen_wire_copy_task(2, 2))
+    characterisation_taskgraph.prepend(gen_symbol_val_gen_task(n_sym_vals=n_vals))
+    characterisation_taskgraph.append(gen_result_extraction_task())
 
-    return MitEx(_experiment_mitex).from_TaskGraph(experiment_taskgraph)
+    return MitEx(backend).from_TaskGraph(characterisation_taskgraph)
