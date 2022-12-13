@@ -3,24 +3,25 @@ import numpy as np
 from copy import deepcopy
 from numpy.typing import NDArray
 
+
 class SignalFilter(ABC):
-    """Base class for signal filtering.
-    """
+    """Base class for signal filtering."""
 
     def filter(
         self,
-        fft_result_val_grid:NDArray[np.float64]
+        fft_result_val_grid: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """Method transforming array of floats into filtered array of floats.
-        """
+        """Method transforming array of floats into filtered array of
+        floats."""
         pass
+
 
 class SmallCoefficientSignalFilter(SignalFilter):
     """Child class of SignalFilter which filters results by reducing small
     Fourier coefficients to 0.
     """
 
-    def __init__(self, tol:float):
+    def __init__(self, tol: float):
         """Initialisation method.
 
         :param tol: Value below which coefficients should be reduced to 0
@@ -30,7 +31,7 @@ class SmallCoefficientSignalFilter(SignalFilter):
 
     def filter(
         self,
-        fft_result_val_grid:NDArray[np.float64]
+        fft_result_val_grid: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         """Filter method reducing values in `fft_result_val_grid` to 0 if
         they are less than `tol`.
