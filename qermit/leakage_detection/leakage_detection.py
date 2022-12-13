@@ -36,14 +36,14 @@ def get_leakage_gadget_circuit(
     c.ZZMax(postselection_qubit, circuit_qubit).H(postselection_qubit).Z(circuit_qubit)
     c.add_barrier([circuit_qubit, postselection_qubit])
     c.Measure(postselection_qubit, postselection_bit)
-    c.Reset(postselection_qubit)
+    c.add_gate(OpType.Reset, [postselection_qubit])
     return c
 
 
 def get_detection_circuit(
     original_circuit: Circuit, max_circuit_qubits: int
 ) -> Tuple[Circuit, List[Tuple[Bit, ...]]]:
-    n_qubits = original_circuit.n_qubits()
+    n_qubits = original_circuit.n_qubits
     if n_qubits == 0:
         raise ValueError(
             "Circuit for Leakage Gadget Postselection must have at least one Qubit."
@@ -92,7 +92,7 @@ def get_detection_circuit(
     b_ps_index = 0
     postselection_bits: List[Bit] = []
     for q in end_circuit_measures:
-        if q.name == "leakage_gadget_qubit":
+        if q.reg_name == "leakage_gadget_qubit":
             raise ValueError(
                 "Leakage Gadget scheme makes a qubit register named 'leakage_gadget_qubit' but this already exists in the passed circuit."
             )
@@ -113,7 +113,7 @@ def get_detection_circuit(
         detection_circuit.Measure(q, b)
 
     detection_circuit.remove_blank_wires()
-    return detection_circuit
+    return detection_circuit, postselection_bits
 
 
 def postselection_circuits_task_gen(max_circuit_qubits: int) -> MitTask:
