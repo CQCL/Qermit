@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qermit.spectral_filtering &mdash; Qermit 0.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="qermit.probabilistic_error_cancellation" href="probabilistic_error_cancellation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Qermit
+          </a>
+              <div class="version">
+                0.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="taskgraph.html">qermit.taskgraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mitres.html">qermit.mitres</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mitex.html">qermit.mitex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">qermit.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mittask.html">qermit.mittask</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measurement_reduction.html">qermit.measurement_reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spam.html">qermit.spam</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frame_randomisation.html">qermit.frame_randomisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clifford_noise_characterisation.html">qermit.clifford_noise_characterisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zero_noise_extrapolation.html">qermit.zero_noise_extrapolation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="probabilistic_error_cancellation.html">qermit.probabilistic_error_cancellation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">qermit.spectral_filtering</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.spectral_filtering.gen_spectral_filtering_MitEx"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_spectral_filtering_MitEx()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.spectral_filtering.gen_result_extraction_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_result_extraction_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.spectral_filtering.gen_mitigation_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_mitigation_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.spectral_filtering.gen_fft_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_fft_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.spectral_filtering.gen_ndarray_to_dict_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_ndarray_to_dict_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.spectral_filtering.gen_inv_fft_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_inv_fft_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.spectral_filtering.gen_flatten_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_flatten_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.spectral_filtering.gen_reshape_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_reshape_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.spectral_filtering.gen_obs_exp_grid_gen_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_obs_exp_grid_gen_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.spectral_filtering.gen_symbol_val_gen_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_symbol_val_gen_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.spectral_filtering.gen_wire_copy_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_wire_copy_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.spectral_filtering.gen_param_grid_gen_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_param_grid_gen_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.signal_filter.SmallCoefficientSignalFilter"><code class="docutils literal notranslate"><span class="pre">SmallCoefficientSignalFilter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#qermit.spectral_filtering.signal_filter.SmallCoefficientSignalFilter.filter"><code class="docutils literal notranslate"><span class="pre">SmallCoefficientSignalFilter.filter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spectral_filtering.signal_filter.SignalFilter"><code class="docutils literal notranslate"><span class="pre">SignalFilter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#qermit.spectral_filtering.signal_filter.SignalFilter.filter"><code class="docutils literal notranslate"><span class="pre">SignalFilter.filter()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Qermit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">qermit.spectral_filtering</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/spectral_filtering.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qermit-spectral-filtering">
+<h1>qermit.spectral_filtering<a class="headerlink" href="#qermit-spectral-filtering" title="Permalink to this heading"></a></h1>
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.spectral_filtering.gen_spectral_filtering_MitEx">
+<span class="sig-prename descclassname"><span class="pre">spectral_filtering.</span></span><span class="sig-name descname"><span class="pre">gen_spectral_filtering_MitEx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx"><span class="pre">MitEx</span></a></span></span><a class="headerlink" href="#qermit.spectral_filtering.spectral_filtering.gen_spectral_filtering_MitEx" title="Permalink to this definition"></a></dt>
+<dd><p>Generator function for the spectral filtering MitEx. This method
+acts on symbolic circuits, evaluating the circuit on a grid of symbol
+values and performing mitigation on the resulting landscape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>backend</strong> (<em>Backend</em>) – Backend on which all experiments are run.</p></li>
+<li><p><strong>n_vals</strong> (<em>int</em>) – The number of values each symbol should take. Each symbol
+will take n_vals equally spaced values in the range
+<span class="math notranslate nohighlight">\([0, 2 U+03C0]\)</span>. The circuit will be evaluate at every
+permutation of the symbols evaluated at these points, giving a grid
+of circuit evaluations.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Key signal_filter</dt>
+<dd class="field-even"><p>Method for filtering the landscape of circuit
+evaluations. Defaults to SmallCoefficientSignalFilter.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>MitEx implementing spectral filtering.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx">MitEx</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.spectral_filtering.gen_result_extraction_task">
+<span class="sig-prename descclassname"><span class="pre">spectral_filtering.</span></span><span class="sig-name descname"><span class="pre">gen_result_extraction_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spectral_filtering.spectral_filtering.gen_result_extraction_task" title="Permalink to this definition"></a></dt>
+<dd><p>Generates task which extracts a result at coordinates specified
+by symbol values from grid of results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Task interpolating results.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.spectral_filtering.gen_mitigation_task">
+<span class="sig-prename descclassname"><span class="pre">spectral_filtering.</span></span><span class="sig-name descname"><span class="pre">gen_mitigation_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spectral_filtering.spectral_filtering.gen_mitigation_task" title="Permalink to this definition"></a></dt>
+<dd><p>Generates task acting <cite>signal_filter</cite> on the fourier coefficients
+of a grid of results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>signal_filter</strong> (<a class="reference internal" href="#qermit.spectral_filtering.signal_filter.SignalFilter" title="qermit.spectral_filtering.signal_filter.SignalFilter"><em>SignalFilter</em></a>) – Method of filtering the signal.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Task performing filtering.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.spectral_filtering.gen_fft_task">
+<span class="sig-prename descclassname"><span class="pre">spectral_filtering.</span></span><span class="sig-name descname"><span class="pre">gen_fft_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spectral_filtering.spectral_filtering.gen_fft_task" title="Permalink to this definition"></a></dt>
+<dd><p>Generates task which performs Fast Fourier Transform
+of grids of values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Task performing Fast Fourier Transform</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.spectral_filtering.gen_ndarray_to_dict_task">
+<span class="sig-prename descclassname"><span class="pre">spectral_filtering.</span></span><span class="sig-name descname"><span class="pre">gen_ndarray_to_dict_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spectral_filtering.spectral_filtering.gen_ndarray_to_dict_task" title="Permalink to this definition"></a></dt>
+<dd><p>Generates task reshaping an array of QubitPauliOperator into a
+dictionary with QubitPauliStrings as keys and an array of the appropriate
+coefficients as values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Task reshaping QubitPauliOperator into a
+dictionary with QubitPauliStrings as keys and an array of
+the appropriate coefficients as values.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.spectral_filtering.gen_inv_fft_task">
+<span class="sig-prename descclassname"><span class="pre">spectral_filtering.</span></span><span class="sig-name descname"><span class="pre">gen_inv_fft_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spectral_filtering.spectral_filtering.gen_inv_fft_task" title="Permalink to this definition"></a></dt>
+<dd><p>Generates task performing the inverse Fast Fourier Transform
+on each value in the list of dictionaries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Task performing Fast Fourier Transform.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.spectral_filtering.gen_flatten_task">
+<span class="sig-prename descclassname"><span class="pre">spectral_filtering.</span></span><span class="sig-name descname"><span class="pre">gen_flatten_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spectral_filtering.spectral_filtering.gen_flatten_task" title="Permalink to this definition"></a></dt>
+<dd><p>Generates task which transforms a list of ndarrays of
+ObservableExperiments into a list of ObservableExperiments. These
+ObservableExperiments can then be run in sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Generates task which transforms a list of ndarrays of
+ObservableExperiments into a list of ObservableExperiments</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.spectral_filtering.gen_reshape_task">
+<span class="sig-prename descclassname"><span class="pre">spectral_filtering.</span></span><span class="sig-name descname"><span class="pre">gen_reshape_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spectral_filtering.spectral_filtering.gen_reshape_task" title="Permalink to this definition"></a></dt>
+<dd><p>Generates task which reshapes a list of QubitPauliOperator into
+a list of ndarrays of QubitPauliOperator. This can be used to have the
+effect for reversing the task generated by <cite>gen_flatten_task</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Task which reshapes a list of QubitPauliOperator into
+a list of ndarrays of QubitPauliOperator.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.spectral_filtering.gen_obs_exp_grid_gen_task">
+<span class="sig-prename descclassname"><span class="pre">spectral_filtering.</span></span><span class="sig-name descname"><span class="pre">gen_obs_exp_grid_gen_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spectral_filtering.spectral_filtering.gen_obs_exp_grid_gen_task" title="Permalink to this definition"></a></dt>
+<dd><p>Generates task creating an ObservableExperiment for each point in the
+input meshgrid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Task generating grid of experiments.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.spectral_filtering.gen_symbol_val_gen_task">
+<span class="sig-prename descclassname"><span class="pre">spectral_filtering.</span></span><span class="sig-name descname"><span class="pre">gen_symbol_val_gen_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spectral_filtering.spectral_filtering.gen_symbol_val_gen_task" title="Permalink to this definition"></a></dt>
+<dd><p>Generates task which produces a grid of values. The values are
+generated uniformly in the interval [0,2]
+(factors of pi give full coverage of the Bloch sphere) for each symbol.
+The points on the grid are equally spaces, and the number of values
+is the same in each dimension. In the context of the spectral filtering
+MitEx, the given circuit will be evaluated at each point in the grid.
+This is to say that the symbols in the circuit will be substituted for
+the values at each point in the grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n_sym_vals</strong> (<em>int</em>) – The number of values to be taken by each symbol
+in the circuit.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Task generating grid of symbol values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.spectral_filtering.gen_wire_copy_task">
+<span class="sig-prename descclassname"><span class="pre">spectral_filtering.</span></span><span class="sig-name descname"><span class="pre">gen_wire_copy_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_wire_copies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spectral_filtering.spectral_filtering.gen_wire_copy_task" title="Permalink to this definition"></a></dt>
+<dd><p>Generates task which copies each of the input wires <cite>n_wire_copies</cite>
+times. The output wires are repeated in the same order as the input wires.
+This is to say that input wires 1,2,…n will be outputted as
+1,2,…,n,…,1,2,…n.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_in_wires</strong> (<em>int</em>) – The number of wires input into this task.</p></li>
+<li><p><strong>n_wire_copies</strong> (<em>int</em>) – The number of times the wires are to be copied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Task which coppies input wires.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.spectral_filtering.gen_param_grid_gen_task">
+<span class="sig-prename descclassname"><span class="pre">spectral_filtering.</span></span><span class="sig-name descname"><span class="pre">gen_param_grid_gen_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spectral_filtering.spectral_filtering.gen_param_grid_gen_task" title="Permalink to this definition"></a></dt>
+<dd><p>Generates task converting lists of symbol values into a meshgrid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Task converting list of symbol values into a meshgrid.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.signal_filter.SmallCoefficientSignalFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qermit.spectral_filtering.signal_filter.</span></span><span class="sig-name descname"><span class="pre">SmallCoefficientSignalFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.spectral_filtering.signal_filter.SmallCoefficientSignalFilter" title="Permalink to this definition"></a></dt>
+<dd><p>Child class of SignalFilter which filters results by reducing small
+Fourier coefficients to 0.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.signal_filter.SmallCoefficientSignalFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fft_result_val_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.spectral_filtering.signal_filter.SmallCoefficientSignalFilter.filter" title="Permalink to this definition"></a></dt>
+<dd><p>Filter method reducing values in <cite>fft_result_val_grid</cite> to 0 if
+they are less than <cite>tol</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fft_result_val_grid</strong> (<em>NDArray</em><em>[</em><em>float</em><em>]</em>) – Grid of values.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Grid of values with values less than <cite>tol</cite> reduced to 0.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>NDArray[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.signal_filter.SignalFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qermit.spectral_filtering.signal_filter.</span></span><span class="sig-name descname"><span class="pre">SignalFilter</span></span><a class="headerlink" href="#qermit.spectral_filtering.signal_filter.SignalFilter" title="Permalink to this definition"></a></dt>
+<dd><p>Base class for signal filtering.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qermit.spectral_filtering.signal_filter.SignalFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fft_result_val_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.spectral_filtering.signal_filter.SignalFilter.filter" title="Permalink to this definition"></a></dt>
+<dd><p>Method transforming array of floats into filtered array of
+floats.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="probabilistic_error_cancellation.html" class="btn btn-neutral float-left" title="qermit.probabilistic_error_cancellation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Cambridge Quantum Computing Ltd.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

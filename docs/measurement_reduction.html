@@ -14,7 +14,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -47,12 +49,17 @@
 <li class="toctree-l1"><a class="reference internal" href="mitex.html">qermit.mitex</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">qermit.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mittask.html">qermit.mittask</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">qermit.measurement_reduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">qermit.measurement_reduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.taskgraph.measurement_reduction.measurement_reduction_task_gen"><code class="docutils literal notranslate"><span class="pre">measurement_reduction.measurement_reduction_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.taskgraph.measurement_reduction.gen_MeasurementReduction_MitEx"><code class="docutils literal notranslate"><span class="pre">measurement_reduction.gen_MeasurementReduction_MitEx()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="spam.html">qermit.spam</a></li>
 <li class="toctree-l1"><a class="reference internal" href="frame_randomisation.html">qermit.frame_randomisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="clifford_noise_characterisation.html">qermit.clifford_noise_characterisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="zero_noise_extrapolation.html">qermit.zero_noise_extrapolation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="probabilistic_error_cancellation.html">qermit.probabilistic_error_cancellation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spectral_filtering.html">qermit.spectral_filtering</a></li>
 </ul>
 
         </div>
@@ -68,8 +75,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>qermit.measurement_reduction</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">qermit.measurement_reduction</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/measurement_reduction.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -80,10 +87,10 @@
            <div itemprop="articleBody">
              
   <section id="qermit-measurement-reduction">
-<h1>qermit.measurement_reduction<a class="headerlink" href="#qermit-measurement-reduction" title="Permalink to this headline"></a></h1>
+<h1>qermit.measurement_reduction<a class="headerlink" href="#qermit-measurement-reduction" title="Permalink to this heading"></a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.measurement_reduction.measurement_reduction_task_gen">
-<span class="sig-prename descclassname"><span class="pre">measurement_reduction.</span></span><span class="sig-name descname"><span class="pre">measurement_reduction_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pytket._tket.partition.GraphColourMethod</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cx_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pytket._tket.transform.CXConfigType</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.measurement_reduction.measurement_reduction_task_gen" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">measurement_reduction.</span></span><span class="sig-name descname"><span class="pre">measurement_reduction_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GraphColourMethod</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cx_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CXConfigType</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.measurement_reduction.measurement_reduction_task_gen" title="Permalink to this definition"></a></dt>
 <dd><p>Uses measurement reduction techniques available in the pytket.partition module to reduce
 the number of measurement circuits required to measure all expectations for an observable.</p>
 <dl class="field-list simple">
@@ -106,7 +113,7 @@ measurement circuits to ObservableTracker.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.measurement_reduction.gen_MeasurementReduction_MitEx">
-<span class="sig-prename descclassname"><span class="pre">measurement_reduction.</span></span><span class="sig-name descname"><span class="pre">gen_MeasurementReduction_MitEx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx"><span class="pre">qermit.taskgraph.mitex.MitEx</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.measurement_reduction.gen_MeasurementReduction_MitEx" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">measurement_reduction.</span></span><span class="sig-name descname"><span class="pre">gen_MeasurementReduction_MitEx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx"><span class="pre">MitEx</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.measurement_reduction.gen_MeasurementReduction_MitEx" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a MitEx object that produces measurement circuits via Measurement Reduction
 methods.</p>
 <dl class="field-list simple">

@@ -14,7 +14,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -48,11 +50,20 @@
 <li class="toctree-l1"><a class="reference internal" href="utils.html">qermit.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mittask.html">qermit.mittask</a></li>
 <li class="toctree-l1"><a class="reference internal" href="measurement_reduction.html">qermit.measurement_reduction</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">qermit.spam</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">qermit.spam</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spam.spam_mitres.gen_FullyCorrelated_SPAM_MitRes"><code class="docutils literal notranslate"><span class="pre">spam_mitres.gen_FullyCorrelated_SPAM_MitRes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spam.spam_mitres.gen_UnCorrelated_SPAM_MitRes"><code class="docutils literal notranslate"><span class="pre">spam_mitres.gen_UnCorrelated_SPAM_MitRes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_circuits_task"><code class="docutils literal notranslate"><span class="pre">full_spam_correction.gen_full_tomography_spam_circuits_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_characterisation_task"><code class="docutils literal notranslate"><span class="pre">full_spam_correction.gen_full_tomography_spam_characterisation_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_correction_task"><code class="docutils literal notranslate"><span class="pre">full_spam_correction.gen_full_tomography_spam_correction_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.spam.full_spam_correction.gen_get_bit_maps_task"><code class="docutils literal notranslate"><span class="pre">full_spam_correction.gen_get_bit_maps_task()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="frame_randomisation.html">qermit.frame_randomisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="clifford_noise_characterisation.html">qermit.clifford_noise_characterisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="zero_noise_extrapolation.html">qermit.zero_noise_extrapolation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="probabilistic_error_cancellation.html">qermit.probabilistic_error_cancellation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spectral_filtering.html">qermit.spectral_filtering</a></li>
 </ul>
 
         </div>
@@ -68,8 +79,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>qermit.spam</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">qermit.spam</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/spam.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -80,10 +91,10 @@
            <div itemprop="articleBody">
              
   <section id="qermit-spam">
-<h1>qermit.spam<a class="headerlink" href="#qermit-spam" title="Permalink to this headline"></a></h1>
+<h1>qermit.spam<a class="headerlink" href="#qermit-spam" title="Permalink to this heading"></a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.spam.spam_mitres.gen_FullyCorrelated_SPAM_MitRes">
-<span class="sig-prename descclassname"><span class="pre">spam_mitres.</span></span><span class="sig-name descname"><span class="pre">gen_FullyCorrelated_SPAM_MitRes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calibration_shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Node</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes"><span class="pre">qermit.taskgraph.mitres.MitRes</span></a></span></span><a class="headerlink" href="#qermit.spam.spam_mitres.gen_FullyCorrelated_SPAM_MitRes" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spam_mitres.</span></span><span class="sig-name descname"><span class="pre">gen_FullyCorrelated_SPAM_MitRes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calibration_shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes"><span class="pre">MitRes</span></a></span></span><a class="headerlink" href="#qermit.spam.spam_mitres.gen_FullyCorrelated_SPAM_MitRes" title="Permalink to this definition"></a></dt>
 <dd><p>Produces a MitRes object for performing SPAM correction with subsets of fully
 correlated device nodes specified by correlations. Requires 2^n circuits
 to fully characterise, where n is the size of the largest sublist of correlated nodes.</p>
@@ -100,7 +111,7 @@ to fully characterise, where n is the size of the largest sublist of correlated 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.spam.spam_mitres.gen_UnCorrelated_SPAM_MitRes">
-<span class="sig-prename descclassname"><span class="pre">spam_mitres.</span></span><span class="sig-name descname"><span class="pre">gen_UnCorrelated_SPAM_MitRes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calibration_shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes"><span class="pre">qermit.taskgraph.mitres.MitRes</span></a></span></span><a class="headerlink" href="#qermit.spam.spam_mitres.gen_UnCorrelated_SPAM_MitRes" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spam_mitres.</span></span><span class="sig-name descname"><span class="pre">gen_UnCorrelated_SPAM_MitRes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calibration_shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes"><span class="pre">MitRes</span></a></span></span><a class="headerlink" href="#qermit.spam.spam_mitres.gen_UnCorrelated_SPAM_MitRes" title="Permalink to this definition"></a></dt>
 <dd><p>Produces a MitRes object for performing SPAM correction with no correlated nodes.
 Requires 2 circuits to characterise device.</p>
 <dl class="field-list simple">
@@ -115,7 +126,7 @@ Requires 2 circuits to characterise device.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.spam.full_spam_correction.gen_full_tomography_spam_circuits_task">
-<span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_full_tomography_spam_circuits_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit_subsets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Qubit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_circuits_task" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_full_tomography_spam_circuits_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit_subsets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Qubit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_circuits_task" title="Permalink to this definition"></a></dt>
 <dd><p>Generate MitTask for calibration circuits according to the specified correlation and given backend.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -141,7 +152,7 @@ corresponding to Calibration Circuits and corresponding states.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.spam.full_spam_correction.gen_full_tomography_spam_characterisation_task">
-<span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_full_tomography_spam_characterisation_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit_subsets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pytket._tket.circuit.Qubit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_characterisation_task" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_full_tomography_spam_characterisation_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit_subsets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Qubit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_characterisation_task" title="Permalink to this definition"></a></dt>
 <dd><p>Uses results from device for characterisation circuits to characterise transition matrices
 for different qubit subsets and stores them in backend.</p>
 <dl class="field-list simple">
@@ -156,7 +167,7 @@ for different qubit subsets and stores them in backend.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.spam.full_spam_correction.gen_full_tomography_spam_correction_task">
-<span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_full_tomography_spam_correction_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corr_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">qermit.spam.full_transition_tomography.CorrectionMethod</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_correction_task" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_full_tomography_spam_correction_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corr_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CorrectionMethod</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_correction_task" title="Permalink to this definition"></a></dt>
 <dd><p>Uses characterisation result held in backend to correct for SPAM noise in passed
 BackendResult objects. Method used to invert SPAM characteriastion matrices
 and correct results given by CorrectionMethod enum.</p>
@@ -173,7 +184,7 @@ and correct results given by CorrectionMethod enum.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.spam.full_spam_correction.gen_get_bit_maps_task">
-<span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_get_bit_maps_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_get_bit_maps_task" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_get_bit_maps_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_get_bit_maps_task" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a task that takes a list of circuits and returns the circuits, and a map betwen
 each circuit bit and the qubit it is measured on.</p>
 </dd></dl>

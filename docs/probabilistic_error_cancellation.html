@@ -14,10 +14,13 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qermit.spectral_filtering" href="spectral_filtering.html" />
     <link rel="prev" title="qermit.zero_noise_extrapolation" href="zero_noise_extrapolation.html" /> 
 </head>
 
@@ -51,7 +54,19 @@
 <li class="toctree-l1"><a class="reference internal" href="frame_randomisation.html">qermit.frame_randomisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="clifford_noise_characterisation.html">qermit.clifford_noise_characterisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="zero_noise_extrapolation.html">qermit.zero_noise_extrapolation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">qermit.probabilistic_error_cancellation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">qermit.probabilistic_error_cancellation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_PEC_learning_based_MitEx"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_PEC_learning_based_MitEx()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_rebase_to_frames_and_computing"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_rebase_to_frames_and_computing()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_run_with_quasi_prob"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_run_with_quasi_prob()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.probabilistic_error_cancellation.pec_learning_based.collate_results_task_gen"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.collate_results_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.probabilistic_error_cancellation.pec_learning_based.learn_quasi_probs_task_gen"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.learn_quasi_probs_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_get_clifford_training_set"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_get_clifford_training_set()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_label_gates"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_label_gates()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_wrap_frame_gates"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_wrap_frame_gates()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_get_noisy_circuits"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_get_noisy_circuits()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="spectral_filtering.html">qermit.spectral_filtering</a></li>
 </ul>
 
         </div>
@@ -67,8 +82,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>qermit.probabilistic_error_cancellation</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">qermit.probabilistic_error_cancellation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/probabilistic_error_cancellation.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -79,10 +94,10 @@
            <div itemprop="articleBody">
              
   <section id="qermit-probabilistic-error-cancellation">
-<h1>qermit.probabilistic_error_cancellation<a class="headerlink" href="#qermit-probabilistic-error-cancellation" title="Permalink to this headline"></a></h1>
+<h1>qermit.probabilistic_error_cancellation<a class="headerlink" href="#qermit-probabilistic-error-cancellation" title="Permalink to this heading"></a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.probabilistic_error_cancellation.pec_learning_based.gen_PEC_learning_based_MitEx">
-<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_PEC_learning_based_MitEx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulator_backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pytket.backends.backend.Backend</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx"><span class="pre">qermit.taskgraph.mitex.MitEx</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_PEC_learning_based_MitEx" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_PEC_learning_based_MitEx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulator_backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Backend</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx"><span class="pre">MitEx</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_PEC_learning_based_MitEx" title="Permalink to this definition"></a></dt>
 <dd><p>Generates MitEx object for mitigating errors using learning based Probabilistic
 Error Cancellation (PEC), as introduced in <a class="reference external" href="https://arxiv.org/abs/2005.07601">https://arxiv.org/abs/2005.07601</a>.</p>
 <dl class="field-list simple">
@@ -121,7 +136,7 @@ Error Cancellation (PEC), as introduced in <a class="reference external" href="h
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.probabilistic_error_cancellation.pec_learning_based.gen_rebase_to_frames_and_computing">
-<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_rebase_to_frames_and_computing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_rebase_to_frames_and_computing" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_rebase_to_frames_and_computing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_rebase_to_frames_and_computing" title="Permalink to this definition"></a></dt>
 <dd><p>Generates task which rebases circuits into the Frame and Computing gate set,
 as defined in <a class="reference external" href="https://arxiv.org/abs/2005.07601">https://arxiv.org/abs/2005.07601</a>.
 In particular, all two qubit gates are Clifford gates (called Frame gates),
@@ -138,7 +153,7 @@ and all single qubit gates (called Computing gates) are merged where possible.</
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.probabilistic_error_cancellation.pec_learning_based.gen_run_with_quasi_prob">
-<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_run_with_quasi_prob</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_run_with_quasi_prob" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_run_with_quasi_prob</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_run_with_quasi_prob" title="Permalink to this definition"></a></dt>
 <dd><p>Generates task which converts list of quasi probabilities and noisy circuit results
 into error mitigated results.</p>
 <dl class="field-list simple">
@@ -153,7 +168,7 @@ into error mitigated results.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.probabilistic_error_cancellation.pec_learning_based.collate_results_task_gen">
-<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">collate_results_task_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.collate_results_task_gen" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">collate_results_task_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.collate_results_task_gen" title="Permalink to this definition"></a></dt>
 <dd><p>Generates task which collates results from running circuit, and circuits with frame
 gates wrapped in Pauli gates. The results are collated so as to facilitate
 learning the quasiprobabilities required for correction. The data itself is
@@ -170,7 +185,7 @@ not changed by this task.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.probabilistic_error_cancellation.pec_learning_based.learn_quasi_probs_task_gen">
-<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">learn_quasi_probs_task_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.learn_quasi_probs_task_gen" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">learn_quasi_probs_task_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.learn_quasi_probs_task_gen" title="Permalink to this definition"></a></dt>
 <dd><p>Generates task which characterises quasi-probabilities. This takes ideal simulation results
 (from running Clifford circuit) and noisy results, and uses
 them to deduce quasi-probabilities for later correction of real experiment results.</p>
@@ -189,7 +204,7 @@ them to deduce quasi-probabilities for later correction of real experiment resul
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.probabilistic_error_cancellation.pec_learning_based.gen_get_clifford_training_set">
-<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_get_clifford_training_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_rand_cliff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_get_clifford_training_set" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_get_clifford_training_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_rand_cliff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_get_clifford_training_set" title="Permalink to this definition"></a></dt>
 <dd><p>Generates task which creates characterisation Clifford circuits. These circuits are
 constructed from an initial circuit by replacing all Computing gates with random Clifford gates.</p>
 <dl class="field-list simple">
@@ -210,7 +225,7 @@ constructed from an initial circuit by replacing all Computing gates with random
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.probabilistic_error_cancellation.pec_learning_based.gen_label_gates">
-<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_label_gates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_label_gates" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_label_gates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_label_gates" title="Permalink to this definition"></a></dt>
 <dd><p>Generates task which labels all gates as either Computing or Frame.
 Frame gates are 2-qubit Clifford gates and Computing gates are single qubit gates.
 Circuits should be rebased to Frame and Computing before this task.</p>
@@ -226,7 +241,7 @@ Circuits should be rebased to Frame and Computing before this task.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.probabilistic_error_cancellation.pec_learning_based.gen_wrap_frame_gates">
-<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_wrap_frame_gates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_wrap_frame_gates" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_wrap_frame_gates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_wrap_frame_gates" title="Permalink to this definition"></a></dt>
 <dd><p>Generates task which wraps Frame gates in Pauli
 gates, initially set to the identity. Pauli gates are labelled as such.</p>
 <dl class="field-list simple">
@@ -241,7 +256,7 @@ gates, initially set to the identity. Pauli gates are labelled as such.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.probabilistic_error_cancellation.pec_learning_based.gen_get_noisy_circuits">
-<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_get_noisy_circuits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">qermit.taskgraph.mittask.MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_get_noisy_circuits" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pec_learning_based.</span></span><span class="sig-name descname"><span class="pre">gen_get_noisy_circuits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.probabilistic_error_cancellation.pec_learning_based.gen_get_noisy_circuits" title="Permalink to this definition"></a></dt>
 <dd><p>Generates task which create list of circuts, build from original by adding an error
 to one of the Frame gates. An error here is recreated by replacing a pair of Pauli gates,
 wrapped around one Frame gate, by a Pauli gate. Note that there will be a new circuit for each
@@ -266,6 +281,7 @@ possible Pauli error.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="zero_noise_extrapolation.html" class="btn btn-neutral float-left" title="qermit.zero_noise_extrapolation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="spectral_filtering.html" class="btn btn-neutral float-right" title="qermit.spectral_filtering" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
