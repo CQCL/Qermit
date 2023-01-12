@@ -46,7 +46,7 @@ class TaskGraph:
         # set member variables
         self._label = _label
         self.G = None
-
+        self.characterisation: dict = {}
         # default constructor runs all circuits through passed Backend
         self._task_graph = nx.MultiDiGraph()
 
@@ -68,6 +68,7 @@ class TaskGraph:
         """
         self._task_graph = deepcopy(task_graph._task_graph)
         self._label = task_graph._label
+        self.characterisation = task_graph.characterisation
         return self
 
     @property
@@ -84,6 +85,15 @@ class TaskGraph:
     @property
     def label(self) -> str:
         return self._label
+
+    def get_characterisation(self) -> dict:
+        return self.characterisation
+
+    def update_characterisation(self, characterisation: dict):
+        self.characterisation.update(characterisation)
+
+    def set_characterisation(self, characterisation: dict):
+        self.characterisation = characterisation
 
     @property
     def n_in_wires(self) -> int:
@@ -326,7 +336,9 @@ class TaskGraph:
                 data=None,
             )
 
-    def run(self, input_wires: List[Wire], cache: bool = False) -> Tuple[List[Wire]]:
+    def run(
+        self, input_wires: List[Wire], cache: bool = False, characterisation: dict = {}
+    ) -> Tuple[List[Wire]]:
         """
         Each task in TaskGraph is a pure function that produces output data
         from input data to some specification. Data is stored on edges of the
@@ -363,6 +375,7 @@ class TaskGraph:
         # input wires all realised before a task is reached
         node_list = list(nx.topological_sort(self._task_graph))
 
+        self.characterisation.update(characterisation)
         # clear cache of held data if required
         # also check that all mittask label are unique else dict will fail
         if cache == True:
@@ -381,6 +394,7 @@ class TaskGraph:
             # nothing to process
             if task in (self._i, self._o):
                 continue
+            task.characterisation.update(self.characterisation)
             # get all input data and store on inputs for task
             in_edges = self._task_graph.in_edges(task, data=True, keys=True)
             inputs = [None] * len(in_edges)
@@ -389,6 +403,7 @@ class TaskGraph:
                 inputs[ports[1]] = i_data["data"]
             # run held task
             outputs = task(inputs)
+            self.characterisation.update(task.characterisation)
             if cache == True:
                 self._cache[task._label] = (task, outputs)
             # assign outputs ot out_edges of task

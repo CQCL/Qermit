@@ -33,15 +33,15 @@ from pytket.extensions.qiskit import AerBackend, IBMQEmulatorBackend  # type: ig
 from pytket import Circuit, Qubit
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.utils import QubitPauliOperator
-from numpy.polynomial.polynomial import polyval
+from numpy.polynomial.polynomial import polyval  # type: ignore
 import math
-import numpy as np
+import numpy as np  # type: ignore
 from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
 import qiskit.providers.aer.noise as noise  # type: ignore
 from pytket.circuit import OpType  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
-from pytket.circuit import Node
+from pytket.circuit import Node  # type: ignore
 
 n_qubits = 2
 

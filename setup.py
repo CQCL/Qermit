@@ -14,7 +14,7 @@ setup(
     license="CQC Non-Commercial Use Software Licence",
     include_package_data=True,
     packages=find_packages(),
-    install_requires=["pytket ~= 1.0", "matplotlib", "networkx"],
+    install_requires=["pytket ~= 1.7", "matplotlib", "networkx"],
     classifiers=[
         "Environment :: Console",
         "Programming Language :: Python :: 3.8",
