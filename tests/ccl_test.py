@@ -34,7 +34,7 @@ from qermit.clifford_noise_characterisation.ccl import (  # type: ignore
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 from pytket.pauli import QubitPauliString, Pauli  # type: ignore
 from pytket.utils import QubitPauliOperator
-import numpy as np
+import numpy as np  # type: ignore
 
 
 def test_sample_weighted_clifford_angle():

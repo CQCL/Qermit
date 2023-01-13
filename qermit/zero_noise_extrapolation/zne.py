@@ -24,14 +24,14 @@ from qermit import (
 from copy import copy
 from pytket.pauli import QubitPauliString  # type: ignore
 from enum import Enum
-import numpy as np
+import numpy as np  # type: ignore
 from scipy.optimize import curve_fit  # type: ignore
 from typing import List, Tuple, cast, Dict
 from pytket import Circuit, OpType
 from pytket.predicates import CompilationUnit  # type: ignore
 from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
-from numpy.polynomial.polynomial import Polynomial
+from numpy.polynomial.polynomial import Polynomial  # type: ignore
 from pytket.circuit import Node  # type: ignore
 
 

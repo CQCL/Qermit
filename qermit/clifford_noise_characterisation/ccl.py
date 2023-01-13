@@ -35,7 +35,7 @@ from .cdr_post import (
     _PolyCDRCorrect,
     cdr_quality_check_task_gen,
 )
-import numpy as np
+import numpy as np  # type: ignore
 import random
 from enum import Enum
 import warnings
@@ -572,7 +572,6 @@ def gen_CDR_MitEx(
     )
     _post_calibrate_task_graph.append(
         cdr_calibration_task_gen(
-            device_backend,
             kwargs.get("model", _PolyCDRCorrect(1)),
         )
     )
@@ -597,6 +596,6 @@ def gen_CDR_MitEx(
         )
     )
     _experiment_taskgraph.append(_post_task_graph)
-    _experiment_taskgraph.append(cdr_correction_task_gen(device_backend))
+    _experiment_taskgraph.append(cdr_correction_task_gen())
 
     return MitEx(device_backend).from_TaskGraph(_experiment_taskgraph)

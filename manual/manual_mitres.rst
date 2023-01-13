@@ -520,8 +520,9 @@ the properties of the Lagos device available through IBMQ, including readout err
 
 
 
-The device SPAM characterisation produced is stored inside the characterisation attribute of the ``Backend`` the ``MitRes`` is generated with. If a 
-characterisation is already available for a given method when ``MitRes.run`` is called, then it will not be characterised again.
+The device SPAM characterisation produced is stored inside the characterisation attribute the ``MitRes`` object. If a 
+characterisation is already available for a given method when ``MitRes.run`` is called, then it will not be characterised again. This characterisation
+can be accessed by calling ``MitRes.get_characterisation()``.
 
 Naively comparing counts, we can see that by using the ``MitRes`` object returned by ``gen_UnCorrelated_SPAM_MitRes`` a greater proportion of the returned
 shots are the deterministic outputs we expected. We can not make any grand peformance claims based off this example alone, but we can see how

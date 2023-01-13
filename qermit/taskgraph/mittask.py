@@ -89,6 +89,7 @@ class MitTask:
         self._n_out_wires = _n_out_wires
         if _method:
             self.run = MethodType(_method, self)
+        self.characterisation: dict = {}
 
     @property
     def label(self) -> str:

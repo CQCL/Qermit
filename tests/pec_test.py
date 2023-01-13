@@ -37,7 +37,7 @@ from pytket import Circuit, Qubit, OpType
 import math
 from pytket.predicates import GateSetPredicate, CliffordCircuitPredicate  # type: ignore
 from qermit import AnsatzCircuit, ObservableExperiment
-from pytket.extensions.qiskit import IBMQEmulatorBackend
+from pytket.extensions.qiskit import IBMQEmulatorBackend  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
 
