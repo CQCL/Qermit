@@ -140,3 +140,4 @@ are several ways to contact us:
    clifford_noise_characterisation.rst
    zero_noise_extrapolation.rst
    probabilistic_error_cancellation.rst
+   spectral_filtering.rst
