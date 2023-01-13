@@ -370,10 +370,10 @@ def gen_reshape_task() -> MitTask:
                 length_list[:i] for i in range(len(length_list) + 1)
             ]
         ]
-        flattened_result_grid_list = np.array([
+        flattened_result_grid_list = [
             result_list[start:end]
             for start, end in zip(position_list[:-1], position_list[1:])
-        ])
+        ]
         result_grid_list = [
             np.reshape(flattened_result_grid, shape)
             for flattened_result_grid, shape in zip(
