@@ -72,7 +72,7 @@ def get_detection_circuit(
         # first check if a mid circuit measure needs to be readded
         for q in com.qubits:
             # this condition only true if this Qubit has previously had a measure operation
-            # this implies it is in another Quantum operation and tuhs preivous measure was "mid-circuit"
+            # this implies it is in another Quantum operation and thus previous measure was "mid-circuit"
             if q in end_circuit_measures:
                 detection_circuit.Measure(q, end_circuit_measures.pop(q))
         if com.op.type == OpType.Measure:
