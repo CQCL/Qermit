@@ -193,7 +193,7 @@ def postselection_results_task_gen() -> MitTask:
                 result.c_bits[b] for b in postselection_bits
             ]
             # as we delete key as we go, go through state from back to front
-            # to avoid
+            # to avoid changing the object the index refers to
             postselection_indices.sort(reverse=True)
             for state in received_counts:
                 # first of all find the condensed state without ancilla bits
