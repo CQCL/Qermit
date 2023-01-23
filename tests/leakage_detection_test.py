@@ -177,8 +177,6 @@ def test_gen_Leakage_Detection_MitRes() -> None:
 
     res = ld_mitres.run([(b.get_compiled_circuit(experiment_circuit), 100)])
     counts = res[0].get_counts()
-    print(counts.values())
-    print(sum(counts.values()))
     assert sum(counts.values()) == 100
 
 
