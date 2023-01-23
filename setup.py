@@ -7,7 +7,7 @@ with open("_version.py") as fp:
 setup(
     name="qermit",
     version=version["__version__"],
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     description="error-mitigation framework, an extension to pytket",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -17,8 +17,9 @@ setup(
     install_requires=["pytket ~= 1.7", "matplotlib", "networkx"],
     classifiers=[
         "Environment :: Console",
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.11",
         "License :: Other/Proprietary License",
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: POSIX :: Linux",
