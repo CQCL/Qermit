@@ -100,8 +100,7 @@ def get_detection_circuit(
             raise ValueError(
                 "Leakage Gadget scheme makes a qubit register named 'leakage_gadget_qubit' but this already exists in the passed circuit."
             )
-        if q_ps_index == n_spare_qubits:
-            q_ps_index = 0
+        q_ps_index = 0 if q_ps_index == n_spare_qubits else q_ps_index
         leakage_gadget_bit = Bit("leakage_gadget_bit", b_ps_index)
         leakage_gadget_circuit = get_leakage_gadget_circuit(
             q, postselection_qubits[q_ps_index], leakage_gadget_bit
