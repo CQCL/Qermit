@@ -18,4 +18,8 @@ The Leakage Detection module provides generator methods for producing MitRes obj
 that automatically run leakage detection schemes via a postselection method.
 """
 
-from .leakage_detection import gen_Leakage_Detection_MitRes, postselection_circuits_task_gen
+from .leakage_detection import (
+    gen_Leakage_Detection_MitRes,
+    postselection_circuits_task_gen,
+    postselection_results_task_gen,
+)

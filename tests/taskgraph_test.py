@@ -22,7 +22,7 @@ from qermit.taskgraph import (  # type: ignore
     duplicate_wire_task_gen,
 )
 import networkx as nx  # type: ignore
-import pytest
+import pytest  # type: ignore
 
 
 def test_task_graph_constructor():

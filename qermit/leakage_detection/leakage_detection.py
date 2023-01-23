@@ -18,7 +18,6 @@ from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray  # type: ignore
 from copy import copy
 from typing import List, Dict, Tuple, Counter, cast, Sequence
-
 from qermit import MitTask, CircuitShots, TaskGraph, MitRes  # type: ignore
 
 
@@ -48,10 +47,9 @@ def get_detection_circuit(
         raise ValueError(
             "Circuit for Leakage Gadget Postselection must have at least one Qubit."
         )
+    max_circuit_qubits = 2 * n_qubits if max_circuit_qubits == 0 else max_circuit_qubits
     n_spare_qubits = max_circuit_qubits - n_qubits
     if n_spare_qubits <= 0:
-        # TODO: Note we can just hijack some other used Qubits for this
-        # add later
         raise ValueError(
             "Circuit has more or equal Qubits to the parameter maximum allowed."
         )
@@ -98,7 +96,7 @@ def get_detection_circuit(
             )
         if q_ps_index == n_spare_qubits:
             q_ps_index = 0
-        leakage_gadget_bit = Bit("leakage_gadget_circuit", b_ps_index)
+        leakage_gadget_bit = Bit("leakage_gadget_bit", b_ps_index)
         leakage_gadget_circuit = get_leakage_gadget_circuit(
             q, postselection_qubits[q_ps_index], leakage_gadget_bit
         )
@@ -168,7 +166,7 @@ def postselection_results_task_gen() -> MitTask:
     def task(
         obj,
         all_results: List[BackendResult],
-        all_postselection_bits: List[Bit],
+        all_postselection_bits: List[List[Bit]],
     ) -> Tuple[List[BackendResult]]:
         """
         :param all_results: Results being postselected on
@@ -188,6 +186,9 @@ def postselection_results_task_gen() -> MitTask:
             postselection_indices: List[int] = [
                 result.c_bits[b] for b in postselection_bits
             ]
+            # as we delete key as we go, go through state from back to front
+            # to avoid
+            postselection_indices.sort(reverse=True)
             for state in received_counts:
                 # first of all find the condensed state without ancilla bits
                 experiment_key = list(state)
@@ -196,6 +197,7 @@ def postselection_results_task_gen() -> MitTask:
                     if experiment_key[i] == 1:
                         banned_state = True
                         break
+
                     del experiment_key[i]
 
                 if not banned_state:
@@ -243,7 +245,6 @@ def gen_Leakage_Detection_MitRes(backend: Backend, **kwargs) -> MitRes:
 
     _task_graph_mitres = TaskGraph().from_TaskGraph(_mitres)
     _task_graph_mitres.add_wire()
-
     _task_graph_mitres.prepend(
         postselection_circuits_task_gen(len(backend.backend_info.architecture.nodes))  # type: ignore
     )
