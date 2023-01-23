@@ -47,6 +47,12 @@ def get_detection_circuit(
         raise ValueError(
             "Circuit for Leakage Gadget Postselection must have at least one Qubit."
         )
+    # In generating the scheme from a Backend, sometimes a simulator Backend
+    # may be passed through which has "no qubits", but in practice can have "infinite"
+    # Assuming no real device would have maximum 0 qubits, if max_circuit_qubits
+    # is set to 0, we assume its a simulator and so set it to 2*n_qubits, a value
+    # that means each qubit can have an ancilla for completing leakage detection
+    # with
     max_circuit_qubits = 2 * n_qubits if max_circuit_qubits == 0 else max_circuit_qubits
     n_spare_qubits = max_circuit_qubits - n_qubits
     if n_spare_qubits <= 0:
