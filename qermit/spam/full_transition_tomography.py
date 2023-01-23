@@ -17,7 +17,7 @@ import itertools
 from functools import lru_cache
 
 from pytket.circuit import Circuit, Qubit, Bit, Node, CircBox  # type: ignore
-import numpy as np
+import numpy as np  # type: ignore
 from collections import OrderedDict, namedtuple
 from typing import Dict, Iterable, List, Tuple, Counter, cast, Optional
 from math import ceil, log2

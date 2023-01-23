@@ -16,10 +16,12 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/thebelab-helper.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -69,8 +71,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>MitRes</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">MitRes</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/manual_mitres.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -81,7 +83,7 @@
            <div itemprop="articleBody">
              
   <section id="mitres">
-<h1>MitRes<a class="headerlink" href="#mitres" title="Permalink to this headline"></a></h1>
+<h1>MitRes<a class="headerlink" href="#mitres" title="Permalink to this heading"></a></h1>
 <p>A typical process for running experiments on quantum devices is as follows: first
 a logical quantum circuit is constructed, next it is compiled to fit to the constraints of
 the quantum device of choice (such as the connectivity graph or set of gate primitives) before
@@ -138,7 +140,7 @@ When the run function is called, a topological sort is applied to the graph to o
 <code class="docutils literal notranslate"><span class="pre">Tuple</span></code> type objects. This is necessary for the execution in the <code class="docutils literal notranslate"><span class="pre">TaskGraph.run</span></code> method.
 All typing information is accessible via the <code class="docutils literal notranslate"><span class="pre">qermit</span></code> documentation.</p>
 <section id="error-mitigation-with-mitres">
-<h2>Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitRes</span></code><a class="headerlink" href="#error-mitigation-with-mitres" title="Permalink to this headline"></a></h2>
+<h2>Error-mitigation with <code class="docutils literal notranslate"><span class="pre">MitRes</span></code><a class="headerlink" href="#error-mitigation-with-mitres" title="Permalink to this heading"></a></h2>
 <p>To produce a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object that executes an error-mitigation protocol when the <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code>
 method is called, additional <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects need to be added to its task graph.</p>
 <p>The defining characteristic of a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object is that the first <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> object
@@ -150,7 +152,7 @@ extending a <code class="docutils literal notranslate"><span class="pre">MitRes<
 a <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code> object with relaxed type constraints on internal tasks and then casting to a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object at completion.</p>
 </section>
 <section id="extending-mitres-with-mittask">
-<h2>Extending <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> with <code class="docutils literal notranslate"><span class="pre">MitTask</span></code><a class="headerlink" href="#extending-mitres-with-mittask" title="Permalink to this headline"></a></h2>
+<h2>Extending <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> with <code class="docutils literal notranslate"><span class="pre">MitTask</span></code><a class="headerlink" href="#extending-mitres-with-mittask" title="Permalink to this heading"></a></h2>
 <p>We have already seen that the basic construction of a <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object has two <code class="docutils literal notranslate"><span class="pre">MitTask</span></code> objects, one
 submitting Circuit to a <code class="docutils literal notranslate"><span class="pre">pytket</span></code> Backend to retrieve unique handles, the other submitting these handles
 back to the Backend to retrieve <code class="docutils literal notranslate"><span class="pre">BackendResult</span></code>.</p>
@@ -251,7 +253,7 @@ the basic <code class="docutils literal notranslate"><span class="pre">MitRes</s
 being executed on the hardware. The <code class="docutils literal notranslate"><span class="pre">MitRes.append</span></code> method works similarly - later examples will show it in use.</p>
 </section>
 <section id="constructing-mitres-from-taskgraph">
-<h2>Constructing <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> from <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code><a class="headerlink" href="#constructing-mitres-from-taskgraph" title="Permalink to this headline"></a></h2>
+<h2>Constructing <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> from <code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code><a class="headerlink" href="#constructing-mitres-from-taskgraph" title="Permalink to this heading"></a></h2>
 <p>Error-mitigation methods can involve complicated sequences of tasks to work. The strict type requirements of the
 <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> prepend and append rules preserve properties required for combining error-mitigation methods, but restrict
 the possible structure and order of tasks.</p>
@@ -405,7 +407,7 @@ acting on a <code class="docutils literal notranslate"><span class="pre">MitRes<
 method allows the error-mitigation method to be constructed around custom <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects using keyword arguments.</p>
 </section>
 <section id="spam-mitigation-in-qermit">
-<h2>SPAM Mitigation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#spam-mitigation-in-qermit" title="Permalink to this headline"></a></h2>
+<h2>SPAM Mitigation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#spam-mitigation-in-qermit" title="Permalink to this heading"></a></h2>
 <p>A prominent source of noise is that occurring during State Preparation and Measurement (SPAM).</p>
 <p>SPAM error-mitigation methods can correct for such noise through a post-processing step that modifies the output
 distribution measured from repeatedly sampling shots. This is possible given the assumption that SPAM noise is not
@@ -490,8 +492,9 @@ the properties of the Lagos device available through IBMQ, including readout err
 <span class="n">Counter</span><span class="p">({(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">992</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">})</span>
 </pre></div>
 </div>
-<p>The device SPAM characterisation produced is stored inside the characterisation attribute of the <code class="docutils literal notranslate"><span class="pre">Backend</span></code> the <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> is generated with. If a
-characterisation is already available for a given method when <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code> is called, then it will not be characterised again.</p>
+<p>The device SPAM characterisation produced is stored inside the characterisation attribute the <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object. If a
+characterisation is already available for a given method when <code class="docutils literal notranslate"><span class="pre">MitRes.run</span></code> is called, then it will not be characterised again. This characterisation
+can be accessed by calling <code class="docutils literal notranslate"><span class="pre">MitRes.get_characterisation()</span></code>.</p>
 <p>Naively comparing counts, we can see that by using the <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> object returned by <code class="docutils literal notranslate"><span class="pre">gen_UnCorrelated_SPAM_MitRes</span></code> a greater proportion of the returned
 shots are the deterministic outputs we expected. We can not make any grand peformance claims based off this example alone, but we can see how
 SPAM error-mitigation can improve results. However as emphasised earlier, <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> objects can work with any <code class="docutils literal notranslate"><span class="pre">pytket</span></code> <code class="docutils literal notranslate"><span class="pre">Backend</span></code> object, meaning
@@ -534,7 +537,7 @@ is an artifact of the correction procedure, but importantly we can see that the 
 <p>As with the emulator <code class="docutils literal notranslate"><span class="pre">Backend</span></code>, the distribution of results returned with SPAM error-mitigation for this simple test case is improved.</p>
 </section>
 <section id="frame-randomisation-in-qermit">
-<h2>Frame-Randomisation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#frame-randomisation-in-qermit" title="Permalink to this headline"></a></h2>
+<h2>Frame-Randomisation in <code class="docutils literal notranslate"><span class="pre">qermit</span></code><a class="headerlink" href="#frame-randomisation-in-qermit" title="Permalink to this heading"></a></h2>
 <p>While it is not possible to efficiently characterise and suppress all device noise, it can be advantageous to transform some adverse type of noise into a less damaging type.</p>
 <p>Coherent errors are additional unwanted unitary rotations that may appear throughout a quantum computation. Their effect can be damaging due to a possible faster rate of error accumulation than in the case of probabilistic (incoherent) errors.</p>
 <p>Randomisation protocols can be used to tailor the form of the noise profile. By averaging the n-qubit noise channel over all elements from a group (specifically some subgroup of the full unitary group on n qubits), the resulting noise is invariant under the action of any element from this group.</p>
@@ -622,7 +625,7 @@ aren’t enough shots here to say anything conclusive.</p>
 without, or as it was with SPAM error-mitigation.</p>
 </section>
 <section id="combining-mitres-methods">
-<h2>Combining <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> methods<a class="headerlink" href="#combining-mitres-methods" title="Permalink to this headline"></a></h2>
+<h2>Combining <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> methods<a class="headerlink" href="#combining-mitres-methods" title="Permalink to this heading"></a></h2>
 <p>One of the key features of <code class="docutils literal notranslate"><span class="pre">qermit</span></code> is how it easily facilitates running combinations of error-mitigation protocols.
 While each error-mitigated <code class="docutils literal notranslate"><span class="pre">MitRes</span></code> generator will have different options for what combinations can be done, for
 this example we will consider combining the frame-randomisation and SPAM mitigation methods we’ve previously looked at.</p>

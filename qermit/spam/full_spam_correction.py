@@ -52,15 +52,10 @@ def gen_full_tomography_spam_circuits_task(
     def task(
         obj, wire: List[CircuitShots]
     ) -> Tuple[List[CircuitShots], List[CircuitShots], List[StateInfo]]:
-        if backend.backend_info is None:
-            raise ValueError("Backend has no backend_info attribute.")
-
-        if "FullCorrelatedSpamCorrection" in backend.backend_info.misc:
+        if "FullCorrelatedSpamCorrection" in obj.characterisation:
             # check correlations distance
             if (
-                backend.backend_info.misc[
-                    "FullCorrelatedSpamCorrection"
-                ].CorrelatedNodes
+                obj.characterisation["FullCorrelatedSpamCorrection"].CorrelatedNodes
                 is qubit_subsets
             ):
                 return (wire, [], [])
@@ -84,14 +79,12 @@ def gen_full_tomography_spam_circuits_task(
 
 
 def gen_full_tomography_spam_characterisation_task(
-    backend: Backend, qubit_subsets: List[List[Qubit]]
+    qubit_subsets: List[List[Qubit]],
 ) -> MitTask:
     """
     Uses results from device for characterisation circuits to characterise transition matrices
     for different qubit subsets and stores them in backend.
 
-    :param backend: Backend for storing characterisations in.
-    :type backend: Backend
     :param qubit_subsets: Subsets of qubits in backend corresponding to different correlated subsets.
     :type qubit_subsets: List[List[Qubit]]
     """
@@ -113,13 +106,10 @@ def gen_full_tomography_spam_characterisation_task(
                 "SPAM Characterisation requires the same number of prepared states and results."
             )
         if len(results) > 0:
-            characterisation = calculate_correlation_matrices(
-                results, state_infos, qubit_subsets
-            )
+            obj.characterisation[
+                "FullCorrelatedSpamCorrection"
+            ] = calculate_correlation_matrices(results, state_infos, qubit_subsets)
 
-            if backend.backend_info is None:
-                raise ValueError("Backend has no backend_info attribute.")
-            backend.backend_info.misc["FullCorrelatedSpamCorrection"] = characterisation
         return (True,)
 
     return MitTask(
@@ -130,20 +120,14 @@ def gen_full_tomography_spam_characterisation_task(
     )
 
 
-def gen_full_tomography_spam_correction_task(
-    backend: Backend, corr_method: CorrectionMethod
-) -> MitTask:
+def gen_full_tomography_spam_correction_task(corr_method: CorrectionMethod) -> MitTask:
     """
     Uses characterisation result held in backend to correct for SPAM noise in passed
     BackendResult objects. Method used to invert SPAM characteriastion matrices
     and correct results given by CorrectionMethod enum.
 
-    :param backend: Device Backend holding SPAM characterisation.
-    :type backend: Backend
     :param corr_method: Method used to invert matrices and correct results.
     :type corr_method: CorrectionMethod
-    :param characterised: bool passed from characterisation task confirming characterisation is complete.
-    :type characterised: bool
     """
 
     def task(
@@ -162,11 +146,8 @@ def gen_full_tomography_spam_correction_task(
         :return: Corrected Results
         :rtype: Tuple[List[BackendResult]]
         """
-        if backend.backend_info is None:
-            raise ValueError("Backend has no backend_info attribute.")
-
-        if "FullCorrelatedSpamCorrection" in backend.backend_info.misc:
-            char = backend.backend_info.misc["FullCorrelatedSpamCorrection"]
+        if "FullCorrelatedSpamCorrection" in obj.characterisation:
+            char = obj.characterisation["FullCorrelatedSpamCorrection"]
         else:
             raise ValueError(
                 "'FullCorrelatedSpamCorrection' not characterised for Backend."

@@ -77,7 +77,7 @@ class FrameRandomisation(Enum):
         ufr = UniversalFrameRandomisation()
         ufr_shots = ceil(shots / samples)
 
-        ufr_gateset = auto_rebase_pass({OpType.CX, OpType.Rz, OpType.H}).apply(circuit)
+        auto_rebase_pass({OpType.CX, OpType.Rz, OpType.H}).apply(circuit)
         ufr_circuits = ufr.sample_circuits(circuit, samples)
         return [CircuitShots(Circuit=c, Shots=ufr_shots) for c in ufr_circuits]
 
