@@ -60,9 +60,7 @@ def gen_result_extraction_task() -> MitTask:
         """
 
         interpolated_result_list = []
-        for result, points, obs_exp in zip(
-            result_list, points_list, obs_exp_list
-        ):
+        for result, points, obs_exp in zip(result_list, points_list, obs_exp_list):
 
             # Extract point to be interpolated to. This is the symbol values
             # given in the initial experiment definition.
@@ -72,9 +70,7 @@ def gen_result_extraction_task() -> MitTask:
 
             # For each QubitPauliString in the experiment QubitPauliOperator,
             # interpolate it's value at the given point.
-            interpolated_qpo = deepcopy(
-                obs_exp.ObservableTracker.qubit_pauli_operator
-            )
+            interpolated_qpo = deepcopy(obs_exp.ObservableTracker.qubit_pauli_operator)
 
             if set(interpolated_qpo._dict.keys()) != set(result.keys()):
                 raise Exception(
@@ -212,9 +208,7 @@ def gen_ndarray_to_dict_task() -> MitTask:
             # the expectations of the individual QubitPauliStrings.
             result_grid_dict = dict()
             for key in zero_qpo_result_grid._dict.keys():
-                result_grid_dict[key] = np.empty(
-                    qpo_result_grid.shape, dtype=float
-                )
+                result_grid_dict[key] = np.empty(qpo_result_grid.shape, dtype=float)
 
             # For each point on the grid, extract the expections of the
             # given QubitPauliString
@@ -366,9 +360,7 @@ def gen_reshape_task() -> MitTask:
 
         position_list = [
             sum(sub_list)
-            for sub_list in [
-                length_list[:i] for i in range(len(length_list) + 1)
-            ]
+            for sub_list in [length_list[:i] for i in range(len(length_list) + 1)]
         ]
         flattened_result_grid_list = [
             result_list[start:end]
@@ -426,10 +418,7 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
         # A grid of ObservableExperiment is generated for each
         # ObservableExperiment in obs_exp_list
         obs_exp_grid_list = []
-        for obs_exp, sym_val_grid_list in zip(
-            obs_exp_list,
-            obs_exp_sym_val_grid_list
-        ):
+        for obs_exp, sym_val_grid_list in zip(obs_exp_list, obs_exp_sym_val_grid_list):
 
             # Initialise empty grid of ObservableExperiment
             obs_exp_grid = np.empty(
@@ -454,11 +443,7 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
                 }
                 sym_dict = SymbolsDict().symbols_from_dict(sym_map)
                 circ = obs_exp.AnsatzCircuit.Circuit.copy()
-                anz_circ = AnsatzCircuit(
-                    circ,
-                    obs_exp.AnsatzCircuit.Shots,
-                    sym_dict
-                )
+                anz_circ = AnsatzCircuit(circ, obs_exp.AnsatzCircuit.Shots, sym_dict)
 
                 obs_exp_grid[grid_point] = ObservableExperiment(
                     anz_circ, obs_exp.ObservableTracker
@@ -598,11 +583,7 @@ def gen_param_grid_gen_task() -> MitTask:
     )
 
 
-def gen_spectral_filtering_MitEx(
-    backend: Backend,
-    n_vals: int,
-    **kwargs
-) -> MitEx:
+def gen_spectral_filtering_MitEx(backend: Backend, n_vals: int, **kwargs) -> MitEx:
     """Generator function for the spectral filtering MitEx. This method
     acts on symbolic circuits, evaluating the circuit on a grid of symbol
     values and performing mitigation on the resulting landscape.
@@ -629,21 +610,14 @@ def gen_spectral_filtering_MitEx(
     _experiment_mitres = copy(
         kwargs.get(
             "experiment_mitres",
-            gen_compiled_MitRes(
-                backend,
-                optimisation_level=_optimisation_level
-            ),
+            gen_compiled_MitRes(backend, optimisation_level=_optimisation_level),
         )
     )
 
     _experiment_mitex = copy(
         kwargs.get(
             "experiment_mitex",
-            MitEx(
-                backend,
-                _label="ExperimentMitex",
-                mitres=_experiment_mitres
-            ),
+            MitEx(backend, _label="ExperimentMitex", mitres=_experiment_mitres),
         )
     )
 
@@ -661,22 +635,15 @@ def gen_spectral_filtering_MitEx(
     characterisation_taskgraph.append(gen_ndarray_to_dict_task())
     characterisation_taskgraph.append(gen_fft_task())
 
-    signal_filter = kwargs.get(
-        "signal_filter",
-        SmallCoefficientSignalFilter(tol=5)
-    )
+    signal_filter = kwargs.get("signal_filter", SmallCoefficientSignalFilter(tol=5))
 
-    characterisation_taskgraph.append(
-        gen_mitigation_task(signal_filter=signal_filter)
-    )
+    characterisation_taskgraph.append(gen_mitigation_task(signal_filter=signal_filter))
 
     characterisation_taskgraph.append(gen_inv_fft_task())
 
     characterisation_taskgraph.add_n_wires(2)
     characterisation_taskgraph.prepend(gen_wire_copy_task(2, 2))
-    characterisation_taskgraph.prepend(
-        gen_symbol_val_gen_task(n_sym_vals=n_vals)
-    )
+    characterisation_taskgraph.prepend(gen_symbol_val_gen_task(n_sym_vals=n_vals))
     characterisation_taskgraph.append(gen_result_extraction_task())
 
     return MitEx(backend).from_TaskGraph(characterisation_taskgraph)
