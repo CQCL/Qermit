@@ -2,9 +2,9 @@
 
 [![PyPI version](https://badge.fury.io/py/qermit.svg)](https://badge.fury.io/py/qermit)
 
-`qermit` is a python module for running error-mitigation protocols on quantum processors using [`pytket`](https://github.com/CQCL/pytket), the Cambridge Quantum python module for interfacing with [CQC](https://cambridgequantum.com/) TKET, a set of quantum programming tools.
+`qermit` is a python module for running error-mitigation protocols on quantum processors using [`pytket`](https://github.com/CQCL/pytket), the [Quantinuum](https://www.quantinuum.com/) python module for interfacing with TKET, a set of quantum programming tools.
 
-This repo containts API documentation, a user manual for getting started with `qermit` and source code.
+This repo contains API documentation, a user manual for getting started with `qermit` and source code.
 
 ## Getting Started
 
