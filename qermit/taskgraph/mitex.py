@@ -390,11 +390,14 @@ class MitEx(TaskGraph):
         self,
         experiment_wires: List[List[ObservableExperiment]],
         characterisation: dict = {},
+        continue_run: bool = False,
     ) -> Tuple[List[QubitPauliOperator]]:
         return cast(
             Tuple[List[QubitPauliOperator]],
             super().run(
-                cast(List[Wire], experiment_wires), characterisation=characterisation
+                cast(List[Wire], experiment_wires),
+                characterisation=characterisation,
+                continue_run=continue_run,
             ),
         )
 
@@ -472,7 +475,10 @@ class MitEx(TaskGraph):
         raise TypeError("MitEx.add_wire forbidden.")
 
     def run(  # type: ignore[override]
-        self, mitex_wires: List[ObservableExperiment], characterisation: dict = {}
+        self,
+        mitex_wires: List[ObservableExperiment],
+        characterisation: dict = {},
+        continue_run: bool = False,
     ) -> List[QubitPauliOperator]:
         """
         Overloaded run method.
@@ -495,7 +501,7 @@ class MitEx(TaskGraph):
         :return: Observable experiment results as QubitPauliOperator, where values are expectations.
         :rtype: List[QubitPauliOperator]
         """
-        return self([mitex_wires], characterisation)[0]
+        return self([mitex_wires], characterisation, continue_run=continue_run)[0]
 
     def run_basic(
         self, mitex_wires: List[Tuple[CircuitShots, QubitPauliOperator]]

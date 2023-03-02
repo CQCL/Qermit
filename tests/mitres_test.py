@@ -162,9 +162,33 @@ def test_gen_shot_split_MitRes():
     assert len(results[1].get_shots()) == n_shots_2
 
 
+def test_mitres_continue_run():
+
+    backend = AerBackend()
+
+    mitres = gen_shot_split_MitRes(backend, 5)
+    mitres.get_task_graph()
+
+    n_shots_1 = 8
+    circ_1 = Circuit(1).H(0).X(0).measure_all()
+    n_shots_2 = 12
+    circ_2 = Circuit(2).H(0).CX(0, 1).measure_all()
+
+    results0 = mitres.run(
+        [CircuitShots(circ_1, n_shots_1), CircuitShots(circ_2, n_shots_2)]
+    )
+    results1 = mitres.run(
+        [CircuitShots(circ_1, n_shots_1), CircuitShots(circ_2, n_shots_2)],
+        continue_run=True,
+    )
+    assert results0[0].get_counts() == results1[0].get_counts()
+    assert results0[1].get_counts() == results1[1].get_counts()
+
+
 if __name__ == "__main__":
     test_backend_handle_result_task_gen()
     test_mitres_run()
     test_split_shots_task_gen()
     test_group_shots_task_gen()
     test_gen_shot_split_MitRes()
+    test_mitres_continue_run()
