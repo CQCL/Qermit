@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>qermit.frame_randomisation &mdash; Qermit 0.2.0 documentation</title>
@@ -11,10 +11,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,14 +27,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Qermit
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Qermit
           </a>
               <div class="version">
                 0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -81,7 +83,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">qermit.frame_randomisation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/frame_randomisation.rst.txt" rel="nofollow"> View page source</a>
@@ -99,16 +101,16 @@
 <span class="sig-prename descclassname"><span class="pre">frame_randomisation.</span></span><span class="sig-name descname"><span class="pre">gen_Frame_Randomisation_MitRes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes"><span class="pre">MitRes</span></a></span></span><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.gen_Frame_Randomisation_MitRes" title="Permalink to this definition"></a></dt>
 <dd><p>Produces a MitRes object that applies FrameRandomisation techniques to experiment circuits.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>backend</strong> (<em>Backend</em>) – Backend which experiments are default run through.</p></li>
 <li><p><strong>samples</strong> (<em>int</em>) – Number of Frame Randomisation instances sampled in Frame Randomisation.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Key mitres</dt>
+<dt class="field-even">Key mitres<span class="colon">:</span></dt>
 <dd class="field-even"><p>MitRes object FrameRandomisation MitRes built around if given.</p>
 </dd>
-<dt class="field-odd">Key frame_randomisation</dt>
+<dt class="field-odd">Key frame_randomisation<span class="colon">:</span></dt>
 <dd class="field-odd"><p>FrameRandomisation Enum passed to specify method used.
 Default set to FrameRandomisation.UniversalFrameRandomisation.</p>
 </dd>
@@ -125,7 +127,7 @@ Default set to FrameRandomisation.UniversalFrameRandomisation.</p>
 <dd><p>Uses the pytket.tailoring method PauliFrameRandomisation  to return a list of
 circuits corresponding to instances of frame randomisation for the input circuit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>circuit</strong> (<em>Circuit</em>) – Circuit to have frame randomisation applied.</p></li>
 <li><p><strong>shots</strong> (<em>int</em>) – Number of shots of each frame randomisation circuit to take.</p></li>
@@ -145,7 +147,7 @@ the whole circuit is a single cycle for frame randomisation. This is possible wi
 the additional noise assumption on top of the regular Frame Randomisation assumptions
 that Rz(-x) and Rz(x) incur similar noise for any angle x.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>circuit</strong> (<em>Circuit</em>) – Circuit to have frame randomisation applied.</p></li>
 <li><p><strong>shots</strong> (<em>int</em>) – Number of shots of each frame randomisation circuit to take.</p></li>
@@ -162,7 +164,7 @@ that Rz(-x) and Rz(x) incur similar noise for any angle x.</p>
 <span class="sig-prename descclassname"><span class="pre">frame_randomisation.</span></span><span class="sig-name descname"><span class="pre">frame_randomisation_circuits_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_fr_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qermit.frame_randomisation.frame_randomisation.FrameRandomisation" title="qermit.frame_randomisation.frame_randomisation.FrameRandomisation"><span class="pre">FrameRandomisation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.frame_randomisation.frame_randomisation.frame_randomisation_circuits_task_gen" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a MitTask object that produces Frame Randomisation circuits for some wire of experiment circuits.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>samples</strong> (<em>int</em>) – Number of samples of frame randomisation circuits to take for each circuit in wire.</p>
 </dd>
 </dl>
@@ -175,7 +177,7 @@ that Rz(-x) and Rz(x) incur similar noise for any angle x.</p>
 BackendResult object. These collated BackendResult objects should include all frame experiments for a single
 original circuit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>samples</strong> (<em>int</em>) – Number of frame randomisation instances created in the first place, used to suitably
 collate results.</p>
 </dd>

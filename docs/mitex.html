@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>qermit.mitex &mdash; Qermit 0.2.0 documentation</title>
@@ -11,10 +11,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,14 +27,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Qermit
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Qermit
           </a>
               <div class="version">
                 0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -94,7 +96,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">qermit.mitex</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/mitex.rst.txt" rel="nofollow"> View page source</a>
@@ -116,7 +118,7 @@
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitex.MitEx.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment_wires</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ObservableExperiment</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">QubitPauliOperator</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.__call__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment_wires</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ObservableExperiment</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characterisation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">QubitPauliOperator</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.__call__" title="Permalink to this definition"></a></dt>
 <dd><p>Call self as a function.</p>
 </dd></dl>
 
@@ -127,13 +129,13 @@
 However, as experiments run through some MitRes object, kwargs
 can be used to run through any mitres of choice.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>backend</strong> (<em>Backend</em>) – Pytket backend default constructor which tasks are generated from.</p></li>
 <li><p><strong>label</strong> (<em>str</em>) – Name for identification of MitEx object.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Key mitres</dt>
+<dt class="field-even">Key mitres<span class="colon">:</span></dt>
 <dd class="field-even"><p>MitEx object experiments are run through</p>
 </dd>
 </dl>
@@ -152,7 +154,7 @@ can be used to run through any mitres of choice.</p>
 and output vertex, with no type restrictions. Not permitted for MitEx,
 raises TypeError.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>num_wires</strong> (<em>int</em>) – Number of edges to add between input and output vertices.</p>
 </dd>
 </dl>
@@ -167,20 +169,20 @@ Not permitted for MitEx, raises TypeError.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitex.MitEx.check_append_wires">
-<span class="sig-name descname"><span class="pre">check_append_wires</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">TaskGraph</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.check_append_wires" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_append_wires</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">TaskGraph</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.check_append_wires" title="Permalink to this definition"></a></dt>
 <dd><p>Confirms that the number of in wires the passed task has is equal
 to the number of in wires to the output, and that the number
 of out wires the passed task has is 1. Also checks that the
 task.run attribute argument is List[QubitPauliOperator] and that its
 return type is Tuple[List[QubitPauliOperator]].</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>task</strong> (<em>Union</em><em>[</em><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><em>MitTask</em></a><em>, </em><em>Taskgraph</em><em>]</em>) – MitTask or TaskGraph object for checking wire numbers of.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if task is suitably for appending, False if not.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
@@ -188,20 +190,20 @@ return type is Tuple[List[QubitPauliOperator]].</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitex.MitEx.check_prepend_wires">
-<span class="sig-name descname"><span class="pre">check_prepend_wires</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">TaskGraph</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.check_prepend_wires" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_prepend_wires</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">TaskGraph</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.check_prepend_wires" title="Permalink to this definition"></a></dt>
 <dd><p>Confirms that the number of out wires the passed task has is equal
 to the number of out wires from the input, and that the number
 of in wires the passed task has is 1. Also checks that the
 task.run attribute argument is List[ObservableExperiment] and that its
 return type is Tuple[List[ObservableExperiment]].</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>task</strong> (<em>Union</em><em>[</em><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><em>MitTask</em></a><em>, </em><em>Taskgraph</em><em>]</em>) – MitTask or TaskGraph object for checking wire numbers of.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if task is suitably for prepending, False if not.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
@@ -212,13 +214,13 @@ return type is Tuple[List[ObservableExperiment]].</p>
 <span class="sig-name descname"><span class="pre">from_TaskGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">TaskGraph</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.from_TaskGraph" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a MitEx object from a TaskGraph object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>task_graph</strong> (<a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><em>TaskGraph</em></a>) – TaskGraph object to copy tasks from.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Copied TaskGraph as MitEx</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx">MitEx</a></p>
 </dd>
 </dl>
@@ -226,11 +228,11 @@ return type is Tuple[List[ObservableExperiment]].</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitex.MitEx.parallel">
-<span class="sig-name descname"><span class="pre">parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">TaskGraph</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.parallel" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph" title="qermit.taskgraph.task_graph.TaskGraph"><span class="pre">TaskGraph</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.parallel" title="Permalink to this definition"></a></dt>
 <dd><p>Requests to add new MitTask/TaskGraph to TaskGraph object in parallel.
 Not permitted for MitEx, raises TypeError.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>task</strong> (<a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><em>MitTask</em></a>) – New task to be added in parallel.</p>
 </dd>
 </dl>
@@ -238,7 +240,7 @@ Not permitted for MitEx, raises TypeError.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.mitex.MitEx.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mitex_wires</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ObservableExperiment</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">QubitPauliOperator</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.run" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mitex_wires</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ObservableExperiment</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characterisation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">QubitPauliOperator</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.mitex.MitEx.run" title="Permalink to this definition"></a></dt>
 <dd><p>Overloaded run method.
 A single observable experiment is defined by a Tuple containg an Ansatz
 Circuit object and an ObservableTracker object.
@@ -252,14 +254,14 @@ An ObservableTracker object is defined by a QubitPauliOperator defining the obse
 (a dictionary between QubitPauliStrings and coefficients), and later stores MeasurementCircuit
 objects for running on devices.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>mitex_wires</strong> (<em>List</em><em>[</em><em>ObservableExperiment</em><em>]</em>) – Each Tuple pertains to a different Observable measuring experiment, and contains
 the minimum amount of information to run an Mitigated Experiment for calculating observables.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Observable experiment results as QubitPauliOperator, where values are expectations.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List[QubitPauliOperator]</p>
 </dd>
 </dl>
@@ -273,13 +275,13 @@ An experiment is defined here as just the ansatz circuit, number of shots and th
 This method converts these into the arguments for using run, calls run and then returns the
 desired operator.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>mitex_wires</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>CircuitShots</em><em>, </em><em>QubitPauliOperator</em><em>]</em><em>]</em>) – Each tuple pertains to a different basic observable measuring experiment.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Observable experiment results as QubitPauliOperator, where values are expectations.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List[QubitPauliOperator]</p>
 </dd>
 </dl>
@@ -294,16 +296,16 @@ desired operator.</p>
 circuit wires via backend.compile_circuit. Optimisaion level can be optionally
 set as defined by backend.compile_circuit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>backend</strong> (<em>Backend</em>) – Backend with circuits are compiled for.</p></li>
 <li><p><strong>optimisation_level</strong> (<em>int</em>) – Sets options in compile_circuit method</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>MitRes object with compilation task prepended.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes">MitRes</a></p>
 </dd>
 </dl>
@@ -316,17 +318,17 @@ set as defined by backend.compile_circuit.</p>
 circuit wires via backend.compile_circuit. Optimisation level can be optionally
 set as defined by backend.compile_circuit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>backend</strong> (<em>Backend</em>) – Backend with circuits are compiled for.</p></li>
 <li><p><strong>max_shots</strong> (<em>int</em>) – The maximum number of shots that each job should request.</p></li>
 <li><p><strong>optimisation_level</strong> (<em>int</em>) – Sets options in compile_circuit method</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>shot splitting MitRes object with compilation task prepended.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes" title="qermit.taskgraph.mitres.MitRes">MitRes</a></p>
 </dd>
 </dl>
@@ -338,13 +340,13 @@ set as defined by backend.compile_circuit.</p>
 <dd><p>Given a Qubit Pauli String, returns a circuit for measuring qubits in given basis
 via changing of basis through quantum gates.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>string</strong> (<em>QubitPauliString</em>) – Qubit Pauli String to be measured</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Measurement circuit for appending on some ansatz</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Circuit</p>
 </dd>
 </dl>
@@ -356,10 +358,10 @@ via changing of basis through quantum gates.</p>
 <dd><p>Generates basic (changing measurement basis via Pauli gates) MeasurementCircuit
 for every QubitPauliString passed that has no Measurementcircuit in ObservableTracker object passed on wire.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Pure function that adds MeasurementCircuit objects to ObservableTracker.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
 </dd>
 </dl>

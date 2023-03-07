@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MitEx &mdash; qermit-manual  documentation</title>
@@ -13,10 +13,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/thebelab-helper.js"></script>
@@ -34,11 +32,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> qermit-manual
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            qermit-manual
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -71,7 +73,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">MitEx</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/manual_mitex.rst.txt" rel="nofollow"> View page source</a>
@@ -706,29 +708,39 @@ we construct an example that with expected value 1.0.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> object returned by <code class="docutils literal notranslate"><span class="pre">gen_DFSC_MitEx</span></code> has both a characterisation and experiment stage.
 The <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> characterisation is completed with can be specified with the <code class="docutils literal notranslate"><span class="pre">CharacterisationMitex</span></code> keyword argument.
 The <code class="docutils literal notranslate"><span class="pre">MitEx</span></code> the experiment is completed with can be specified with the <code class="docutils literal notranslate"><span class="pre">ExperimentMitex</span></code> keyword argument.</p>
-<dl class="citation">
-<dt class="label" id="bonet-monroig2018"><span class="brackets"><a class="fn-backref" href="#id1">Bonet-Monroig2018</a></span></dt>
-<dd><p>Bonet-Monroig, X., Sagastizabal, R., Singh, M., O’Brien, T.E., 2018. Low-cost error mitigation by symmetry verification. Phys. Rev. A 98, 062339 (2018).</p>
-</dd>
-<dt class="label" id="temme2016"><span class="brackets">Temme2016</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id5">2</a>,<a href="#id7">3</a>,<a href="#id10">4</a>)</span></dt>
-<dd><p>Temme, K., Bravyi, S., Gambetta, J.M., 2016. error mitigation for short-depth quantum circuits.  Phys. Rev. Lett. 119, 180509 (2017).</p>
-</dd>
-<dt class="label" id="giurgica-tiron2020"><span class="brackets">Giurgica-Tiron2020</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id11">2</a>)</span></dt>
-<dd><p>Giurgica-Tiron, T., Hindy, Y., LaRose, Ryan., Mari, A., Zeng, W.J., 2020, Digital zero noise extrapolation for quantum error mitigation. 2020 IEEE International Conference on Quantum Computing and Engineering (QCE), Denver, CO, USA, 2020.</p>
-</dd>
-<dt class="label" id="czarnik2020"><span class="brackets">Czarnik2020</span><span class="fn-backref">(<a href="#id4">1</a>,<a href="#id14">2</a>)</span></dt>
-<dd><p>Czarnik, P., Arrasmith, A., Coles, P.J., Cincio, L., 2020. error mitigation with Clifford quantum-circuit data. arXiv:2005.10189.</p>
-</dd>
-<dt class="label" id="li2017"><span class="brackets"><a class="fn-backref" href="#id9">Li2017</a></span></dt>
-<dd><p>Li, Y., &amp; Benjamin, S. C. (2017). Efficient variational quantum simulator incorporating active error minimization. Physical Review X, 7(2), 021050.</p>
-</dd>
-<dt class="label" id="endo2018"><span class="brackets"><a class="fn-backref" href="#id6">Endo2018</a></span></dt>
-<dd><p>Endo, S., Benjamin, S. C., &amp; Li, Y. (2018). Practical quantum error mitigation for near-future applications. Physical Review X, 8(3), 031027.</p>
-</dd>
-<dt class="label" id="strikis2020"><span class="brackets"><a class="fn-backref" href="#id8">Strikis2020</a></span></dt>
-<dd><p>Strikis, A., Qin, D., Chen, Y., Benjamin, S. C., &amp; Li, Y. (2020). Learning-based quantum error mitigation. arXiv preprint arXiv:2005.07601.</p>
-</dd>
-</dl>
+<div role="list" class="citation-list">
+<div class="citation" id="bonet-monroig2018" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Bonet-Monroig2018</a><span class="fn-bracket">]</span></span>
+<p>Bonet-Monroig, X., Sagastizabal, R., Singh, M., O’Brien, T.E., 2018. Low-cost error mitigation by symmetry verification. Phys. Rev. A 98, 062339 (2018).</p>
+</div>
+<div class="citation" id="temme2016" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Temme2016<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id5">2</a>,<a role="doc-backlink" href="#id7">3</a>,<a role="doc-backlink" href="#id10">4</a>)</span>
+<p>Temme, K., Bravyi, S., Gambetta, J.M., 2016. error mitigation for short-depth quantum circuits.  Phys. Rev. Lett. 119, 180509 (2017).</p>
+</div>
+<div class="citation" id="giurgica-tiron2020" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Giurgica-Tiron2020<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id11">2</a>)</span>
+<p>Giurgica-Tiron, T., Hindy, Y., LaRose, Ryan., Mari, A., Zeng, W.J., 2020, Digital zero noise extrapolation for quantum error mitigation. 2020 IEEE International Conference on Quantum Computing and Engineering (QCE), Denver, CO, USA, 2020.</p>
+</div>
+<div class="citation" id="czarnik2020" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Czarnik2020<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id4">1</a>,<a role="doc-backlink" href="#id14">2</a>)</span>
+<p>Czarnik, P., Arrasmith, A., Coles, P.J., Cincio, L., 2020. error mitigation with Clifford quantum-circuit data. arXiv:2005.10189.</p>
+</div>
+<div class="citation" id="li2017" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">Li2017</a><span class="fn-bracket">]</span></span>
+<p>Li, Y., &amp; Benjamin, S. C. (2017). Efficient variational quantum simulator incorporating active error minimization. Physical Review X, 7(2), 021050.</p>
+</div>
+<div class="citation" id="endo2018" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">Endo2018</a><span class="fn-bracket">]</span></span>
+<p>Endo, S., Benjamin, S. C., &amp; Li, Y. (2018). Practical quantum error mitigation for near-future applications. Physical Review X, 8(3), 031027.</p>
+</div>
+<div class="citation" id="strikis2020" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">Strikis2020</a><span class="fn-bracket">]</span></span>
+<p>Strikis, A., Qin, D., Chen, Y., Benjamin, S. C., &amp; Li, Y. (2020). Learning-based quantum error mitigation. arXiv preprint arXiv:2005.07601.</p>
+</div>
+</div>
 </section>
 </section>
 
