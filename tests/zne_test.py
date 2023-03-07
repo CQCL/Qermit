@@ -33,6 +33,7 @@ from pytket.extensions.qiskit import AerBackend, IBMQEmulatorBackend  # type: ig
 from pytket import Circuit, Qubit
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.utils import QubitPauliOperator
+from pytket.circuit import CircBox
 from numpy.polynomial.polynomial import polyval  # type: ignore
 import math
 import numpy as np  # type: ignore
@@ -534,6 +535,9 @@ def test_two_qubit_gate_folding():
     task_1 = digital_folding_task_gen(
         be, n_folds_1, Folding.two_qubit_gate, _allow_approx_fold=False
     )
+    task_invalid = digital_folding_task_gen(
+        be, 5.5, Folding.two_qubit_gate, _allow_approx_fold=False
+    )
 
     assert task_1.n_in_wires == 1
     assert task_1.n_out_wires == 1
@@ -541,14 +545,24 @@ def test_two_qubit_gate_folding():
     c_1 = Circuit(2).Rz(0.3,0).ZZPhase(0.3,1,0)
     c_2 = Circuit(3).Rz(0.3,2).CZ(1,2).add_barrier([0,1,2]).CX(0,1).X(0)
 
+    circ_box = CircBox(c_1)
+    c_invalid = Circuit(2).add_circbox(circ_box, [0,1])
+
     ac_1 = AnsatzCircuit(c_1, 10000, {})
     ac_2 = AnsatzCircuit(c_2, 10000, {})
+    ac_invalid = AnsatzCircuit(c_invalid, 10000, {})
 
     qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
-    qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
 
     experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
-    experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_2))
+    experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_1))
+    experiment_invalid = ObservableExperiment(ac_invalid, ObservableTracker(qpo_1))
+
+    with pytest.raises(ValueError):
+        task_invalid([[experiment_1, experiment_2]])
+
+    with  pytest.raises(RuntimeError):
+        task_1([[experiment_invalid]])
     
     folded_experiment = task_1([[experiment_1, experiment_2]])[0]
 
