@@ -53,6 +53,57 @@ class Folding(Enum):
     :rtype: Circuit
     """
 
+    def two_qubit_gate(circ: Circuit, noise_scaling: int, **kwargs) -> Circuit:
+        """Noise scaling by folding 2 qubit gates. Two qubit gates
+        :math:`G` are replaced :math:`GG^{-1}G...G^{-1}G` where the number
+        of gates in  the sequence is `noise_scaling`. It is implicitly
+        assumed that the noise on the 2 qubit gates dominate. Noise can
+        only be scaled by odd integer factors.
+
+        :param circ: Original circuit to be folded.
+        :type circ: Circuit
+        :param noise_scaling: Factor by which the noise should be scaled.
+        :type noise_scaling: int
+        :raises ValueError: Raised if the noise scaling factor given is not
+            an odd integer.
+        :raises RuntimeError: Raised if the circuit includes boxes.
+        :return: Circuit with noise scaled.
+        :rtype: Circuit
+        """
+
+        if not (noise_scaling % 2 == 1):
+            raise ValueError(
+                "When performing two qubit gate folding, "
+                "noise_scaling must be an odd integer."
+            )
+
+        # Copy qubit register of original circuit.
+        folded_circuit = Circuit()
+        for qubit in circ.qubits:
+            folded_circuit.add_qubit(qubit)
+
+        for gate in circ.get_commands():
+            # Barriers are not folded and added as given.
+            if gate.op.type == OpType.Barrier:
+                folded_circuit.add_barrier(gate.args)
+            # Boxes are not supported.
+            elif gate.op.type in box_types:
+                raise RuntimeError("Box types not supported when folding.")
+            # 2 qubit gates are folded.
+            elif len(gate.qubits) == 2:
+                folded_circuit.add_gate(gate.op, gate.args)
+                for _ in range((noise_scaling-1) // 2):
+                    folded_circuit.add_barrier(gate.args)
+                    folded_circuit.add_gate(gate.op.dagger, gate.args)
+                    folded_circuit.add_barrier(gate.args)
+                    folded_circuit.add_gate(gate.op, gate.args)
+            # All other gates are added as given.
+            else:
+                folded_circuit.add_gate(gate.op, gate.args)
+
+        return folded_circuit
+
+
     # TODO: circ does not appear as input in docs
     # TODO Generalise with 'partial folding' to allow for non integer noise scaling
     def circuit(circ: Circuit, noise_scaling: int, **kwargs) -> Circuit:

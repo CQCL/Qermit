@@ -68,6 +68,7 @@ REASON = "IBMQ account not configured"
 
 
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
+@pytest.mark.high_compute
 def test_no_qubit_relabel():
 
     lagos_backend = IBMQEmulatorBackend(
@@ -241,6 +242,7 @@ def test_extrapolation_task_gen():
 
 
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
+@pytest.mark.high_compute
 def test_folding_compiled_circuit():
 
     emulator_backend = IBMQEmulatorBackend("ibmq_quito")
@@ -521,6 +523,63 @@ def test_odd_gate_folding():
         .CX(1, 2)
     )
     assert folded_circ == correct_folded_circ
+
+
+def test_two_qubit_gate_folding():
+
+    be = AerBackend()
+
+    n_folds_1 = 3
+
+    task_1 = digital_folding_task_gen(
+        be, n_folds_1, Folding.two_qubit_gate, _allow_approx_fold=False
+    )
+
+    assert task_1.n_in_wires == 1
+    assert task_1.n_out_wires == 1
+
+    c_1 = Circuit(2).Rz(0.3,0).ZZPhase(0.3,1,0)
+    c_2 = Circuit(3).Rz(0.3,2).CZ(1,2).add_barrier([0,1,2]).CX(0,1).X(0)
+
+    ac_1 = AnsatzCircuit(c_1, 10000, {})
+    ac_2 = AnsatzCircuit(c_2, 10000, {})
+
+    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+    qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+
+    experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
+    experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_2))
+    
+    folded_experiment = task_1([[experiment_1, experiment_2]])[0]
+
+    folded_c_1 = folded_experiment[0].AnsatzCircuit.Circuit
+    folded_c_2 = folded_experiment[1].AnsatzCircuit.Circuit
+
+    ideal_folded_c_1 = Circuit(2)
+    ideal_folded_c_1.Rz(0.3,0)
+    ideal_folded_c_1.ZZPhase(0.3,1,0)
+    ideal_folded_c_1.add_barrier([1,0])
+    ideal_folded_c_1.ZZPhase(3.7,1,0)
+    ideal_folded_c_1.add_barrier([1,0])
+    ideal_folded_c_1.ZZPhase(0.3,1,0)
+
+    assert folded_c_1 == ideal_folded_c_1
+
+    assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_1)
+    assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_2)
+
+    # Note that in both cases barriers are added. This is why there is the
+    # n_folds_i - 1 term at the end.
+    assert folded_c_1.n_gates == c_1.n_gates + 2 * c_1.n_2qb_gates() * (n_folds_1 - 1)
+    assert folded_c_2.n_gates == c_2.n_gates + 2 * c_2.n_2qb_gates() * (n_folds_1 - 1)
+
+    c_1_unitary = c_1.get_unitary()
+    c_2_unitary = c_2.get_unitary()
+    folded_c_1_unitary = folded_c_1.get_unitary()
+    folded_c_2_unitary = folded_c_2.get_unitary()
+
+    assert np.allclose(c_1_unitary, folded_c_1_unitary)
+    assert np.allclose(c_2_unitary, folded_c_2_unitary)
 
 
 if __name__ == "__main__":
