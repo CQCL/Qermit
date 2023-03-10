@@ -532,42 +532,73 @@ def test_two_qubit_gate_folding():
 
     n_folds_1 = 3
 
+    # This tests the case of odd integer folding, which is always possible
     task_1 = digital_folding_task_gen(
         be, n_folds_1, Folding.two_qubit_gate, _allow_approx_fold=False
     )
+    # This tests the case of non integer folding. 5.5 is not possible
+    # as the circuit has 1 case and so only odd integer folding is possible
     task_invalid = digital_folding_task_gen(
         be, 5.5, Folding.two_qubit_gate, _allow_approx_fold=False
+    )
+    # This test the case of non integer folding when approximate folding is
+    # allowed
+    task_2 = digital_folding_task_gen(
+        be, 5.8, Folding.two_qubit_gate, _allow_approx_fold=True
     )
 
     assert task_1.n_in_wires == 1
     assert task_1.n_out_wires == 1
+    assert task_2.n_in_wires == 1
+    assert task_2.n_out_wires == 1
+    assert task_invalid.n_in_wires == 1
+    assert task_invalid.n_out_wires == 1
 
     c_1 = Circuit(2).Rz(0.3,0).ZZPhase(0.3,1,0)
-    c_2 = Circuit(3).Rz(0.3,2).CZ(1,2).add_barrier([0,1,2]).CX(0,1).X(0)
+    # This is to ensure that the barrier is not folded, even though it
+    # acts on 2 qubits
+    c_2 = Circuit(3).Rz(0.3,2).CZ(1,2).add_barrier([0,1]).CX(0,1).X(0)
+    c_3 = Circuit(3).CZ(0,1).CZ(1,2).CZ(0,2)
 
     circ_box = CircBox(c_1)
-    c_invalid = Circuit(2).add_circbox(circ_box, [0,1])
+    # Tests that circuits with nothing to fold will raise an error.
+    c_gate_set_invalid_1 = Circuit(2).add_circbox(circ_box, [0,1])
+    # Tests that circuitss with CircBox will raise an error.
+    c_gate_set_invalid_2 = Circuit(2).add_circbox(circ_box, [0,1]).CZ(0,1)
 
     ac_1 = AnsatzCircuit(c_1, 10000, {})
     ac_2 = AnsatzCircuit(c_2, 10000, {})
-    ac_invalid = AnsatzCircuit(c_invalid, 10000, {})
+    ac_3 = AnsatzCircuit(c_3, 10000, {})
+    ac_gate_set_invalid_1 = AnsatzCircuit(c_gate_set_invalid_1, 10000, {})
+    ac_gate_set_invalid_2 = AnsatzCircuit(c_gate_set_invalid_2, 10000, {})
 
     qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
 
     experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
     experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_1))
-    experiment_invalid = ObservableExperiment(ac_invalid, ObservableTracker(qpo_1))
+    experiment_3 = ObservableExperiment(ac_3, ObservableTracker(qpo_1))
+    experiment_gate_set_invalid_1 = ObservableExperiment(
+        ac_gate_set_invalid_1, ObservableTracker(qpo_1)
+    )
+    experiment_gate_set_invalid_2 = ObservableExperiment(
+        ac_gate_set_invalid_2, ObservableTracker(qpo_1)
+    )
 
     with pytest.raises(ValueError):
         task_invalid([[experiment_1, experiment_2]])
 
     with  pytest.raises(RuntimeError):
-        task_1([[experiment_invalid]])
-    
-    folded_experiment = task_1([[experiment_1, experiment_2]])[0]
+        task_1([[experiment_gate_set_invalid_1]])
 
-    folded_c_1 = folded_experiment[0].AnsatzCircuit.Circuit
-    folded_c_2 = folded_experiment[1].AnsatzCircuit.Circuit
+    with  pytest.raises(RuntimeError):
+        task_1([[experiment_gate_set_invalid_2]])
+    
+    folded_experiment_1 = task_1([[experiment_1, experiment_2]])[0]
+    folded_experiment_2 = task_2([[experiment_3]])[0]
+
+    folded_c_1 = folded_experiment_1[0].AnsatzCircuit.Circuit
+    folded_c_2 = folded_experiment_1[1].AnsatzCircuit.Circuit
+    folded_c_3 = folded_experiment_2[0].AnsatzCircuit.Circuit
 
     ideal_folded_c_1 = Circuit(2)
     ideal_folded_c_1.Rz(0.3,0)
@@ -581,19 +612,24 @@ def test_two_qubit_gate_folding():
 
     assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_1)
     assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_2)
+    assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_3)
 
     # Note that in both cases barriers are added. This is why there is the
     # n_folds_i - 1 term at the end.
     assert folded_c_1.n_gates == c_1.n_gates + 2 * c_1.n_2qb_gates() * (n_folds_1 - 1)
     assert folded_c_2.n_gates == c_2.n_gates + 2 * c_2.n_2qb_gates() * (n_folds_1 - 1)
+    assert folded_c_3.n_2qb_gates() == 17  # note that this gives an nose scaling = 17/3 = 5.6 which is a little smaller than 5.8
 
     c_1_unitary = c_1.get_unitary()
     c_2_unitary = c_2.get_unitary()
+    c_3_unitary = c_3.get_unitary()
     folded_c_1_unitary = folded_c_1.get_unitary()
     folded_c_2_unitary = folded_c_2.get_unitary()
+    folded_c_3_unitary = folded_c_3.get_unitary()
 
     assert np.allclose(c_1_unitary, folded_c_1_unitary)
     assert np.allclose(c_2_unitary, folded_c_2_unitary)
+    assert np.allclose(c_3_unitary, folded_c_3_unitary)
 
 
 if __name__ == "__main__":

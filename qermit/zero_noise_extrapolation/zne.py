@@ -33,6 +33,8 @@ from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial  # type: ignore
 from pytket.circuit import Node  # type: ignore
+import random
+import math
 
 
 box_types = {
@@ -104,7 +106,7 @@ class Folding(Enum):
 
         return folded_circ
 
-    def two_qubit_gate(circ: Circuit, noise_scaling: int, **kwargs) -> Circuit:
+    def two_qubit_gate(circ: Circuit, noise_scaling: float, **kwargs) -> Circuit:
         """Noise scaling by folding 2 qubit gates. Two qubit gates
         :math:`G` are replaced by :math:`GG^{-1}G...G^{-1}G` where the number
         of gates in  the sequence is `noise_scaling`. It is implicitly
@@ -122,10 +124,43 @@ class Folding(Enum):
         :rtype: Circuit
         """
 
-        if not (noise_scaling % 2 == 1):
+        assert noise_scaling>=1
+
+        _allow_approx_fold = kwargs.get("_allow_approx_fold", True)
+
+        num_folds_dict = {
+            i:(int(noise_scaling-1)//2) for i, cmd in enumerate(circ.get_commands()) 
+            if (
+                not (cmd.op.type == OpType.Barrier) and
+                not (cmd.op.type in box_types) and
+                len(cmd.qubits) == 2
+            )
+        }
+
+        if len(num_folds_dict) == 0:
+            raise RuntimeError(
+                "There are no valid q qubits gates in this circuit to fold. "
+                "Your circuit should include 2 qubit gates other than "
+                "Barrier and CircBox."
+            )
+
+        fold_frac = ((noise_scaling-1)%2)/2
+        to_fold = random.sample(
+            list(num_folds_dict.keys()), 
+            int(len(num_folds_dict.keys()) * fold_frac)
+        )
+        for i in to_fold:
+            num_folds_dict[i] += 1
+
+        true_noise_scaling = sum(2*i + 1 for i in num_folds_dict.values())
+        true_noise_scaling /= len(num_folds_dict)
+
+        if not (_allow_approx_fold or math.isclose(noise_scaling, true_noise_scaling, abs_tol=0.001)):
             raise ValueError(
-                "When performing two qubit gate folding, "
-                "noise_scaling must be an odd integer."
+                "The noise cannot be scaled by the amount inputted."
+                "The noise must be scaled by a factor of the form "
+                "(#gates + 2i)/#gates, where #gates is the number of gates "
+                "in the compiled circuit, and i is an integer."
             )
 
         # Copy qubit register of original circuit.
@@ -133,7 +168,7 @@ class Folding(Enum):
         for qubit in circ.qubits:
             folded_circuit.add_qubit(qubit)
 
-        for gate in circ.get_commands():
+        for i, gate in enumerate(circ.get_commands()):
             # Barriers are not folded and added as given.
             if gate.op.type == OpType.Barrier:
                 folded_circuit.add_barrier(gate.args)
@@ -143,7 +178,7 @@ class Folding(Enum):
             # 2 qubit gates are folded.
             elif len(gate.qubits) == 2:
                 folded_circuit.add_gate(gate.op, gate.args)
-                for _ in range((noise_scaling-1) // 2):
+                for _ in range(num_folds_dict[i]):
                     folded_circuit.add_barrier(gate.args)
                     folded_circuit.add_gate(gate.op.dagger, gate.args)
                     folded_circuit.add_barrier(gate.args)
