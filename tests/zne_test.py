@@ -537,7 +537,7 @@ def test_two_qubit_gate_folding():
         be, n_folds_1, Folding.two_qubit_gate, _allow_approx_fold=False
     )
     # This tests the case of non integer folding. 5.5 is not possible
-    # as the circuit has 1 case and so only odd integer folding is possible
+    # as the circuit has 1 gate and so only odd integer folding is possible
     task_invalid = digital_folding_task_gen(
         be, 5.5, Folding.two_qubit_gate, _allow_approx_fold=False
     )
@@ -563,7 +563,7 @@ def test_two_qubit_gate_folding():
     circ_box = CircBox(c_1)
     # Tests that circuits with nothing to fold will raise an error.
     c_gate_set_invalid_1 = Circuit(2).add_circbox(circ_box, [0,1])
-    # Tests that circuitss with CircBox will raise an error.
+    # Tests that circuits with CircBox will raise an error.
     c_gate_set_invalid_2 = Circuit(2).add_circbox(circ_box, [0,1]).CZ(0,1)
 
     ac_1 = AnsatzCircuit(c_1, 10000, {})
@@ -618,7 +618,8 @@ def test_two_qubit_gate_folding():
     # n_folds_i - 1 term at the end.
     assert folded_c_1.n_gates == c_1.n_gates + 2 * c_1.n_2qb_gates() * (n_folds_1 - 1)
     assert folded_c_2.n_gates == c_2.n_gates + 2 * c_2.n_2qb_gates() * (n_folds_1 - 1)
-    assert folded_c_3.n_2qb_gates() == 17  # note that this gives an nose scaling = 17/3 = 5.6 which is a little smaller than 5.8
+    # note that this gives an nose scaling = 17/3 = 5.6 which is a little smaller than 5.8
+    assert folded_c_3.n_2qb_gates() == 17 
 
     c_1_unitary = c_1.get_unitary()
     c_2_unitary = c_2.get_unitary()

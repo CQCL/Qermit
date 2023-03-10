@@ -227,12 +227,14 @@ scaled.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.zero_noise_extrapolation.zne.Folding.two_qubit_gate">
-<span class="sig-name descname"><span class="pre">two_qubit_gate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_scaling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Circuit</span></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Folding.two_qubit_gate" title="Permalink to this definition"></a></dt>
-<dd><p>Noise scaling by folding 2 qubit gates. Two qubit gates
-<span class="math notranslate nohighlight">\(G\)</span> are replaced by <span class="math notranslate nohighlight">\(GG^{-1}G...G^{-1}G\)</span> where the number
-of gates in  the sequence is <cite>noise_scaling</cite>. It is implicitly
-assumed that the noise on the 2 qubit gates dominate. Noise can
-only be scaled by odd integer factors.</p>
+<span class="sig-name descname"><span class="pre">two_qubit_gate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_scaling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Circuit</span></span></span><a class="headerlink" href="#qermit.zero_noise_extrapolation.zne.Folding.two_qubit_gate" title="Permalink to this definition"></a></dt>
+<dd><p>Noise scaling by folding 2 qubit gates. It is implicitly
+assumed that the noise on the 2 qubit gates dominate. Two qubit gates
+<span class="math notranslate nohighlight">\(G\)</span> are replaced by <span class="math notranslate nohighlight">\(GG^{-1}G...G^{-1}G\)</span>. If
+<cite>noise_scaling</cite> is of the form (#gates + 2i)/#gates,
+where #gates is the number of gates in the compiled circuit and i is
+an integer, then the noise scaling is exact. It will otherwise be
+as close as possible to but smaller then noise_scaling.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -242,16 +244,22 @@ only be scaled by odd integer factors.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – Raised if the noise scaling factor given is not
-an odd integer.</p></li>
+<li><p><strong>ValueError</strong> – Raised if noise_scaling is less than 1.</p></li>
+<li><p><strong>ValueError</strong> – Raised if the noise cannot be scaled by
+exactly noise_scaling and <cite>_allow_approx_fold</cite> is not True.</p></li>
+<li><p><strong>RuntimeError</strong> – Raised if there are no valid gates to fold.</p></li>
 <li><p><strong>RuntimeError</strong> – Raised if the circuit includes boxes.</p></li>
 </ul>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Circuit with noise scaled.</p>
+<dt class="field-odd">Key _allow_approx_fold<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True or false depending on if
+approximate folding is allowed. Defaults to True.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Circuit</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Circuit with noise scaled.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Circuit</p>
 </dd>
 </dl>
 </dd></dl>
