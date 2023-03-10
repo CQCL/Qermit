@@ -644,3 +644,4 @@ if __name__ == "__main__":
     test_odd_gate_folding()
     test_circuit_folding_TK1()
     test_gen_qubit_relabel_task()
+    test_two_qubit_gate_folding()
