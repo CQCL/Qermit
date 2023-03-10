@@ -1,4 +1,4 @@
-# Copyright 2019-2023 Cambridge Quantum Computing
+# Copyright 2019-2023 Quantinuum
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -932,16 +932,13 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
     np.random.seed(seed=_seed)
 
     for fold in noise_scaling_list:
-
         _label = str(fold) + "FoldMitEx"
-
         _fold_mitres = copy(
             kwargs.get(
                 "experiment_mitres",
                 MitRes(backend),
             )
         )
-
         _fold_mitex = copy(
             kwargs.get(
                 "experiment_mitex",
@@ -949,7 +946,6 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
             )
         )
         _fold_mitex._label = _label + _fold_mitex._label
-
         digital_folding_task = digital_folding_task_gen(
             backend, fold, _folding_type, _allow_approx_fold
         )
