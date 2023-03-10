@@ -78,7 +78,6 @@ class Folding(Enum):
 
         folded_circ = circ.copy()
         for _ in range(noise_scaling // 2):
-
             # Add barrier between circuit and its inverse
             folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
 
@@ -105,11 +104,7 @@ class Folding(Enum):
 
         return folded_circ
 
-    def two_qubit_gate(
-        circ: Circuit,
-        noise_scaling: float,
-        **kwargs
-    ) -> Circuit:
+    def two_qubit_gate(circ: Circuit, noise_scaling: float, **kwargs) -> Circuit:
         """Noise scaling by folding 2 qubit gates. It is implicitly
         assumed that the noise on the 2 qubit gates dominate. Two qubit gates
         :math:`G` are replaced by :math:`GG^{-1}G...G^{-1}G`. If
@@ -137,9 +132,7 @@ class Folding(Enum):
         """
 
         if noise_scaling < 1:
-            raise ValueError(
-                "noise_scaling must be greater than or equal to 1"
-            )
+            raise ValueError("noise_scaling must be greater than or equal to 1")
 
         _allow_approx_fold = kwargs.get("_allow_approx_fold", True)
 
@@ -147,12 +140,12 @@ class Folding(Enum):
         # less than noise_scaling-1. By doing so the noise is scaled by the
         # odd integer less than noise_scaling.
         num_folds_dict = {
-            i:(int(noise_scaling-1)//2)
-            for i, cmd in enumerate(circ.get_commands()) 
+            i: (int(noise_scaling - 1) // 2)
+            for i, cmd in enumerate(circ.get_commands())
             if (
-                not (cmd.op.type == OpType.Barrier) and
-                not (cmd.op.type in box_types) and
-                len(cmd.qubits) == 2
+                not (cmd.op.type == OpType.Barrier)
+                and not (cmd.op.type in box_types)
+                and len(cmd.qubits) == 2
             )
         }
 
@@ -167,23 +160,21 @@ class Folding(Enum):
         # to scale. fold_frac gives the fraction of gates which need to be
         # folded to achieve noise_scaling. The appropriate fraction of
         # gates is then randomly selected.
-        fold_frac = ((noise_scaling-1)%2)/2
+        fold_frac = ((noise_scaling - 1) % 2) / 2
         to_fold = np.random.choice(
-            list(num_folds_dict.keys()), 
+            list(num_folds_dict.keys()),
             size=int(len(num_folds_dict.keys()) * fold_frac),
             replace=False,
         )
         for i in to_fold:
             num_folds_dict[i] += 1
 
-        true_noise_scaling = float(
-            sum(2*i + 1 for i in num_folds_dict.values())
-        )
+        true_noise_scaling = float(sum(2 * i + 1 for i in num_folds_dict.values()))
         true_noise_scaling /= len(num_folds_dict)
 
         if not (
-            _allow_approx_fold or 
-            math.isclose(noise_scaling, true_noise_scaling, abs_tol=0.001)
+            _allow_approx_fold
+            or math.isclose(noise_scaling, true_noise_scaling, abs_tol=0.001)
         ):
             raise ValueError(
                 "The noise cannot be scaled by the amount inputted."
@@ -285,7 +276,6 @@ class Folding(Enum):
         folded_command_list = []
         # For each command, fold the appropriate number of times.
         for command_index in num_folds:
-
             command = c_dict["commands"][command_index]
             command_circ_dict.update({"commands": [command]})
             command_circ = Circuit().from_dict(command_circ_dict)
@@ -352,11 +342,9 @@ class Folding(Enum):
         }
 
         for command in c_dict["commands"]:
-
             # Barriers are added to the circuit but otherwise effectively
             # skipped.
             if command["op"]["type"] == "Barrier":
-
                 folded_command_list.append(command)
 
             elif fold:
@@ -460,7 +448,6 @@ class Fit(Enum):
 
         # Plot fitted function and data
         if _show_fit:
-
             fit_x = np.linspace(0, max(x), 100)
             fit_y = [cube_root_func(i, *vals[0]) for i in fit_x]
 
@@ -523,7 +510,6 @@ class Fit(Enum):
 
         # Plot data and fitted function
         if _show_fit:
-
             fit_x = np.linspace(0, max(x), 100)
             fit_y = [poly_exp_func(i, *vals[0]) for i in fit_x]
 
@@ -585,7 +571,6 @@ class Fit(Enum):
 
         # Plot data and fitted function
         if _show_fit:
-
             linspace = fit.linspace()
             fit_x = linspace[0]
             fit_y = linspace[1]
@@ -708,7 +693,6 @@ def digital_folding_task_gen(
         # For each circuit in the input wire, extract the circuit, apply the fold,
         # and perform the necessary compilation.
         for experiment in mitex_wire:
-
             # Apply the necessary folding method
             zne_circ = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold)  # type: ignore
 
@@ -782,7 +766,6 @@ def extrapolation_task_gen(
         # The list of expectations for each experiment is now used to
         # extrapolate to the ideal value
         for qpo_list_float in all_fold_qpo_list_floats:
-
             extrapolated.append(
                 QubitPauliOperator(
                     {
@@ -931,7 +914,6 @@ def gen_initial_compilation_task(
         mapped_wire = []
 
         for obs_exp in wire:
-
             # Perform default compilation, tracking to which physical
             # qubits the initial qubits are mapped
             compiled_circ = obs_exp.AnsatzCircuit.Circuit.copy()
@@ -1046,7 +1028,6 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
     np.random.seed(seed=_seed)
 
     for fold in noise_scaling_list:
-
         _label = str(fold) + "FoldMitEx"
 
         _fold_mitres = copy(
