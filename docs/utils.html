@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>qermit.utils &mdash; Qermit 0.2.0 documentation</title>
@@ -11,10 +11,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,14 +27,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Qermit
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Qermit
           </a>
               <div class="version">
                 0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -115,7 +117,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">qermit.utils</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/utils.rst.txt" rel="nofollow"> View page source</a>
@@ -162,10 +164,10 @@ symbols.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.add_symbol">
-<span class="sig-name descname"><span class="pre">add_symbol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Symbol</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.add_symbol" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">add_symbol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.add_symbol" title="Permalink to this definition"></a></dt>
 <dd><p>Adds any passed Symbol (in string form or sympy Symbol type) as a key to dictionary with None value assigned.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>symbol</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Symbol</em><em>]</em>) – Symbol to be added to self._symbolic_map</p>
 </dd>
 </dl>
@@ -176,7 +178,7 @@ symbols.</p>
 <span class="sig-name descname"><span class="pre">add_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.add_value" title="Permalink to this definition"></a></dt>
 <dd><p>Assigns value to self._symbolic_map[symbol]. If symbol not in object then throws an error.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>symbol</strong> (<em>Symbol</em>) – Symbol to have value assigned.</p></li>
 <li><p><strong>value</strong> (<em>float</em>) – Value to assign to symbol.</p></li>
@@ -191,13 +193,13 @@ symbols.</p>
 <dd><p>Assigns given values in parameters to keys in self._symbolic_map in order, for a new
 dictionary object. Returns just this dictionary type.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>symbol_values</strong> (<em>ndarray</em>) – Ordered values to match to ordered keys for new dict object.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>New dict object mapping symbol to value.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Dict[Symbol, float]</p>
 </dd>
 </dl>
@@ -209,13 +211,13 @@ dictionary object. Returns just this dictionary type.</p>
 <dd><p>Assigns given values in parameters to keys in self._symbolic_map in order, for a new
 dictionary object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>symbol_values</strong> (<em>ndarray</em>) – Orderd values to match to ordered keys for new dict object.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>New dict object mapping symbol to value.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Dict[Symbol, float]</p>
 </dd>
 </dl>
@@ -227,7 +229,7 @@ dictionary object.</p>
 <dd><p>Given a pytket Circuit, returns a SymbolsDict object capturing
 given circuits free symbols.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>circuit</strong> (<em>Circuit</em>) – Pytket circuit with potential symbols.</p>
 </dd>
 </dl>
@@ -235,11 +237,11 @@ given circuits free symbols.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.symbols_from_dict">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">symbols_from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Symbol</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">SymbolsDict</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_from_dict" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">symbols_from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Symbol</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">SymbolsDict</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Assigns to mit_symbols attribute _symbolic_map straight from passed dictionary
 of Symbol to None/float.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>symbol_dict</strong> (<em>Dict</em><em>[</em><em>Symbol</em><em>, </em><em>Union</em><em>[</em><em>None</em><em>, </em><em>float</em><em>]</em>) – Dictionary from Circuit symbolics to values.</p>
 </dd>
 </dl>
@@ -247,10 +249,10 @@ of Symbol to None/float.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.utils.SymbolsDict.symbols_from_list">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">symbols_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbols_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Symbol</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">SymbolsDict</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_from_list" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">symbols_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbols_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Symbol</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">SymbolsDict</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_from_list" title="Permalink to this definition"></a></dt>
 <dd><p>Adds all symbols (or string representing Symbol) as dict entries with no value.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>symbols_list</strong> (<em>Iterable</em><em>[</em><em>Union</em><em>[</em><em>Symbol</em><em>, </em><em>str</em><em>]</em>) – A list of strings representing Symbols or Symbols.</p>
 </dd>
 </dl>
@@ -261,10 +263,10 @@ of Symbol to None/float.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">symbols_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Symbol</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#qermit.taskgraph.utils.SymbolsDict.symbols_list" title="Permalink to this definition"></a></dt>
 <dd><p>Returns all symbols held in dictionary of symbols in SymbolsDict object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Iterable containing all keys from _symbolic_map, i.e. all Symbols</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Iterable[Symbol]</p>
 </dd>
 </dl>
@@ -274,15 +276,15 @@ of Symbol to None/float.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="qermit.taskgraph.utils.MeasurementCircuit">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qermit.taskgraph.utils.</span></span><span class="sig-name descname"><span class="pre">MeasurementCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbolic_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">SymbolsDict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qermit.taskgraph.utils.</span></span><span class="sig-name descname"><span class="pre">MeasurementCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbolic_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">SymbolsDict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit" title="Permalink to this definition"></a></dt>
 <dd><p>Stores a single measurement circuit that captures one or multiple observable estimations
 for some Ansatz Circuit.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.taskgraph.utils.MeasurementCircuit.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbolic_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">SymbolsDict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbolic_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><span class="pre">SymbolsDict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.__init__" title="Permalink to this definition"></a></dt>
 <dd><p>Stores information required to instantiate any MeasurementCircuit with parameterised symbols.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>symbolic_circuit</strong> (<em>Circuit</em>) – Measurement circuit, may or may not have symbolics.</p></li>
 <li><p><strong>symbols</strong> (<a class="reference internal" href="#qermit.taskgraph.utils.SymbolsDict" title="qermit.taskgraph.utils.SymbolsDict"><em>SymbolsDict</em></a>) – SymbolsDict object holding symbols and values for all symbols in Circuit. Default none if circuit not symbolic.</p></li>
@@ -302,10 +304,10 @@ for some Ansatz Circuit.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">circuit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Circuit</span></em><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.circuit" title="Permalink to this definition"></a></dt>
 <dd><p>Returns measurement circuit stored in oracle.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Circuit in oracle</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Circuit</p>
 </dd>
 </dl>
@@ -316,10 +318,10 @@ for some Ansatz Circuit.</p>
 <span class="sig-name descname"><span class="pre">get_parametric_circuit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Circuit</span></span></span><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.get_parametric_circuit" title="Permalink to this definition"></a></dt>
 <dd><p>Substitutes parameters held in SymbolDict into copy of circuit and returns.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Substituted circuit</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Circuit</p>
 </dd>
 </dl>
@@ -330,10 +332,10 @@ for some Ansatz Circuit.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">symbols</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Symbol</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#qermit.taskgraph.utils.MeasurementCircuit.symbols" title="Permalink to this definition"></a></dt>
 <dd><p>Converts symbols_list property held in SymbolsDict to a tuple and returns it.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>All Symbols in object</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Tuple[List[Symbol]]</p>
 </dd>
 </dl>
@@ -353,7 +355,7 @@ QubitPauliString in a given QubitPauliOperator.</p>
 and the qubits measured to get expectation, along with an empty list for storing measurement circuits and
 a list for storing partitions.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>qubit_pauli_operator</strong> – QubitPauliOperator for which given ObservableTracker is expected
 to retain measurement circuits all QubitPauliString keys for before any Backend execution.</p>
 </dd>
@@ -384,7 +386,7 @@ to retain measurement circuits all QubitPauliString keys for before any Backend 
 <dd><p>Adds given measurement circuit to stored _measurement_circuits attribute and for each qubit pauli string and qubits in associated
 strings, updates dictionary between string and its measurement circuit + bit to measure and whether result should be inverted.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>circuit</strong> (<a class="reference internal" href="#qermit.taskgraph.utils.MeasurementCircuit" title="qermit.taskgraph.utils.MeasurementCircuit"><em>MeasurementCircuit</em></a>) – Measurement circuit to run to get results.</p></li>
 <li><p><strong>measurement_info</strong> (<em>List</em><em>[</em><em>MeasurementInfo</em><em>] </em><em>i.e. List</em><em>[</em><em>Tuple</em><em>[</em><em>QubitPauliString</em><em>, </em><em>List</em><em>[</em><em>Bit</em><em>]</em><em>, </em><em>bool</em><em>]</em><em>]</em>) – Each entry contains a QubitPauliString, the bits required to take expectation over in resulting result
@@ -399,13 +401,13 @@ and a bool signifying whether expectation should be inverted when taking result.
 <span class="sig-name descname"><span class="pre">check_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QubitPauliString</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.check_string" title="Permalink to this definition"></a></dt>
 <dd><p>Returns true if given QubitPauliString has a measurement circuit stored in self._measurement_circuits.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>string</strong> (<em>QubitPauliString</em>) – Operator measurement circuit existence being checked for.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if string has measurement circuit, false if not.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
@@ -422,7 +424,7 @@ and a bool signifying whether expectation should be inverted when taking result.
 <span class="sig-name descname"><span class="pre">extend_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_operator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QubitPauliOperator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.extend_operator" title="Permalink to this definition"></a></dt>
 <dd><p>Extends self._qubit_pauli_operator to include tuples in passed operator.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>new_operator</strong> (<em>QubitPauliOperator</em>) – Each QubitPauliString and coefficient added to held operator.</p>
 </dd>
 </dl>
@@ -433,10 +435,10 @@ and a bool signifying whether expectation should be inverted when taking result.
 <span class="sig-name descname"><span class="pre">from_ObservableTracker</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qermit.taskgraph.utils.ObservableTracker" title="qermit.taskgraph.utils.ObservableTracker"><span class="pre">ObservableTracker</span></a></span></span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.from_ObservableTracker" title="Permalink to this definition"></a></dt>
 <dd><p>Copies each class attribute from to_copy to self. Returns self.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>to_copy</strong> (<em>'ObservableTracker'</em>) – An alternative ObservableTracker for making a copy of.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>New ObservableTracker object</p>
 </dd>
 </dl>
@@ -447,10 +449,10 @@ and a bool signifying whether expectation should be inverted when taking result.
 <span class="sig-name descname"><span class="pre">get_empty_strings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">QubitPauliString</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.get_empty_strings" title="Permalink to this definition"></a></dt>
 <dd><p>Returns all strings in operator that don’t have some assigned MeasurementCircuit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Strings that require some MeasurementCircuit to be set</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>List[QubitPauliString]</p>
 </dd>
 </dl>
@@ -462,13 +464,13 @@ and a bool signifying whether expectation should be inverted when taking result.
 <dd><p>For given list of results, returns a QubitPauliOperator giving an expectation for each QubitPauliString
 held in self._qps_to_indices. Expectation derived by taking parity of counts.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>results</strong> – Result objects to derive counts and then an expectation from.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Expectation for each QubitPauliString in self._qps_to_indices</p>
 </dd>
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>QubitPauliOperator</p>
 </dd>
 </dl>
@@ -479,13 +481,13 @@ held in self._qps_to_indices. Expectation derived by taking parity of counts.</p
 <span class="sig-name descname"><span class="pre">get_measurement_circuits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QubitPauliString</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qermit.taskgraph.utils.MeasurementCircuit" title="qermit.taskgraph.utils.MeasurementCircuit"><span class="pre">MeasurementCircuit</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.get_measurement_circuits" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the measurements required to be run for a single QubitPauliString’s expectation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>string</strong> (<em>QubitPauliString</em>) – QubitPauliString of interest.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Measurement Circuit run to find expection of QubitPauliString for some undefined ansatz circuit.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#qermit.taskgraph.utils.MeasurementCircuit" title="qermit.taskgraph.utils.MeasurementCircuit">MeasurementCircuit</a></p>
 </dd>
 </dl>
@@ -496,10 +498,10 @@ held in self._qps_to_indices. Expectation derived by taking parity of counts.</p
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurement_circuits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qermit.taskgraph.utils.MeasurementCircuit" title="qermit.taskgraph.utils.MeasurementCircuit"><span class="pre">MeasurementCircuit</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.measurement_circuits" title="Permalink to this definition"></a></dt>
 <dd><p>Returns all measurement circuits aded to ObservableTracker via get_measurement_circuit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>All measurement circuits held in ObservableTracker self._measurement_circuits attirbute.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>List[<a class="reference internal" href="#qermit.taskgraph.utils.MeasurementCircuit" title="qermit.taskgraph.utils.MeasurementCircuit">MeasurementCircuit</a>]</p>
 </dd>
 </dl>
@@ -511,7 +513,7 @@ held in self._qps_to_indices. Expectation derived by taking parity of counts.</p
 <dd><p>Updates coefficients in held QubitPauliOperator with new coefficients. Each QubitPauliString
 must already be in self._qubit_pauli_operator</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>new_coefficients</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>QubitPauliString</em><em>, </em><em>float</em><em>]</em><em>]</em>) – Each Tuple contains a QubitPauliString a new coefficient.</p>
 </dd>
 </dl>
@@ -522,10 +524,10 @@ must already be in self._qubit_pauli_operator</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">qubit_pauli_operator</span></span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.qubit_pauli_operator" title="Permalink to this definition"></a></dt>
 <dd><p>Returns stored qubit pauli operator</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>QubitPauliOperator object stored in class</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>QubitPauliOperator</p>
 </dd>
 </dl>
@@ -536,7 +538,7 @@ must already be in self._qubit_pauli_operator</p>
 <span class="sig-name descname"><span class="pre">remove_strings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">QubitPauliString</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qermit.taskgraph.utils.ObservableTracker.remove_strings" title="Permalink to this definition"></a></dt>
 <dd><p>Removes passed qubit pauli strings from held QubitPauliOperator and dict from string to index.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>strings</strong> (<em>List</em><em>[</em><em>QubitPauliString</em><em>]</em>) – Qubit Pauli Strings no longer required to be measured by ObservableTracker</p>
 </dd>
 </dl>

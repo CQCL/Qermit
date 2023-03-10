@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>qermit.spam &mdash; Qermit 0.2.0 documentation</title>
@@ -11,10 +11,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,14 +27,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Qermit
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Qermit
           </a>
               <div class="version">
                 0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -79,7 +81,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">qermit.spam</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/spam.rst.txt" rel="nofollow"> View page source</a>
@@ -99,7 +101,7 @@
 correlated device nodes specified by correlations. Requires 2^n circuits
 to fully characterise, where n is the size of the largest sublist of correlated nodes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>backend</strong> (<em>Backend</em>) – Default Backend characterisation and experiment are executed on.</p></li>
 <li><p><strong>calibration_shots</strong> (<em>int</em>) – Number of shots required for each characterisation circuit</p></li>
@@ -115,7 +117,7 @@ to fully characterise, where n is the size of the largest sublist of correlated 
 <dd><p>Produces a MitRes object for performing SPAM correction with no correlated nodes.
 Requires 2 circuits to characterise device.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>backend</strong> (<em>Backend</em>) – Default Backend characterisation and experiment are executed on.</p></li>
 <li><p><strong>calibration_shots</strong> (<em>int</em>) – Number of shots required for each characterisation circuit</p></li>
@@ -129,7 +131,7 @@ Requires 2 circuits to characterise device.</p>
 <span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_full_tomography_spam_circuits_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit_subsets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Qubit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_circuits_task" title="Permalink to this definition"></a></dt>
 <dd><p>Generate MitTask for calibration circuits according to the specified correlation and given backend.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>backend</strong> (<em>Backend</em>) – Backend on which the experiments are run.</p></li>
 <li><p><strong>qubit_subsets</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>Qubit</em><em>]</em><em>]</em>) – A list of lists of correlated Nodes of a <cite>Device</cite>.
@@ -140,11 +142,11 @@ backend’s associated <cite>Device</cite>.</p></li>
 <li><p><strong>shots</strong> – An int corresponding to the number of shots of each calibration circuit required.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A MitTask object, requiring 1 List[CircuitShots] wire and returning (List[CircuitShots], List[StateInfo])
 corresponding to Calibration Circuits and corresponding states.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
 </dd>
 </dl>
@@ -152,32 +154,25 @@ corresponding to Calibration Circuits and corresponding states.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.spam.full_spam_correction.gen_full_tomography_spam_characterisation_task">
-<span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_full_tomography_spam_characterisation_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit_subsets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Qubit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_characterisation_task" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_full_tomography_spam_characterisation_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_characterisation_task" title="Permalink to this definition"></a></dt>
 <dd><p>Uses results from device for characterisation circuits to characterise transition matrices
 for different qubit subsets and stores them in backend.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> (<em>Backend</em>) – Backend for storing characterisations in.</p></li>
-<li><p><strong>qubit_subsets</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>Qubit</em><em>]</em><em>]</em>) – Subsets of qubits in backend corresponding to different correlated subsets.</p></li>
-</ul>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>qubit_subsets</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>Qubit</em><em>]</em><em>]</em>) – Subsets of qubits in backend corresponding to different correlated subsets.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qermit.spam.full_spam_correction.gen_full_tomography_spam_correction_task">
-<span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_full_tomography_spam_correction_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corr_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CorrectionMethod</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_correction_task" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">full_spam_correction.</span></span><span class="sig-name descname"><span class="pre">gen_full_tomography_spam_correction_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.spam.full_spam_correction.gen_full_tomography_spam_correction_task" title="Permalink to this definition"></a></dt>
 <dd><p>Uses characterisation result held in backend to correct for SPAM noise in passed
 BackendResult objects. Method used to invert SPAM characteriastion matrices
 and correct results given by CorrectionMethod enum.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> (<em>Backend</em>) – Device Backend holding SPAM characterisation.</p></li>
-<li><p><strong>corr_method</strong> (<em>CorrectionMethod</em>) – Method used to invert matrices and correct results.</p></li>
-<li><p><strong>characterised</strong> (<em>bool</em>) – bool passed from characterisation task confirming characterisation is complete.</p></li>
-</ul>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>corr_method</strong> (<em>CorrectionMethod</em>) – Method used to invert matrices and correct results.</p>
 </dd>
 </dl>
 </dd></dl>

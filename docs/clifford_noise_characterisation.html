@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>qermit.clifford_noise_characterisation &mdash; Qermit 0.2.0 documentation</title>
@@ -11,10 +11,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,14 +27,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Qermit
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Qermit
           </a>
               <div class="version">
                 0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -86,7 +88,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">qermit.clifford_noise_characterisation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/clifford_noise_characterisation.rst.txt" rel="nofollow"> View page source</a>
@@ -106,7 +108,7 @@
 mitigation methods when calculating expectation values of observables. Implementation as
 in arXiv:2005.10189.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>device_backend</strong> (<em>Backend</em>) – Backend object device experiments are default run through.</p></li>
 <li><p><strong>simulator_backend</strong> (<em>Backend</em>) – Backend object simulated characterisation experiments are
@@ -118,36 +120,36 @@ each time a new state circuit is generated.</p></li>
 <li><p><strong>total_state_circuits</strong> (<em>int</em>) – Total number of state circuits produced for characterisation.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Key states_simulator_mitex</dt>
+<dt class="field-even">Key states_simulator_mitex<span class="colon">:</span></dt>
 <dd class="field-even"><p>MitEx object noiseless characterisation simulations are executed on, default
 simulator_backend with basic compilation of circuit.</p>
 </dd>
-<dt class="field-odd">Key states_device_mitex</dt>
+<dt class="field-odd">Key states_device_mitex<span class="colon">:</span></dt>
 <dd class="field-odd"><p>MitEx object noisy characterisation circuit are executed on, default
 device_backend with basic compilation of circuit.</p>
 </dd>
-<dt class="field-even">Key experiment_mitex</dt>
+<dt class="field-even">Key experiment_mitex<span class="colon">:</span></dt>
 <dd class="field-even"><p>MitEx object that actual experiment circuits are executed on, default
 backend with some compilation of circuit.</p>
 </dd>
-<dt class="field-odd">Key model</dt>
+<dt class="field-odd">Key model<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Model characterised by state circuits, default _PolyCDRCorrect(1) (see cdr_post.py for other options).</p>
 </dd>
-<dt class="field-even">Key likelihood_function</dt>
+<dt class="field-even">Key likelihood_function<span class="colon">:</span></dt>
 <dd class="field-even"><p>LikelihoodFunction used to filter state circuit results, given by a LikelihoodFunction Enum,
 default set to none.</p>
 </dd>
-<dt class="field-odd">Key tolerance</dt>
+<dt class="field-odd">Key tolerance<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Model can be perturbed when calibration circuits have by
 exact expectation values too close to each other. This parameter
 sets a distance between exact expectation values which at least some
 calibration circuits should have.</p>
 </dd>
-<dt class="field-even">Key distance_tolerance</dt>
+<dt class="field-even">Key distance_tolerance<span class="colon">:</span></dt>
 <dd class="field-even"><p>The absolute tolerance on the distance between
 expectation values of the calibration and original circuit.</p>
 </dd>
-<dt class="field-odd">Key calibration_fraction</dt>
+<dt class="field-odd">Key calibration_fraction<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The upper bound on the fraction of calibration
 circuits which have noisy expectation values far from that of the
 original circuit.</p>
@@ -164,16 +166,16 @@ original circuit.</p>
 <span class="sig-name descname"><span class="pre">none</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qpo_noisy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QubitPauliOperator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qpo_exact</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QubitPauliOperator</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qermit.clifford_noise_characterisation.ccl.LikelihoodFunction.none" title="Permalink to this definition"></a></dt>
 <dd><p>Returns probability 1 of accepting returned results.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>qpo_noisy</strong> (<em>QubitPauliOperators</em>) – Results calculated from device of choice.</p></li>
 <li><p><strong>qpo_exact</strong> (<em>QubitPauliOperator</em>) – Results calculated from noiseless simulator of choice.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Always 1, meaning any result is accepted.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -186,19 +188,19 @@ original circuit.</p>
 <span class="sig-prename descclassname"><span class="pre">dfsc.</span></span><span class="sig-name descname"><span class="pre">gen_DFSC_MitEx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx"><span class="pre">MitEx</span></a></span></span><a class="headerlink" href="#qermit.clifford_noise_characterisation.dfsc.gen_DFSC_MitEx" title="Permalink to this definition"></a></dt>
 <dd><p>Produces a MitEx object that applies DFSC characterisation to all experiment results.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>backend</strong> (<em>Backend</em>) – Backend experiments are run through.</p>
 </dd>
-<dt class="field-even">Key experiment_mitex</dt>
+<dt class="field-even">Key experiment_mitex<span class="colon">:</span></dt>
 <dd class="field-even"><p>MitEx object observable experiments are run through</p>
 </dd>
-<dt class="field-odd">Key characterisation_mitex</dt>
+<dt class="field-odd">Key characterisation_mitex<span class="colon">:</span></dt>
 <dd class="field-odd"><p>MitEX object characteriastion experiments are run through.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>MitEx object for automatic DFSC correction of circuits.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx" title="qermit.taskgraph.mitex.MitEx">MitEx</a></p>
 </dd>
 </dl>
@@ -212,7 +214,7 @@ for each experiment prepares a set of state circuits for Clifford Circuit Learni
 The original experiment is returned on the first wire, state circuits for running on backend on second wire,
 and state circuits for noiseless simulation on the third wire.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_non_cliffords</strong> (<em>int</em>) – Number of remaining non-Clifford gates in generated State Circuits.</p></li>
 <li><p><strong>n_pairs</strong> – Parameter used for guiding properties of State Circuits generated.</p></li>
@@ -228,10 +230,10 @@ list of calibrations circuit with significantly different expectation
 values, before resorting to a list with similar expectation values.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>MitTask object for preparing and returning state circuits for characterisation.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
 </dd>
 </dl>
@@ -244,15 +246,15 @@ values, before resorting to a list with similar expectation values.</p></li>
 from state circuits for that experiments CCL calibration and then returns results for a single
 calibration in a single list.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>n_state_circuits</strong> (<em>int</em>) – Number of state circuits initially prepared for each
 experiment characterisation.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>MitTask object that organises QubitPauliOperator objects required for
 characterisation.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>MitTask.</p>
 </dd>
 </dl>
@@ -262,18 +264,18 @@ characterisation.</p>
 <dt class="sig sig-object py" id="qermit.clifford_noise_characterisation.ccl.ccl_likelihood_filtering_task_gen">
 <span class="sig-prename descclassname"><span class="pre">ccl.</span></span><span class="sig-name descname"><span class="pre">ccl_likelihood_filtering_task_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask"><span class="pre">MitTask</span></a></span></span><a class="headerlink" href="#qermit.clifford_noise_characterisation.ccl.ccl_likelihood_filtering_task_gen" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>likelihood_function</strong> (<a class="reference internal" href="#qermit.clifford_noise_characterisation.ccl.LikelihoodFunction" title="qermit.clifford_noise_characterisation.ccl.LikelihoodFunction"><em>LikelihoodFunction</em></a>) – LikelihoodFunction enum used to accept or reject some pair of noisy and noiseless expectation.
 Function must take two QubitPauliOperator as parameter, and return a single float between 0 and 1 as answer.</p>
 </dd>
-<dt class="field-even">Key seed</dt>
+<dt class="field-even">Key seed<span class="colon">:</span></dt>
 <dd class="field-even"><p>Seed value for sampling probability for likelihood function</p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>MitTask object that removes some characterisation results under some
 condition set by the likelihood_function option.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
 </dd>
 </dl>
@@ -287,10 +289,10 @@ If any non symbolic gates are non Clifford, an error is thrown.
 For each Clifford ansatz circuit, a new ObservableTracke is forme with new measurement circuits
 added for each Qubit Pauli String in the operator.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>MitTask object that produces characterisation circuits for DFSC on a new wire as new experiments</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
 </dd>
 </dl>
@@ -306,12 +308,12 @@ This task unpackages these Lists into a single List as suitable for input to Mit
 It also stores information required to produce characterisation from resulting QubitPauliOperators out of
 MitEx object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>MitTask object that collates many BackendResult objects for a single
 frame randomisation instance and converts them into a single
 BackendResult object.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
 </dd>
 </dl>
@@ -323,10 +325,10 @@ BackendResult object.</p>
 <dd><p>Given characterisation results for all experiments, Clifford circuits and QubitPauliStrings, produces
 a characterisation result for each Experiment.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>MitTask object for organising and calculating characterisation.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
 </dd>
 </dl>
@@ -338,13 +340,13 @@ a characterisation result for each Experiment.</p>
 <dd><p>For each experiment expectation, if characterisation value greater than threshold, divide experiment expectation
 by characteriastion value to correct for depolaring noise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>zero_threshold</strong> (<em>float</em>) – Method does not correct for zero characteriastion expectation values, threshold for this zero limit.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Function for DFSC correctoin.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask" title="qermit.taskgraph.mittask.MitTask">MitTask</a></p>
 </dd>
 </dl>
