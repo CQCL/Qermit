@@ -33,6 +33,7 @@ from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial  # type: ignore
 from pytket.circuit import Node  # type: ignore
+from math import isclose
 
 
 box_types = {
@@ -77,7 +78,6 @@ class Folding(Enum):
 
         folded_circ = circ.copy()
         for _ in range(noise_scaling // 2):
-
             # Add barrier between circuit and its inverse
             folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
 
@@ -103,6 +103,111 @@ class Folding(Enum):
                     folded_circ.add_gate(gate.op, gate.args)
 
         return folded_circ
+
+    def two_qubit_gate(circ: Circuit, noise_scaling: float, **kwargs) -> Circuit:
+        """Noise scaling by folding 2 qubit gates. It is implicitly
+        assumed that the noise on the 2 qubit gates dominate. Two qubit gates
+        :math:`G` are replaced by :math:`GG^{-1}G...G^{-1}G`. If
+        `noise_scaling` is of the form (#gates + 2i)/#gates,
+        where #gates is the number of gates in the compiled circuit and i is
+        an integer, then the noise scaling is exact. It will otherwise be
+        as close as possible to but smaller then noise_scaling.
+
+        :param circ: Original circuit to be folded.
+        :type circ: Circuit
+        :param noise_scaling: Factor by which the noise should be scaled.
+        :type noise_scaling: int
+
+        :raises ValueError: Raised if noise_scaling is less than 1.
+        :raises ValueError: Raised if the noise cannot be scaled by
+            exactly noise_scaling and `_allow_approx_fold` is not True.
+        :raises RuntimeError: Raised if there are no valid gates to fold.
+        :raises RuntimeError: Raised if the circuit includes boxes.
+
+        :key _allow_approx_fold: True or false depending on if
+            approximate folding is allowed. Defaults to True.
+
+        :return: Circuit with noise scaled.
+        :rtype: Circuit
+        """
+
+        if noise_scaling < 1:
+            raise ValueError("noise_scaling must be greater than or equal to 1")
+
+        _allow_approx_fold = kwargs.get("_allow_approx_fold", True)
+
+        # All gates will be folded by an amount equal to the even number
+        # less than noise_scaling-1. By doing so the noise is scaled by the
+        # odd integer less than noise_scaling.
+        num_folds_dict = {
+            i: (int(noise_scaling - 1) // 2)
+            for i, cmd in enumerate(circ.get_commands())
+            if (
+                not (cmd.op.type == OpType.Barrier)
+                and not (cmd.op.type in box_types)
+                and len(cmd.qubits) == 2
+            )
+        }
+
+        if len(num_folds_dict) == 0:
+            raise RuntimeError(
+                "There are no valid q qubits gates in this circuit to fold. "
+                "Your circuit should include 2 qubit gates other than "
+                "Barrier and CircBox."
+            )
+
+        # The remaining noise scaling is achieved by randomly selecting gates
+        # to scale. fold_frac gives the fraction of gates which need to be
+        # folded to achieve noise_scaling. The appropriate fraction of
+        # gates is then randomly selected.
+        fold_frac = ((noise_scaling - 1) % 2) / 2
+        to_fold = np.random.choice(
+            list(num_folds_dict.keys()),
+            size=int(len(num_folds_dict.keys()) * fold_frac),
+            replace=False,
+        )
+        for i in to_fold:
+            num_folds_dict[i] += 1
+
+        true_noise_scaling = float(sum(2 * i + 1 for i in num_folds_dict.values()))
+        true_noise_scaling /= len(num_folds_dict)
+
+        if not (
+            _allow_approx_fold
+            or isclose(noise_scaling, true_noise_scaling, abs_tol=0.001)
+        ):
+            raise ValueError(
+                "The noise cannot be scaled by the amount inputted."
+                "The noise must be scaled by a factor of the form "
+                "(#gates + 2i)/#gates, where #gates is the number of gates "
+                "in the compiled circuit, and i is an integer."
+            )
+
+        # Copy qubit register of original circuit.
+        folded_circuit = Circuit()
+        for qubit in circ.qubits:
+            folded_circuit.add_qubit(qubit)
+
+        for i, gate in enumerate(circ.get_commands()):
+            # Barriers are not folded and added as given.
+            if gate.op.type == OpType.Barrier:
+                folded_circuit.add_barrier(gate.args)
+            # Boxes are not supported.
+            elif gate.op.type in box_types:
+                raise RuntimeError("Box types not supported when folding.")
+            # 2 qubit gates are folded.
+            elif len(gate.qubits) == 2:
+                folded_circuit.add_gate(gate.op, gate.args)
+                for _ in range(num_folds_dict[i]):
+                    folded_circuit.add_barrier(gate.args)
+                    folded_circuit.add_gate(gate.op.dagger, gate.args)
+                    folded_circuit.add_barrier(gate.args)
+                    folded_circuit.add_gate(gate.op, gate.args)
+            # All other gates are added as given.
+            else:
+                folded_circuit.add_gate(gate.op, gate.args)
+
+        return folded_circuit
 
     def gate(circ: Circuit, noise_scaling: float, **kwargs) -> Circuit:
         """Noise scaling by gate folding. In this case gates :math:`G` are replaced at random
@@ -171,7 +276,6 @@ class Folding(Enum):
         folded_command_list = []
         # For each command, fold the appropriate number of times.
         for command_index in num_folds:
-
             command = c_dict["commands"][command_index]
             command_circ_dict.update({"commands": [command]})
             command_circ = Circuit().from_dict(command_circ_dict)
@@ -238,11 +342,9 @@ class Folding(Enum):
         }
 
         for command in c_dict["commands"]:
-
             # Barriers are added to the circuit but otherwise effectively
             # skipped.
             if command["op"]["type"] == "Barrier":
-
                 folded_command_list.append(command)
 
             elif fold:
@@ -346,7 +448,6 @@ class Fit(Enum):
 
         # Plot fitted function and data
         if _show_fit:
-
             fit_x = np.linspace(0, max(x), 100)
             fit_y = [cube_root_func(i, *vals[0]) for i in fit_x]
 
@@ -409,7 +510,6 @@ class Fit(Enum):
 
         # Plot data and fitted function
         if _show_fit:
-
             fit_x = np.linspace(0, max(x), 100)
             fit_y = [poly_exp_func(i, *vals[0]) for i in fit_x]
 
@@ -471,7 +571,6 @@ class Fit(Enum):
 
         # Plot data and fitted function
         if _show_fit:
-
             linspace = fit.linspace()
             fit_x = linspace[0]
             fit_y = linspace[1]
@@ -594,7 +693,6 @@ def digital_folding_task_gen(
         # For each circuit in the input wire, extract the circuit, apply the fold,
         # and perform the necessary compilation.
         for experiment in mitex_wire:
-
             # Apply the necessary folding method
             zne_circ = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold)  # type: ignore
 
@@ -668,7 +766,6 @@ def extrapolation_task_gen(
         # The list of expectations for each experiment is now used to
         # extrapolate to the ideal value
         for qpo_list_float in all_fold_qpo_list_floats:
-
             extrapolated.append(
                 QubitPauliOperator(
                     {
@@ -817,7 +914,6 @@ def gen_initial_compilation_task(
         mapped_wire = []
 
         for obs_exp in wire:
-
             # Perform default compilation, tracking to which physical
             # qubits the initial qubits are mapped
             compiled_circ = obs_exp.AnsatzCircuit.Circuit.copy()
