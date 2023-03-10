@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Cambridge Quantum Computing
+# Copyright 2019-2023 Quantinuum
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,6 +89,7 @@ class MitTask:
         self._n_out_wires = _n_out_wires
         if _method:
             self.run = MethodType(_method, self)
+        self.characterisation: dict = {}
 
     @property
     def label(self) -> str:

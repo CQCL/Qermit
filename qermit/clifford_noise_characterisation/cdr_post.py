@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Cambridge Quantum Computing
+# Copyright 2019-2023 Quantinuum
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ from abc import ABC, abstractmethod
 from typing import List, Tuple, cast, Dict, Union
 
 import numpy as np  #  type: ignore
-from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator
 from pytket.pauli import QubitPauliString  # type: ignore
 from qermit import MitTask
@@ -151,7 +150,6 @@ def cdr_quality_check_task_gen(
 
 
 def cdr_calibration_task_gen(
-    backend: Backend,
     model: _BaseExCorrectModel,
 ) -> MitTask:
     """
@@ -203,17 +201,13 @@ def cdr_calibration_task_gen(
 
                     noisy_char_dict[key].append(float(noisy_qpo._dict[key]))
                     exact_char_dict[key].append(float(exact_qpo._dict[key]))
-            if backend.backend_info is None:
-                raise ValueError("Backend has no backend_info attribute.")
-
-            backend.backend_info.misc["CDR_" + str(counter)] = dict()
+            obj.characterisation["CDR_" + str(counter)] = dict()
             # for each qubit pauli string in operator, add model for calibrating
             for key in noisy_char_dict:
                 model.calibrate(noisy_char_dict[key], exact_char_dict[key])
                 # calibrate creates new model, copy it in to backend
-                backend.backend_info.misc["CDR_" + str(counter)][key] = copy(model)
+                obj.characterisation["CDR_" + str(counter)][key] = copy(model)
             counter += 1
-
         return (True,)
 
     return MitTask(
@@ -224,7 +218,7 @@ def cdr_calibration_task_gen(
     )
 
 
-def cdr_correction_task_gen(backend: Backend) -> MitTask:
+def cdr_correction_task_gen() -> MitTask:
     """
     For each QubitPauliOperator passed, corrects the given expectation for each
     internal QubitPauliString via some pre-characterised mode.
@@ -246,17 +240,9 @@ def cdr_correction_task_gen(backend: Backend) -> MitTask:
         :type calibration_complete: bool
 
         """
-        if backend.backend_info is None:
-            raise ValueError("Backend has no backend_info attribute.")
-
         corrected_expectations = []
         for i in range(len(noisy_expectation)):
-            char_string = "CDR_" + str(i)
-            if char_string not in backend.backend_info.misc:
-                raise RuntimeError(
-                    "CDR characterisation not stored in backend.charactersation attribute."
-                )
-            models = backend.backend_info.misc[char_string]
+            models = obj.characterisation["CDR_" + str(i)]
             new_qpo_dict = dict()
             for qps in noisy_expectation[i]._dict:
                 if qps in models:

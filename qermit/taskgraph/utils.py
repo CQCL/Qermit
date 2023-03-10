@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Cambridge Quantum Computing
+# Copyright 2019-2023 Quantinuum
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ from copy import copy
 from sympy import Symbol  # type: ignore
 from typing import Iterable, Dict, Union, Tuple, List
 from collections import OrderedDict
-from numpy import ndarray
+from numpy import ndarray  # type: ignore
 
 
 class SymbolsDict(object):

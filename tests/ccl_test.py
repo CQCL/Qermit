@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Cambridge Quantum Computing
+# Copyright 2019-2023 Quantinuum
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ from qermit.clifford_noise_characterisation.ccl import (  # type: ignore
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 from pytket.pauli import QubitPauliString, Pauli  # type: ignore
 from pytket.utils import QubitPauliOperator
-import numpy as np
+import numpy as np  # type: ignore
 
 
 def test_sample_weighted_clifford_angle():

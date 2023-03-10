@@ -10,10 +10,10 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -24,14 +24,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Qermit
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Qermit
           </a>
               <div class="version">
                 0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -50,6 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="clifford_noise_characterisation.html">qermit.clifford_noise_characterisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="zero_noise_extrapolation.html">qermit.zero_noise_extrapolation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="probabilistic_error_cancellation.html">qermit.probabilistic_error_cancellation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spectral_filtering.html">qermit.spectral_filtering</a></li>
 </ul>
 
         </div>
@@ -65,8 +70,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Index</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Index</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -298,6 +303,12 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.signal_filter.SignalFilter.filter">filter() (qermit.spectral_filtering.signal_filter.SignalFilter method)</a>
+
+      <ul>
+        <li><a href="spectral_filtering.html#qermit.spectral_filtering.signal_filter.SmallCoefficientSignalFilter.filter">(qermit.spectral_filtering.signal_filter.SmallCoefficientSignalFilter method)</a>
+</li>
+      </ul></li>
       <li><a href="mitex.html#qermit.taskgraph.mitex.filter_observable_tracker_task_gen">filter_observable_tracker_task_gen() (qermit.taskgraph.mitex method)</a>
 </li>
       <li><a href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.Fit">Fit (class in qermit.zero_noise_extrapolation.zne)</a>
@@ -306,10 +317,10 @@
 </li>
       <li><a href="frame_randomisation.html#qermit.frame_randomisation.frame_randomisation.frame_randomisation_circuits_task_gen">frame_randomisation_circuits_task_gen() (qermit.frame_randomisation.frame_randomisation method)</a>
 </li>
-      <li><a href="frame_randomisation.html#qermit.frame_randomisation.frame_randomisation.frame_randomisation_result_task_gen">frame_randomisation_result_task_gen() (qermit.frame_randomisation.frame_randomisation method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="frame_randomisation.html#qermit.frame_randomisation.frame_randomisation.frame_randomisation_result_task_gen">frame_randomisation_result_task_gen() (qermit.frame_randomisation.frame_randomisation method)</a>
+</li>
       <li><a href="frame_randomisation.html#qermit.frame_randomisation.frame_randomisation.FrameRandomisation">FrameRandomisation (class in qermit.frame_randomisation.frame_randomisation)</a>
 </li>
       <li><a href="utils.html#qermit.taskgraph.utils.ObservableTracker.from_ObservableTracker">from_ObservableTracker() (qermit.taskgraph.utils.ObservableTracker method)</a>
@@ -340,6 +351,10 @@
 </li>
       <li><a href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.gen_duplication_task">gen_duplication_task() (qermit.zero_noise_extrapolation.zne method)</a>
 </li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_fft_task">gen_fft_task() (qermit.spectral_filtering.spectral_filtering method)</a>
+</li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_flatten_task">gen_flatten_task() (qermit.spectral_filtering.spectral_filtering method)</a>
+</li>
       <li><a href="frame_randomisation.html#qermit.frame_randomisation.frame_randomisation.gen_Frame_Randomisation_MitRes">gen_Frame_Randomisation_MitRes() (qermit.frame_randomisation.frame_randomisation method)</a>
 </li>
       <li><a href="spam.html#qermit.spam.full_spam_correction.gen_full_tomography_spam_characterisation_task">gen_full_tomography_spam_characterisation_task() (qermit.spam.full_spam_correction method)</a>
@@ -358,23 +373,43 @@
 </li>
       <li><a href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.gen_initial_compilation_task">gen_initial_compilation_task() (qermit.zero_noise_extrapolation.zne method)</a>
 </li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_inv_fft_task">gen_inv_fft_task() (qermit.spectral_filtering.spectral_filtering method)</a>
+</li>
       <li><a href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.gen_label_gates">gen_label_gates() (qermit.probabilistic_error_cancellation.pec_learning_based method)</a>
 </li>
       <li><a href="measurement_reduction.html#qermit.taskgraph.measurement_reduction.gen_MeasurementReduction_MitEx">gen_MeasurementReduction_MitEx() (qermit.taskgraph.measurement_reduction method)</a>
 </li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_mitigation_task">gen_mitigation_task() (qermit.spectral_filtering.spectral_filtering method)</a>
+</li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_ndarray_to_dict_task">gen_ndarray_to_dict_task() (qermit.spectral_filtering.spectral_filtering method)</a>
+</li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_obs_exp_grid_gen_task">gen_obs_exp_grid_gen_task() (qermit.spectral_filtering.spectral_filtering method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_param_grid_gen_task">gen_param_grid_gen_task() (qermit.spectral_filtering.spectral_filtering method)</a>
+</li>
       <li><a href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.gen_PEC_learning_based_MitEx">gen_PEC_learning_based_MitEx() (qermit.probabilistic_error_cancellation.pec_learning_based method)</a>
 </li>
       <li><a href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.gen_qubit_relabel_task">gen_qubit_relabel_task() (qermit.zero_noise_extrapolation.zne method)</a>
 </li>
       <li><a href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.gen_rebase_to_frames_and_computing">gen_rebase_to_frames_and_computing() (qermit.probabilistic_error_cancellation.pec_learning_based method)</a>
 </li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_reshape_task">gen_reshape_task() (qermit.spectral_filtering.spectral_filtering method)</a>
+</li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_result_extraction_task">gen_result_extraction_task() (qermit.spectral_filtering.spectral_filtering method)</a>
+</li>
       <li><a href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.gen_run_with_quasi_prob">gen_run_with_quasi_prob() (qermit.probabilistic_error_cancellation.pec_learning_based method)</a>
 </li>
       <li><a href="mitres.html#qermit.taskgraph.mitres.gen_shot_split_MitRes">gen_shot_split_MitRes() (qermit.taskgraph.mitres method)</a>
 </li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_spectral_filtering_MitEx">gen_spectral_filtering_MitEx() (qermit.spectral_filtering.spectral_filtering method)</a>
+</li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_symbol_val_gen_task">gen_symbol_val_gen_task() (qermit.spectral_filtering.spectral_filtering method)</a>
+</li>
       <li><a href="spam.html#qermit.spam.spam_mitres.gen_UnCorrelated_SPAM_MitRes">gen_UnCorrelated_SPAM_MitRes() (qermit.spam.spam_mitres method)</a>
+</li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_wire_copy_task">gen_wire_copy_task() (qermit.spectral_filtering.spectral_filtering method)</a>
 </li>
       <li><a href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.gen_wrap_frame_gates">gen_wrap_frame_gates() (qermit.probabilistic_error_cancellation.pec_learning_based method)</a>
 </li>
@@ -532,14 +567,18 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="utils.html#qermit.taskgraph.utils.SymbolsDict.set_values">set_values() (qermit.taskgraph.utils.SymbolsDict method)</a>
 </li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.signal_filter.SignalFilter">SignalFilter (class in qermit.spectral_filtering.signal_filter)</a>
+</li>
+      <li><a href="spectral_filtering.html#qermit.spectral_filtering.signal_filter.SmallCoefficientSignalFilter">SmallCoefficientSignalFilter (class in qermit.spectral_filtering.signal_filter)</a>
+</li>
       <li><a href="mitex.html#qermit.taskgraph.mitex.split_results_task_gen">split_results_task_gen() (qermit.taskgraph.mitex method)</a>
 </li>
       <li><a href="mitres.html#qermit.taskgraph.mitres.split_shots_task_gen">split_shots_task_gen() (qermit.taskgraph.mitres method)</a>
 </li>
-      <li><a href="utils.html#qermit.taskgraph.utils.MeasurementCircuit.symbols">symbols (qermit.taskgraph.utils.MeasurementCircuit property)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utils.html#qermit.taskgraph.utils.MeasurementCircuit.symbols">symbols (qermit.taskgraph.utils.MeasurementCircuit property)</a>
+</li>
       <li><a href="utils.html#qermit.taskgraph.utils.SymbolsDict.symbols_from_circuit">symbols_from_circuit() (qermit.taskgraph.utils.SymbolsDict class method)</a>
 </li>
       <li><a href="utils.html#qermit.taskgraph.utils.SymbolsDict.symbols_from_dict">symbols_from_dict() (qermit.taskgraph.utils.SymbolsDict class method)</a>
@@ -561,6 +600,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph.tasks">tasks (qermit.taskgraph.task_graph.TaskGraph property)</a>
+</li>
+      <li><a href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.Folding.two_qubit_gate">two_qubit_gate() (qermit.zero_noise_extrapolation.zne.Folding method)</a>
 </li>
   </ul></td>
 </tr></table>

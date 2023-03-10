@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Cambridge Quantum Computing
+# Copyright 2019-2023 Quantinuum
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -291,6 +291,7 @@ class MitEx(TaskGraph):
         self._label = _label
         self._n_wires = 1
         self.G = None
+        self.characterisation: dict = {}
 
         # start building default MitEx task graph
         self._task_graph = nx.MultiDiGraph()
@@ -386,11 +387,15 @@ class MitEx(TaskGraph):
         return f"<MitEx::{self._label}>"
 
     def __call__(  # type: ignore[override]
-        self, experiment_wires: List[List[ObservableExperiment]]
+        self,
+        experiment_wires: List[List[ObservableExperiment]],
+        characterisation: dict = {},
     ) -> Tuple[List[QubitPauliOperator]]:
         return cast(
             Tuple[List[QubitPauliOperator]],
-            super().run(cast(List[Wire], experiment_wires)),
+            super().run(
+                cast(List[Wire], experiment_wires), characterisation=characterisation
+            ),
         )
 
     def from_TaskGraph(self, task_graph: TaskGraph):
@@ -467,7 +472,7 @@ class MitEx(TaskGraph):
         raise TypeError("MitEx.add_wire forbidden.")
 
     def run(  # type: ignore[override]
-        self, mitex_wires: List[ObservableExperiment]
+        self, mitex_wires: List[ObservableExperiment], characterisation: dict = {}
     ) -> List[QubitPauliOperator]:
         """
         Overloaded run method.
@@ -490,7 +495,7 @@ class MitEx(TaskGraph):
         :return: Observable experiment results as QubitPauliOperator, where values are expectations.
         :rtype: List[QubitPauliOperator]
         """
-        return self([mitex_wires])[0]
+        return self([mitex_wires], characterisation)[0]
 
     def run_basic(
         self, mitex_wires: List[Tuple[CircuitShots, QubitPauliOperator]]

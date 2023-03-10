@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Qermit &mdash; Qermit 0.2.0 documentation</title>
@@ -11,10 +11,10 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -26,14 +26,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="#" class="icon icon-home"> Qermit
+
+          
+          
+          <a href="#" class="icon icon-home">
+            Qermit
           </a>
               <div class="version">
                 0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -52,6 +56,7 @@
 <li class="toctree-l1"><a class="reference internal" href="clifford_noise_characterisation.html">qermit.clifford_noise_characterisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="zero_noise_extrapolation.html">qermit.zero_noise_extrapolation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="probabilistic_error_cancellation.html">qermit.probabilistic_error_cancellation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spectral_filtering.html">qermit.spectral_filtering</a></li>
 </ul>
 
         </div>
@@ -67,8 +72,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>Qermit</li>
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Qermit</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -79,7 +84,7 @@
            <div itemprop="articleBody">
              
   <section id="qermit">
-<h1>Qermit<a class="headerlink" href="#qermit" title="Permalink to this headline"></a></h1>
+<h1>Qermit<a class="headerlink" href="#qermit" title="Permalink to this heading"></a></h1>
 <a class="reference internal image-reference" href="_images/CQCLogo.png"><img alt="_images/CQCLogo.png" class="align-right" src="_images/CQCLogo.png" style="width: 120px;" /></a>
 <p><code class="docutils literal notranslate"><span class="pre">qermit</span></code> is a python module for running error-mitigation protocols on quantum computers using <code class="docutils literal notranslate"><span class="pre">pytket</span></code>,
 CQC’s python module for interfacing with <a class="reference external" href="https://cambridgequantum.com/">CQC</a> tket, a set of quantum programming tools.
@@ -168,7 +173,7 @@ pre-defined error-mitigation methods and composing error-mitigation methods.</p>
 <li><p>Depolarisation-Factor-Supression-For-Nearest-Clifford</p></li>
 </ul>
 <section id="user-support">
-<h2>User Support<a class="headerlink" href="#user-support" title="Permalink to this headline"></a></h2>
+<h2>User Support<a class="headerlink" href="#user-support" title="Permalink to this heading"></a></h2>
 <p>If you have problems with the use of Qermit or you think you have found a bug, there
 are several ways to contact us:
 - Write an email to <a class="reference external" href="mailto:tket-support&#37;&#52;&#48;cambridgequantum&#46;com">tket-support<span>&#64;</span>cambridgequantum<span>&#46;</span>com</a> and ask for help with your problem.
@@ -176,17 +181,116 @@ are several ways to contact us:
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="taskgraph.html">qermit.taskgraph</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mitres.html">qermit.mitres</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mitex.html">qermit.mitex</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">qermit.utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mittask.html">qermit.mittask</a></li>
-<li class="toctree-l1"><a class="reference internal" href="measurement_reduction.html">qermit.measurement_reduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="spam.html">qermit.spam</a></li>
-<li class="toctree-l1"><a class="reference internal" href="frame_randomisation.html">qermit.frame_randomisation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="clifford_noise_characterisation.html">qermit.clifford_noise_characterisation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="zero_noise_extrapolation.html">qermit.zero_noise_extrapolation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="probabilistic_error_cancellation.html">qermit.probabilistic_error_cancellation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="taskgraph.html">qermit.taskgraph</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="taskgraph.html#qermit.taskgraph.task_graph.TaskGraph"><code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mitres.html">qermit.mitres</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.MitRes"><code class="docutils literal notranslate"><span class="pre">MitRes</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.backend_compile_circuit_shots_task_gen"><code class="docutils literal notranslate"><span class="pre">mitres.backend_compile_circuit_shots_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.backend_handle_task_gen"><code class="docutils literal notranslate"><span class="pre">mitres.backend_handle_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.backend_res_task_gen"><code class="docutils literal notranslate"><span class="pre">mitres.backend_res_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.gen_shot_split_MitRes"><code class="docutils literal notranslate"><span class="pre">mitres.gen_shot_split_MitRes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.split_shots_task_gen"><code class="docutils literal notranslate"><span class="pre">mitres.split_shots_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitres.html#qermit.taskgraph.mitres.group_shots_task_gen"><code class="docutils literal notranslate"><span class="pre">mitres.group_shots_task_gen()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mitex.html">qermit.mitex</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.MitEx"><code class="docutils literal notranslate"><span class="pre">MitEx</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.gen_compiled_MitRes"><code class="docutils literal notranslate"><span class="pre">mitex.gen_compiled_MitRes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.gen_compiled_shot_split_MitRes"><code class="docutils literal notranslate"><span class="pre">mitex.gen_compiled_shot_split_MitRes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.get_basic_measurement_circuit"><code class="docutils literal notranslate"><span class="pre">mitex.get_basic_measurement_circuit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.filter_observable_tracker_task_gen"><code class="docutils literal notranslate"><span class="pre">mitex.filter_observable_tracker_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.collate_circuit_shots_task_gen"><code class="docutils literal notranslate"><span class="pre">mitex.collate_circuit_shots_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.split_results_task_gen"><code class="docutils literal notranslate"><span class="pre">mitex.split_results_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitex.html#qermit.taskgraph.mitex.get_expectations_task_gen"><code class="docutils literal notranslate"><span class="pre">mitex.get_expectations_task_gen()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">qermit.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#qermit.taskgraph.utils.SymbolsDict"><code class="docutils literal notranslate"><span class="pre">SymbolsDict</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#qermit.taskgraph.utils.MeasurementCircuit"><code class="docutils literal notranslate"><span class="pre">MeasurementCircuit</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#qermit.taskgraph.utils.ObservableTracker"><code class="docutils literal notranslate"><span class="pre">ObservableTracker</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mittask.html">qermit.mittask</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.MitTask"><code class="docutils literal notranslate"><span class="pre">MitTask</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mittask.html#qermit.taskgraph.mittask.IOTask"><code class="docutils literal notranslate"><span class="pre">IOTask</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="measurement_reduction.html">qermit.measurement_reduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="measurement_reduction.html#qermit.taskgraph.measurement_reduction.measurement_reduction_task_gen"><code class="docutils literal notranslate"><span class="pre">measurement_reduction.measurement_reduction_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="measurement_reduction.html#qermit.taskgraph.measurement_reduction.gen_MeasurementReduction_MitEx"><code class="docutils literal notranslate"><span class="pre">measurement_reduction.gen_MeasurementReduction_MitEx()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="spam.html">qermit.spam</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spam.html#qermit.spam.spam_mitres.gen_FullyCorrelated_SPAM_MitRes"><code class="docutils literal notranslate"><span class="pre">spam_mitres.gen_FullyCorrelated_SPAM_MitRes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spam.html#qermit.spam.spam_mitres.gen_UnCorrelated_SPAM_MitRes"><code class="docutils literal notranslate"><span class="pre">spam_mitres.gen_UnCorrelated_SPAM_MitRes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spam.html#qermit.spam.full_spam_correction.gen_full_tomography_spam_circuits_task"><code class="docutils literal notranslate"><span class="pre">full_spam_correction.gen_full_tomography_spam_circuits_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spam.html#qermit.spam.full_spam_correction.gen_full_tomography_spam_characterisation_task"><code class="docutils literal notranslate"><span class="pre">full_spam_correction.gen_full_tomography_spam_characterisation_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spam.html#qermit.spam.full_spam_correction.gen_full_tomography_spam_correction_task"><code class="docutils literal notranslate"><span class="pre">full_spam_correction.gen_full_tomography_spam_correction_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spam.html#qermit.spam.full_spam_correction.gen_get_bit_maps_task"><code class="docutils literal notranslate"><span class="pre">full_spam_correction.gen_get_bit_maps_task()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="frame_randomisation.html">qermit.frame_randomisation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="frame_randomisation.html#qermit.frame_randomisation.frame_randomisation.gen_Frame_Randomisation_MitRes"><code class="docutils literal notranslate"><span class="pre">frame_randomisation.gen_Frame_Randomisation_MitRes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="frame_randomisation.html#qermit.frame_randomisation.frame_randomisation.FrameRandomisation"><code class="docutils literal notranslate"><span class="pre">FrameRandomisation</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="frame_randomisation.html#qermit.frame_randomisation.frame_randomisation.frame_randomisation_circuits_task_gen"><code class="docutils literal notranslate"><span class="pre">frame_randomisation.frame_randomisation_circuits_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="frame_randomisation.html#qermit.frame_randomisation.frame_randomisation.frame_randomisation_result_task_gen"><code class="docutils literal notranslate"><span class="pre">frame_randomisation.frame_randomisation_result_task_gen()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="clifford_noise_characterisation.html">qermit.clifford_noise_characterisation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="clifford_noise_characterisation.html#qermit.clifford_noise_characterisation.ccl.gen_CDR_MitEx"><code class="docutils literal notranslate"><span class="pre">ccl.gen_CDR_MitEx()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clifford_noise_characterisation.html#qermit.clifford_noise_characterisation.ccl.LikelihoodFunction"><code class="docutils literal notranslate"><span class="pre">LikelihoodFunction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clifford_noise_characterisation.html#qermit.clifford_noise_characterisation.dfsc.gen_DFSC_MitEx"><code class="docutils literal notranslate"><span class="pre">dfsc.gen_DFSC_MitEx()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clifford_noise_characterisation.html#qermit.clifford_noise_characterisation.ccl.ccl_state_task_gen"><code class="docutils literal notranslate"><span class="pre">ccl.ccl_state_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clifford_noise_characterisation.html#qermit.clifford_noise_characterisation.ccl.ccl_result_batching_task_gen"><code class="docutils literal notranslate"><span class="pre">ccl.ccl_result_batching_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clifford_noise_characterisation.html#qermit.clifford_noise_characterisation.ccl.ccl_likelihood_filtering_task_gen"><code class="docutils literal notranslate"><span class="pre">ccl.ccl_likelihood_filtering_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clifford_noise_characterisation.html#qermit.clifford_noise_characterisation.dfsc.DFSC_circuit_task_gen"><code class="docutils literal notranslate"><span class="pre">dfsc.DFSC_circuit_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clifford_noise_characterisation.html#qermit.clifford_noise_characterisation.dfsc.DFSC_collater_task_gen"><code class="docutils literal notranslate"><span class="pre">dfsc.DFSC_collater_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clifford_noise_characterisation.html#qermit.clifford_noise_characterisation.dfsc.DFSC_characterisation_task_gen"><code class="docutils literal notranslate"><span class="pre">dfsc.DFSC_characterisation_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clifford_noise_characterisation.html#qermit.clifford_noise_characterisation.dfsc.DFSC_correction_task_gen"><code class="docutils literal notranslate"><span class="pre">dfsc.DFSC_correction_task_gen()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="zero_noise_extrapolation.html">qermit.zero_noise_extrapolation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.gen_ZNE_MitEx"><code class="docutils literal notranslate"><span class="pre">zne.gen_ZNE_MitEx()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.Folding"><code class="docutils literal notranslate"><span class="pre">Folding</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.Fit"><code class="docutils literal notranslate"><span class="pre">Fit</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.digital_folding_task_gen"><code class="docutils literal notranslate"><span class="pre">zne.digital_folding_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.extrapolation_task_gen"><code class="docutils literal notranslate"><span class="pre">zne.extrapolation_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.gen_initial_compilation_task"><code class="docutils literal notranslate"><span class="pre">zne.gen_initial_compilation_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.gen_qubit_relabel_task"><code class="docutils literal notranslate"><span class="pre">zne.gen_qubit_relabel_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="zero_noise_extrapolation.html#qermit.zero_noise_extrapolation.zne.gen_duplication_task"><code class="docutils literal notranslate"><span class="pre">zne.gen_duplication_task()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="probabilistic_error_cancellation.html">qermit.probabilistic_error_cancellation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.gen_PEC_learning_based_MitEx"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_PEC_learning_based_MitEx()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.gen_rebase_to_frames_and_computing"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_rebase_to_frames_and_computing()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.gen_run_with_quasi_prob"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_run_with_quasi_prob()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.collate_results_task_gen"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.collate_results_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.learn_quasi_probs_task_gen"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.learn_quasi_probs_task_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.gen_get_clifford_training_set"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_get_clifford_training_set()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.gen_label_gates"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_label_gates()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.gen_wrap_frame_gates"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_wrap_frame_gates()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="probabilistic_error_cancellation.html#qermit.probabilistic_error_cancellation.pec_learning_based.gen_get_noisy_circuits"><code class="docutils literal notranslate"><span class="pre">pec_learning_based.gen_get_noisy_circuits()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="spectral_filtering.html">qermit.spectral_filtering</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_spectral_filtering_MitEx"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_spectral_filtering_MitEx()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_result_extraction_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_result_extraction_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_mitigation_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_mitigation_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_fft_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_fft_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_ndarray_to_dict_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_ndarray_to_dict_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_inv_fft_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_inv_fft_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_flatten_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_flatten_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_reshape_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_reshape_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_obs_exp_grid_gen_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_obs_exp_grid_gen_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_symbol_val_gen_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_symbol_val_gen_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_wire_copy_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_wire_copy_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.spectral_filtering.gen_param_grid_gen_task"><code class="docutils literal notranslate"><span class="pre">spectral_filtering.gen_param_grid_gen_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.signal_filter.SmallCoefficientSignalFilter"><code class="docutils literal notranslate"><span class="pre">SmallCoefficientSignalFilter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral_filtering.html#qermit.spectral_filtering.signal_filter.SignalFilter"><code class="docutils literal notranslate"><span class="pre">SignalFilter</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>

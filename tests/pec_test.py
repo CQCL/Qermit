@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Cambridge Quantum Computing
+# Copyright 2019-2023 Quantinuum
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ from pytket import Circuit, Qubit, OpType
 import math
 from pytket.predicates import GateSetPredicate, CliffordCircuitPredicate  # type: ignore
 from qermit import AnsatzCircuit, ObservableExperiment
-from pytket.extensions.qiskit import IBMQEmulatorBackend
+from pytket.extensions.qiskit import IBMQEmulatorBackend  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
 
@@ -46,6 +46,7 @@ REASON = "IBMQ account not configured"
 
 
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
+@pytest.mark.high_compute
 def test_no_qubit_relabel():
 
     noiseless_backend = AerBackend()
@@ -560,6 +561,7 @@ def test_gen_rebase_to_frames_and_computing():
         assert GateSetPredicate({OpType.CX, OpType.TK1}).verify(circuit)
 
 
+@pytest.mark.high_compute
 def test_gen_PEC_learning_based_MitEx():
 
     be = AerBackend()

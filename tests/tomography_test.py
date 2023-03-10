@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Cambridge Quantum Computing
+# Copyright 2019-2023 Quantinuum
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ from qermit.spam.full_transition_tomography import (  # type: ignore
 from pytket import Circuit, Bit
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 import qiskit.providers.aer.noise as noise  # type: ignore
-import numpy as np
+import numpy as np  # type: ignore
 
 # set up basic readout error noise model backend for tests
 def get_noisy_backend(n_qubits, prob_ro):

@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Cambridge Quantum Computing
+# Copyright 2019-2023 Quantinuum
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ from pytket.predicates import CliffordCircuitPredicate  # type: ignore
 import re
 from typing import List, Tuple, Dict, cast, Union, Any
 from copy import copy
-import numpy as np
+import numpy as np  # type: ignore
 
 QuasiProbabilities = List[float]
 

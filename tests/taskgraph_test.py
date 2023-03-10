@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Cambridge Quantum Computing
+# Copyright 2019-2023 Quantinuum
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -172,8 +172,30 @@ def test_run_with_cache():
         tg.run([1, 2], cache=True)
 
 
+def test_run_with_characterisation():
+    tg = TaskGraph()
+    c0 = {"key0": 0, "key1": "val"}
+    tg.run([], characterisation=c0)
+    assert tg.get_characterisation() == c0
+    c1 = {"key0": 1, "key2": 3}
+    tg.run([], characterisation=c1)
+    characterisation = tg.get_characterisation()
+    assert characterisation["key0"] == 1
+    assert characterisation["key1"] == "val"
+    assert characterisation["key2"] == 3
+    c2 = {"key4": "val2"}
+    tg.update_characterisation(c2)
+    assert tg.get_characterisation()["key4"] == "val2"
+    c3 = {"key0": 7}
+    tg.set_characterisation(c3)
+    characterisation = tg.get_characterisation()
+    assert len(characterisation) == 1
+    assert characterisation["key0"] == 7
+
+
 if __name__ == "__main__":
     test_task_graph_constructor()
     test_basic_task_graph_methods()
     test_advanced_task_graph_methods()
     test_run_with_cache()
+    test_run_with_characterisation()

@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Cambridge Quantum Computing
+# Copyright 2019-2023 Quantinuum
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,15 +33,16 @@ from pytket.extensions.qiskit import AerBackend, IBMQEmulatorBackend  # type: ig
 from pytket import Circuit, Qubit
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.utils import QubitPauliOperator
-from numpy.polynomial.polynomial import polyval
+from pytket.circuit import CircBox
+from numpy.polynomial.polynomial import polyval  # type: ignore
 import math
-import numpy as np
+import numpy as np  # type: ignore
 from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
 import qiskit.providers.aer.noise as noise  # type: ignore
 from pytket.circuit import OpType  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
-from pytket.circuit import Node
+from pytket.circuit import Node  # type: ignore
 
 n_qubits = 2
 
@@ -68,6 +69,7 @@ REASON = "IBMQ account not configured"
 
 
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
+@pytest.mark.high_compute
 def test_no_qubit_relabel():
 
     lagos_backend = IBMQEmulatorBackend(
@@ -241,6 +243,7 @@ def test_extrapolation_task_gen():
 
 
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
+@pytest.mark.high_compute
 def test_folding_compiled_circuit():
 
     emulator_backend = IBMQEmulatorBackend("ibmq_quito")
@@ -523,6 +526,113 @@ def test_odd_gate_folding():
     assert folded_circ == correct_folded_circ
 
 
+def test_two_qubit_gate_folding():
+
+    be = AerBackend()
+
+    n_folds_1 = 3
+
+    # This tests the case of odd integer folding, which is always possible
+    task_1 = digital_folding_task_gen(
+        be, n_folds_1, Folding.two_qubit_gate, _allow_approx_fold=False
+    )
+    # This tests the case of non integer folding. 5.5 is not possible
+    # as the circuit has 1 gate and so only odd integer folding is possible
+    task_invalid = digital_folding_task_gen(
+        be, 5.5, Folding.two_qubit_gate, _allow_approx_fold=False
+    )
+    # This test the case of non integer folding when approximate folding is
+    # allowed
+    task_2 = digital_folding_task_gen(
+        be, 5.8, Folding.two_qubit_gate, _allow_approx_fold=True
+    )
+
+    assert task_1.n_in_wires == 1
+    assert task_1.n_out_wires == 1
+    assert task_2.n_in_wires == 1
+    assert task_2.n_out_wires == 1
+    assert task_invalid.n_in_wires == 1
+    assert task_invalid.n_out_wires == 1
+
+    c_1 = Circuit(2).Rz(0.3,0).ZZPhase(0.3,1,0)
+    # This is to ensure that the barrier is not folded, even though it
+    # acts on 2 qubits
+    c_2 = Circuit(3).Rz(0.3,2).CZ(1,2).add_barrier([0,1]).CX(0,1).X(0)
+    c_3 = Circuit(3).CZ(0,1).CZ(1,2).CZ(0,2)
+
+    circ_box = CircBox(c_1)
+    # Tests that circuits with nothing to fold will raise an error.
+    c_gate_set_invalid_1 = Circuit(2).add_circbox(circ_box, [0,1])
+    # Tests that circuits with CircBox will raise an error.
+    c_gate_set_invalid_2 = Circuit(2).add_circbox(circ_box, [0,1]).CZ(0,1)
+
+    ac_1 = AnsatzCircuit(c_1, 10000, {})
+    ac_2 = AnsatzCircuit(c_2, 10000, {})
+    ac_3 = AnsatzCircuit(c_3, 10000, {})
+    ac_gate_set_invalid_1 = AnsatzCircuit(c_gate_set_invalid_1, 10000, {})
+    ac_gate_set_invalid_2 = AnsatzCircuit(c_gate_set_invalid_2, 10000, {})
+
+    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+
+    experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
+    experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_1))
+    experiment_3 = ObservableExperiment(ac_3, ObservableTracker(qpo_1))
+    experiment_gate_set_invalid_1 = ObservableExperiment(
+        ac_gate_set_invalid_1, ObservableTracker(qpo_1)
+    )
+    experiment_gate_set_invalid_2 = ObservableExperiment(
+        ac_gate_set_invalid_2, ObservableTracker(qpo_1)
+    )
+
+    with pytest.raises(ValueError):
+        task_invalid([[experiment_1, experiment_2]])
+
+    with  pytest.raises(RuntimeError):
+        task_1([[experiment_gate_set_invalid_1]])
+
+    with  pytest.raises(RuntimeError):
+        task_1([[experiment_gate_set_invalid_2]])
+    
+    folded_experiment_1 = task_1([[experiment_1, experiment_2]])[0]
+    folded_experiment_2 = task_2([[experiment_3]])[0]
+
+    folded_c_1 = folded_experiment_1[0].AnsatzCircuit.Circuit
+    folded_c_2 = folded_experiment_1[1].AnsatzCircuit.Circuit
+    folded_c_3 = folded_experiment_2[0].AnsatzCircuit.Circuit
+
+    ideal_folded_c_1 = Circuit(2)
+    ideal_folded_c_1.Rz(0.3,0)
+    ideal_folded_c_1.ZZPhase(0.3,1,0)
+    ideal_folded_c_1.add_barrier([1,0])
+    ideal_folded_c_1.ZZPhase(3.7,1,0)
+    ideal_folded_c_1.add_barrier([1,0])
+    ideal_folded_c_1.ZZPhase(0.3,1,0)
+
+    assert folded_c_1 == ideal_folded_c_1
+
+    assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_1)
+    assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_2)
+    assert GateSetPredicate(be.backend_info.gate_set).verify(folded_c_3)
+
+    # Note that in both cases barriers are added. This is why there is the
+    # n_folds_i - 1 term at the end.
+    assert folded_c_1.n_gates == c_1.n_gates + 2 * c_1.n_2qb_gates() * (n_folds_1 - 1)
+    assert folded_c_2.n_gates == c_2.n_gates + 2 * c_2.n_2qb_gates() * (n_folds_1 - 1)
+    # note that this gives an nose scaling = 17/3 = 5.6 which is a little smaller than 5.8
+    assert folded_c_3.n_2qb_gates() == 17 
+
+    c_1_unitary = c_1.get_unitary()
+    c_2_unitary = c_2.get_unitary()
+    c_3_unitary = c_3.get_unitary()
+    folded_c_1_unitary = folded_c_1.get_unitary()
+    folded_c_2_unitary = folded_c_2.get_unitary()
+    folded_c_3_unitary = folded_c_3.get_unitary()
+
+    assert np.allclose(c_1_unitary, folded_c_1_unitary)
+    assert np.allclose(c_2_unitary, folded_c_2_unitary)
+    assert np.allclose(c_3_unitary, folded_c_3_unitary)
+
+
 if __name__ == "__main__":
     test_no_qubit_relabel()
     test_extrapolation_task_gen()
@@ -534,3 +644,4 @@ if __name__ == "__main__":
     test_odd_gate_folding()
     test_circuit_folding_TK1()
     test_gen_qubit_relabel_task()
+    test_two_qubit_gate_folding()

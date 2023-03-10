@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Cambridge Quantum Computing
+# Copyright 2019-2023 Quantinuum
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ from pytket.transform import Transform  # type: ignore
 from pytket.utils import QubitPauliOperator
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.tailoring import apply_clifford_basis_change  # type: ignore
-from numpy import mean
+from numpy import mean  # type: ignore
 
 from typing import List, Tuple, cast, Union, Dict
 from copy import copy
