@@ -33,7 +33,7 @@ from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial  # type: ignore
 from pytket.circuit import Node  # type: ignore
-import math
+from math import isclose
 
 
 box_types = {
@@ -174,7 +174,7 @@ class Folding(Enum):
 
         if not (
             _allow_approx_fold
-            or math.isclose(noise_scaling, true_noise_scaling, abs_tol=0.001)
+            or isclose(noise_scaling, true_noise_scaling, abs_tol=0.001)
         ):
             raise ValueError(
                 "The noise cannot be scaled by the amount inputted."
