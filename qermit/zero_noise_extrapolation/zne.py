@@ -33,7 +33,6 @@ from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial  # type: ignore
 from pytket.circuit import Node  # type: ignore
-import random
 import math
 
 
@@ -106,7 +105,11 @@ class Folding(Enum):
 
         return folded_circ
 
-    def two_qubit_gate(circ: Circuit, noise_scaling: float, **kwargs) -> Circuit:
+    def two_qubit_gate(
+        circ: Circuit,
+        noise_scaling: float,
+        **kwargs
+    ) -> Circuit:
         """Noise scaling by folding 2 qubit gates. It is implicitly
         assumed that the noise on the 2 qubit gates dominate. Two qubit gates
         :math:`G` are replaced by :math:`GG^{-1}G...G^{-1}G`. If
@@ -144,7 +147,8 @@ class Folding(Enum):
         # less than noise_scaling-1. By doing so the noise is scaled by the
         # odd integer less than noise_scaling.
         num_folds_dict = {
-            i:(int(noise_scaling-1)//2) for i, cmd in enumerate(circ.get_commands()) 
+            i:(int(noise_scaling-1)//2)
+            for i, cmd in enumerate(circ.get_commands()) 
             if (
                 not (cmd.op.type == OpType.Barrier) and
                 not (cmd.op.type in box_types) and
@@ -164,7 +168,7 @@ class Folding(Enum):
         # folded to achieve noise_scaling. The appropriate fraction of
         # gates is then randomly selected.
         fold_frac = ((noise_scaling-1)%2)/2
-        to_fold = np.choice(
+        to_fold = np.random.choice(
             list(num_folds_dict.keys()), 
             size=int(len(num_folds_dict.keys()) * fold_frac),
             replace=False,
@@ -172,7 +176,9 @@ class Folding(Enum):
         for i in to_fold:
             num_folds_dict[i] += 1
 
-        true_noise_scaling = sum(2*i + 1 for i in num_folds_dict.values())
+        true_noise_scaling = float(
+            sum(2*i + 1 for i in num_folds_dict.values())
+        )
         true_noise_scaling /= len(num_folds_dict)
 
         if not (
