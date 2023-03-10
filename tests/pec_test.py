@@ -46,6 +46,7 @@ REASON = "IBMQ account not configured"
 
 
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
+@pytest.mark.high_compute
 def test_no_qubit_relabel():
 
     noiseless_backend = AerBackend()
@@ -560,6 +561,7 @@ def test_gen_rebase_to_frames_and_computing():
         assert GateSetPredicate({OpType.CX, OpType.TK1}).verify(circuit)
 
 
+@pytest.mark.high_compute
 def test_gen_PEC_learning_based_MitEx():
 
     be = AerBackend()
