@@ -85,13 +85,11 @@ def get_full_transition_tomography_circuits(
         should be processed without compilation.
     :rtype: List[Circuit]
     """
-
     subsets_matrix_map = OrderedDict.fromkeys(
         sorted(map(tuple, correlations), key=len, reverse=True)
     )
     # ordered from largest to smallest via OrderedDict & sorted
     subset_dimensions = [len(subset) for subset in subsets_matrix_map]
-
     major_state_dimensions = subset_dimensions[0]
     n_circuits = 1 << major_state_dimensions
     all_qubits = [qb for subset in correlations for qb in subset]
@@ -112,9 +110,14 @@ def get_full_transition_tomography_circuits(
     xcirc = backend.get_compiled_circuit(xcirc)
     FlattenRegisters().apply(xcirc)
     xbox = CircBox(xcirc)
-
     # need to be default register to add as box suitably
+
+    n_qubits_pre_compile = process_circuit.n_qubits
     process_circuit = backend.get_compiled_circuit(process_circuit)
+
+    while process_circuit.n_qubits < n_qubits_pre_compile:
+        process_circuit.add_qubit(Qubit("temp_q", process_circuit.n_qubits))
+
     rename_map_pc = {}
     for index, qb in enumerate(process_circuit.qubits):
         rename_map_pc[qb] = Qubit(index)
@@ -147,6 +150,8 @@ def get_full_transition_tomography_circuits(
                 state_circuit.add_circbox(xbox, [flipped_qb])
         # Decompose boxes, add barriers to preserve circuit, add measures
         state_circuit.add_barrier(all_qubits)
+
+        DecomposeBoxes().apply(state_circuit)
         # add process circuit to measure
         state_circuit.add_circbox(pbox, state_circuit.qubits)
         DecomposeBoxes().apply(state_circuit)
