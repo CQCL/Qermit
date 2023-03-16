@@ -151,7 +151,6 @@ def get_full_transition_tomography_circuits(
         # Decompose boxes, add barriers to preserve circuit, add measures
         state_circuit.add_barrier(all_qubits)
 
-        DecomposeBoxes().apply(state_circuit)
         # add process circuit to measure
         state_circuit.add_circbox(pbox, state_circuit.qubits)
         DecomposeBoxes().apply(state_circuit)
