@@ -27,8 +27,7 @@ from qermit.spam import gen_UnCorrelated_SPAM_MitRes
 from qermit import CircuitShots
 from pytket import Circuit
 from pytket.extensions.quantinuum import QuantinuumBackend
-from pytket.extensions.myqos import Myqos, MyqosBackend, QuantinuumConfig, IBMQEmulatorConfig
-from .test_backends import MockQuantinuumBackend, NoisyAerBackend
+from .test_backends import MockQuantinuumBackend
 import pytest
 
 
