@@ -23,6 +23,30 @@ from qermit.spam import (  # type: ignore
     CorrectionMethod,
 )
 from qermit.taskgraph import CircuitShots  # type: ignore
+from qermit.spam import gen_UnCorrelated_SPAM_MitRes
+from qermit import CircuitShots
+from pytket import Circuit
+from pytket.extensions.quantinuum import QuantinuumBackend
+from pytket.extensions.myqos import Myqos, MyqosBackend, QuantinuumConfig, IBMQEmulatorConfig
+from .test_backends import MockQuantinuumBackend, NoisyAerBackend
+import pytest
+
+
+@pytest.mark.xfail(
+    reason=("Presently pytket removes unused qubits. There is also a missmatch between node and qubit names with QuantinuumBackend")
+)
+def test_mock_quantinuum_all_qubits():
+
+    circuit = Circuit(2).X(0).X(1).measure_all()
+    circ_shots = CircuitShots(circuit, 1000)
+    noisy_backend = MockQuantinuumBackend()
+
+    spam_mitres = gen_UnCorrelated_SPAM_MitRes(
+        backend=noisy_backend,
+        calibration_shots=100000,
+    )
+    print(spam_mitres.run([circ_shots])[0].get_counts())
+    assert (1,1) in spam_mitres.run([circ_shots])[0].get_counts().keys()
 
 
 def gen_test_wire():
