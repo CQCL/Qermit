@@ -9,6 +9,10 @@ from pytket.predicates import CompilationUnit  # type: ignore
 from pytket.extensions.qiskit import AerBackend
 import qiskit.providers.aer.noise as noise  # type: ignore
 from pytket import OpType
+from pytket import Circuit
+from pytket.backends.resulthandle import ResultHandle
+from typing import List, Union
+from pytket.backends.backendresult import BackendResult
 
 
 class NoisyAerBackend(AerBackend):
@@ -21,14 +25,51 @@ class NoisyAerBackend(AerBackend):
         OpType.Measure
     }
 
-    def __init__(self, n_qubits, prob_1, prob_2, prob_ro):
+    def __init__(
+        self,
+        n_qubits: int,
+        prob_1: float,
+        prob_2: float,
+        prob_ro: float
+    ):
+        """AerBacked with simple depolarising and SPAM noise model.
+
+        :param n_qubits: The number of qubits available on the backend.
+        :type n_qubits: int
+        :param prob_1: The depolarising noise error rates on single qubit gates.
+        :type prob_1: float
+        :param prob_2: The depolarising noise error rates on two qubit gates.
+        :type prob_2: float
+        :param prob_ro: Error rates of symmetric uncorrelated SPAM errors.
+        :type prob_ro: float
+        """
 
         noise_model = self.depolarizing_noise_model(
             n_qubits, prob_1, prob_2, prob_ro
         )
         super().__init__(noise_model=noise_model)
 
-    def depolarizing_noise_model(self, n_qubits, prob_1, prob_2, prob_ro):
+    def depolarizing_noise_model(
+        self,
+        n_qubits: int,
+        prob_1: float,
+        prob_2: float,
+        prob_ro: float,
+    ) -> noise.NoiseModel:
+        """Generates noise model, may be passed to `noise_model` parameter of
+        AerBacked.
+
+        :param n_qubits: Number of qubits noise model applies to.
+        :type n_qubits: int
+        :param prob_1: The depolarising noise error rates on single qubit gates.
+        :type prob_1: float
+        :param prob_2: The depolarising noise error rates on two qubit gates.
+        :type prob_2: float
+        :param prob_ro: Error rates of symmetric uncorrelated SPAM errors.
+        :type prob_ro: float
+        :return: Noise model
+        :rtype: noise.NoiseModel
+        """
 
         noise_model = noise.NoiseModel()
 
@@ -78,7 +119,25 @@ class MockQuantinuumBackend(QuantinuumBackend):
         )
         self.handle_cu_dict = dict()
 
-    def process_circuit(self, circuit, n_shot, valid_check=True, **kwargs):
+    def process_circuit(
+        self,
+        circuit: Circuit,
+        n_shot: int,
+        valid_check: bool=True,
+        **kwargs,
+    ) -> ResultHandle:
+        """Submit circuit to the backend for running.
+
+        :param circuit: Circuit to process on the backend
+        :type circuit: Circuit
+        :param n_shot: Number of shots to run per circuit.
+        :type n_shot: int
+        :param valid_check: Explicitly check that all circuits satisfy all
+            required predicates to run on the backend, defaults to True
+        :type valid_check: bool, optional
+        :return: Handles to results for each input circuit, as an interable in the same order as the circuits.
+        :rtype: ResultHandle
+        """
 
         if valid_check:
             assert self.valid_circuit(circuit)
@@ -97,7 +156,26 @@ class MockQuantinuumBackend(QuantinuumBackend):
 
         return handle
 
-    def process_circuits(self, circuits, n_shots, valid_check=True, **kwargs):
+    def process_circuits(
+        self,
+        circuits: List[Circuit],
+        n_shots: Union[List[int], int],
+        valid_check: bool=True,
+        **kwargs,
+    ) -> List[ResultHandle]:
+        """Submit list of circuits to the backend for running.
+
+        :param circuits: Circuits to process on the backend
+        :type circuits: List[Circuit]
+        :param n_shot: Number of shots to run per circuit. May be a list of
+            the same length as circuits.
+        :type n_shot: int
+        :param valid_check: Explicitly check that all circuits satisfy all
+            required predicates to run on the backend, defaults to True
+        :type valid_check: bool, optional
+        :return: Handles to results for each input circuit, as an interable in the same order as the circuits.
+        :rtype: List[ResultHandle]
+        """
         if isinstance(n_shots, int):
             return [
                 self.process_circuit(circuit, n_shots, valid_check=valid_check)
@@ -108,5 +186,12 @@ class MockQuantinuumBackend(QuantinuumBackend):
                 for circuit, n_shot in zip(circuits, n_shots)
             ]
 
-    def get_result(self, handle, **kwargs):
+    def get_result(self, handle:ResultHandle, **kwargs) -> BackendResult:
+        """Return a BackendResult corresponding to the handle.
+
+        :param handle: handle to results
+        :type handle: ResultHandle
+        :return: Results corresponding to handle.
+        :rtype: BackendResult
+        """
         return self.noisy_backend.get_result(handle, *kwargs)
