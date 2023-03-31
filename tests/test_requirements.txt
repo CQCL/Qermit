@@ -1,3 +1,4 @@
 pytket-qiskit~=0.23
 pytest
 pytest-cov
+flake8
