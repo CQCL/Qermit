@@ -223,7 +223,7 @@ class TaskGraph:
         with the _task_graph structure held inside the node.
         """
         check_for_decompose = True
-        while check_for_decompose == True:
+        while check_for_decompose:
             # get all nodes and iterate through them
             check_for_decompose = False
             node_list = list(nx.topological_sort(self._task_graph))
@@ -251,8 +251,7 @@ class TaskGraph:
                             set(task_input_out_edges).intersection(
                                 set(task_output_in_edges)
                             )
-                        )
-                        > 0
+                        ) > 0
                     ):
                         raise ValueError(
                             "Decomposition of TaskGraph node {}, not permitted: TaskGraph to be decomposed has edge between input and output vertices.".format(
@@ -378,7 +377,7 @@ class TaskGraph:
         self.characterisation.update(characterisation)
         # clear cache of held data if required
         # also check that all mittask label are unique else dict will fail
-        if cache == True:
+        if cache:
             unique_labels = set()
             for task in node_list:
                 if task not in (self._i, self._o):
@@ -404,7 +403,7 @@ class TaskGraph:
             # run held task
             outputs = task(inputs)
             self.characterisation.update(task.characterisation)
-            if cache == True:
+            if cache:
                 self._cache[task._label] = (task, outputs)
             # assign outputs ot out_edges of task
             out_edges = self._task_graph.out_edges(task, data=True, keys=True)

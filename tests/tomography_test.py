@@ -29,6 +29,7 @@ from pytket.extensions.qiskit import AerBackend  # type: ignore
 import qiskit.providers.aer.noise as noise  # type: ignore
 import numpy as np  # type: ignore
 
+
 # set up basic readout error noise model backend for tests
 def get_noisy_backend(n_qubits, prob_ro):
     noise_model = noise.NoiseModel()

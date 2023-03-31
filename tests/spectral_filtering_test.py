@@ -1,5 +1,4 @@
 from qermit.spectral_filtering.spectral_filtering import (
-    gen_fft_task,
     gen_result_extraction_task,
     gen_wire_copy_task,
     gen_inv_fft_task,
@@ -21,7 +20,6 @@ from pytket import Circuit, Qubit
 from pytket.pauli import QubitPauliString, Pauli
 from qermit import AnsatzCircuit, SymbolsDict, ObservableExperiment, ObservableTracker
 from sympy import Symbol
-from qermit import TaskGraph
 import scipy.fft
 from pytket.extensions.qiskit import AerBackend
 
@@ -318,7 +316,7 @@ def test_gen_flatten_reshape_task():
 
     assert out_wire[1] == length_list
     assert out_wire[0][: length_list[0]] == grid_0_flattened
-    assert out_wire[0][length_list[0] : length_list[0] + length_list[1]] == [
+    assert out_wire[0][length_list[0]: length_list[0] + length_list[1]] == [
         1,
         2,
         3,

@@ -77,10 +77,10 @@ def test_measurement_reduction_task_gen():
     assert [Bit(0), Bit(1), Bit(2)] == info10[0][1]
     assert [Bit(0), Bit(1)] == info11[0][1]
     # check no result expects inversion of expectation
-    assert info00[0][2] == False
-    assert info01[0][2] == False
-    assert info10[0][2] == False
-    assert info11[0][2] == False
+    assert info00[0][2] is False
+    assert info01[0][2] is False
+    assert info10[0][2] is False
+    assert info11[0][2] is False
 
 
 def test_gen_me_MitEx():

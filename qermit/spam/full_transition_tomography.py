@@ -34,6 +34,7 @@ FullCorrelatedNoiseCharacterisation = namedtuple(
 
 StateInfo = namedtuple("StateInfo", ["PreparedStates", "QubitBitMaps"])
 
+
 # Helper methods for holding basis states
 @lru_cache(maxsize=128)
 def binary_to_int(bintuple: Tuple[int]) -> int:
@@ -221,14 +222,13 @@ def calculate_correlation_matrices(
     )
 
 
-#########################################
-### _compute_dot and helper functions ###
-###
-### With thanks to
-### https://math.stackexchange.com/a/3423910
-### and especially
-### https://gist.github.com/ahwillia/f65bc70cb30206d4eadec857b98c4065
-### on which this code is based.
+# _compute_dot and helper functions #
+#
+# With thanks to
+# https://math.stackexchange.com/a/3423910
+# and especially
+# https://gist.github.com/ahwillia/f65bc70cb30206d4eadec857b98c4065
+# on which this code is based.
 def _unfold(tens: np.ndarray, mode: int, dims: List[int]) -> np.ndarray:
     """
     Unfolds tensor into matrix.
