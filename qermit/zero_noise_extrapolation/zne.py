@@ -142,7 +142,11 @@ class Folding(Enum):
         num_folds_dict = {
             i: (int(noise_scaling - 1) // 2)
             for i, cmd in enumerate(circ.get_commands())
-            if (cmd.op.type is not OpType.Barrier) and (cmd.op.type not in box_types) and len(cmd.qubits) == 2
+            if (
+                (cmd.op.type is not OpType.Barrier)
+                and (cmd.op.type not in box_types)
+                and (len(cmd.qubits) == 2)
+            )
         }
 
         if len(num_folds_dict) == 0:
@@ -168,7 +172,10 @@ class Folding(Enum):
         true_noise_scaling = float(sum(2 * i + 1 for i in num_folds_dict.values()))
         true_noise_scaling /= len(num_folds_dict)
 
-        if not (_allow_approx_fold or isclose(noise_scaling, true_noise_scaling, abs_tol=0.001)):
+        if not (
+            _allow_approx_fold 
+            or isclose(noise_scaling, true_noise_scaling, abs_tol=0.001)
+        ):
             raise ValueError(
                 "The noise cannot be scaled by the amount inputted."
                 "The noise must be scaled by a factor of the form "

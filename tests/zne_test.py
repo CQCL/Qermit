@@ -189,7 +189,10 @@ def test_gen_duplication_task():
         duplicate_2_qpo = duplicate_2_experiment[1]
 
         assert duplicate_1_ac == duplicate_2_ac
-        assert duplicate_1_qpo._qubit_pauli_operator == duplicate_2_qpo._qubit_pauli_operator
+        assert (
+            duplicate_1_qpo._qubit_pauli_operator
+            == duplicate_2_qpo._qubit_pauli_operator
+        )
 
 
 def test_extrapolation_task_gen():
