@@ -2,3 +2,4 @@ pytket-qiskit~=0.23
 pytest
 pytest-cov
 flake8
+mypy==0.982
