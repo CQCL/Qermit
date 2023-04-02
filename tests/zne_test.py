@@ -107,7 +107,7 @@ def test_gen_qubit_relabel_task():
     )
     qubit_pauli_operator = QubitPauliOperator({qubit_pauli_string: 1.0})
 
-    compilation_map = {Node(0): Qubit(0), Node(1): Qubit(1), Node(2): Qubit(2)}
+    compilation_map = [{Node(0): Qubit(0), Node(1): Qubit(1), Node(2): Qubit(2)}]
 
     relabeled_qubit_pauli_string = QubitPauliString(
         [Node(0), Node(1), Node(2)], [Pauli.Z, Pauli.Z, Pauli.Z]
@@ -467,8 +467,8 @@ def test_simple_run_end_to_end():
     expectation_1 = result[0]
     expectation_2 = result[1]
 
-    res1 = expectation_1[QubitPauliString([Qubit(0)], [Pauli.Z])]
-    res2 = expectation_2[QubitPauliString([Qubit(1)], [Pauli.Z])]
+    res1 = expectation_1[QubitPauliString([Qubit(1)], [Pauli.Z])]
+    res2 = expectation_2[QubitPauliString([Qubit(0)], [Pauli.Z])]
 
     assert round(float(res1)) == 1.0
     assert round(float(res2)) == -1.0
