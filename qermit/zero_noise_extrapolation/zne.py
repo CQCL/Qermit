@@ -971,7 +971,7 @@ def gen_qubit_relabel_task() -> MitTask:
 
         :param qpo_list: List of QubitPauliOperator
         :type qpo_list: List[QubitPauliOperator]
-        :param compilation_map: List of Dictionaries mapping nodes as
+        :param compilation_map_list: List of Dictionaries mapping nodes as
             returned by gen_initial_compilation_task task
         :type compilation_map_list: List[Dict[Node, Node]]
         :return: List of QubitPauliOperator with relabeled nodes.
