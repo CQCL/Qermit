@@ -107,7 +107,7 @@ def test_gen_qubit_relabel_task():
     )
     qubit_pauli_operator = QubitPauliOperator({qubit_pauli_string: 1.0})
 
-    compilation_map = {Node(0): Qubit(0), Node(1): Qubit(1), Node(2): Qubit(2)}
+    compilation_map = [{Node(0): Qubit(0), Node(1): Qubit(1), Node(2): Qubit(2)}]
 
     relabeled_qubit_pauli_string = QubitPauliString(
         [Node(0), Node(1), Node(2)], [Pauli.Z, Pauli.Z, Pauli.Z]
@@ -130,13 +130,13 @@ def test_gen_initial_compilation_task():
     assert task.n_out_wires == 2
 
     c_1 = Circuit(2).CZ(0, 1).T(1)
-    c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
+    c_2 = Circuit(1).T(0).X(0)
 
     ac_1 = AnsatzCircuit(c_1, 10000, {})
     ac_2 = AnsatzCircuit(c_2, 10000, {})
 
-    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
-    qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+    qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
 
     experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
     experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_2))
