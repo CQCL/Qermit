@@ -27,8 +27,8 @@ jobs:
         uses: actions/configure-pages@v3
       - name: Build Docs
         run: |
-          pip install requirements.txt
           cd docs_src
+          pip install requirements.txt
           ./build_docs.sh
           cd ../manual
           ./build_manual.sh
