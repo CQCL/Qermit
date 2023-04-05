@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pytket.extensions.quantinuum import QuantinuumBackend
 from pytket import OpType
 from pytket.backends.backendinfo import BackendInfo
 from pytket.architecture import FullyConnected  # type: ignore
 from pytket.passes.auto_rebase import auto_rebase_pass
 from pytket.predicates import GateSetPredicate  # type: ignore
-from pytket.extensions.quantinuum.backends.quantinuum import _GATE_SET
+from pytket.extensions.quantinuum import QuantinuumBackend  # type: ignore
+from pytket.extensions.quantinuum.backends.quantinuum import _GATE_SET  # type: ignore
 from pytket.predicates import CompilationUnit  # type: ignore
-from pytket.extensions.qiskit import AerBackend
+from pytket.extensions.qiskit import AerBackend  # type: ignore
 import qiskit.providers.aer.noise as noise  # type: ignore
 from pytket import OpType
 from pytket import Circuit
@@ -30,7 +30,6 @@ from pytket.backends.backendresult import BackendResult
 
 
 class NoisyAerBackend(AerBackend):
-
     noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Rz, OpType.Measure}
 
     def __init__(self, n_qubits: int, prob_1: float, prob_2: float, prob_ro: float):
@@ -91,7 +90,6 @@ class NoisyAerBackend(AerBackend):
 
 
 class MockQuantinuumBackend(QuantinuumBackend):
-
     gate_set = _GATE_SET
     gate_set.add(OpType.ZZPhase)
 
@@ -106,7 +104,6 @@ class MockQuantinuumBackend(QuantinuumBackend):
     noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Rz, OpType.Measure}
 
     def __init__(self):
-
         super(MockQuantinuumBackend, self).__init__(device_name="H1-1SC")
         self.noisy_backend = NoisyAerBackend(
             self.backend_info.n_nodes, 0.0001, 0.001, 0.01
