@@ -899,19 +899,20 @@ def gen_initial_compilation_task(
 
     def task(
         obj, wire: List[ObservableExperiment]
-    ) -> Tuple[List[ObservableExperiment], Dict[Node, Node]]:
+    ) -> Tuple[List[ObservableExperiment], List[Dict[Node, Node]]]:
         """Performs initial compilation before folding. This is to ensure minimal compilation
         after folding, as this could disrupt by how much the noise is increased.
 
         :param wire: List of experiments
         :type wire: List[ObservableExperiment]
         :return: List of experiments compiled to run on the inputted backend.
-        Additionally a dictionary describing how the nodes have been mapped
-        by compilation.
-        :rtype: Tuple[List[ObservableExperiment], Dict[Node, Node]]
+            Additionally a list of dictionaries describing how the nodes have
+            been mapped by compilation.
+        :rtype: Tuple[List[ObservableExperiment], List[Dict[Node, Node]]]
         """
 
         mapped_wire = []
+        node_map_list = []
 
         for obs_exp in wire:
             # Perform default compilation, tracking to which physical
@@ -923,6 +924,7 @@ def gen_initial_compilation_task(
                 optimisation_level=optimisation_level
             ).apply(cu)
             node_map = cu.final_map
+            node_map_list.append(node_map)
 
             # Alter the qubit pauli operator so that it maps to the new physical qubits.
             qpo = obs_exp[1]._qubit_pauli_operator
@@ -942,7 +944,7 @@ def gen_initial_compilation_task(
 
         return (
             mapped_wire,
-            node_map,
+            node_map_list,
         )
 
     return MitTask(
@@ -962,22 +964,26 @@ def gen_qubit_relabel_task() -> MitTask:
     """
 
     def task(
-        obj, qpo_list: List[QubitPauliOperator], compilation_map: Dict[Node, Node]
+        obj, qpo_list: List[QubitPauliOperator], compilation_map_list: List[Dict[Node, Node]]
     ) -> Tuple[List[QubitPauliOperator]]:
         """Use node map returned by compilation unit to undo the relabelling
         performed by gen_initial_compilation_task
 
         :param qpo_list: List of QubitPauliOperator
         :type qpo_list: List[QubitPauliOperator]
-        :param compilation_map: Dictionary mapping nodes as returned by
-        gen_initial_compilation_task task
-        :type compilation_map: Dict[Node, Node]
+        :param compilation_map_list: List of Dictionaries mapping nodes as
+            returned by gen_initial_compilation_task task
+        :type compilation_map_list: List[Dict[Node, Node]]
         :return: List of QubitPauliOperator with relabeled nodes.
         :rtype: Tuple[List[QubitPauliOperator]]
         """
 
-        node_map = {value: key for key, value in compilation_map.items()}
-        new_qpo_list = [qpo_node_relabel(qpo, node_map) for qpo in qpo_list]
+        new_qpo_list = []
+
+        for compilation_map, qpo in zip(compilation_map_list, qpo_list):
+
+            node_map = {value: key for key, value in compilation_map.items()}
+            new_qpo_list.append(qpo_node_relabel(qpo, node_map))
 
         return (new_qpo_list,)
 
