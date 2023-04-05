@@ -156,11 +156,11 @@ def test_gen_initial_compilation_task():
     assert be.valid_circuit(compiled_c_2)
 
 
-@pytest.mark.xfail(
-    reason=("Presently CompilationUnit does not correctly track qubit names")
-)
+# @pytest.mark.xfail(
+#     reason=("Presently CompilationUnit does not correctly track qubit names")
+# )
 def test_gen_initial_compilation_task_quantinuum_qubit_names():
-    
+
     be = MockQuantinuumBackend()
 
     task = gen_initial_compilation_task(be, optimisation_level=0)

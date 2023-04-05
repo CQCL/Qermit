@@ -31,9 +31,9 @@ from .test_backends import MockQuantinuumBackend
 import pytest
 
 
-@pytest.mark.xfail(
-    reason=("Presently pytket removes unused qubits. There is also a missmatch between node and qubit names with QuantinuumBackend")
-)
+# @pytest.mark.xfail(
+#     reason=("Presently pytket removes unused qubits. There is also a missmatch between node and qubit names with QuantinuumBackend")
+# )
 def test_mock_quantinuum_all_qubits() -> None:
 
     circuit = Circuit(2).X(0).X(1).measure_all()
@@ -44,7 +44,7 @@ def test_mock_quantinuum_all_qubits() -> None:
         backend=noisy_backend,
         calibration_shots=100000,
     )
-    assert (1,1) in spam_mitres.run([circ_shots])[0].get_counts().keys()
+    assert (1, 1) in spam_mitres.run([circ_shots])[0].get_counts().keys()
 
 
 def gen_test_wire():
