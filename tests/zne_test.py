@@ -43,6 +43,8 @@ from pytket.circuit import OpType  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
 from pytket.circuit import Node  # type: ignore
+from .test_backends import MockQuantinuumBackend
+import pytest
 
 n_qubits = 2
 
@@ -152,6 +154,33 @@ def test_gen_initial_compilation_task():
     # Check that the compiled circuits are indeed valid
     assert be.valid_circuit(compiled_c_1)
     assert be.valid_circuit(compiled_c_2)
+
+
+@pytest.mark.xfail(
+    reason=("Presently CompilationUnit does not correctly track qubit names")
+)
+def test_gen_initial_compilation_task_quantinuum_qubit_names():
+    
+    be = MockQuantinuumBackend()
+
+    task = gen_initial_compilation_task(be, optimisation_level=0)
+
+    assert task.n_in_wires == 1
+    assert task.n_out_wires == 2
+
+    c = Circuit(2).X(0).X(1)
+
+    ac = AnsatzCircuit(c, 10000, {})
+
+    qpo = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+
+    experiment = ObservableExperiment(ac, ObservableTracker(qpo))
+
+    result = task([[experiment]])
+
+    c_qubits = set(result[0][0].AnsatzCircuit.Circuit.qubits)
+    qpo_qubits = result[0][0].ObservableTracker._qubit_pauli_operator.all_qubits
+    assert qpo_qubits.issubset(c_qubits)
 
 
 def test_gen_duplication_task():
