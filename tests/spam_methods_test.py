@@ -26,14 +26,10 @@ from qermit.taskgraph import CircuitShots  # type: ignore
 from qermit.spam import gen_UnCorrelated_SPAM_MitRes
 from qermit import CircuitShots
 from pytket import Circuit
-from pytket.extensions.quantinuum import QuantinuumBackend
-from .test_backends import MockQuantinuumBackend
+from qermit.mock_backend import MockQuantinuumBackend  # type: ignore
 import pytest
 
 
-# @pytest.mark.xfail(
-#     reason=("Presently pytket removes unused qubits. There is also a missmatch between node and qubit names with QuantinuumBackend")
-# )
 def test_mock_quantinuum_all_qubits() -> None:
 
     circuit = Circuit(2).X(0).X(1).measure_all()
@@ -42,7 +38,7 @@ def test_mock_quantinuum_all_qubits() -> None:
 
     spam_mitres = gen_UnCorrelated_SPAM_MitRes(
         backend=noisy_backend,
-        calibration_shots=100000,
+        calibration_shots=1000,
     )
     assert (1, 1) in spam_mitres.run([circ_shots])[0].get_counts().keys()
 
@@ -95,3 +91,4 @@ def test_gen_UC_mr():
 if __name__ == "__main__":
     test_gen_FC_mr()
     test_gen_UC_mr()
+    test_mock_quantinuum_all_qubits()

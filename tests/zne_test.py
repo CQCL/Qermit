@@ -43,7 +43,7 @@ from pytket.circuit import OpType  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
 from pytket.circuit import Node  # type: ignore
-from .test_backends import MockQuantinuumBackend
+from qermit.mock_backend import MockQuantinuumBackend  # type: ignore
 import pytest
 
 n_qubits = 2
@@ -156,11 +156,7 @@ def test_gen_initial_compilation_task():
     assert be.valid_circuit(compiled_c_2)
 
 
-# @pytest.mark.xfail(
-#     reason=("Presently CompilationUnit does not correctly track qubit names")
-# )
 def test_gen_initial_compilation_task_quantinuum_qubit_names():
-
     be = MockQuantinuumBackend()
 
     task = gen_initial_compilation_task(be, optimisation_level=0)
@@ -674,3 +670,4 @@ if __name__ == "__main__":
     test_circuit_folding_TK1()
     test_gen_qubit_relabel_task()
     test_two_qubit_gate_folding()
+    test_gen_initial_compilation_task_quantinuum_qubit_names()
