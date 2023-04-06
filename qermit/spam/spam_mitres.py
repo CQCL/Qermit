@@ -101,7 +101,12 @@ def gen_UnCorrelated_SPAM_MitRes(
     """
     if backend.backend_info is None:
         raise ValueError("Backend has no backend_info attribute.")
+    if len(backend.backend_info.architecture.nodes) == 0:
+        raise ValueError(
+            "Backend Architecture has no specified Nodes, please use a Backend with a specified Architecture."
+        )
     correlations = [[n] for n in backend.backend_info.architecture.nodes]
+
     return gen_FullyCorrelated_SPAM_MitRes(
         backend, calibration_shots, correlations, **kwargs
     )
