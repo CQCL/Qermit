@@ -24,7 +24,7 @@ from qermit.spam.full_transition_tomography import (  # type: ignore
     reduce_matrices,
 )
 
-from pytket import Circuit, Bit
+from pytket import Circuit, Bit, Qubit
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 import qiskit.providers.aer.noise as noise  # type: ignore
 import numpy as np  # type: ignore
@@ -44,6 +44,15 @@ def test_binary_int_methods():
     test_int = 2
     converted_binary = int_to_binary(test_int, 5)
     assert binary_to_int(converted_binary) == test_int
+
+
+def test_wire_adding():
+    c = Circuit(10).CX(0, 1)
+    n_qubits = c.n_qubits
+    c.remove_blank_wires()
+    while c.n_qubits < n_qubits:
+        c.add_qubit(Qubit("temp", c.n_qubits))
+    assert c.n_qubits == 10
 
 
 def test_get_transition_tomography_circuits():
@@ -203,3 +212,4 @@ if __name__ == "__main__":
     test_calculate_correlation_matrices()
     test_correct_transition_noise()
     test_reduce_matrices()
+    test_wire_adding()

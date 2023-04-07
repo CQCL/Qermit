@@ -43,6 +43,8 @@ from pytket.circuit import OpType  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
 from pytket.circuit import Node  # type: ignore
+from qermit.mock_backend import MockQuantinuumBackend  # type: ignore
+import pytest
 
 n_qubits = 2
 
@@ -107,7 +109,7 @@ def test_gen_qubit_relabel_task():
     )
     qubit_pauli_operator = QubitPauliOperator({qubit_pauli_string: 1.0})
 
-    compilation_map = {Node(0): Qubit(0), Node(1): Qubit(1), Node(2): Qubit(2)}
+    compilation_map = [{Node(0): Qubit(0), Node(1): Qubit(1), Node(2): Qubit(2)}]
 
     relabeled_qubit_pauli_string = QubitPauliString(
         [Node(0), Node(1), Node(2)], [Pauli.Z, Pauli.Z, Pauli.Z]
@@ -130,13 +132,13 @@ def test_gen_initial_compilation_task():
     assert task.n_out_wires == 2
 
     c_1 = Circuit(2).CZ(0, 1).T(1)
-    c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
+    c_2 = Circuit(1).T(0).X(0)
 
     ac_1 = AnsatzCircuit(c_1, 10000, {})
     ac_2 = AnsatzCircuit(c_2, 10000, {})
 
-    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
-    qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+    qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
 
     experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
     experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_2))
@@ -152,6 +154,29 @@ def test_gen_initial_compilation_task():
     # Check that the compiled circuits are indeed valid
     assert be.valid_circuit(compiled_c_1)
     assert be.valid_circuit(compiled_c_2)
+
+
+def test_gen_initial_compilation_task_quantinuum_qubit_names():
+    be = MockQuantinuumBackend()
+
+    task = gen_initial_compilation_task(be, optimisation_level=0)
+
+    assert task.n_in_wires == 1
+    assert task.n_out_wires == 2
+
+    c = Circuit(2).X(0).X(1)
+
+    ac = AnsatzCircuit(c, 10000, {})
+
+    qpo = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+
+    experiment = ObservableExperiment(ac, ObservableTracker(qpo))
+
+    result = task([[experiment]])
+
+    c_qubits = set(result[0][0].AnsatzCircuit.Circuit.qubits)
+    qpo_qubits = result[0][0].ObservableTracker._qubit_pauli_operator.all_qubits
+    assert qpo_qubits.issubset(c_qubits)
 
 
 def test_gen_duplication_task():
@@ -442,7 +467,7 @@ def test_simple_run_end_to_end():
     )
 
     c_1 = Circuit(2).CZ(0, 1).T(1)
-    c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
+    c_2 = Circuit(1).T(0).X(0)
     ac_1 = AnsatzCircuit(c_1, 10000, SymbolsDict())
     ac_2 = AnsatzCircuit(c_2, 10000, SymbolsDict())
     circ_list = []
@@ -450,7 +475,7 @@ def test_simple_run_end_to_end():
         ObservableExperiment(
             ac_1,
             ObservableTracker(
-                QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+                QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
             ),
         )
     )
@@ -458,7 +483,7 @@ def test_simple_run_end_to_end():
         ObservableExperiment(
             ac_2,
             ObservableTracker(
-                QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+                QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
             ),
         )
     )
@@ -467,8 +492,8 @@ def test_simple_run_end_to_end():
     expectation_1 = result[0]
     expectation_2 = result[1]
 
-    res1 = expectation_1[QubitPauliString([Qubit(0)], [Pauli.Z])]
-    res2 = expectation_2[QubitPauliString([Qubit(1)], [Pauli.Z])]
+    res1 = expectation_1[QubitPauliString([Qubit(1)], [Pauli.Z])]
+    res2 = expectation_2[QubitPauliString([Qubit(0)], [Pauli.Z])]
 
     assert round(float(res1)) == 1.0
     assert round(float(res2)) == -1.0
@@ -645,3 +670,4 @@ if __name__ == "__main__":
     test_circuit_folding_TK1()
     test_gen_qubit_relabel_task()
     test_two_qubit_gate_folding()
+    test_gen_initial_compilation_task_quantinuum_qubit_names()

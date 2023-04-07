@@ -23,6 +23,24 @@ from qermit.spam import (  # type: ignore
     CorrectionMethod,
 )
 from qermit.taskgraph import CircuitShots  # type: ignore
+from qermit.spam import gen_UnCorrelated_SPAM_MitRes
+from qermit import CircuitShots
+from pytket import Circuit
+from qermit.mock_backend import MockQuantinuumBackend  # type: ignore
+import pytest
+
+
+def test_mock_quantinuum_all_qubits() -> None:
+
+    circuit = Circuit(2).X(0).X(1).measure_all()
+    circ_shots = CircuitShots(circuit, 1000)
+    noisy_backend = MockQuantinuumBackend()
+
+    spam_mitres = gen_UnCorrelated_SPAM_MitRes(
+        backend=noisy_backend,
+        calibration_shots=1000,
+    )
+    assert (1, 1) in spam_mitres.run([circ_shots])[0].get_counts().keys()
 
 
 def gen_test_wire():
@@ -73,3 +91,4 @@ def test_gen_UC_mr():
 if __name__ == "__main__":
     test_gen_FC_mr()
     test_gen_UC_mr()
+    test_mock_quantinuum_all_qubits()
