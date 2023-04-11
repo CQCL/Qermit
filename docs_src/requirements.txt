@@ -1,4 +1,4 @@
 sphinx
 sphinx_autodoc_annotation
 sphinx_rtd_theme
-
+jupyter_sphinx

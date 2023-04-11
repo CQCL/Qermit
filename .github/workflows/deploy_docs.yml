@@ -1,0 +1,48 @@
+name: Build and Deploy Docs
+
+on:
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Qermit
+        run: pip install .
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Build Docs
+        run: |
+          cd docs_src
+          pip install -r requirements.txt
+          ./build_docs.sh
+          cd ../manual
+          ./build_manual.sh
+      - name: Save documentation
+        uses: actions/upload-artifact@v2
+        with:
+          name: docs_html
+          path: docs/
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: 'docs/'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
