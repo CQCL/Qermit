@@ -26,6 +26,7 @@ from pytket.pauli import QubitPauliString, Pauli  # type: ignore
 from pytket.utils import QubitPauliOperator
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 
+
 # tests for SymbolsDict class in utils
 def test_SymbolsDict_circuit_constructor() -> None:
     test_circuit = Circuit(4)

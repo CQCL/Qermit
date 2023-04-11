@@ -359,7 +359,7 @@ def gen_run_with_quasi_prob() -> MitTask:
             # The number of noisy circuits corresponding to one ideal.
             last = len(experiment[0])
             # Append portion of the list of noisy results that relate to one circuit.
-            circ_results_list.append(noisy_circ_results[first : first + last])
+            circ_results_list.append(noisy_circ_results[first: first + last])
             first += last
 
         # Create new list with mitigated results

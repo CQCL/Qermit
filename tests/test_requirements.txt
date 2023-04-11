@@ -1,3 +1,6 @@
 pytket-qiskit~=0.23
-pytket-quantinuum>=0.15.0
 pytest
+pytest-cov
+flake8
+mypy==0.982
+pytket-quantinuum>=0.15.0

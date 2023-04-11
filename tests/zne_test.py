@@ -44,7 +44,6 @@ from qiskit import IBMQ  # type: ignore
 import pytest
 from pytket.circuit import Node  # type: ignore
 from qermit.mock_backend import MockQuantinuumBackend  # type: ignore
-import pytest
 
 n_qubits = 2
 

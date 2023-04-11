@@ -22,12 +22,8 @@ from qermit.spam import (  # type: ignore
     gen_UnCorrelated_SPAM_MitRes,
     CorrectionMethod,
 )
-from qermit.taskgraph import CircuitShots  # type: ignore
-from qermit.spam import gen_UnCorrelated_SPAM_MitRes
 from qermit import CircuitShots
-from pytket import Circuit
 from qermit.mock_backend import MockQuantinuumBackend  # type: ignore
-import pytest
 
 
 def test_mock_quantinuum_all_qubits() -> None:

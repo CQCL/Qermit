@@ -19,4 +19,4 @@ that automatically run frame randomisation protocols (a generalisation of random
 compilation).
 """
 
-from .frame_randomisation import FrameRandomisation, gen_Frame_Randomisation_MitRes
+from .frame_randomisation import FrameRandomisation, gen_Frame_Randomisation_MitRes  # noqa:F401

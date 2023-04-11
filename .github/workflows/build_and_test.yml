@@ -25,17 +25,18 @@ jobs:
       if: github.event_name == 'pull_request'
       run: |
         pip install -e . -v
-    - name: Run mypy
-      if: github.event_name == 'pull_request'
-      run: |
-        python3 -m pip install -U mypy==0.982
-        mypy -p qermit 
     - name: Test qermit 
       if: github.event_name == 'pull_request'
       run: |
         cd tests
         pip install -r test_requirements.txt
-        pytest
+        pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
+    - name: Run mypy
+      if: github.event_name == 'pull_request'
+      run: mypy -p qermit
+    - name: Format check
+      if: github.event_name == 'pull_request'
+      run: flake8 qermit/ tests/ --ignore=E501,W503
   linux:
     name: Build and test (Linux)
     runs-on: ubuntu-latest
@@ -57,7 +58,7 @@ jobs:
       run: |
         cd tests
         pip install -r test_requirements.txt
-        pytest
+        pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
       
   windows:
     name: Build and test (Windows)
@@ -80,4 +81,4 @@ jobs:
       run: |
         cd tests
         pip install -r test_requirements.txt
-        pytest
+        pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10

@@ -17,8 +17,8 @@
 The taskgraph module defines the TaskGraph, MitRes and MitTask objects, through which
 mitigated experiments are run.
 """
-from .task_graph import TaskGraph
-from .mittask import (
+from .task_graph import TaskGraph  # noqa:F401
+from .mittask import (  # noqa:F401
     MitTask,
     IOTask,
     CircuitShots,
@@ -27,7 +27,7 @@ from .mittask import (
     AnsatzCircuit,
     ObservableExperiment,
 )
-from .mitres import (
+from .mitres import (  # noqa:F401
     MitRes,
     backend_compile_circuit_shots_task_gen,
     backend_handle_task_gen,
@@ -36,7 +36,7 @@ from .mitres import (
     group_shots_task_gen,
     gen_shot_split_MitRes,
 )
-from .mitex import (
+from .mitex import (  # noqa:F401
     MitEx,
     gen_compiled_MitRes,
     filter_observable_tracker_task_gen,
@@ -45,5 +45,5 @@ from .mitex import (
     get_expectations_task_gen,
     gen_compiled_shot_split_MitRes,
 )
-from .utils import SymbolsDict, MeasurementCircuit, ObservableTracker
-from .measurement_reduction import gen_MeasurementReduction_MitEx
+from .utils import SymbolsDict, MeasurementCircuit, ObservableTracker  # noqa:F401
+from .measurement_reduction import gen_MeasurementReduction_MitEx  # noqa:F401

@@ -145,7 +145,7 @@ class Folding(Enum):
             if (
                 not (cmd.op.type == OpType.Barrier)
                 and not (cmd.op.type in box_types)
-                and len(cmd.qubits) == 2
+                and (len(cmd.qubits) == 2)
             )
         }
 
