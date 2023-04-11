@@ -32,6 +32,11 @@ jobs:
           ./build_docs.sh
           cd ../manual
           ./build_manual.sh
+      - name: Save documentation
+        uses: actions/upload-artifact@v2
+        with:
+          name: docs_html
+          path: docs/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
