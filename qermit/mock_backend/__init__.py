@@ -18,4 +18,4 @@ The mock_backend module provides custom noisy instances of the pytket AerBackend
 and QuantinuumBackend objects, for local testing.
 """
 
-from .mock_quantinuum_backend import MockQuantinuumBackend
+from .mock_quantinuum_backend import MockQuantinuumBackend  # noqa:F401

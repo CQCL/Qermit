@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pytket import OpType
 from pytket.backends.backendinfo import BackendInfo
 from pytket.architecture import FullyConnected  # type: ignore
 from pytket.passes.auto_rebase import auto_rebase_pass
