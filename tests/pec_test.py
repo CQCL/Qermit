@@ -17,9 +17,6 @@ from qermit import (  # type: ignore
     ObservableTracker,
     SymbolsDict,
 )
-from qermit.probabilistic_error_cancellation import (  # type: ignore
-    gen_PEC_learning_based_MitEx,
-)
 from qermit.probabilistic_error_cancellation.pec_learning_based import (  # type: ignore
     gen_rebase_to_frames_and_computing,
     gen_label_gates,
@@ -40,9 +37,43 @@ from qermit import AnsatzCircuit, ObservableExperiment
 from pytket.extensions.qiskit import IBMQEmulatorBackend  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
+from qermit.probabilistic_error_cancellation import (
+    gen_PEC_learning_based_MitEx,
+    gen_PEC_noise_model_MitEx,
+)
+from qiskit_aer.noise import NoiseModel
 
 skip_remote_tests: bool = not IBMQ.stored_account()
 REASON = "IBMQ account not configured"
+
+
+def test_pec_noise_model():
+
+    noise_model = NoiseModel()
+    device_backend = AerBackend()
+    pec_mitex = gen_PEC_noise_model_MitEx(
+        device_backend=device_backend, noise_model=noise_model
+    )
+
+    circ = Circuit(2)
+    circ.H(0).H(1).Rz(0.2, 0).Rz(0.3, 1).H(0).H(1).CX(0, 1)
+    sym_dict = SymbolsDict()
+    ansatz_circuit = AnsatzCircuit(circ, 1000, sym_dict)
+
+    qubit_pauli_string = QubitPauliString(
+        [Qubit(0), Qubit(1)], [Pauli.Z, Pauli.Z]
+    )
+    qubit_pauli_operator = QubitPauliOperator(
+        {qubit_pauli_string: 1.0}
+    )
+    observable_tracker = ObservableTracker(qubit_pauli_operator)
+
+    exp = ObservableExperiment(
+        ansatz_circuit,
+        observable_tracker,
+    )
+
+    pec_mitex.run([exp])
 
 
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)

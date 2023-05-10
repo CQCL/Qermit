@@ -22,3 +22,6 @@ Probabilistic Error Cancellation.
 from .pec_learning_based import (  # noqa:F401
     gen_PEC_learning_based_MitEx,
 )
+from .pec_noise_model import (  # noqa:F401
+    gen_PEC_noise_model_MitEx,
+)
