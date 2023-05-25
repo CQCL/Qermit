@@ -38,8 +38,8 @@ tests and is accepted after review, it will be merged in.
 
 #### Formatting
 
-All code should be formatted using
-[black](https://black.readthedocs.io/en/stable/), with default options. 
+All code should adhere to [flake8](https://flake8.pycqa.org/en/latest/)
+formatting, ignoring only E501 and W503
 
 #### Type annotation
 

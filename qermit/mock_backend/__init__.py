@@ -14,11 +14,8 @@
 
 
 """
-The probabilistic_error_cancellation module provides generator methods for producing
-MitEx objects that automatically characterise and correct device noise via
-Probabilistic Error Cancellation.
+The mock_backend module provides custom noisy instances of the pytket AerBackend
+and QuantinuumBackend objects, for local testing.
 """
 
-from .pec_learning_based import (  # noqa:F401
-    gen_PEC_learning_based_MitEx,
-)
+from .mock_quantinuum_backend import MockQuantinuumBackend  # noqa:F401

@@ -34,6 +34,7 @@ FullCorrelatedNoiseCharacterisation = namedtuple(
 
 StateInfo = namedtuple("StateInfo", ["PreparedStates", "QubitBitMaps"])
 
+
 # Helper methods for holding basis states
 @lru_cache(maxsize=128)
 def binary_to_int(bintuple: Tuple[int]) -> int:
@@ -85,13 +86,11 @@ def get_full_transition_tomography_circuits(
         should be processed without compilation.
     :rtype: List[Circuit]
     """
-
     subsets_matrix_map = OrderedDict.fromkeys(
         sorted(map(tuple, correlations), key=len, reverse=True)
     )
     # ordered from largest to smallest via OrderedDict & sorted
     subset_dimensions = [len(subset) for subset in subsets_matrix_map]
-
     major_state_dimensions = subset_dimensions[0]
     n_circuits = 1 << major_state_dimensions
     all_qubits = [qb for subset in correlations for qb in subset]
@@ -112,9 +111,14 @@ def get_full_transition_tomography_circuits(
     xcirc = backend.get_compiled_circuit(xcirc)
     FlattenRegisters().apply(xcirc)
     xbox = CircBox(xcirc)
-
     # need to be default register to add as box suitably
+
+    n_qubits_pre_compile = process_circuit.n_qubits
     process_circuit = backend.get_compiled_circuit(process_circuit)
+
+    while process_circuit.n_qubits < n_qubits_pre_compile:
+        process_circuit.add_qubit(Qubit("temp_q", process_circuit.n_qubits))
+
     rename_map_pc = {}
     for index, qb in enumerate(process_circuit.qubits):
         rename_map_pc[qb] = Qubit(index)
@@ -147,6 +151,7 @@ def get_full_transition_tomography_circuits(
                 state_circuit.add_circbox(xbox, [flipped_qb])
         # Decompose boxes, add barriers to preserve circuit, add measures
         state_circuit.add_barrier(all_qubits)
+
         # add process circuit to measure
         state_circuit.add_circbox(pbox, state_circuit.qubits)
         DecomposeBoxes().apply(state_circuit)
@@ -221,14 +226,13 @@ def calculate_correlation_matrices(
     )
 
 
-#########################################
-### _compute_dot and helper functions ###
-###
-### With thanks to
-### https://math.stackexchange.com/a/3423910
-### and especially
-### https://gist.github.com/ahwillia/f65bc70cb30206d4eadec857b98c4065
-### on which this code is based.
+# _compute_dot and helper functions #
+#
+# With thanks to
+# https://math.stackexchange.com/a/3423910
+# and especially
+# https://gist.github.com/ahwillia/f65bc70cb30206d4eadec857b98c4065
+# on which this code is based.
 def _unfold(tens: np.ndarray, mode: int, dims: List[int]) -> np.ndarray:
     """
     Unfolds tensor into matrix.

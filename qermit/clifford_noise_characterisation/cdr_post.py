@@ -16,7 +16,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple, cast, Dict, Union
 
-import numpy as np  #  type: ignore
+import numpy as np  # type: ignore
 from pytket.utils import QubitPauliOperator
 from pytket.pauli import QubitPauliString  # type: ignore
 from qermit import MitTask

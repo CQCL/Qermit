@@ -43,6 +43,7 @@ from pytket.circuit import OpType  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
 from pytket.circuit import Node  # type: ignore
+from qermit.mock_backend import MockQuantinuumBackend  # type: ignore
 
 n_qubits = 2
 
@@ -107,7 +108,7 @@ def test_gen_qubit_relabel_task():
     )
     qubit_pauli_operator = QubitPauliOperator({qubit_pauli_string: 1.0})
 
-    compilation_map = {Node(0): Qubit(0), Node(1): Qubit(1), Node(2): Qubit(2)}
+    compilation_map = [{Node(0): Qubit(0), Node(1): Qubit(1), Node(2): Qubit(2)}]
 
     relabeled_qubit_pauli_string = QubitPauliString(
         [Node(0), Node(1), Node(2)], [Pauli.Z, Pauli.Z, Pauli.Z]
@@ -130,13 +131,13 @@ def test_gen_initial_compilation_task():
     assert task.n_out_wires == 2
 
     c_1 = Circuit(2).CZ(0, 1).T(1)
-    c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
+    c_2 = Circuit(1).T(0).X(0)
 
     ac_1 = AnsatzCircuit(c_1, 10000, {})
     ac_2 = AnsatzCircuit(c_2, 10000, {})
 
-    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
-    qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+    qpo_1 = QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+    qpo_2 = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
 
     experiment_1 = ObservableExperiment(ac_1, ObservableTracker(qpo_1))
     experiment_2 = ObservableExperiment(ac_2, ObservableTracker(qpo_2))
@@ -152,6 +153,29 @@ def test_gen_initial_compilation_task():
     # Check that the compiled circuits are indeed valid
     assert be.valid_circuit(compiled_c_1)
     assert be.valid_circuit(compiled_c_2)
+
+
+def test_gen_initial_compilation_task_quantinuum_qubit_names():
+    be = MockQuantinuumBackend()
+
+    task = gen_initial_compilation_task(be, optimisation_level=0)
+
+    assert task.n_in_wires == 1
+    assert task.n_out_wires == 2
+
+    c = Circuit(2).X(0).X(1)
+
+    ac = AnsatzCircuit(c, 10000, {})
+
+    qpo = QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+
+    experiment = ObservableExperiment(ac, ObservableTracker(qpo))
+
+    result = task([[experiment]])
+
+    c_qubits = set(result[0][0].AnsatzCircuit.Circuit.qubits)
+    qpo_qubits = result[0][0].ObservableTracker._qubit_pauli_operator.all_qubits
+    assert qpo_qubits.issubset(c_qubits)
 
 
 def test_gen_duplication_task():
@@ -442,7 +466,7 @@ def test_simple_run_end_to_end():
     )
 
     c_1 = Circuit(2).CZ(0, 1).T(1)
-    c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
+    c_2 = Circuit(1).T(0).X(0)
     ac_1 = AnsatzCircuit(c_1, 10000, SymbolsDict())
     ac_2 = AnsatzCircuit(c_2, 10000, SymbolsDict())
     circ_list = []
@@ -450,7 +474,7 @@ def test_simple_run_end_to_end():
         ObservableExperiment(
             ac_1,
             ObservableTracker(
-                QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
+                QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
             ),
         )
     )
@@ -458,7 +482,7 @@ def test_simple_run_end_to_end():
         ObservableExperiment(
             ac_2,
             ObservableTracker(
-                QubitPauliOperator({QubitPauliString([Qubit(1)], [Pauli.Z]): 1})
+                QubitPauliOperator({QubitPauliString([Qubit(0)], [Pauli.Z]): 1})
             ),
         )
     )
@@ -467,8 +491,8 @@ def test_simple_run_end_to_end():
     expectation_1 = result[0]
     expectation_2 = result[1]
 
-    res1 = expectation_1[QubitPauliString([Qubit(0)], [Pauli.Z])]
-    res2 = expectation_2[QubitPauliString([Qubit(1)], [Pauli.Z])]
+    res1 = expectation_1[QubitPauliString([Qubit(1)], [Pauli.Z])]
+    res2 = expectation_2[QubitPauliString([Qubit(0)], [Pauli.Z])]
 
     assert round(float(res1)) == 1.0
     assert round(float(res2)) == -1.0
@@ -554,17 +578,17 @@ def test_two_qubit_gate_folding():
     assert task_invalid.n_in_wires == 1
     assert task_invalid.n_out_wires == 1
 
-    c_1 = Circuit(2).Rz(0.3,0).ZZPhase(0.3,1,0)
+    c_1 = Circuit(2).Rz(0.3, 0).ZZPhase(0.3, 1, 0)
     # This is to ensure that the barrier is not folded, even though it
     # acts on 2 qubits
-    c_2 = Circuit(3).Rz(0.3,2).CZ(1,2).add_barrier([0,1]).CX(0,1).X(0)
-    c_3 = Circuit(3).CZ(0,1).CZ(1,2).CZ(0,2)
+    c_2 = Circuit(3).Rz(0.3, 2).CZ(1, 2).add_barrier([0, 1]).CX(0, 1).X(0)
+    c_3 = Circuit(3).CZ(0, 1).CZ(1, 2).CZ(0, 2)
 
     circ_box = CircBox(c_1)
     # Tests that circuits with nothing to fold will raise an error.
-    c_gate_set_invalid_1 = Circuit(2).add_circbox(circ_box, [0,1])
+    c_gate_set_invalid_1 = Circuit(2).add_circbox(circ_box, [0, 1])
     # Tests that circuits with CircBox will raise an error.
-    c_gate_set_invalid_2 = Circuit(2).add_circbox(circ_box, [0,1]).CZ(0,1)
+    c_gate_set_invalid_2 = Circuit(2).add_circbox(circ_box, [0, 1]).CZ(0, 1)
 
     ac_1 = AnsatzCircuit(c_1, 10000, {})
     ac_2 = AnsatzCircuit(c_2, 10000, {})
@@ -587,12 +611,12 @@ def test_two_qubit_gate_folding():
     with pytest.raises(ValueError):
         task_invalid([[experiment_1, experiment_2]])
 
-    with  pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError):
         task_1([[experiment_gate_set_invalid_1]])
 
-    with  pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError):
         task_1([[experiment_gate_set_invalid_2]])
-    
+
     folded_experiment_1 = task_1([[experiment_1, experiment_2]])[0]
     folded_experiment_2 = task_2([[experiment_3]])[0]
 
@@ -601,12 +625,12 @@ def test_two_qubit_gate_folding():
     folded_c_3 = folded_experiment_2[0].AnsatzCircuit.Circuit
 
     ideal_folded_c_1 = Circuit(2)
-    ideal_folded_c_1.Rz(0.3,0)
-    ideal_folded_c_1.ZZPhase(0.3,1,0)
-    ideal_folded_c_1.add_barrier([1,0])
-    ideal_folded_c_1.ZZPhase(3.7,1,0)
-    ideal_folded_c_1.add_barrier([1,0])
-    ideal_folded_c_1.ZZPhase(0.3,1,0)
+    ideal_folded_c_1.Rz(0.3, 0)
+    ideal_folded_c_1.ZZPhase(0.3, 1, 0)
+    ideal_folded_c_1.add_barrier([1, 0])
+    ideal_folded_c_1.ZZPhase(3.7, 1, 0)
+    ideal_folded_c_1.add_barrier([1, 0])
+    ideal_folded_c_1.ZZPhase(0.3, 1, 0)
 
     assert folded_c_1 == ideal_folded_c_1
 
@@ -619,7 +643,7 @@ def test_two_qubit_gate_folding():
     assert folded_c_1.n_gates == c_1.n_gates + 2 * c_1.n_2qb_gates() * (n_folds_1 - 1)
     assert folded_c_2.n_gates == c_2.n_gates + 2 * c_2.n_2qb_gates() * (n_folds_1 - 1)
     # note that this gives an nose scaling = 17/3 = 5.6 which is a little smaller than 5.8
-    assert folded_c_3.n_2qb_gates() == 17 
+    assert folded_c_3.n_2qb_gates() == 17
 
     c_1_unitary = c_1.get_unitary()
     c_2_unitary = c_2.get_unitary()
@@ -645,3 +669,4 @@ if __name__ == "__main__":
     test_circuit_folding_TK1()
     test_gen_qubit_relabel_task()
     test_two_qubit_gate_folding()
+    test_gen_initial_compilation_task_quantinuum_qubit_names()
