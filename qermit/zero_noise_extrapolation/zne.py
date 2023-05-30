@@ -964,7 +964,9 @@ def gen_qubit_relabel_task() -> MitTask:
     """
 
     def task(
-        obj, qpo_list: List[QubitPauliOperator], compilation_map_list: List[Dict[Node, Node]]
+        obj,
+        qpo_list: List[QubitPauliOperator],
+        compilation_map_list: List[Dict[Node, Node]],
     ) -> Tuple[List[QubitPauliOperator]]:
         """Use node map returned by compilation unit to undo the relabelling
         performed by gen_initial_compilation_task
