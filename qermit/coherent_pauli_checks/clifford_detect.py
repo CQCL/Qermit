@@ -1,8 +1,8 @@
 from pytket import Circuit, OpType, Qubit
 import networkx as nx  # type: ignore
-from pytket.circuit import Command  # type: ignore
+from pytket.circuit import Command, Bit  # type: ignore
 from pytket.passes.auto_rebase import auto_rebase_pass
-from .stabiliser import PauliSampler
+from .pauli_sampler import PauliSampler
 from pytket.passes import DecomposeBoxes  # type: ignore
 
 
@@ -34,6 +34,7 @@ class QermitDAGCircuit(nx.DiGraph):
             DAGCommand(command) for command in circuit.get_commands()
         ]
         self.qubits = circuit.qubits
+        self.bits = circuit.bits
 
         current_node: dict[Qubit, int] = {}
         for node, command in enumerate(self.node_command):
@@ -165,8 +166,10 @@ class QermitDAGCircuit(nx.DiGraph):
 
         # Initialise new circuit
         pauli_check_circuit = Circuit()
-        for quibt in self.qubits:
-            pauli_check_circuit.add_qubit(quibt)
+        for qubit in self.qubits:
+            pauli_check_circuit.add_qubit(qubit)
+        for bit in self.bits:
+            pauli_check_circuit.add_bit(bit)
 
         ancilla_count = 0
 
@@ -189,7 +192,6 @@ class QermitDAGCircuit(nx.DiGraph):
                     break
             assert sub_circuit_to_implement is not None
 
-
             # List the nodes in the chosen sub circuit
             node_to_implement_list = [
                 node for node in self.nodes()
@@ -206,11 +208,11 @@ class QermitDAGCircuit(nx.DiGraph):
                     name='ancilla',
                     index=ancilla_count,
                 )
+                 # TODO: check that register names do not already exist
                 pauli_check_circuit.add_qubit(control_qubit)
-                ancilla_count += 1
 
                 pauli_check_circuit.add_barrier(
-                    qubit_list
+                    qubit_list + [control_qubit]
                 )
 
                 stabiliser = pauli_sampler.sample(qubit_list=qubit_list)
@@ -222,14 +224,14 @@ class QermitDAGCircuit(nx.DiGraph):
                 )
 
                 pauli_check_circuit.add_barrier(
-                    qubit_list
+                    qubit_list + [control_qubit]
                 )
 
             # Add all commands in the sub circuit
             for node in node_to_implement_list:
                 pauli_check_circuit.add_gate(
                     self.node_command[node].command.op,
-                    self.node_command[node].command.qubits
+                    self.node_command[node].command.args
                 )
                 implemented_commands[node] = True
                 if self.node_command[node].clifford:
@@ -242,7 +244,7 @@ class QermitDAGCircuit(nx.DiGraph):
             if self.node_command[node_to_implement_list[0]].clifford:
 
                 pauli_check_circuit.add_barrier(
-                    qubit_list
+                    qubit_list + [control_qubit]
                 )
 
                 stabiliser_circuit = stabiliser.get_control_circuit(
@@ -253,8 +255,24 @@ class QermitDAGCircuit(nx.DiGraph):
                 )
 
                 pauli_check_circuit.add_barrier(
-                    qubit_list
+                    qubit_list + [control_qubit]
                 )
+
+                measure_bit = Bit(
+                    name='ancilla_measure',
+                    index=ancilla_count,
+                )
+                 # TODO: check that register names do not already exist
+                pauli_check_circuit.add_bit(
+                    id=measure_bit
+                )
+                pauli_check_circuit.Measure(
+                    qubit=control_qubit,
+                    bit=measure_bit,
+                )
+
+                ancilla_count += 1
+
 
         DecomposeBoxes().apply(pauli_check_circuit)
 

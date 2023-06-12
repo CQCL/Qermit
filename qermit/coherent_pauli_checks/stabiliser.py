@@ -14,7 +14,7 @@ class Stabiliser:
         3: 0 - 1j,
     }
 
-    def __init__(self, Z_list: list[int], qubit_list: list[Qubit]):
+    def __init__(self, Z_list: list[int], X_list:list[int], qubit_list: list[Qubit]):
         """Initialisation is by a list of qubits, and a list of 0, 1
         values indicating that a Z operator acts there.
 
@@ -31,7 +31,8 @@ class Stabiliser:
         # The equivalent X list is initialised in 0. As such only Z
         # stabilisers can be initialised. This could be generalised if
         # necessary.
-        self.X_list = {qubit: 0 for qubit in qubit_list}
+        # self.X_list = {qubit: 0 for qubit in qubit_list}
+        self.X_list = {qubit: X for qubit, X in zip(qubit_list, X_list)}
         self.phase = 0
         self.qubit_list = qubit_list
 
@@ -212,21 +213,3 @@ class Stabiliser:
         )
 
         return qubit_pauli_string, self.phase_dict[operator_phase]
-
-
-class PauliSampler:
-
-    def sample(self, **kwargs):
-        pass
-
-
-class DeterministicPauliSampler(PauliSampler):
-
-    def __init__(self):
-        pass
-
-    def sample(self, qubit_list):
-        return Stabiliser(
-            Z_list=[1] * len(qubit_list),
-            qubit_list=qubit_list,
-        )
