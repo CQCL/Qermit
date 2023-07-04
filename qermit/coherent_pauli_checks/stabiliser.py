@@ -14,7 +14,7 @@ class Stabiliser:
         3: 0 - 1j,
     }
 
-    def __init__(self, Z_list: list[int], X_list:list[int], qubit_list: list[Qubit]):
+    def __init__(self, Z_list: list[int], X_list: list[int], qubit_list: list[Qubit]):
         """Initialisation is by a list of qubits, and a list of 0, 1
         values indicating that a Z operator acts there.
 
@@ -162,7 +162,9 @@ class Stabiliser:
                     control_qubit=control_qubit,
                     target_qubit=qubit,
                 )
-        circ.add_phase(a=self.phase / 2)
+        for _ in range(self.phase):
+            circ.S(control_qubit)
+        # circ.add_phase(a=self.phase / 2)
 
         return circ
 

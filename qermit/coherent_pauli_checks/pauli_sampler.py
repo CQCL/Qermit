@@ -1,6 +1,7 @@
 from .stabiliser import Stabiliser
 import numpy.random
 
+
 class PauliSampler:
 
     def sample(self, **kwargs):
@@ -19,6 +20,7 @@ class DeterministicZPauliSampler(PauliSampler):
             qubit_list=qubit_list,
         )
 
+
 class DeterministicXPauliSampler(PauliSampler):
 
     def __init__(self):
@@ -30,6 +32,7 @@ class DeterministicXPauliSampler(PauliSampler):
             X_list=[1] * len(qubit_list),
             qubit_list=qubit_list,
         )
+
 
 class RandomPauliSampler(PauliSampler):
 

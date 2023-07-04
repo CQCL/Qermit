@@ -36,10 +36,16 @@ class QermitDAGCircuit(nx.DiGraph):
         self.qubits = circuit.qubits
         self.bits = circuit.bits
 
+        # Lists the most recent node to act on a particular qubits. If a
+        # new gate is found to act on that qubit then an edge between the
+        # node which corresponds to the new gate and the node which
+        # most recently acted on that qubit is added.
         current_node: dict[Qubit, int] = {}
         for node, command in enumerate(self.node_command):
             self.add_node(node)
             for qubit in command.command.qubits:
+                # This if statement is used in case the qubit has not been
+                # acted on yet.
                 if qubit in current_node.keys():
                     self.add_edge(current_node[qubit], node)
                 current_node[qubit] = node
@@ -90,16 +96,20 @@ class QermitDAGCircuit(nx.DiGraph):
 
                 # Check if any of the paths in the circuit from the neighbour
                 # to other commands in the clifford circuit pass through
-                # non clifford gates.
+                # a different Clifford subcircuit. If nodes on the path
+                # belonged to another clifford subcircuit then it would
+                # not be possible to build the circuit by applying
+                # sub circuits sequentially.
                 same_clifford_circuit = True
                 for same_sub_circuit_node in same_sub_circuit_node_list:
 
                     for path in nx.all_simple_paths(
                         self, same_sub_circuit_node, neighbour_id
                     ):
+
                         if not all(
-                            self.node_command[path_node].clifford
-                            for path_node in path
+                            node_sub_circuit[path_node] == node_sub_circuit[node]
+                            for path_node in path[:-1]
                         ):
                             same_clifford_circuit = False
 
@@ -115,7 +125,7 @@ class QermitDAGCircuit(nx.DiGraph):
         self, node_sub_circuit: list[int]
     ) -> dict[int, set[Qubit]]:
         """Creates a dictionary from the clifford sub circuit to the qubits
-        which it covers
+        which it covers.
 
         :param node_sub_circuit: List identifying to which clifford sub circuit
         each command belongs.
@@ -208,12 +218,13 @@ class QermitDAGCircuit(nx.DiGraph):
                     name='ancilla',
                     index=ancilla_count,
                 )
-                 # TODO: check that register names do not already exist
+                # TODO: check that register names do not already exist
                 pauli_check_circuit.add_qubit(control_qubit)
 
                 pauli_check_circuit.add_barrier(
                     qubit_list + [control_qubit]
                 )
+                pauli_check_circuit.H(control_qubit)
 
                 stabiliser = pauli_sampler.sample(qubit_list=qubit_list)
                 stabiliser_circuit = stabiliser.get_control_circuit(
@@ -253,7 +264,7 @@ class QermitDAGCircuit(nx.DiGraph):
                 pauli_check_circuit.append(
                     circuit=stabiliser_circuit,
                 )
-
+                pauli_check_circuit.H(control_qubit)
                 pauli_check_circuit.add_barrier(
                     qubit_list + [control_qubit]
                 )
@@ -262,7 +273,7 @@ class QermitDAGCircuit(nx.DiGraph):
                     name='ancilla_measure',
                     index=ancilla_count,
                 )
-                 # TODO: check that register names do not already exist
+                # TODO: check that register names do not already exist
                 pauli_check_circuit.add_bit(
                     id=measure_bit
                 )
@@ -272,7 +283,6 @@ class QermitDAGCircuit(nx.DiGraph):
                 )
 
                 ancilla_count += 1
-
 
         DecomposeBoxes().apply(pauli_check_circuit)
 

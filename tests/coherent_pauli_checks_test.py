@@ -1,7 +1,14 @@
 from pytket import Circuit
-from qermit.coherent_pauli_checks import QermitDAGCircuit, cpc_rebase_pass
-from qermit.coherent_pauli_checks import DeterministicZPauliSampler
+from qermit.coherent_pauli_checks import (
+    QermitDAGCircuit,
+    cpc_rebase_pass,
+    DeterministicZPauliSampler,
+    DeterministicXPauliSampler,
+    RandomPauliSampler,
+)
 from pytket.circuit import Qubit, Bit
+from qermit.probabilistic_error_cancellation.cliff_circuit_gen import random_clifford_circ
+import pytest
 
 
 def test_get_clifford_subcircuits():
@@ -41,28 +48,38 @@ def test_add_pauli_checks():
     ideal_circ.add_bit(id=ancilla_measure_1)
 
     ideal_circ.add_barrier([ideal_circ.qubits[3], ancilla_0])
+    ideal_circ.H(ancilla_0)
     ideal_circ.CZ(control_qubit=ancilla_0, target_qubit=ideal_circ.qubits[3])
     ideal_circ.add_barrier([ideal_circ.qubits[3], ancilla_0])
+
     ideal_circ.H(ideal_circ.qubits[3])
+
     ideal_circ.add_barrier([ideal_circ.qubits[3], ancilla_0])
     ideal_circ.CX(control_qubit=ancilla_0, target_qubit=ideal_circ.qubits[3])
+    ideal_circ.H(ancilla_0)
     ideal_circ.add_barrier([ideal_circ.qubits[3], ancilla_0])
+
     ideal_circ.add_barrier([ideal_circ.qubits[3], ideal_circ.qubits[2], ancilla_1])
+    ideal_circ.H(ancilla_1)
     ideal_circ.CZ(control_qubit=ancilla_1, target_qubit=ideal_circ.qubits[3])
     ideal_circ.CZ(control_qubit=ancilla_1, target_qubit=ideal_circ.qubits[2])
     ideal_circ.add_barrier([ideal_circ.qubits[3], ideal_circ.qubits[2], ancilla_1])
+
     ideal_circ.H(ideal_circ.qubits[2])
     ideal_circ.CZ(control_qubit=ideal_circ.qubits[3], target_qubit=ideal_circ.qubits[2])
     ideal_circ.H(ideal_circ.qubits[2])
+
     ideal_circ.add_barrier([ideal_circ.qubits[3], ideal_circ.qubits[2], ancilla_1])
     ideal_circ.CZ(control_qubit=ancilla_1, target_qubit=ideal_circ.qubits[2])
+    ideal_circ.H(ancilla_1)
     ideal_circ.add_barrier([ideal_circ.qubits[3], ideal_circ.qubits[2], ancilla_1])
+
     ideal_circ.Measure(ancilla_0, ancilla_measure_0)
     ideal_circ.Measure(ancilla_1, ancilla_measure_1)
 
     assert ideal_circ == circuit
 
-    circ = Circuit(2).H(0).CX(1,0).X(1).CX(1,0)
+    circ = Circuit(2).H(0).CX(1, 0).X(1).CX(1, 0)
     cpc_rebase_pass.apply(circ)
     cliff_circ = QermitDAGCircuit(circ)
     circuit = cliff_circ.add_pauli_checks(pauli_sampler=DeterministicZPauliSampler())
@@ -76,9 +93,11 @@ def test_add_pauli_checks():
     ideal_circ.add_bit(id=ancilla_measure)
 
     ideal_circ.add_barrier([ideal_circ.qubits[2], ideal_circ.qubits[1], ancilla])
+    ideal_circ.H(ancilla)
     ideal_circ.CZ(control_qubit=ancilla, target_qubit=ideal_circ.qubits[2])
     ideal_circ.CZ(control_qubit=ancilla, target_qubit=ideal_circ.qubits[1])
     ideal_circ.add_barrier([ideal_circ.qubits[2], ideal_circ.qubits[1], ancilla])
+
     ideal_circ.H(ideal_circ.qubits[1])
     ideal_circ.H(ideal_circ.qubits[1])
     ideal_circ.CZ(control_qubit=ideal_circ.qubits[2], target_qubit=ideal_circ.qubits[1])
@@ -87,11 +106,87 @@ def test_add_pauli_checks():
     ideal_circ.X(ideal_circ.qubits[2])
     ideal_circ.CZ(control_qubit=ideal_circ.qubits[2], target_qubit=ideal_circ.qubits[1])
     ideal_circ.H(ideal_circ.qubits[1])
+
     ideal_circ.add_barrier([ideal_circ.qubits[2], ideal_circ.qubits[1], ancilla])
     ideal_circ.CZ(control_qubit=ancilla, target_qubit=ideal_circ.qubits[2])
     ideal_circ.CX(control_qubit=ancilla, target_qubit=ideal_circ.qubits[1])
+    ideal_circ.S(ancilla)
+    ideal_circ.S(ancilla)
+    ideal_circ.H(ancilla)
     ideal_circ.add_barrier([ideal_circ.qubits[2], ideal_circ.qubits[1], ancilla])
-    ideal_circ.add_phase(1)
+
     ideal_circ.Measure(ancilla, ancilla_measure)
 
     assert ideal_circ == circuit
+
+
+def test_simply_non_minimal_example():
+
+    # Note that this is a simple example of where the current implementation
+    # is not minimal. The whole think is a relatively easy to identify
+    # Clifford circuit.
+
+    clifford_circuit = Circuit(3).CZ(0, 1).X(2).X(0).CZ(0, 2).CZ(1, 2)
+    dag_circuit = QermitDAGCircuit(clifford_circuit)
+    assert dag_circuit.get_clifford_subcircuits() == [0, 1, 0, 1, 1]
+
+
+def test_5q_random_clifford():
+
+    clifford_circuit = random_clifford_circ(n_qubits=5, seed=0)
+    cpc_rebase_pass.apply(clifford_circuit)
+    dag_circuit = QermitDAGCircuit(clifford_circuit)
+    pauli_sampler = RandomPauliSampler(seed=0)
+    dag_circuit.add_pauli_checks(pauli_sampler=pauli_sampler)
+
+
+@pytest.mark.skip(reason="This test passes, but the functionality is incorrect. In particular there is a H in the middle which is identified as Clifford but which has no checks added.")
+def test_2q_random_clifford():
+
+    clifford_circuit = random_clifford_circ(n_qubits=5, seed=0)
+    cpc_rebase_pass.apply(clifford_circuit)
+    dag_circuit = QermitDAGCircuit(clifford_circuit)
+    pauli_sampler = RandomPauliSampler(seed=0)
+    dag_circuit.add_pauli_checks(pauli_sampler=pauli_sampler)
+
+
+def test_CZ_circuit_with_phase():
+
+    # This test is a case where the pauli circuit to be controlled has a
+    # global phase which needs to be bumped to the control.
+
+    original_circuit = Circuit(2).CZ(0, 1).measure_all()
+    dag_circuit = QermitDAGCircuit(original_circuit)
+    pauli_sampler = DeterministicXPauliSampler()
+    pauli_checks_circuit = dag_circuit.add_pauli_checks(pauli_sampler=pauli_sampler)
+
+    ideal_circ = Circuit(2, 2)
+    comp_qubits = ideal_circ.qubits
+    comp_bits = ideal_circ.bits
+
+    ancilla = Qubit(name='ancilla', index=0)
+    ancilla_measure = Bit(name='ancilla_measure', index=0)
+
+    ideal_circ.add_qubit(ancilla)
+    ideal_circ.add_bit(id=ancilla_measure)
+
+    ideal_circ.add_barrier([*list(reversed(comp_qubits)), ancilla])
+    ideal_circ.H(ancilla)
+    ideal_circ.CX(ancilla, comp_qubits[1])
+    ideal_circ.CX(ancilla, comp_qubits[0])
+    ideal_circ.add_barrier([*list(reversed(comp_qubits)), ancilla])
+    ideal_circ.CZ(comp_qubits[0], comp_qubits[1])
+    ideal_circ.add_barrier([*list(reversed(comp_qubits)), ancilla])
+    ideal_circ.CZ(ancilla, comp_qubits[1])
+    ideal_circ.CX(ancilla, comp_qubits[1])
+    ideal_circ.CZ(ancilla, comp_qubits[0])
+    ideal_circ.CX(ancilla, comp_qubits[0])
+    ideal_circ.S(ancilla)
+    ideal_circ.S(ancilla)
+    ideal_circ.H(ancilla)
+    ideal_circ.add_barrier([*list(reversed(comp_qubits)), ancilla])
+    ideal_circ.Measure(comp_qubits[0], comp_bits[0])
+    ideal_circ.Measure(comp_qubits[1], comp_bits[1])
+    ideal_circ.Measure(ancilla, ancilla_measure)
+
+    assert pauli_checks_circuit == ideal_circ
