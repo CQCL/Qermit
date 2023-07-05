@@ -106,8 +106,8 @@ class MockQuantinuumBackend(QuantinuumBackend):
         OpType.Rz,
         OpType.Rz,
         OpType.Measure,
-        OpType.Barrier,
-        OpType.Reset,
+        # OpType.Barrier,
+        # OpType.Reset,
     }
 
     def __init__(self):
