@@ -160,7 +160,6 @@ def get_full_transition_tomography_circuits(
             state_circuit.Measure(q, measures[q])
         # add to returned types
         state_circuit = backend.get_compiled_circuit(state_circuit)
-        print("state_circuit", state_circuit.get_commands())
         prepared_circuits.append(state_circuit)
         state_infos.append(StateInfo(new_state_dicts, measures))
     return (prepared_circuits, state_infos)
