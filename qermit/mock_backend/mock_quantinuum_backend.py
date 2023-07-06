@@ -98,6 +98,7 @@ class MockQuantinuumBackend(QuantinuumBackend):
         version="n/a",
         architecture=FullyConnected(10, "node"),
         gate_set=gate_set,
+        n_cl_reg=100,
     )
 
     noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Measure}
