@@ -4,6 +4,7 @@ from pytket.circuit import Command, Bit  # type: ignore
 from pytket.passes.auto_rebase import auto_rebase_pass
 from .pauli_sampler import PauliSampler
 from pytket.passes import DecomposeBoxes  # type: ignore
+from pytket.circuit import CircBox
 
 
 clifford_ops = [OpType.CZ, OpType.H, OpType.Z, OpType.S, OpType.X]
@@ -121,6 +122,98 @@ class QermitDAGCircuit(nx.DiGraph):
 
         return node_sub_circuit
 
+    def to_clifford_subcircuit_boxes(self):
+
+        # TODO: It could be worth insisting that the given circuit does not
+        # include any boxes called 'Clifford Subcircuit'. i.e. that the
+        # circuit is 'clean'.
+
+        node_sub_circuit_list = self.get_clifford_subcircuits()
+        sub_circuit_qubits = self.get_sub_circuit_qubits(node_sub_circuit_list)
+
+        # List indicating if a command has been implemented
+        implemented_commands = [False for _ in self.nodes()]
+
+        # Initialise new circuit
+        clifford_box_circuit = Circuit()
+        for qubit in self.qubits:
+            clifford_box_circuit.add_qubit(qubit)
+        for bit in self.bits:
+            clifford_box_circuit.add_bit(bit)
+
+        while not all(implemented_commands):
+
+            # Search for a subcircuit that it is safe to implement, and
+            # pick the first one found to be implemented.
+            not_implemented = [
+                node_sub_circuit
+                for node_sub_circuit, implemented
+                in zip(node_sub_circuit_list, implemented_commands)
+                if not implemented
+            ]
+            sub_circuit_to_implement = None
+            for sub_circuit in set(not_implemented):
+                if self.can_implement(
+                    sub_circuit, node_sub_circuit_list, implemented_commands
+                ):
+                    sub_circuit_to_implement = sub_circuit
+                    break
+            assert sub_circuit_to_implement is not None
+
+            # List the nodes in the chosen sub circuit
+            node_to_implement_list = [
+                node for node in self.nodes()
+                if node_sub_circuit_list[node] == sub_circuit_to_implement
+            ]
+            assert len(node_to_implement_list) > 0
+
+            # If the circuit is clifford add it as a circbox
+            if self.node_command[node_to_implement_list[0]].clifford:
+                
+                # Empty circuit to contain clifford subcircuit
+                clifford_subcircuit = Circuit(
+                    n_qubits = len(
+                        sub_circuit_qubits[sub_circuit_to_implement]
+                    ),
+                    name = 'Clifford Subcircuit'
+                )
+                
+                # Map from qubits in original circuit to qubits in new
+                # clifford circuit.
+                qubit_to_index = {
+                    qubit:i
+                    for i, qubit
+                    in enumerate(sub_circuit_qubits[sub_circuit_to_implement])
+                }
+
+                # Add all gates to new circuit
+                for node in node_to_implement_list:
+                    clifford_subcircuit.add_gate(
+                        self.node_command[node].command.op,
+                        [
+                            qubit_to_index[qubit]
+                            for qubit in self.node_command[node].command.args
+                        ]
+                    )
+                    implemented_commands[node] = True
+                    
+                clifford_circ_box = CircBox(clifford_subcircuit)
+                clifford_box_circuit.add_circbox(
+                    clifford_circ_box,
+                    list(sub_circuit_qubits[sub_circuit_to_implement])
+                )
+
+            # Otherwise, add the gates straight to the circuit
+            else:
+                for node in node_to_implement_list:
+                    clifford_box_circuit.add_gate(
+                        self.node_command[node].command.op,
+                        self.node_command[node].command.args
+                    )
+                    implemented_commands[node] = True
+
+        return clifford_box_circuit
+
     def get_sub_circuit_qubits(
         self, node_sub_circuit: list[int]
     ) -> dict[int, set[Qubit]]:
@@ -166,54 +259,31 @@ class QermitDAGCircuit(nx.DiGraph):
 
         return can_implement
 
-    def add_pauli_checks(self, pauli_sampler: PauliSampler):
+    def add_pauli_checks_to_circbox(self, pauli_sampler: PauliSampler):
 
-        node_sub_circuit_list = self.get_clifford_subcircuits()
-        sub_circuit_qubits = self.get_sub_circuit_qubits(node_sub_circuit_list)
-
-        # List indicating if a command has been implemented
-        implemented_commands = [False for _ in self.nodes()]
-
-        # Initialise new circuit
         pauli_check_circuit = Circuit()
         for qubit in self.qubits:
             pauli_check_circuit.add_qubit(qubit)
         for bit in self.bits:
             pauli_check_circuit.add_bit(bit)
-
+            
         ancilla_count = 0
 
-        while not all(implemented_commands):
-
-            # Search for a subcircuit that it is safe to implement, and
-            # pick the first one found to be implemented.
-            not_implemented = [
-                node_sub_circuit
-                for node_sub_circuit, implemented
-                in zip(node_sub_circuit_list, implemented_commands)
-                if not implemented
-            ]
-            sub_circuit_to_implement = None
-            for sub_circuit in set(not_implemented):
-                if self.can_implement(
-                    sub_circuit, node_sub_circuit_list, implemented_commands
-                ):
-                    sub_circuit_to_implement = sub_circuit
-                    break
-            assert sub_circuit_to_implement is not None
-
-            # List the nodes in the chosen sub circuit
-            node_to_implement_list = [
-                node for node in self.nodes()
-                if node_sub_circuit_list[node] == sub_circuit_to_implement
-            ]
-            assert len(node_to_implement_list) > 0
-
-            qubit_list = list(sub_circuit_qubits[sub_circuit_to_implement])
-
-            # Add a barrier is this is a Clifford sub circuit
-            if self.node_command[node_to_implement_list[0]].clifford:
-
+        # Add each command in the circuit, wrapped by checks
+        # if the command is a circbox named 'Clifford Subcircuit'
+        for command in [
+            node_command.command for node_command in self.node_command
+        ]:
+            
+            # Add barriers and check if appropriate
+            if (
+                command.op.type == OpType.CircBox
+            ) and (
+                command.op.get_circuit().name == 'Clifford Subcircuit'
+            ):
+                
+                clifford_subcircuit = command.op.get_circuit()
+                
                 control_qubit = Qubit(
                     name='ancilla',
                     index=ancilla_count,
@@ -222,11 +292,11 @@ class QermitDAGCircuit(nx.DiGraph):
                 pauli_check_circuit.add_qubit(control_qubit)
 
                 pauli_check_circuit.add_barrier(
-                    qubit_list + [control_qubit]
+                    command.args + [control_qubit]
                 )
                 pauli_check_circuit.H(control_qubit)
 
-                stabiliser = pauli_sampler.sample(qubit_list=qubit_list)
+                stabiliser = pauli_sampler.sample(qubit_list=command.args)
                 stabiliser_circuit = stabiliser.get_control_circuit(
                     control_qubit=control_qubit
                 )
@@ -235,27 +305,38 @@ class QermitDAGCircuit(nx.DiGraph):
                 )
 
                 pauli_check_circuit.add_barrier(
-                    qubit_list + [control_qubit]
+                    command.args + [control_qubit]
                 )
-
-            # Add all commands in the sub circuit
-            for node in node_to_implement_list:
-                pauli_check_circuit.add_gate(
-                    self.node_command[node].command.op,
-                    self.node_command[node].command.args
-                )
-                implemented_commands[node] = True
-                if self.node_command[node].clifford:
+                
+            # Add command
+            pauli_check_circuit.add_gate(
+                command.op,
+                command.args
+            )
+            
+            # Add barriers and checks if appropriate.
+            if (
+                command.op.type == OpType.CircBox
+            ) and (
+                command.op.get_circuit().name == 'Clifford Subcircuit'
+            ):
+                
+                qubit_map = {
+                    q_subcirc: q_orig
+                    for q_subcirc, q_orig
+                    in zip(clifford_subcircuit.qubits, command.args)
+                }
+                for clifford_command in clifford_subcircuit.get_commands():
+                    # TODO: an error would be raised here if clifford_command
+                    # is not Clifford. It could be worth raising a clearer
+                    # error.
                     stabiliser.apply_gate(
-                        self.node_command[node].command.op.type,
-                        self.node_command[node].command.qubits
+                        clifford_command.op.type,
+                        [qubit_map[qubit] for qubit in clifford_command.qubits]
                     )
-
-            # Add barrier if this is a Clifford sub circuit.
-            if self.node_command[node_to_implement_list[0]].clifford:
-
+                    
                 pauli_check_circuit.add_barrier(
-                    qubit_list + [control_qubit]
+                    command.args + [control_qubit]
                 )
 
                 stabiliser_circuit = stabiliser.get_control_circuit(
@@ -266,14 +347,13 @@ class QermitDAGCircuit(nx.DiGraph):
                 )
                 pauli_check_circuit.H(control_qubit)
                 pauli_check_circuit.add_barrier(
-                    qubit_list + [control_qubit]
+                    command.args + [control_qubit]
                 )
 
                 measure_bit = Bit(
                     name='ancilla_measure',
                     index=ancilla_count,
                 )
-                # TODO: check that register names do not already exist
                 pauli_check_circuit.add_bit(
                     id=measure_bit
                 )
@@ -283,11 +363,21 @@ class QermitDAGCircuit(nx.DiGraph):
                 )
 
                 ancilla_count += 1
+                
+        return pauli_check_circuit
 
-        DecomposeBoxes().apply(pauli_check_circuit)
+    def add_pauli_checks(self, pauli_sampler: PauliSampler):
+
+        # Convert to clifford boxes, add checks, decompose boxes.
+        clifford_box_circuit = self.to_clifford_subcircuit_boxes()
+        cliff_box_dag_circ = QermitDAGCircuit(clifford_box_circuit)
+        pauli_check_circ = cliff_box_dag_circ.add_pauli_checks_to_circbox(
+            pauli_sampler=pauli_sampler
+        )
+        DecomposeBoxes().apply(pauli_check_circ)
 
         # TODO: Given more time it would be nice to add a check here
         # which XZ reduces the circuits with and without the checks and
         # asserts that they are the same.
 
-        return pauli_check_circuit
+        return pauli_check_circ

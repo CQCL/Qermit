@@ -9,6 +9,7 @@ from qermit.coherent_pauli_checks import (
 from pytket.circuit import Qubit, Bit
 from qermit.probabilistic_error_cancellation.cliff_circuit_gen import random_clifford_circ
 import pytest
+from pytket.passes import DecomposeBoxes
 
 
 def test_get_clifford_subcircuits():
@@ -120,7 +121,7 @@ def test_add_pauli_checks():
     assert ideal_circ == circuit
 
 
-def test_simply_non_minimal_example():
+def test_simple_non_minimal_example():
 
     # Note that this is a simple example of where the current implementation
     # is not minimal. The whole think is a relatively easy to identify
@@ -190,3 +191,11 @@ def test_CZ_circuit_with_phase():
     ideal_circ.Measure(ancilla, ancilla_measure)
 
     assert pauli_checks_circuit == ideal_circ
+
+def test_to_clifford_subcircuits():
+
+    orig_circuit = Circuit(3).CZ(1, 2).Rz(0.1, 1).H(2).Z(1).CZ(0, 1).Rz(0.1, 1).CZ(1, 0).Z(1).CZ(1, 2)
+    dag_circuit = QermitDAGCircuit(orig_circuit)
+    clifford_box_circuit = dag_circuit.to_clifford_subcircuit_boxes()
+    DecomposeBoxes().apply(clifford_box_circuit)
+    assert clifford_box_circuit == orig_circuit
