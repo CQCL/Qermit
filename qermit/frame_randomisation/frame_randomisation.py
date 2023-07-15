@@ -24,7 +24,7 @@ from qermit import (
 )
 from qermit.taskgraph.mitex import backend_compile_circuit_shots_task_gen
 from pytket import Circuit, Bit
-from copy import copy
+from copy import copy, deepcopy
 from math import ceil
 from pytket.backends import Backend
 from pytket.backends.backendresult import BackendResult
@@ -52,6 +52,7 @@ class FrameRandomisation(Enum):
         :param samples: Number of frame randomisation instances to sample.
         :type samples: int
         """
+        print(f"===== sampling {samples} circuits from initial =====")
         pfr = PauliFrameRandomisation()
         pfr_shots = ceil(shots / samples)
         auto_rebase_pass({OpType.CX, OpType.Rz, OpType.H, OpType.S}).apply(circuit)
@@ -183,7 +184,13 @@ def gen_Frame_Randomisation_MitRes(backend: Backend, samples: int, **kwargs) -> 
     :key frame_randomisation: FrameRandomisation Enum passed to specify method used.
         Default set to FrameRandomisation.UniversalFrameRandomisation.
     """
-    _mitres = copy(
+    # for reasons that scare me deeply this needs to be a deep copy. Otherwise
+    # if I use the inputted mitres later in the computation it is interpreted
+    # as the randomisation mitres generated here, rather then the original.
+    # I'm also adding deep copy elsewhere to ease my fears but i think if
+    # a task graph is created from the mitres then that has the effect of
+    # making a deep copy.
+    _mitres = deepcopy(
         kwargs.get("mitres", MitRes(backend, _label="FrameRandomisationMitRes"))
     )
     _fr_type = copy(
@@ -191,7 +198,11 @@ def gen_Frame_Randomisation_MitRes(backend: Backend, samples: int, **kwargs) -> 
             "frame_randomisation", FrameRandomisation.UniversalFrameRandomisation
         )
     )
-    _mitres.prepend(backend_compile_circuit_shots_task_gen(backend))
+    _mitres.prepend(
+        backend_compile_circuit_shots_task_gen(
+            backend=backend,
+        )
+    )
     _mitres.prepend(frame_randomisation_circuits_task_gen(samples, _fr_type))
     _mitres.append(
         frame_randomisation_result_task_gen(samples),

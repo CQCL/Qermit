@@ -1,5 +1,5 @@
-from .stabiliser import Stabiliser
 import numpy.random
+from quantinuum_benchmarking.direct_fidelity_estimation import Stabiliser
 
 
 class PauliSampler:

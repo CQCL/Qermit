@@ -74,6 +74,8 @@ class Folding(Enum):
         :rtype: Circuit
         """
 
+        print(f"===== conducting {noise_scaling} folding =====")
+
         # Raise if the amount by which the noise should be scaled is not an odd integer
         if (not noise_scaling % 2) or noise_scaling % 1:
             raise ValueError(

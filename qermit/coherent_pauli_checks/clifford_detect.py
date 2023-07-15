@@ -122,6 +122,8 @@ class QermitDAGCircuit(nx.DiGraph):
 
         return node_sub_circuit
 
+    # TODO: I'm not sure if this should return a circuit, or changes this
+    # QermitDagCircuit in place
     def to_clifford_subcircuit_boxes(self):
 
         # TODO: It could be worth insisting that the given circuit does not
@@ -374,6 +376,11 @@ class QermitDAGCircuit(nx.DiGraph):
         pauli_check_circ = cliff_box_dag_circ.add_pauli_checks_to_circbox(
             pauli_sampler=pauli_sampler
         )
+        # TODO: This decompose boxes may be problematic if there are
+        # already boxes in the circuit. Not easy to avoid though I think.
+        # I cant think at the moment why this would be a problem though,
+        # especially as the user has surrendered their circuit to Qermit
+        # at this point.
         DecomposeBoxes().apply(pauli_check_circ)
 
         # TODO: Given more time it would be nice to add a check here
