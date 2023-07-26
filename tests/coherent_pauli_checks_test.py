@@ -5,11 +5,44 @@ from qermit.coherent_pauli_checks import (
     DeterministicZPauliSampler,
     DeterministicXPauliSampler,
     RandomPauliSampler,
+    OptimalPauliSampler,
 )
 from pytket.circuit import Qubit, Bit
 from qermit.probabilistic_error_cancellation.cliff_circuit_gen import random_clifford_circ
 import pytest
 from pytket.passes import DecomposeBoxes
+from quantinuum_benchmarking.noise_model import (
+    ErrorDistribution,
+    NoiseModel,
+)
+from pytket.pauli import Pauli
+from pytket import OpType
+from quantinuum_benchmarking.direct_fidelity_estimation import Stabiliser
+from qermit.coherent_pauli_checks import PostSelectMgr
+from pytket.circuit import Bit
+from collections import Counter
+
+
+def test_post_select_manager():
+    
+    cbits = [Bit(name='A', index=0), Bit(name='B', index=0), Bit(name='C', index=0), Bit(name='A', index=1)]
+    post_select_cbits = [Bit(name='B', index=0), Bit(name='A', index=1)]
+    counts = {
+        (0,0,0,0):100,
+        (0,1,0,0):100,
+        (0,0,0,1):100,
+        (0,1,0,1):100,
+        (1,0,0,0):100,
+        (1,1,0,0):100,
+    }
+    counts = Counter(counts)
+    count_mgr = PostSelectMgr(
+        counts=counts,
+        cbits=cbits,
+        post_select_cbits=post_select_cbits,
+    )
+    assert count_mgr.post_select() == Counter({(0,0):100, (1,0):100})
+    assert count_mgr.merge() == Counter({(0,0):400, (1,0):200})
 
 
 def test_get_clifford_subcircuits():
@@ -199,3 +232,34 @@ def test_to_clifford_subcircuits():
     clifford_box_circuit = dag_circuit.to_clifford_subcircuit_boxes()
     DecomposeBoxes().apply(clifford_box_circuit)
     assert clifford_box_circuit == orig_circuit
+
+def test_optimal_pauli_sampler():
+
+    # TODO: add a measure and barrier to this circuit, just to check
+    cliff_circ = Circuit()
+    cliff_circ.add_q_register(name='my_reg', size=3)
+    qubits = cliff_circ.qubits
+    cliff_circ.CZ(qubits[0],qubits[1]).CZ(qubits[1],qubits[2])
+
+    error_distribution_dict = {}
+    error_distribution_dict[(Pauli.X, Pauli.I)] = 0.3
+    error_distribution_dict[(Pauli.I, Pauli.X)] = 0.7
+
+    error_distribution = ErrorDistribution(error_distribution_dict, seed=0)
+    noise_model = NoiseModel({OpType.CZ:error_distribution})
+
+    pauli_sampler = OptimalPauliSampler(noise_model)
+    stab = pauli_sampler.sample(cliff_circ.qubits, cliff_circ)
+
+    assert stab == Stabiliser(
+        Z_list=[0,0,1],
+        X_list=[0,0,1],
+        qubit_list=qubits,
+        phase=1,
+    )
+
+    # TODO: an assert is needed for this last part
+
+    pauli_sampler = OptimalPauliSampler(noise_model)
+    dag_circ = QermitDAGCircuit(cliff_circ)
+    pauli_check_circ = dag_circ.add_pauli_checks(pauli_sampler=pauli_sampler)

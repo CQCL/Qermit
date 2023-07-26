@@ -5,6 +5,7 @@ from pytket.passes.auto_rebase import auto_rebase_pass
 from .pauli_sampler import PauliSampler
 from pytket.passes import DecomposeBoxes  # type: ignore
 from pytket.circuit import CircBox
+import math
 
 
 clifford_ops = [OpType.CZ, OpType.H, OpType.Z, OpType.S, OpType.X]
@@ -20,7 +21,20 @@ class DAGCommand:
     def __init__(self, command: Command):
 
         self.command = command
-        self.clifford = command.op.type in clifford_ops
+
+    @property
+    def clifford(self):
+
+        if self.command.op.is_clifford_type():
+            return True
+
+        if self.command.op.type in [OpType.PhasedX, OpType.Rz]:
+            return all(
+                math.isclose(param%0.5, 0) or math.isclose(param%0.5, 0.5)
+                for param in self.command.op.params
+            )
+
+        return False
 
 
 class QermitDAGCircuit(nx.DiGraph):
@@ -261,7 +275,7 @@ class QermitDAGCircuit(nx.DiGraph):
 
         return can_implement
 
-    def add_pauli_checks_to_circbox(self, pauli_sampler: PauliSampler):
+    def add_pauli_checks_to_circbox(self, pauli_sampler: PauliSampler, **kwargs):
 
         pauli_check_circuit = Circuit()
         for qubit in self.qubits:
@@ -285,6 +299,14 @@ class QermitDAGCircuit(nx.DiGraph):
             ):
                 
                 clifford_subcircuit = command.op.get_circuit()
+                qubit_map = {
+                    q_subcirc: q_orig
+                    for q_subcirc, q_orig
+                    in zip(clifford_subcircuit.qubits, command.args)
+                }
+                # TDOO: it may be possible to rename the registers before
+                # this point?
+                clifford_subcircuit.rename_units(qubit_map)
                 
                 control_qubit = Qubit(
                     name='ancilla',
@@ -298,7 +320,7 @@ class QermitDAGCircuit(nx.DiGraph):
                 )
                 pauli_check_circuit.H(control_qubit)
 
-                stabiliser = pauli_sampler.sample(qubit_list=command.args)
+                stabiliser = pauli_sampler.sample(qubit_list=command.args, circ=clifford_subcircuit, **kwargs)
                 stabiliser_circuit = stabiliser.get_control_circuit(
                     control_qubit=control_qubit
                 )
@@ -322,19 +344,13 @@ class QermitDAGCircuit(nx.DiGraph):
             ) and (
                 command.op.get_circuit().name == 'Clifford Subcircuit'
             ):
-                
-                qubit_map = {
-                    q_subcirc: q_orig
-                    for q_subcirc, q_orig
-                    in zip(clifford_subcircuit.qubits, command.args)
-                }
+
                 for clifford_command in clifford_subcircuit.get_commands():
                     # TODO: an error would be raised here if clifford_command
                     # is not Clifford. It could be worth raising a clearer
                     # error.
                     stabiliser.apply_gate(
-                        clifford_command.op.type,
-                        [qubit_map[qubit] for qubit in clifford_command.qubits]
+                        clifford_command.op.type, clifford_command.qubits, params=clifford_command.op.params
                     )
                     
                 pauli_check_circuit.add_barrier(
@@ -368,14 +384,19 @@ class QermitDAGCircuit(nx.DiGraph):
                 
         return pauli_check_circuit
 
-    def add_pauli_checks(self, pauli_sampler: PauliSampler):
+    def add_pauli_checks(self, pauli_sampler: PauliSampler, **kwargs):
+
+        print("add_pauli_checks")
 
         # Convert to clifford boxes, add checks, decompose boxes.
         clifford_box_circuit = self.to_clifford_subcircuit_boxes()
+        print("clifford_box_circuit", clifford_box_circuit)
         cliff_box_dag_circ = QermitDAGCircuit(clifford_box_circuit)
+        print("cliff_box_dag_circ", cliff_box_dag_circ)
         pauli_check_circ = cliff_box_dag_circ.add_pauli_checks_to_circbox(
-            pauli_sampler=pauli_sampler
+            pauli_sampler=pauli_sampler, **kwargs
         )
+        print("pauli_check_circ", pauli_check_circ)
         # TODO: This decompose boxes may be problematic if there are
         # already boxes in the circuit. Not easy to avoid though I think.
         # I cant think at the moment why this would be a problem though,
