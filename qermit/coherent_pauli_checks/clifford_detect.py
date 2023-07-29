@@ -6,6 +6,7 @@ from .pauli_sampler import PauliSampler
 from pytket.passes import DecomposeBoxes  # type: ignore
 from pytket.circuit import CircBox
 import math
+import time
 
 
 clifford_ops = [OpType.CZ, OpType.H, OpType.Z, OpType.S, OpType.X]
@@ -65,7 +66,7 @@ class QermitDAGCircuit(nx.DiGraph):
                     self.add_edge(current_node[qubit], node)
                 current_node[qubit] = node
 
-    def get_clifford_subcircuits(self):
+    def get_clifford_subcircuits(self, **kwargs):
 
         # a list indicating the clifford subcircuit to which a command belongs.
         node_sub_circuit = [None for _ in self.nodes]
@@ -118,8 +119,11 @@ class QermitDAGCircuit(nx.DiGraph):
                 same_clifford_circuit = True
                 for same_sub_circuit_node in same_sub_circuit_node_list:
 
+                    # I'm allowing kwarg to pass cutoff, but that should
+                    # not be allowed. all_simple_paths is quite slow otherwise.
+                    cutoff = kwargs.get("cutoff", None)
                     for path in nx.all_simple_paths(
-                        self, same_sub_circuit_node, neighbour_id
+                        self, same_sub_circuit_node, neighbour_id, cutoff=cutoff
                     ):
 
                         if not all(
@@ -127,6 +131,7 @@ class QermitDAGCircuit(nx.DiGraph):
                             for path_node in path[:-1]
                         ):
                             same_clifford_circuit = False
+                            break
 
                 # add the neighbour if no paths in the circuit to other
                 # commands in the clifford sub circuit pass through
@@ -138,13 +143,13 @@ class QermitDAGCircuit(nx.DiGraph):
 
     # TODO: I'm not sure if this should return a circuit, or changes this
     # QermitDagCircuit in place
-    def to_clifford_subcircuit_boxes(self):
+    def to_clifford_subcircuit_boxes(self, **kwargs):
 
         # TODO: It could be worth insisting that the given circuit does not
         # include any boxes called 'Clifford Subcircuit'. i.e. that the
         # circuit is 'clean'.
 
-        node_sub_circuit_list = self.get_clifford_subcircuits()
+        node_sub_circuit_list = self.get_clifford_subcircuits(**kwargs)
         sub_circuit_qubits = self.get_sub_circuit_qubits(node_sub_circuit_list)
 
         # List indicating if a command has been implemented
@@ -320,8 +325,8 @@ class QermitDAGCircuit(nx.DiGraph):
                 )
                 pauli_check_circuit.H(control_qubit)
 
-                stabiliser = pauli_sampler.sample(qubit_list=command.args, circ=clifford_subcircuit, **kwargs)
-                stabiliser_circuit = stabiliser.get_control_circuit(
+                start_stabiliser = pauli_sampler.sample(qubit_list=command.args, circ=clifford_subcircuit, **kwargs)
+                stabiliser_circuit = start_stabiliser.get_control_circuit(
                     control_qubit=control_qubit
                 )
                 pauli_check_circuit.append(
@@ -331,6 +336,8 @@ class QermitDAGCircuit(nx.DiGraph):
                 pauli_check_circuit.add_barrier(
                     command.args + [control_qubit]
                 )
+
+                stabiliser = start_stabiliser.dagger()
                 
             # Add command
             pauli_check_circuit.add_gate(
@@ -386,17 +393,13 @@ class QermitDAGCircuit(nx.DiGraph):
 
     def add_pauli_checks(self, pauli_sampler: PauliSampler, **kwargs):
 
-        print("add_pauli_checks")
 
         # Convert to clifford boxes, add checks, decompose boxes.
-        clifford_box_circuit = self.to_clifford_subcircuit_boxes()
-        print("clifford_box_circuit", clifford_box_circuit)
+        clifford_box_circuit = self.to_clifford_subcircuit_boxes(**kwargs)
         cliff_box_dag_circ = QermitDAGCircuit(clifford_box_circuit)
-        print("cliff_box_dag_circ", cliff_box_dag_circ)
         pauli_check_circ = cliff_box_dag_circ.add_pauli_checks_to_circbox(
             pauli_sampler=pauli_sampler, **kwargs
         )
-        print("pauli_check_circ", pauli_check_circ)
         # TODO: This decompose boxes may be problematic if there are
         # already boxes in the circuit. Not easy to avoid though I think.
         # I cant think at the moment why this would be a problem though,

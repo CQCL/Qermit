@@ -54,7 +54,8 @@ class OptimalPauliSampler(PauliSampler):
 
         # TODO: assert that the registers match in this case
 
-        error_counter = self.noise_model.get_effective_pre_error_distribution(circ, **kwargs)
+        n_rand = kwargs.get("n_rand", None)
+        error_counter = self.noise_model.get_effective_pre_error_distribution(circ, n_rand=n_rand)
 
         smallest_commute_prob=1
         for pauli_string in product([Pauli.X , Pauli.Y, Pauli.Z, Pauli.I], repeat=circ.n_qubits):
