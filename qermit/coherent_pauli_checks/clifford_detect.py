@@ -313,31 +313,42 @@ class QermitDAGCircuit(nx.DiGraph):
                 # this point?
                 clifford_subcircuit.rename_units(qubit_map)
                 
-                control_qubit = Qubit(
-                    name='ancilla',
-                    index=ancilla_count,
+                start_stabiliser_list = pauli_sampler.sample(
+                    qubit_list=command.args,
+                    circ=clifford_subcircuit,
+                    **kwargs,
                 )
                 # TODO: check that register names do not already exist
-                pauli_check_circuit.add_qubit(control_qubit)
+                control_qubit_list = [
+                    Qubit(name='ancilla', index=i)
+                    for i in range(
+                        ancilla_count,
+                        ancilla_count+len(start_stabiliser_list)
+                    )
+                ]
+                ancilla_count += len(start_stabiliser_list)
 
-                pauli_check_circuit.add_barrier(
-                    command.args + [control_qubit]
-                )
-                pauli_check_circuit.H(control_qubit)
+                for start_stabiliser, control_qubit in zip(start_stabiliser_list, control_qubit_list):
+                    
+                    pauli_check_circuit.add_qubit(control_qubit)
 
-                start_stabiliser = pauli_sampler.sample(qubit_list=command.args, circ=clifford_subcircuit, **kwargs)
-                stabiliser_circuit = start_stabiliser.get_control_circuit(
-                    control_qubit=control_qubit
-                )
-                pauli_check_circuit.append(
-                    circuit=stabiliser_circuit,
-                )
+                    pauli_check_circuit.add_barrier(
+                        command.args + [control_qubit]
+                    )
+                    pauli_check_circuit.H(control_qubit)
 
-                pauli_check_circuit.add_barrier(
-                    command.args + [control_qubit]
-                )
+                    stabiliser_circuit = start_stabiliser.get_control_circuit(
+                        control_qubit=control_qubit
+                    )
+                    pauli_check_circuit.append(
+                        circuit=stabiliser_circuit,
+                    )
 
-                stabiliser = start_stabiliser.dagger()
+                    pauli_check_circuit.add_barrier(
+                        command.args + [control_qubit]
+                    )
+
+                end_stabiliser_list = [start_stabiliser.dagger() for start_stabiliser in start_stabiliser_list]
                 
             # Add command
             pauli_check_circuit.add_gate(
@@ -352,42 +363,46 @@ class QermitDAGCircuit(nx.DiGraph):
                 command.op.get_circuit().name == 'Clifford Subcircuit'
             ):
 
-                for clifford_command in clifford_subcircuit.get_commands():
-                    # TODO: an error would be raised here if clifford_command
-                    # is not Clifford. It could be worth raising a clearer
-                    # error.
-                    stabiliser.apply_gate(
-                        clifford_command.op.type, clifford_command.qubits, params=clifford_command.op.params
-                    )
+                for end_stabiliser, control_qubit in zip(reversed(end_stabiliser_list), reversed(control_qubit_list)):
+
+                    for clifford_command in clifford_subcircuit.get_commands():
+                        # TODO: an error would be raised here if clifford_command
+                        # is not Clifford. It could be worth raising a clearer
+                        # error.
+                        end_stabiliser.apply_gate(
+                            clifford_command.op.type, clifford_command.qubits, params=clifford_command.op.params
+                        )
                     
-                pauli_check_circuit.add_barrier(
-                    command.args + [control_qubit]
-                )
+                    pauli_check_circuit.add_barrier(
+                        command.args + [control_qubit]
+                    )
 
-                stabiliser_circuit = stabiliser.get_control_circuit(
-                    control_qubit=control_qubit
-                )
-                pauli_check_circuit.append(
-                    circuit=stabiliser_circuit,
-                )
-                pauli_check_circuit.H(control_qubit)
-                pauli_check_circuit.add_barrier(
-                    command.args + [control_qubit]
-                )
+                    stabiliser_circuit = end_stabiliser.get_control_circuit(
+                        control_qubit=control_qubit
+                    )
+                    pauli_check_circuit.append(
+                        circuit=stabiliser_circuit,
+                    )
+                    pauli_check_circuit.H(control_qubit)
+                    pauli_check_circuit.add_barrier(
+                        command.args + [control_qubit]
+                    )
 
-                measure_bit = Bit(
-                    name='ancilla_measure',
-                    index=ancilla_count,
-                )
-                pauli_check_circuit.add_bit(
-                    id=measure_bit
-                )
-                pauli_check_circuit.Measure(
-                    qubit=control_qubit,
-                    bit=measure_bit,
-                )
-
-                ancilla_count += 1
+                    # measure_bit = Bit(
+                    #     name='ancilla_measure',
+                    #     index=ancilla_count,
+                    # )
+                    measure_bit = Bit(
+                        name='ancilla_measure',
+                        index=control_qubit.index,
+                    )
+                    pauli_check_circuit.add_bit(
+                        id=measure_bit
+                    )
+                    pauli_check_circuit.Measure(
+                        qubit=control_qubit,
+                        bit=measure_bit,
+                    )
                 
         return pauli_check_circuit
 

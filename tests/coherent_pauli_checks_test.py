@@ -21,6 +21,7 @@ from quantinuum_benchmarking.direct_fidelity_estimation import Stabiliser
 from qermit.coherent_pauli_checks import PostSelectMgr
 from pytket.circuit import Bit
 from collections import Counter
+from pytket.extensions.qiskit import AerBackend
 
 
 def test_post_select_manager():
@@ -251,7 +252,7 @@ def test_optimal_pauli_sampler():
     pauli_sampler = OptimalPauliSampler(noise_model)
     stab = pauli_sampler.sample(cliff_circ.qubits, cliff_circ)
 
-    assert stab == Stabiliser(
+    assert stab[0] == Stabiliser(
         Z_list=[0,0,1],
         X_list=[0,0,1],
         qubit_list=qubits,
@@ -263,3 +264,56 @@ def test_optimal_pauli_sampler():
     pauli_sampler = OptimalPauliSampler(noise_model)
     dag_circ = QermitDAGCircuit(cliff_circ)
     pauli_check_circ = dag_circ.add_pauli_checks(pauli_sampler=pauli_sampler)
+
+def test_add_ZX_pauli_checks_to_S():
+
+    cliff_circ = Circuit()
+    cliff_circ.add_q_register(name='my_reg', size=1)
+    qubits = cliff_circ.qubits
+    cliff_circ.S(qubits[0])
+    cliff_circ.measure_all()
+
+    class DeterministicPauliSampler:
+
+        def sample(self, qubit_list, **kwargs):
+            return [Stabiliser(
+                Z_list=[1],
+                X_list=[1],
+                qubit_list=qubits,
+            )]
+    
+    dag_circ = QermitDAGCircuit(cliff_circ)
+    pauli_sampler = DeterministicPauliSampler()
+    pauli_check_circ = dag_circ.add_pauli_checks(
+        pauli_sampler=pauli_sampler,
+        n_rand=10000,
+        cutoff=10,
+    )
+
+    ideal_circ = Circuit()
+
+    ancilla = Qubit(name='ancilla', index=0)
+    comp = Qubit(name='my_reg', index=0)
+    ancilla_measure = Bit(name='ancilla_measure', index=0)
+    comp_measure = Bit(name='c', index=0)
+
+    ideal_circ.add_qubit(ancilla)
+    ideal_circ.add_qubit(comp)
+
+    ideal_circ.add_bit(id=ancilla_measure)
+    ideal_circ.add_bit(id=comp_measure)
+
+    ideal_circ.add_barrier([comp, ancilla]).H(ancilla).CZ(ancilla, comp).CX(ancilla, comp).add_barrier([comp, ancilla])
+    ideal_circ.S(comp)
+    ideal_circ.add_barrier([comp, ancilla]).CX(ancilla, comp).S(ancilla).S(ancilla).S(ancilla).H(ancilla).add_barrier([comp, ancilla])
+    ideal_circ.Measure(ancilla, ancilla_measure)
+    ideal_circ.Measure(comp, comp_measure)
+
+    assert ideal_circ == pauli_check_circ
+
+    backend = AerBackend()
+    backend.rebase_pass().apply(pauli_check_circ)
+    result=backend.run_circuit(pauli_check_circ, n_shots=100)
+    counts = result.get_counts()
+
+    assert list(counts.keys()) == [(0,0)]
