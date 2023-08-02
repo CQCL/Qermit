@@ -96,7 +96,7 @@ class MockQuantinuumBackend(QuantinuumBackend):
         name="MockQuantinuumBackend",
         device_name="mock-quantinuum",
         version="n/a",
-        architecture=FullyConnected(10, "node"),
+        architecture=FullyConnected(10, 'q'),
         gate_set=gate_set,
         n_cl_reg=100,
     )
