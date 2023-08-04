@@ -21,7 +21,7 @@ from qermit import (
     ObservableExperiment,
     TaskGraph,
 )
-from copy import copy
+from copy import copy, deepcopy
 from pytket.pauli import QubitPauliString  # type: ignore
 from enum import Enum
 import numpy as np  # type: ignore
@@ -798,9 +798,9 @@ def copy_mitex_wire(wire: ObservableExperiment) -> ObservableExperiment:
 
     # Copy ansatz circuit
     new_ansatz_circuit = AnsatzCircuit(
-        Circuit=wire.AnsatzCircuit.Circuit.copy(),
-        Shots=copy(wire.AnsatzCircuit.Shots),
-        SymbolsDict=copy(wire.AnsatzCircuit.SymbolsDict),
+        Circuit=deepcopy(wire.AnsatzCircuit.Circuit),
+        Shots=deepcopy(wire.AnsatzCircuit.Shots),
+        SymbolsDict=deepcopy(wire.AnsatzCircuit.SymbolsDict),
     )
 
     # copy qps and instantiate new measurement setup
@@ -1008,14 +1008,14 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
     :return: MitEx object performing noise mitigation by ZNE.
     :rtype: MitEx
     """
-    _experiment_mitres = copy(
+    _experiment_mitres = deepcopy(
         kwargs.get(
             "experiment_mitres",
             MitRes(backend),
         )
     )
 
-    _experiment_mitex = copy(
+    _experiment_mitex = deepcopy(
         kwargs.get(
             "experiment_mitex",
             MitEx(backend, _label="ExperimentMitex", mitres=_experiment_mitres),
@@ -1035,18 +1035,7 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
 
     for fold in noise_scaling_list:
         _label = str(fold) + "FoldMitEx"
-        _fold_mitres = copy(
-            kwargs.get(
-                "experiment_mitres",
-                MitRes(backend),
-            )
-        )
-        _fold_mitex = copy(
-            kwargs.get(
-                "experiment_mitex",
-                MitEx(backend, _label=_label, mitres=_fold_mitres),
-            )
-        )
+        _fold_mitex = deepcopy(_experiment_mitex)
         _fold_mitex._label = _label + _fold_mitex._label
         digital_folding_task = digital_folding_task_gen(
             backend, fold, _folding_type, _allow_approx_fold
