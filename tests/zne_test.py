@@ -74,7 +74,7 @@ REASON = "IBMQ account not configured"
 def test_no_qubit_relabel():
 
     lagos_backend = IBMQEmulatorBackend(
-        "ibm_lagos", hub="partner-cqc", group="internal", project="default"
+        "ibm_lagos", instance='partner-cqc/internal/default'
     )
     zne_mitex = gen_ZNE_MitEx(backend=lagos_backend, noise_scaling_list=[3, 5, 7])
 

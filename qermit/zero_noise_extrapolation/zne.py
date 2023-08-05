@@ -426,7 +426,7 @@ class Fit(Enum):
 
     # TODO Consider adding adaptive exponential extrapolation
     def cube_root(
-        self, x: List[float], y: List[float], _show_fit: bool, *args
+        x: List[float], y: List[float], _show_fit: bool, *args
     ) -> float:
         """Fit data to a cube root function. This is to say a function of the form :math:`a + b(x+c)^{1/3}`.
 
@@ -456,7 +456,7 @@ class Fit(Enum):
         return float(fit_to_zero)
 
     def poly_exponential(
-        self, x: List[float], y: List[float], _show_fit: bool, deg: int
+        x: List[float], y: List[float], _show_fit: bool, deg: int
     ) -> float:
         """Fit data to a poly-exponential, which is to say a function of the
         form :math:`a+e^{z}`, where :math:`z` is a polynomial.
@@ -518,7 +518,7 @@ class Fit(Enum):
         return float(fit_to_zero)
 
     def exponential(
-        self, x: List[float], y: List[float], _show_fit: bool, *args
+        x: List[float], y: List[float], _show_fit: bool, *args
     ) -> float:
         """Fit data to an exponential function. This is to say a function of the form :math:`a+e^{(b+x)}`.
         Note that this is a special case of the poly-exponential function.
@@ -535,10 +535,10 @@ class Fit(Enum):
 
         # As the exponential function is a special case of the
         # poly-exponential function, it is called here
-        return Fit.poly_exponential(self, x, y, _show_fit, 1)
+        return Fit.poly_exponential(x, y, _show_fit, 1)
 
     def polynomial(
-        self, x: List[float], y: List[float], _show_fit: bool, deg: int
+        x: List[float], y: List[float], _show_fit: bool, deg: int
     ) -> float:
         """Fit data to a polynomial function.
 
@@ -579,7 +579,7 @@ class Fit(Enum):
 
         return float(fit_to_zero)
 
-    def linear(self, x: List[float], y: List[float], _show_fit: bool, *args) -> float:
+    def linear(x: List[float], y: List[float], _show_fit: bool, *args) -> float:
         """Fit data to a linear function. This is to say a function of the form :math:`ax+b`.
         Note that this is a special case of the polynomial fitting function.
 
@@ -594,10 +594,10 @@ class Fit(Enum):
         """
         # As this is a special case of a fit to a polynomial, the polynomial
         # fitting function is called here with a degree 1
-        return Fit.polynomial(self, x, y, _show_fit, 1)
+        return Fit.polynomial(x, y, _show_fit, 1)
 
     def richardson(
-        self, x: List[float], y: List[float], _show_fit: bool, *args
+        x: List[float], y: List[float], _show_fit: bool, *args
     ) -> float:
         """Use richardson extrapolation. This amounts to fitting to a polynomial of
         degree one less than the number of data points.
@@ -613,7 +613,7 @@ class Fit(Enum):
         """
         # As this is a special case of the polynomial fitting function, the polynomial fitting
         # function is called here with degree one less than the number of data points.
-        return Fit.polynomial(self, x, y, _show_fit, len(x) - 1)
+        return Fit.polynomial(x, y, _show_fit, len(x) - 1)
 
 
 def plot_fit(
@@ -770,7 +770,7 @@ def extrapolation_task_gen(
                 QubitPauliOperator(
                     {
                         qpo_k: _fit_type(  # type: ignore
-                            obj, all_fold_vals, qpo_list_float[qpo_k], _show_fit, deg
+                            all_fold_vals, qpo_list_float[qpo_k], _show_fit, deg
                         )
                         for qpo_k in qpo_list_float
                     }
