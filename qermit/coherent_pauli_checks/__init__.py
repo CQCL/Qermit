@@ -6,4 +6,3 @@ from .pauli_sampler import (  # noqa:F401
     RandomPauliSampler,
     OptimalPauliSampler,
 )
-from .post_select_manager import PostSelectMgr

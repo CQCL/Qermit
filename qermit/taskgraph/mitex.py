@@ -151,7 +151,6 @@ def filter_observable_tracker_task_gen() -> MitTask:
                 # tuple, first entry is measurement circuit for appending
                 # second entry is MeasurementInfo for deriving expectation
                 measurement_circuit = get_basic_measurement_circuit(string)
-                circ.add_barrier(circuit.qubits)
                 circ.append(measurement_circuit[0])
                 # add new circuit to observable tracker
                 observable_tracker.add_measurement_circuit(

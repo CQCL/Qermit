@@ -18,7 +18,7 @@ from quantinuum_benchmarking.noise_model import (
 from pytket.pauli import Pauli
 from pytket import OpType
 from quantinuum_benchmarking.direct_fidelity_estimation import Stabiliser
-from qermit.coherent_pauli_checks import PostSelectMgr
+from qermit.postselection import PostSelectMgr
 from pytket.circuit import Bit
 from collections import Counter
 from pytket.extensions.qiskit import AerBackend
