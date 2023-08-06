@@ -18,32 +18,8 @@ from quantinuum_benchmarking.noise_model import (
 from pytket.pauli import Pauli
 from pytket import OpType
 from quantinuum_benchmarking.direct_fidelity_estimation import Stabiliser
-from qermit.postselection import PostSelectMgr
 from pytket.circuit import Bit
-from collections import Counter
 from pytket.extensions.qiskit import AerBackend
-
-
-def test_post_select_manager():
-    
-    cbits = [Bit(name='A', index=0), Bit(name='B', index=0), Bit(name='C', index=0), Bit(name='A', index=1)]
-    post_select_cbits = [Bit(name='B', index=0), Bit(name='A', index=1)]
-    counts = {
-        (0,0,0,0):100,
-        (0,1,0,0):100,
-        (0,0,0,1):100,
-        (0,1,0,1):100,
-        (1,0,0,0):100,
-        (1,1,0,0):100,
-    }
-    counts = Counter(counts)
-    count_mgr = PostSelectMgr(
-        counts=counts,
-        cbits=cbits,
-        post_select_cbits=post_select_cbits,
-    )
-    assert count_mgr.post_select() == Counter({(0,0):100, (1,0):100})
-    assert count_mgr.merge() == Counter({(0,0):400, (1,0):200})
 
 
 def test_get_clifford_subcircuits():
