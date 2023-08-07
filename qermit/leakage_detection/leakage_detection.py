@@ -17,7 +17,7 @@ def gen_add_leakage_gadget_circuit_task(backend: Backend) -> MitTask:
     :rtype: MitTask
     """
 
-    if backend.backend_info == None:
+    if backend.backend_info is None:
         raise Exception("This backand has no nodes.")
 
     n_device_qubits = cast(BackendInfo, backend.backend_info).n_nodes

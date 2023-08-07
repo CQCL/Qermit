@@ -3,6 +3,9 @@ from pytket import Circuit
 from qermit.taskgraph import gen_compiled_MitRes
 from qermit import CircuitShots
 from qermit.leakage_detection import get_leakage_detection_mitres
+from qermit.leakage_detection.leakage_detection import gen_add_leakage_gadget_circuit_task
+from pytket.extensions.quantinuum.backends.leakage_gadget import prune_shots_detected_as_leaky
+from qermit.postselection.postselect_mitres import gen_postselect_task
 
 
 def test_leakage_gadget():
@@ -24,3 +27,38 @@ def test_leakage_gadget():
     counts = result_list[0].get_counts()
     assert all(shot in list(counts.keys()) for shot in [(0, 0), (1, 0)])
     assert sum(val for val in counts.values()) <= n_shots
+
+
+def test_compare_with_prune():
+    # A test to check for updates to prune that we should know about.
+
+    circuit_0 = Circuit(2).measure_all()
+    circuit_1 = Circuit(2).Rz(0.3, 0).measure_all()
+    circuit_shot_0 = CircuitShots(Circuit=circuit_0, Shots=10)
+    circuit_shot_1 = CircuitShots(Circuit=circuit_1, Shots=20)
+
+    backend = MockQuantinuumBackend()
+
+    generation_task = gen_add_leakage_gadget_circuit_task(backend=backend)
+    postselection_task = gen_postselect_task()
+
+    detection_circuit_shots_list, postselect_mgr_list = generation_task(
+        ([circuit_shot_0, circuit_shot_1], )
+    )
+    result_list = [
+        backend.run_circuit(
+            circuit=backend.get_compiled_circuit(
+                circuit=detection_circuit_shots.Circuit,
+                optimisation_level=0
+            ),
+            n_shots=detection_circuit_shots.Shots,
+        ) for detection_circuit_shots in detection_circuit_shots_list
+    ]
+
+    qermit_result_list = postselection_task(
+        (result_list, postselect_mgr_list, )
+    )
+    pytket_result_list = [
+        prune_shots_detected_as_leaky(result) for result in result_list
+    ]
+    assert qermit_result_list[0] == pytket_result_list
