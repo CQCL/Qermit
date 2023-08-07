@@ -44,6 +44,7 @@ from qiskit import IBMQ  # type: ignore
 import pytest
 from pytket.circuit import Node  # type: ignore
 from qermit.mock_backend import MockQuantinuumBackend  # type: ignore
+from qermit.taskgraph import gen_MeasurementReduction_MitEx
 
 n_qubits = 2
 
@@ -67,6 +68,106 @@ noisy_backend = AerBackend(noise_model)
 
 skip_remote_tests: bool = not IBMQ.stored_account()
 REASON = "IBMQ account not configured"
+
+
+def get_string_operator(meas_qubits, string):
+    # A small utility method for generating observables with expectation
+    # corresponding to bit string probabilities.
+
+    identity_pauli_list = [Pauli.I for _ in meas_qubits]
+
+    identity_qps = QubitPauliString(
+        qubits=meas_qubits,
+        paulis=identity_pauli_list,
+    )
+    qpo = QubitPauliOperator({identity_qps: 1})
+
+    for i in range(len(meas_qubits)):
+        temp_pauli_list = identity_pauli_list.copy()
+        temp_pauli_list[i] = Pauli.Z
+        temp_qps = QubitPauliString(
+            qubits=meas_qubits,
+            paulis=temp_pauli_list,
+        )
+        if string[i] == 0:
+            qpo *= QubitPauliOperator({temp_qps: 0.5, identity_qps: 0.5})
+        elif string[i] == 1:
+            qpo *= QubitPauliOperator({temp_qps: -0.5, identity_qps: 0.5})
+        else:
+            raise Exception(f"{string} is not a binary string.")
+
+    return qpo
+
+
+@pytest.mark.high_compute
+def test_measurement_reduction_integration():
+
+    tol = 0.01
+
+    # A bell state
+    circuit = Circuit()
+    qubit_0 = Qubit(name='my_qubit', index=0)
+    qubit_1 = Qubit(name='my_qubit', index=1)
+    circuit.add_qubit(qubit_0)
+    circuit.add_qubit(qubit_1)
+    circuit.H(qubit_0).CX(qubit_0, qubit_1)
+    meas_qubits = [qubit_0, qubit_1]
+
+    backend = AerBackend()
+    reduction_mitex = gen_MeasurementReduction_MitEx(backend=backend)
+
+    ansatz = AnsatzCircuit(
+        Circuit=circuit,
+        Shots=1000000,
+        SymbolsDict=SymbolsDict()
+    )
+
+    qpo = get_string_operator(meas_qubits, [0, 0])
+    obs = ObservableTracker(qubit_pauli_operator=qpo)
+    obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
+    result = reduction_mitex.run(
+        mitex_wires=[obs_exp]
+    )
+    # The probability of measuring 00 is 0.5
+    assert abs(sum(result[0]._dict.values()) - 0.5) < tol
+
+    qpo = get_string_operator(meas_qubits, [0, 1])
+    obs = ObservableTracker(qubit_pauli_operator=qpo)
+    obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
+    result = reduction_mitex.run(
+        mitex_wires=[obs_exp]
+    )
+    # The probability of measuring 01 is 0
+    assert abs(sum(result[0]._dict.values())) < tol
+
+    folding_type = Folding.two_qubit_gate
+    fit_type = Fit.linear
+    noise_scaling_list = [1.5, 2, 2.5, 3, 3.5]
+    zne_mitex = gen_ZNE_MitEx(
+        backend=backend,
+        experiment_mitex=reduction_mitex,
+        noise_scaling_list=noise_scaling_list,
+        folding_type=folding_type,
+        fit_type=fit_type,
+    )
+
+    qpo = get_string_operator(meas_qubits, [1, 0])
+    obs = ObservableTracker(qubit_pauli_operator=qpo)
+    obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
+    result = zne_mitex.run(
+        mitex_wires=[obs_exp]
+    )
+    # The probability of measuring 10 is 0
+    assert abs(sum(result[0]._dict.values())) < tol
+
+    qpo = get_string_operator(meas_qubits, [1, 1])
+    obs = ObservableTracker(qubit_pauli_operator=qpo)
+    obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
+    result = zne_mitex.run(
+        mitex_wires=[obs_exp]
+    )
+    # The probability of measuring 11 is 0.5
+    assert abs(sum(result[0]._dict.values()) - 0.5) < tol
 
 
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
