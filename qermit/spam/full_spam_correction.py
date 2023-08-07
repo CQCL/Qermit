@@ -56,7 +56,7 @@ def gen_full_tomography_spam_circuits_task(
             # check correlations distance
             if (
                 obj.characterisation["FullCorrelatedSpamCorrection"].CorrelatedNodes
-                is qubit_subsets
+                == qubit_subsets
             ):
                 return (wire, [], [])
 
