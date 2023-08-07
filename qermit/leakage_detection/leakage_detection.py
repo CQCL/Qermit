@@ -9,14 +9,34 @@ from pytket.backends.backendresult import BackendResult
 from pytket.extensions.quantinuum.backends.leakage_gadget import get_detection_circuit
 from qermit.mock_backend import MockQuantinuumBackend
 from qermit.taskgraph import gen_compiled_MitRes
+from pytket.backends import Backend
 
-def gen_add_leakage_gadget_circuit_task(backend):
+def gen_add_leakage_gadget_circuit_task(backend:Backend) -> MitTask:
+    """Generates task adding leakage gadget circuit to given circuts.
+
+    :param backend: Backend on which the circuit will be run.
+    :type backend: Backend
+    :return: Task adding leakage gadget circuit to given circuts.
+    :rtype: MitTask
+    """
     
     def task(
         obj,
         circuit_shots_list:List[CircuitShots]
     ) -> Tuple[List[CircuitShots], List[PostselectMgr]]:
+        """Task adding leakage gadget circuit to given circuts. This reuses
+        methods from pytket-quantinuum. A list of the corresponding
+        postselection managers is also created.
+
+        :param circuit_shots_list: List of circuits to which leakage gadget
+            circuit should be added.
+        :type circuit_shots_list: List[CircuitShots]
+        :return: Circuits with gadget added, and list of corresponding
+            post selection managers.
+        :rtype: Tuple[List[CircuitShots], List[PostselectMgr]]
+        """
         
+        # Add leackage detection gadget to each inputted circuit.
         detection_circuit_shots_list = [
             CircuitShots(
                 Circuit = get_detection_circuit(circuit_shots.Circuit, backend.backend_info.n_nodes),
@@ -25,6 +45,9 @@ def gen_add_leakage_gadget_circuit_task(backend):
             for circuit_shots in circuit_shots_list
         ]
         
+        # For each circuit create a postselection manager. These may be
+        # different for each circuit, if for example the circuits are of
+        # different sizes.
         postselect_mgr_list = [
             PostselectMgr(
                 compute_cbits=orig_circuit.Circuit.bits,
@@ -44,14 +67,23 @@ def gen_add_leakage_gadget_circuit_task(backend):
         _method=task,
     )
 
-def get_leakage_gadget_mitres(backend, **kwargs):
+def get_leakage_detection_mitres(backend:Backend, **kwargs) -> MitRes:
+    """Generate MitRes making use of leakage detection and postselection.
+
+    :param backend: Backend on which the circuits are run.
+    :type backend: Backend
+    :return: MitRes making use of leakage detection and postselection.
+    :rtype: MitRes
+    """
     
     _mitres = deepcopy(
-        kwargs.get("mitres", MitRes(backend, _label="LeakageGadgetMitRes"))
+        kwargs.get("mitres", MitRes(backend, _label="LeakageDetectionMitRes"))
     )
     _taskgraph = TaskGraph().from_TaskGraph(_mitres)
     _taskgraph.add_wire()
+    # Prepend task adding leakage detection circuits.
     _taskgraph.prepend(gen_add_leakage_gadget_circuit_task(backend))
+    # Append task removing shots where leakage is detected
     _taskgraph.append(gen_postselect_task())
     
     return MitRes(backend).from_TaskGraph(_taskgraph)

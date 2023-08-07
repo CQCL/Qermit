@@ -2,7 +2,7 @@ from qermit.mock_backend import MockQuantinuumBackend
 from pytket import Circuit
 from qermit.taskgraph import gen_compiled_MitRes
 from qermit import CircuitShots
-from qermit.leakage_detection import get_leakage_gadget_mitres
+from qermit.leakage_detection import get_leakage_detection_mitres
 
 
 def test_leakage_gadget():
@@ -10,7 +10,7 @@ def test_leakage_gadget():
     backend = MockQuantinuumBackend()
     circuit = Circuit(2).H(0).measure_all()
     compiled_mitres = gen_compiled_MitRes(backend=backend, optimisation_level=0)
-    leakage_gadget_mitres = get_leakage_gadget_mitres(
+    leakage_gadget_mitres = get_leakage_detection_mitres(
         backend = backend,
         mitres = compiled_mitres
     )
