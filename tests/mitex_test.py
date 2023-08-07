@@ -19,6 +19,7 @@ from qermit import (  # type: ignore
     ObservableTracker,
     CircuitShots,
     AnsatzCircuit,
+    ObservableExperiment,
 )
 from qermit.taskgraph.mitex import (  # type: ignore
     filter_observable_tracker_task_gen,
@@ -32,6 +33,42 @@ from pytket.circuit import Circuit, fresh_symbol, Qubit, OpType  # type: ignore
 from pytket.pauli import QubitPauliString, Pauli  # type: ignore
 from pytket.utils import QubitPauliOperator
 from pytket.extensions.qiskit import AerBackend  # type: ignore
+
+
+def test_mitex_cache():
+
+    circuit = Circuit(1).X(0)
+    backend = AerBackend()
+    mitex = MitEx(backend=backend)
+    mitex.decompose_TaskGraph_nodes()
+
+    ansatz = AnsatzCircuit(
+        Circuit=circuit,
+        Shots=100000,
+        SymbolsDict=SymbolsDict()
+    )
+    qubits = circuit.qubits
+    qps = QubitPauliString(
+        qubits=qubits,
+        paulis=[Pauli.Z for _ in qubits],
+    )
+    qpo = QubitPauliOperator({qps: 1})
+    obs = ObservableTracker(qubit_pauli_operator=qpo)
+    obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
+
+    mitex.run(
+        mitex_wires=[obs_exp], cache=True
+    )
+    cache = mitex.get_cache()
+    assert list(cache.keys()) == [
+        'FilterObservableTracker',
+        'CollateExperimentCircuits',
+        'MitResCompileCircuitShots',
+        'MitResCircuitsToHandles',
+        'MitResHandlesToResults',
+        'SplitResults',
+        'GenerateExpectations',
+    ]
 
 
 def gen_test_wire_objs():
