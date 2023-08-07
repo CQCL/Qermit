@@ -96,11 +96,12 @@ class MockQuantinuumBackend(QuantinuumBackend):
         name="MockQuantinuumBackend",
         device_name="mock-quantinuum",
         version="n/a",
-        architecture=FullyConnected(10, "node"),
+        architecture=FullyConnected(10, 'q'),
         gate_set=gate_set,
+        n_cl_reg=100,
     )
 
-    noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Rz, OpType.Measure}
+    noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Measure}
 
     def __init__(self):
         super(MockQuantinuumBackend, self).__init__(device_name="H1-1SC")
