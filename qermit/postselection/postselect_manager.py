@@ -1,18 +1,19 @@
 from collections import Counter
 from pytket.backends.backendresult import BackendResult
-from pytket.utils.outcomearray import OutcomeArray 
+from pytket.utils.outcomearray import OutcomeArray
 from pytket.circuit import Bit
 from typing import List, Tuple, Dict
+
 
 class PostselectMgr:
     """Class for tracking and applying post selection to results.
     Includes other methods to analyse the results after post selection.
     """
-    
+
     def __init__(
         self,
-        compute_cbits:List[Bit],
-        postselect_cbits:List[Bit],
+        compute_cbits: List[Bit],
+        postselect_cbits: List[Bit],
     ):
         """Initialisation method.
 
@@ -24,35 +25,35 @@ class PostselectMgr:
         :raises Exception: Raised if a bit is in both compute_cbits
             and postselect_cbits.
         """
-        
+
         intersect = set(compute_cbits).intersection(set(postselect_cbits))
         if intersect:
             raise Exception(
-                f"{intersect} are post select and compute qubits. " +
-                "They cannot be both."
+                f"{intersect} are post select and compute qubits. "
+                + "They cannot be both."
             )
 
         self.compute_cbits = compute_cbits
         self.postselect_cbits = postselect_cbits
 
         self.cbits = compute_cbits + postselect_cbits
-        
-    def get_post_selected_shot(self, shot:Tuple[int]) -> Tuple[int]:
+
+    def get_post_selected_shot(self, shot: Tuple[int, ...]) -> Tuple[int, ...]:
         "Removes postselection bits from shot."
         return tuple([bit for bit, reg in zip(shot, self.cbits) if reg not in self.postselect_cbits])
-    
-    def is_post_select_shot(self, shot:Tuple[int]) -> bool:
+
+    def is_post_select_shot(self, shot: Tuple[int, ...]) -> bool:
         "Determines if shot survives postselection"
 
         # TODO: It may be nice to generalise this so that other functions
         # besides bit==0 can be used as a means of postselection.
-        return all(bit==0 for bit, reg in zip(shot, self.cbits) if reg in self.postselect_cbits)
+        return all(bit == 0 for bit, reg in zip(shot, self.cbits) if reg in self.postselect_cbits)
 
-    def dict_to_result(self, result_dict:Dict[Tuple[int], int]) -> BackendResult:
+    def dict_to_result(self, result_dict: Dict[Tuple[int, ...], int]) -> BackendResult:
         """Convert dictionary to BackendResult.
 
         :param result_dict: Dictionary to convert.
-        :type result_dict: Dict[Tuple[int], int]
+        :type result_dict: Dict[Tuple[int, ...], int]
         :return: Corresponding BackendResult.
         :rtype: BackendResult
         """
@@ -61,7 +62,7 @@ class PostselectMgr:
         # an empty counter results in an error.
         if result_dict == {}:
             return BackendResult()
-        
+
         return BackendResult(
             counts=Counter({
                 OutcomeArray.from_readouts([key]): val
@@ -69,8 +70,8 @@ class PostselectMgr:
             }),
             c_bits=self.compute_cbits,
         )
-        
-    def post_select_result(self, result:BackendResult) -> BackendResult:
+
+    def post_select_result(self, result: BackendResult) -> BackendResult:
         """Transforms BackendResult to keep only shots which should be
         post selected.
 
@@ -82,12 +83,12 @@ class PostselectMgr:
 
         post_select_dict = {}
         for shot, count in result.get_counts(cbits=self.cbits).items():
-            if self.is_post_select_shot(shot):                
+            if self.is_post_select_shot(shot):
                 post_select_dict[self.get_post_selected_shot(shot)] = count
 
         return self.dict_to_result(post_select_dict)
 
-    def merge_result(self, result:BackendResult) -> BackendResult:
+    def merge_result(self, result: BackendResult) -> BackendResult:
         """Transforms BackendResult so that postselection bits are
         removed, but no shots are removed by postselection.
 
@@ -96,10 +97,11 @@ class PostselectMgr:
         :return: Result with postselection bits removed.
         :rtype: BackendResult
         """
-        
-        merge_dict = {}
+
+        merge_dict: Dict[Tuple[int, ...], int] = {}
         for shot, count in result.get_counts(cbits=self.cbits).items():
             post_selected_shot = self.get_post_selected_shot(shot)
-            merge_dict[post_selected_shot] = merge_dict.get(post_selected_shot, 0) + count
+            merge_dict[post_selected_shot] = merge_dict.get(
+                post_selected_shot, 0) + count
 
         return self.dict_to_result(merge_dict)

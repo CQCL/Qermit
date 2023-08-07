@@ -1,5 +1,3 @@
-from pytket.extensions.qiskit import AerBackend
-from pytket import Circuit
 from .postselect_manager import PostselectMgr
 from qermit import CircuitShots, MitRes, MitTask, TaskGraph
 from copy import deepcopy
@@ -14,11 +12,11 @@ def gen_postselect_task() -> MitTask:
     :return: Task applying postselection to given results.
     :rtype: MitTask
     """
-    
+
     def task(
         obj,
-        result_list:List[BackendResult],
-        postselect_mgr_list:List[PostselectMgr],
+        result_list: List[BackendResult],
+        postselect_mgr_list: List[PostselectMgr],
     ) -> Tuple[List[BackendResult]]:
         """Task applying postselection to given results.
 
@@ -31,12 +29,12 @@ def gen_postselect_task() -> MitTask:
         :return: List of results after postselection has been applied.
         :rtype: Tuple[List[BackendResult]]
         """
-                        
+
         return (
             [
                 postselect_mgr.post_select_result(result)
                 for result, postselect_mgr in zip(result_list, postselect_mgr_list)
-            ], 
+            ],
         )
 
     return MitTask(
@@ -47,7 +45,7 @@ def gen_postselect_task() -> MitTask:
     )
 
 
-def gen_postselect_mgr_gen_task(postselect_mgr:PostselectMgr) -> MitTask:
+def gen_postselect_mgr_gen_task(postselect_mgr: PostselectMgr) -> MitTask:
     """Generates task applying the same post selection manager to all
     circuits.
 
@@ -55,11 +53,11 @@ def gen_postselect_mgr_gen_task(postselect_mgr:PostselectMgr) -> MitTask:
     :type postselect_mgr: PostselectMgr
     :return: Task applying the same post selection manager to all circuits.
     :rtype: MitTask
-    """     
-    
+    """
+
     def task(
         obj,
-        circ_shots_list:List[CircuitShots]
+        circ_shots_list: List[CircuitShots]
     ) -> Tuple[List[CircuitShots], List[PostselectMgr]]:
         """Task applying the same post selection manager to all circuits.
 
@@ -69,9 +67,9 @@ def gen_postselect_mgr_gen_task(postselect_mgr:PostselectMgr) -> MitTask:
         :return: List od circuits and corresponding postselection managers.
         :rtype: Tuple[List[CircuitShots], List[PostselectMgr]]
         """
-        
+
         return (circ_shots_list, [postselect_mgr for _ in circ_shots_list])
-    
+
     return MitTask(
         _label="ConstantNode",
         _n_in_wires=1,
@@ -81,8 +79,8 @@ def gen_postselect_mgr_gen_task(postselect_mgr:PostselectMgr) -> MitTask:
 
 
 def gen_postselect_mitres(
-    backend:Backend,
-    postselect_mgr:PostselectMgr,
+    backend: Backend,
+    postselect_mgr: PostselectMgr,
     **kwargs
 ) -> MitRes:
     """Generates MitRes running given circuit and applying postselection.
@@ -94,7 +92,7 @@ def gen_postselect_mitres(
     :return: MitRes running given circuit and applying postselection.
     :rtype: MitRes
     """
-    
+
     _mitres = deepcopy(
         kwargs.get("mitres", MitRes(backend, _label="PostselectionMitRes"))
     )
@@ -102,5 +100,5 @@ def gen_postselect_mitres(
     _taskgraph.add_wire()
     _taskgraph.prepend(gen_postselect_mgr_gen_task(postselect_mgr))
     _taskgraph.append(gen_postselect_task())
-    
+
     return MitRes(backend).from_TaskGraph(_taskgraph)

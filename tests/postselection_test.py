@@ -9,7 +9,7 @@ from pytket import Circuit
 
 
 def test_postselect_manager():
-    
+
     compute_cbits = [Bit(name='A', index=0), Bit(name='C', index=0)]
     post_select_cbits = [Bit(name='B', index=0), Bit(name='A', index=1)]
 
@@ -19,12 +19,12 @@ def test_postselect_manager():
     )
 
     counts = {
-        (0,0,0,0):100,
-        (0,1,0,0):100,
-        (0,0,0,1):100,
-        (0,1,0,1):100,
-        (1,0,0,0):100,
-        (1,1,0,0):100,
+        (0, 0, 0, 0): 100,
+        (0, 1, 0, 0): 100,
+        (0, 0, 0, 1): 100,
+        (0, 1, 0, 1): 100,
+        (1, 0, 0, 0): 100,
+        (1, 1, 0, 0): 100,
     }
 
     result = BackendResult(
@@ -51,8 +51,8 @@ def test_postselect_mitres():
         postselect_cbits=[cbits[0]],
     )
     postselect_mitres = gen_postselect_mitres(
-        backend = backend,
-        postselect_mgr = postselect_mgr
+        backend=backend,
+        postselect_mgr=postselect_mgr
     )
-    result_list = postselect_mitres.run([CircuitShots(Circuit = circuit, Shots = 50)])
+    result_list = postselect_mitres.run([CircuitShots(Circuit=circuit, Shots=50)])
     assert list(result_list[0].get_counts().keys()) == [(0,)]
