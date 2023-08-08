@@ -7,3 +7,5 @@
 .DS_Store
 .venv
 build
+docs/
+.html
