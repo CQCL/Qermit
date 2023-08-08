@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = "Qermit"
-copyright = "2021, Cambridge Quantum Computing Ltd"
-author = "Cambridge Quantum Computing Ltd"
+copyright = "2023 Quantinuum"
+author = "Quantinuum"
 
 # The short X.Y version
 version = "0.4.0"
@@ -41,6 +41,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
+    "sphinx.ext.viewcode",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -66,16 +67,26 @@ language = "en"
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-# The name of the Pygments (syntax highlighting) style to use.
-pygments_style = "sphinx"
-
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "sphinx_book_theme"
+
+html_theme_options = {
+    "repository_url": "https://github.com/CQCL/qermit",
+    "use_repository_button": True,
+    "use_issues_button": True,
+    "logo": {
+        "image_light": "_static/Quantinuum_logo_black.png",
+        "image_dark": "_static/Quantinuum_logo_white.png",
+    },
+}
+
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

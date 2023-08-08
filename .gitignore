@@ -5,3 +5,6 @@
 .idea/
 .dmypy.json
 .DS_Store
+.venv
+build
+docs/
