@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = "Qermit"
-copyright = "2021, Cambridge Quantum Computing Ltd"
-author = "Cambridge Quantum Computing Ltd"
+copyright = "2023 Quantinuum"
+author = "Quantinuum"
 
 # The short X.Y version
 version = "0.4.0"
