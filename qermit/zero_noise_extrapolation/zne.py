@@ -74,8 +74,6 @@ class Folding(Enum):
         :rtype: Circuit
         """
 
-        print(f"===== conducting {noise_scaling} folding =====")
-
         # Raise if the amount by which the noise should be scaled is not an odd integer
         if (not noise_scaling % 2) or noise_scaling % 1:
             raise ValueError(
@@ -1019,14 +1017,14 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
     :return: MitEx object performing noise mitigation by ZNE.
     :rtype: MitEx
     """
-    _experiment_mitres = deepcopy(
+    _experiment_mitres = copy(
         kwargs.get(
             "experiment_mitres",
             MitRes(backend),
         )
     )
 
-    _experiment_mitex = deepcopy(
+    _experiment_mitex = copy(
         kwargs.get(
             "experiment_mitex",
             MitEx(backend, _label="ExperimentMitex", mitres=_experiment_mitres),
