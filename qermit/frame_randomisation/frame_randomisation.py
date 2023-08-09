@@ -191,9 +191,7 @@ def gen_Frame_Randomisation_MitRes(backend: Backend, samples: int, **kwargs) -> 
             "frame_randomisation", FrameRandomisation.UniversalFrameRandomisation
         )
     )
-    _mitres.prepend(
-        backend_compile_circuit_shots_task_gen(backend)
-    )
+    _mitres.prepend(backend_compile_circuit_shots_task_gen(backend))
     _mitres.prepend(frame_randomisation_circuits_task_gen(samples, _fr_type))
     _mitres.append(
         frame_randomisation_result_task_gen(samples),
