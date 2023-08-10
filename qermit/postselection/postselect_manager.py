@@ -33,10 +33,10 @@ class PostselectMgr:
                 + "They cannot be both."
             )
 
-        self.compute_cbits = compute_cbits
-        self.postselect_cbits = postselect_cbits
+        self.compute_cbits: List[Bit] = compute_cbits
+        self.postselect_cbits: List[Bit] = postselect_cbits
 
-        self.cbits = compute_cbits + postselect_cbits
+        self.cbits: List[Bit] = compute_cbits + postselect_cbits
 
     def get_post_selected_shot(self, shot: Tuple[int, ...]) -> Tuple[int, ...]:
         "Removes postselection bits from shot."
@@ -60,7 +60,7 @@ class PostselectMgr:
 
         # Special case where the dictionary is empty. Presently having
         # an empty counter results in an error.
-        if result_dict == {}:
+        if not result_dict:
             return BackendResult()
 
         return BackendResult(
@@ -81,12 +81,13 @@ class PostselectMgr:
         :rtype: BackendResult
         """
 
-        post_select_dict = {}
-        for shot, count in result.get_counts(cbits=self.cbits).items():
-            if self.is_post_select_shot(shot):
-                post_select_dict[self.get_post_selected_shot(shot)] = count
-
-        return self.dict_to_result(post_select_dict)
+        return self.dict_to_result(
+            {
+                self.get_post_selected_shot(shot):count
+                for shot, count in result.get_counts(cbits=self.cbits).items()
+                if self.is_post_select_shot(shot)
+            }
+        )
 
     def merge_result(self, result: BackendResult) -> BackendResult:
         """Transforms BackendResult so that postselection bits are

@@ -9,16 +9,16 @@ from pytket.backends.backendinfo import BackendInfo
 
 
 def gen_add_leakage_gadget_circuit_task(backend: Backend) -> MitTask:
-    """Generates task adding leakage gadget circuit to given circuts.
+    """Generates task adding leakage gadget circuits to given circuts.
 
     :param backend: Backend on which the circuit will be run.
     :type backend: Backend
-    :return: Task adding leakage gadget circuit to given circuts.
+    :return: Task adding leakage gadget circuits to given circuts.
     :rtype: MitTask
     """
 
     if backend.backend_info is None:
-        raise Exception("This backand has no nodes.")
+        raise Exception("This backend has no nodes.")
 
     n_device_qubits = cast(BackendInfo, backend.backend_info).n_nodes
 
@@ -26,7 +26,7 @@ def gen_add_leakage_gadget_circuit_task(backend: Backend) -> MitTask:
         obj,
         circuit_shots_list: List[CircuitShots]
     ) -> Tuple[List[CircuitShots], List[PostselectMgr]]:
-        """Task adding leakage gadget circuit to given circuts. This reuses
+        """Task adding leakage gadget circuits to given circuts. This reuses
         methods from pytket-quantinuum. A list of the corresponding
         postselection managers is also created.
 

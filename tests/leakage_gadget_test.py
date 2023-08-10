@@ -8,7 +8,7 @@ from pytket.extensions.quantinuum.backends.leakage_gadget import prune_shots_det
 from qermit.postselection.postselect_mitres import gen_postselect_task
 
 
-def test_leakage_gadget():
+def test_leakage_gadget() -> None:
 
     backend = MockQuantinuumBackend()
     circuit = Circuit(2).H(0).measure_all()
@@ -29,7 +29,7 @@ def test_leakage_gadget():
     assert sum(val for val in counts.values()) <= n_shots
 
 
-def test_compare_with_prune():
+def test_compare_with_prune() -> None:
     # A test to check for updates to prune that we should know about.
 
     circuit_0 = Circuit(2).measure_all()

@@ -8,7 +8,7 @@ from qermit import CircuitShots
 from pytket import Circuit
 
 
-def test_postselect_manager():
+def test_postselect_manager() -> None:
 
     compute_cbits = [Bit(name='A', index=0), Bit(name='C', index=0)]
     post_select_cbits = [Bit(name='B', index=0), Bit(name='A', index=1)]
@@ -41,7 +41,7 @@ def test_postselect_manager():
     assert count_mgr.merge_result(result=result).get_counts() == Counter({(0, 0): 200, (0, 1): 200, (1, 0): 200})
 
 
-def test_postselect_mitres():
+def test_postselect_mitres() -> None:
 
     backend = AerBackend()
     circuit = Circuit(2).H(0).measure_all()
