@@ -38,11 +38,11 @@ class PostselectMgr:
 
         self.cbits: List[Bit] = compute_cbits + postselect_cbits
 
-    def get_post_selected_shot(self, shot: Tuple[int, ...]) -> Tuple[int, ...]:
+    def get_postselected_shot(self, shot: Tuple[int, ...]) -> Tuple[int, ...]:
         "Removes postselection bits from shot."
         return tuple([bit for bit, reg in zip(shot, self.cbits) if reg not in self.postselect_cbits])
 
-    def is_post_select_shot(self, shot: Tuple[int, ...]) -> bool:
+    def is_postselect_shot(self, shot: Tuple[int, ...]) -> bool:
         "Determines if shot survives postselection"
 
         # TODO: It may be nice to generalise this so that other functions
@@ -71,7 +71,7 @@ class PostselectMgr:
             c_bits=self.compute_cbits,
         )
 
-    def post_select_result(self, result: BackendResult) -> BackendResult:
+    def postselect_result(self, result: BackendResult) -> BackendResult:
         """Transforms BackendResult to keep only shots which should be
         post selected.
 
@@ -83,9 +83,9 @@ class PostselectMgr:
 
         return self.dict_to_result(
             {
-                self.get_post_selected_shot(shot):count
+                self.get_postselected_shot(shot):count
                 for shot, count in result.get_counts(cbits=self.cbits).items()
-                if self.is_post_select_shot(shot)
+                if self.is_postselect_shot(shot)
             }
         )
 
@@ -101,8 +101,8 @@ class PostselectMgr:
 
         merge_dict: Dict[Tuple[int, ...], int] = {}
         for shot, count in result.get_counts(cbits=self.cbits).items():
-            post_selected_shot = self.get_post_selected_shot(shot)
-            merge_dict[post_selected_shot] = merge_dict.get(
-                post_selected_shot, 0) + count
+            postselected_shot = self.get_postselected_shot(shot)
+            merge_dict[postselected_shot] = merge_dict.get(
+                postselected_shot, 0) + count
 
         return self.dict_to_result(merge_dict)
