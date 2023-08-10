@@ -83,7 +83,7 @@ class PostselectMgr:
 
         return self.dict_to_result(
             {
-                self.get_postselected_shot(shot):count
+                self.get_postselected_shot(shot): count
                 for shot, count in result.get_counts(cbits=self.cbits).items()
                 if self.is_postselect_shot(shot)
             }
