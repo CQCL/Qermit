@@ -32,7 +32,7 @@ def gen_postselect_task() -> MitTask:
 
         return (
             [
-                postselect_mgr.post_select_result(result)
+                postselect_mgr.postselect_result(result)
                 for result, postselect_mgr in zip(result_list, postselect_mgr_list)
             ],
         )
