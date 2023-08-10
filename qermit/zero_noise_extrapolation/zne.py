@@ -1017,14 +1017,14 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
     :return: MitEx object performing noise mitigation by ZNE.
     :rtype: MitEx
     """
-    _experiment_mitres = copy(
+    _experiment_mitres = deepcopy(
         kwargs.get(
             "experiment_mitres",
             MitRes(backend),
         )
     )
 
-    _experiment_mitex = copy(
+    _experiment_mitex = deepcopy(
         kwargs.get(
             "experiment_mitex",
             MitEx(backend, _label="ExperimentMitex", mitres=_experiment_mitres),
