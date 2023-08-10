@@ -37,12 +37,24 @@ class RandomPauliSampler(PauliSampler):
     def __init__(self, seed=None):
         self.rng = numpy.random.default_rng(seed)
 
-    def sample(self, qubit_list, **kwargs):
-        return [Stabiliser(
-            Z_list=[self.rng.integers(2) for _ in qubit_list],
-            X_list=[self.rng.integers(2) for _ in qubit_list],
-            qubit_list=qubit_list,
-        )]
+    def sample(self, qubit_list, n_checks=1, **kwargs):
+
+        stabiliser_list = []
+        while len(stabiliser_list) < n_checks:
+            
+            Z_list=[self.rng.integers(2) for _ in qubit_list]
+            X_list=[self.rng.integers(2) for _ in qubit_list]
+
+            if any(Z==1 for Z in Z_list) or any(X==1 for X in X_list):
+                stabiliser_list.append(
+                    Stabiliser(
+                        Z_list=Z_list,
+                        X_list=X_list,
+                        qubit_list=qubit_list,
+                    )
+                )
+        
+        return stabiliser_list
 
 
 class OptimalPauliSampler(PauliSampler):
