@@ -1,6 +1,6 @@
-from pytket.extensions.qiskit import AerBackend
+from pytket.extensions.qiskit import AerBackend  # type: ignore
 from pytket import OpType
-import qiskit.providers.aer.noise as noise
+import qiskit.providers.aer.noise as noise  # type: ignore
 
 
 class NoisyAerBackend(AerBackend):
