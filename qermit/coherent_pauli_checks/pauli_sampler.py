@@ -45,6 +45,7 @@ class RandomPauliSampler(PauliSampler):
             Z_list=[self.rng.integers(2) for _ in qubit_list]
             X_list=[self.rng.integers(2) for _ in qubit_list]
 
+            # Avoids using the identity string as it commutes with all errors
             if any(Z==1 for Z in Z_list) or any(X==1 for X in X_list):
                 stabiliser_list.append(
                     Stabiliser(

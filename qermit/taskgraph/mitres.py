@@ -30,6 +30,7 @@ from pytket.utils.outcomearray import OutcomeArray
 from pytket import Bit
 import numpy as np  # type: ignore
 from pytket import Circuit
+from collections import Counter
 
 
 def backend_compile_circuit_shots_task_gen(
@@ -420,18 +421,54 @@ def group_shots_task_gen() -> MitTask:
 
         # For each circuit, combine the results.
         for chunk in grouped_results:
-            # Concatenate shots from all results
-            combined_shots = np.concatenate([result.get_shots() for result in chunk])
-            outcome_array = OutcomeArray.from_readouts(combined_shots)
             merged_results.append(
-                BackendResult(
-                    shots=outcome_array, c_bits=cast(Sequence[Bit], chunk[0].c_bits)
+                merge_results(
+                    result_list=chunk,
                 )
             )
 
         return (merged_results,)
 
     return MitTask(_label="MergeShots", _n_in_wires=2, _n_out_wires=1, _method=task)
+
+
+def merge_results(result_list: List[BackendResult]):
+
+    c_bits = sorted(result_list[0].c_bits.keys())
+    if not all(sorted(result.c_bits.keys()) == c_bits for result in result_list):
+        raise Exception("These results to not have matching bits.")
+
+    if all(result.get_result().shots is not None for result in result_list):
+
+        return BackendResult(
+            shots=OutcomeArray.from_readouts(
+                np.concatenate([result.get_shots(cbits=c_bits) for result in result_list])
+            ),
+            c_bits=c_bits
+        )
+
+    if all(result.get_result().counts is not None for result in result_list):
+
+        counts = sum(
+            (result.get_counts(cbits=c_bits) for result in result_list),
+            Counter()
+        )
+        counts = Counter(
+            {
+                OutcomeArray.from_readouts([key]): val
+                for key, val in counts.items()
+            }
+        )
+
+        return BackendResult(
+            counts=counts,
+            c_bits=c_bits,
+        )
+
+    raise Exception(
+        "Not all given results have measured results. " +
+        "They must either all contain shots, or all contain counts."
+    )
 
 
 def gen_shot_split_MitRes(backend: Backend, max_shots: int) -> MitRes:

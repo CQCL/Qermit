@@ -26,6 +26,77 @@ from qermit.taskgraph.mitres import (  # type: ignore
 )
 from pytket import Circuit
 from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.circuit import Bit
+from collections import Counter
+from pytket.backends.backendresult import BackendResult
+from pytket.utils.outcomearray import OutcomeArray
+from qermit.taskgraph.mitres import merge_results
+
+
+def test_merge_results():
+
+    counts_1 = {
+        (0, 0, 0, 0): 100,
+        (0, 0, 0, 1): 100,
+        (0, 1, 0, 1): 100,
+        (1, 1, 0, 0): 100,
+    }
+    counts_2 = {
+        (0, 0, 0, 0): 100,
+        (0, 1, 0, 0): 100,
+        (0, 1, 0, 1): 100,
+        (1, 0, 0, 0): 100,
+    }
+
+    result_1 = BackendResult(
+        counts=Counter(
+            {
+                OutcomeArray.from_readouts([key]): val
+                for key, val in counts_1.items()
+            }
+        ),
+        c_bits=[
+            Bit(name='A', index=0),
+            Bit(name='A', index=1),
+            Bit(name='B', index=0),
+            Bit(name='C', index=0)
+        ],
+    )
+    result_2 = BackendResult(
+        counts=Counter(
+            {
+                OutcomeArray.from_readouts([key]): val
+                for key, val in counts_2.items()
+            }
+        ),
+        c_bits=[
+            Bit(name='A', index=0),
+            Bit(name='C', index=0),
+            Bit(name='B', index=0),
+            Bit(name='A', index=1)
+        ],
+    )
+
+    result = merge_results(
+        result_list=[result_1, result_2],
+    )
+
+    assert result.get_counts(
+        cbits=[
+            Bit(name='C', index=0),
+            Bit(name='A', index=1),
+            Bit(name='B', index=0),
+            Bit(name='A', index=0)
+        ],
+    ) == Counter(
+        {
+            (0, 0, 0, 0): 200,
+            (1, 0, 0, 0): 200,
+            (1, 1, 0, 0): 200,
+            (0, 1, 0, 1): 100,
+            (0, 0, 0, 1): 100,
+        }
+    )
 
 
 def test_backend_handle_result_task_gen():
