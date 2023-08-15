@@ -31,6 +31,37 @@ from collections import Counter
 from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 from qermit.taskgraph.mitres import merge_results
+from qermit.taskgraph.mitres import QermitBackendResult
+import numpy as np
+    
+
+def test_qermit_backend_result():
+
+    counts = {
+        (0, 0, 0, 0): 100,
+        (0, 1, 0, 0): 100,
+        (0, 0, 0, 1): 100,
+        (0, 1, 0, 1): 100,
+        (1, 0, 0, 0): 100,
+        (1, 1, 0, 0): 100,
+    }
+
+    result = BackendResult(
+        counts=Counter(
+            {
+                OutcomeArray.from_readouts([key]): val
+                for key, val in counts.items()
+            }
+        ),
+        c_bits=[Bit(name='A', index=i) for i in range(4)],
+    )
+
+    n_shots=123
+    rng=np.random.default_rng(seed=0)
+    qermit_result = QermitBackendResult(result=result, rng=rng)
+    resample_counts = qermit_result.resample(n_shots=n_shots).get_counts()
+    assert resample_counts.total() == n_shots
+    assert sorted(counts.keys()) == sorted(resample_counts.keys())
 
 
 def test_merge_results():

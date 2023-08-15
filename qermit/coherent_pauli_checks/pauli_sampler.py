@@ -39,6 +39,8 @@ class RandomPauliSampler(PauliSampler):
 
     def sample(self, qubit_list, n_checks=1, **kwargs):
 
+        # TODO: Make sure sampling is done without replacement
+
         stabiliser_list = []
         while len(stabiliser_list) < n_checks:
             
