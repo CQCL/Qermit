@@ -9,7 +9,7 @@ class NoisyAerBackend(AerBackend):
     OpType.Rz, OpType.Measure} and circuits should be rebased into
     that gateset before running.
     """
-    
+
     noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Rz, OpType.Measure}
 
     def __init__(self, n_qubits: int, prob_1: float, prob_2: float, prob_ro: float):
