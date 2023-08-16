@@ -45,8 +45,6 @@ class MockQuantinuumBackend(QuantinuumBackend):
         n_cl_reg=100,
     )
 
-    # noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Measure}
-
     def __init__(self):
         super(MockQuantinuumBackend, self).__init__(device_name="H1-1SC")
         self.noisy_backend = NoisyAerBackend(
