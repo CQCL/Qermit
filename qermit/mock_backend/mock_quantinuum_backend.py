@@ -28,6 +28,11 @@ from .noisy_aer_backend import NoisyAerBackend
 
 
 class MockQuantinuumBackend(QuantinuumBackend):
+    """ Backend mocking some of the features of QuantinuumBackend.
+    In particular the gateset and connectivity of the backend is replicated
+    so that compilation behaviour is reproduced. Some noise (unrelated to
+    that on the device) is also applied.
+    """
     gate_set = _GATE_SET
     gate_set.add(OpType.ZZPhase)
 
@@ -40,7 +45,7 @@ class MockQuantinuumBackend(QuantinuumBackend):
         n_cl_reg=100,
     )
 
-    noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Measure}
+    # noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Measure}
 
     def __init__(self):
         super(MockQuantinuumBackend, self).__init__(device_name="H1-1SC")
@@ -65,7 +70,8 @@ class MockQuantinuumBackend(QuantinuumBackend):
         :param valid_check: Explicitly check that all circuits satisfy all
             required predicates to run on the backend, defaults to True
         :type valid_check: bool, optional
-        :return: Handles to results for each input circuit, as an interable in the same order as the circuits.
+        :return: Handles to results for each input circuit, as an interable
+            in the same order as the circuits.
         :rtype: ResultHandle
         """
 
@@ -74,10 +80,14 @@ class MockQuantinuumBackend(QuantinuumBackend):
 
         noisy_circuit = circuit.copy()
         cu = CompilationUnit(noisy_circuit)
-        auto_rebase_pass(gateset=self.noisy_gate_set).apply(cu)
-        self.noisy_backend.default_compilation_pass(optimisation_level=0).apply(cu)
 
-        assert GateSetPredicate(self.noisy_gate_set).verify(cu.circuit)
+        self.noisy_backend.default_compilation_pass(
+            optimisation_level=0
+        ).apply(cu)
+        auto_rebase_pass(gateset=self.noisy_backend.noisy_gate_set).apply(cu)
+        assert GateSetPredicate(
+            self.noisy_backend.noisy_gate_set
+        ).verify(cu.circuit)
 
         handle = self.noisy_backend.process_circuit(cu.circuit, n_shot)
         self.handle_cu_dict[handle] = cu
