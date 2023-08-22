@@ -101,7 +101,7 @@ class MockQuantinuumBackend(QuantinuumBackend):
         n_cl_reg=100,
     )
 
-    noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Measure}
+    noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Measure, OpType.Reset}
 
     def __init__(self):
         super(MockQuantinuumBackend, self).__init__(device_name="H1-1SC")
@@ -135,8 +135,8 @@ class MockQuantinuumBackend(QuantinuumBackend):
 
         noisy_circuit = circuit.copy()
         cu = CompilationUnit(noisy_circuit)
-        auto_rebase_pass(gateset=self.noisy_gate_set).apply(cu)
         self.noisy_backend.default_compilation_pass(optimisation_level=0).apply(cu)
+        auto_rebase_pass(gateset=self.noisy_gate_set).apply(cu)
 
         assert GateSetPredicate(self.noisy_gate_set).verify(cu.circuit)
 

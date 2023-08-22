@@ -357,7 +357,7 @@ class TaskGraph:
             from the input vertex of the _task_graph.
         :type input_wires: List[Wire]
         :param cache: If True each Tasks output data is stored in an OrderedDict with the
-            Task.label_ attribute as its key.
+            Task._label attribute as its key.
         :type cache: bool
 
 
