@@ -395,7 +395,9 @@ class MitEx(TaskGraph):
         return cast(
             Tuple[List[QubitPauliOperator]],
             super().run(
-                cast(List[Wire], experiment_wires), cache=cache, characterisation=characterisation
+                cast(List[Wire], experiment_wires),
+                cache=cache,
+                characterisation=characterisation,
             ),
         )
 
@@ -473,7 +475,10 @@ class MitEx(TaskGraph):
         raise TypeError("MitEx.add_wire forbidden.")
 
     def run(  # type: ignore[override]
-        self, mitex_wires: List[ObservableExperiment], cache: bool = False, characterisation: dict = {}
+        self,
+        mitex_wires: List[ObservableExperiment],
+        cache: bool = False,
+        characterisation: dict = {},
     ) -> List[QubitPauliOperator]:
         """
         Overloaded run method.

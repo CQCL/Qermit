@@ -443,7 +443,6 @@ def collate_results_task_gen() -> MitTask:
             all_obs_exp_index.add(obs_exp["experiment"])
 
         for obs_exp_index in all_obs_exp_index:
-
             # For each experiment index, create a list of the list structure information
             # of results corresponding to that experiment index.
             fixed_obs_exp_details = [
@@ -461,7 +460,6 @@ def collate_results_task_gen() -> MitTask:
             fixed_obs_exp_results = []
 
             for qps_index in all_qps_index:
-
                 # For each QubitPauliString index, create a list of the list structure information
                 # of results corresponding to that QubitPauliString index.
                 fixed_qps_details = [
@@ -473,7 +471,6 @@ def collate_results_task_gen() -> MitTask:
                 fixed_qps_results = []
 
                 for cliff_details in fixed_qps_details:
-
                     # For each Clifford circuit corresponding to a fixed experiment and
                     # QuasiPauliString, gather the noisy results list structure information.
                     fixed_cliff_details = [
@@ -485,7 +482,6 @@ def collate_results_task_gen() -> MitTask:
                     fixed_cliff_results = []
 
                     for noisy_details in fixed_cliff_details:
-
                         # For each noisy circuit corresponding to a fixed experiment,
                         # QubitPauliString and Clifford circuit, gather the noisy ideal result pair.
                         fixed_cliff_results.append(
@@ -548,7 +544,6 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
         # each inner list is results for fixed clifford circuit
         # each outerlist is for a single Qubit Pauli String in experiment
         for qps_results in results:
-
             qps_quasi_prob_list = []
             # qps is List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]
             # containing all results for all fixed Clifford circuits
@@ -797,13 +792,11 @@ def wrap_frame_gates(circ: Circuit) -> Circuit:
     framed_circ_command_list = []
 
     for command in circ_command_list:
-
         # Add command to new list if not a Frame gate.
         if "Computing" in command["opgroup"]:
             framed_circ_command_list.append(command.copy())
 
         elif "Frame" in command["opgroup"]:
-
             match_return = re.match(r"Frame (.*)", command["opgroup"])
             if match_return is None:
                 raise ValueError(
@@ -926,10 +919,8 @@ def list_pauli_gates(circ: Circuit) -> List[Dict]:
     # the error acts on at most one Frame gate, it is enough to specify the error
     # and the Frame gate on which it acts.
     for opgroup in frame_opgroup_list:
-
         for q1_pauli in ["X", "Y", "Z", "I"]:
             for q2_pauli in ["X", "Y", "Z", "I"]:
-
                 if (q1_pauli == "I") and (q2_pauli == "I"):
                     continue
 
@@ -973,7 +964,6 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
         # For each circuit, create an equivalent circuit but on which one of the
         # possible errors occur.
         for experiment_num, experiment in enumerate(wire):
-
             pauli_errors = list_pauli_gates(experiment.AnsatzCircuit.Circuit)
 
             for error_num, error in enumerate(pauli_errors):

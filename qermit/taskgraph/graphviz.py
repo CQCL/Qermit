@@ -73,7 +73,6 @@ _HTML_PORT_TEMPLATE = (
 
 
 def _html_ports(ports: Iterable[str]) -> str:
-
     return _HTML_PORTS_ROW_TEMPLATE.format(
         port_cells="".join(
             _HTML_PORT_TEMPLATE.format(

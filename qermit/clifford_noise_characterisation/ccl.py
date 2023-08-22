@@ -329,7 +329,6 @@ def ccl_state_task_gen(
             all_close = True
             attempt = 0
             while all_close and attempt < max_state_circuits_attempts:
-
                 state_circuits = gen_state_circuits(
                     c_copy,
                     n_non_cliffords,

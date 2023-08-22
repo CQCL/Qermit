@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from typing import List, Union, Callable, Dict
+from typing import List, Union, Callable, Dict, Optional
 from collections import namedtuple
 from types import MethodType
 from enum import Enum
@@ -82,7 +82,7 @@ class MitTask:
         _label: str,
         _n_in_wires: int,
         _n_out_wires: int,
-        _method: Callable,
+        _method: Optional[Callable] = None,
     ):
         self._label = _label
         self._n_in_wires = _n_in_wires

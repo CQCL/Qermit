@@ -40,14 +40,24 @@ class PostselectMgr:
 
     def get_postselected_shot(self, shot: Tuple[int, ...]) -> Tuple[int, ...]:
         "Removes postselection bits from shot."
-        return tuple([bit for bit, reg in zip(shot, self.cbits) if reg not in self.postselect_cbits])
+        return tuple(
+            [
+                bit
+                for bit, reg in zip(shot, self.cbits)
+                if reg not in self.postselect_cbits
+            ]
+        )
 
     def is_postselect_shot(self, shot: Tuple[int, ...]) -> bool:
         "Determines if shot survives postselection"
 
         # TODO: It may be nice to generalise this so that other functions
         # besides bit==0 can be used as a means of postselection.
-        return all(bit == 0 for bit, reg in zip(shot, self.cbits) if reg in self.postselect_cbits)
+        return all(
+            bit == 0
+            for bit, reg in zip(shot, self.cbits)
+            if reg in self.postselect_cbits
+        )
 
     def dict_to_result(self, result_dict: Dict[Tuple[int, ...], int]) -> BackendResult:
         """Convert dictionary to BackendResult.
@@ -64,10 +74,12 @@ class PostselectMgr:
             return BackendResult()
 
         return BackendResult(
-            counts=Counter({
-                OutcomeArray.from_readouts([key]): val
-                for key, val in result_dict.items()
-            }),
+            counts=Counter(
+                {
+                    OutcomeArray.from_readouts([key]): val
+                    for key, val in result_dict.items()
+                }
+            ),
             c_bits=self.compute_cbits,
         )
 
@@ -102,7 +114,6 @@ class PostselectMgr:
         merge_dict: Dict[Tuple[int, ...], int] = {}
         for shot, count in result.get_counts(cbits=self.cbits).items():
             postselected_shot = self.get_postselected_shot(shot)
-            merge_dict[postselected_shot] = merge_dict.get(
-                postselected_shot, 0) + count
+            merge_dict[postselected_shot] = merge_dict.get(postselected_shot, 0) + count
 
         return self.dict_to_result(merge_dict)

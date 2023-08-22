@@ -1,10 +1,24 @@
+# Copyright 2019-2023 Quantinuum
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 from pytket import OpType
 import qiskit.providers.aer.noise as noise  # type: ignore
 
 
 class NoisyAerBackend(AerBackend):
-    """ AerBacked with simple depolarising and SPAM noise model. Depolarising
+    """AerBacked with simple depolarising and SPAM noise model. Depolarising
     noise is added to the gateset {OpType.CX, OpType.H, OpType.Rz,
     OpType.Rz, OpType.Measure} and circuits should be rebased into
     that gateset before running.
@@ -26,9 +40,7 @@ class NoisyAerBackend(AerBackend):
         """
 
         super().__init__(
-            noise_model=self.depolarizing_noise_model(
-                n_qubits, prob_1, prob_2, prob_ro
-            )
+            noise_model=self.depolarizing_noise_model(n_qubits, prob_1, prob_2, prob_ro)
         )
 
     def depolarizing_noise_model(

@@ -61,7 +61,6 @@ def gen_result_extraction_task() -> MitTask:
 
         interpolated_result_list = []
         for result, points, obs_exp in zip(result_list, points_list, obs_exp_list):
-
             # Extract point to be interpolated to. This is the symbol values
             # given in the initial experiment definition.
             interpolation_point = list(
@@ -158,7 +157,6 @@ def gen_fft_task() -> MitTask:
 
         fft_result_grid_list = []
         for result_grid_dict in result_grid_dict_list:
-
             # Perform the FFT on grids corresponding to each QubitPauliString.
             fft_result_grid_dict = dict()
             for qps, exp_val_grid in result_grid_dict.items():
@@ -197,7 +195,6 @@ def gen_ndarray_to_dict_task() -> MitTask:
 
         result_dict_list = []
         for qpo_result_grid in result_grid_list:
-
             # Take the QubitPauliOperator that is being measured from the 0
             # coordinate element of the grid.
             zero_qpo_result_grid = qpo_result_grid[
@@ -419,7 +416,6 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
         # ObservableExperiment in obs_exp_list
         obs_exp_grid_list = []
         for obs_exp, sym_val_grid_list in zip(obs_exp_list, obs_exp_sym_val_grid_list):
-
             # Initialise empty grid of ObservableExperiment
             obs_exp_grid = np.empty(
                 sym_val_grid_list[0].shape, dtype=ObservableExperiment
@@ -431,7 +427,6 @@ def gen_obs_exp_grid_gen_task() -> MitTask:
                 [i for i in range(size)] for size in sym_val_grid_list[0].shape
             ]
             for grid_point in product(*grid_point_val_list):
-
                 # Generate dictionary mapping every symbol to it's value at
                 # the given point in the grid.
                 sym_map = {
