@@ -25,8 +25,11 @@ class NoisyAerBackend(AerBackend):
         :type prob_ro: float
         """
 
-        noise_model = self.depolarizing_noise_model(n_qubits, prob_1, prob_2, prob_ro)
-        super().__init__(noise_model=noise_model)
+        super().__init__(
+            noise_model=self.depolarizing_noise_model(
+                n_qubits, prob_1, prob_2, prob_ro
+            )
+        )
 
     def depolarizing_noise_model(
         self,
