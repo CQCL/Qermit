@@ -28,6 +28,10 @@ from qermit.taskgraph.mittask import (  # noqa:F401
 )
 from qermit.taskgraph.mitres import MitRes  # noqa:F401
 from qermit.taskgraph.mitex import MitEx  # noqa:F401
-from qermit.taskgraph.utils import SymbolsDict, MeasurementCircuit, ObservableTracker  # noqa:F401
+from qermit.taskgraph.utils import (
+    SymbolsDict,
+    MeasurementCircuit,
+    ObservableTracker,
+)  # noqa:F401
 
 __path__ = __import__("pkgutil").extend_path(__path__, __name__)  # type: ignore

@@ -3,7 +3,7 @@ from qermit.postselection.postselect_mitres import gen_postselect_task
 from qermit import CircuitShots, MitRes, MitTask, TaskGraph
 from copy import deepcopy
 from typing import List, Tuple, cast
-from pytket.extensions.quantinuum.backends.leakage_gadget import get_detection_circuit   # type: ignore
+from pytket.extensions.quantinuum.backends.leakage_gadget import get_detection_circuit  # type: ignore
 from pytket.backends import Backend
 from pytket.backends.backendinfo import BackendInfo
 
@@ -23,8 +23,7 @@ def gen_add_leakage_gadget_circuit_task(backend: Backend) -> MitTask:
     n_device_qubits = cast(BackendInfo, backend.backend_info).n_nodes
 
     def task(
-        obj,
-        circuit_shots_list: List[CircuitShots]
+        obj, circuit_shots_list: List[CircuitShots]
     ) -> Tuple[List[CircuitShots], List[PostselectMgr]]:
         """Task adding leakage gadget circuits to given circuts. This reuses
         methods from pytket-quantinuum. A list of the corresponding
@@ -58,13 +57,19 @@ def gen_add_leakage_gadget_circuit_task(backend: Backend) -> MitTask:
                 compute_cbits=orig_circuit.Circuit.bits,
                 postselect_cbits=list(
                     set(detection_circuit.Circuit.bits).difference(
-                        set(orig_circuit.Circuit.bits))
-                )
+                        set(orig_circuit.Circuit.bits)
+                    )
+                ),
             )
-            for orig_circuit, detection_circuit in zip(circuit_shots_list, detection_circuit_shots_list)
+            for orig_circuit, detection_circuit in zip(
+                circuit_shots_list, detection_circuit_shots_list
+            )
         ]
 
-        return (detection_circuit_shots_list, postselect_mgr_list, )
+        return (
+            detection_circuit_shots_list,
+            postselect_mgr_list,
+        )
 
     return MitTask(
         _label="AddLeakageGadget",

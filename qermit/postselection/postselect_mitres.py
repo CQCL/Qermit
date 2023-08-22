@@ -56,8 +56,7 @@ def gen_postselect_mgr_gen_task(postselect_mgr: PostselectMgr) -> MitTask:
     """
 
     def task(
-        obj,
-        circ_shots_list: List[CircuitShots]
+        obj, circ_shots_list: List[CircuitShots]
     ) -> Tuple[List[CircuitShots], List[PostselectMgr]]:
         """Task applying the same post selection manager to all circuits.
 
@@ -79,9 +78,7 @@ def gen_postselect_mgr_gen_task(postselect_mgr: PostselectMgr) -> MitTask:
 
 
 def gen_postselect_mitres(
-    backend: Backend,
-    postselect_mgr: PostselectMgr,
-    **kwargs
+    backend: Backend, postselect_mgr: PostselectMgr, **kwargs
 ) -> MitRes:
     """Generates MitRes running given circuit and applying postselection.
 

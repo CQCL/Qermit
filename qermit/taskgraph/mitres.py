@@ -110,7 +110,6 @@ def backend_res_task_gen(backend: Backend) -> MitTask:
     """
 
     def task(obj, handles: List[ResultHandle]) -> Tuple[List[BackendResult]]:
-
         results = backend.get_results(handles)
 
         return (results,)
@@ -220,7 +219,9 @@ class MitRes(TaskGraph):
         return cast(
             Tuple[List[BackendResult]],
             super().run(
-                cast(List[Wire], circuits_wire), cache=cache, characterisation=characterisation
+                cast(List[Wire], circuits_wire),
+                cache=cache,
+                characterisation=characterisation,
             ),
         )
 

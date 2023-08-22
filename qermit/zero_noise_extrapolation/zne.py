@@ -430,9 +430,7 @@ class Fit(Enum):
 
     # TODO Consider adding adaptive exponential extrapolation
     @staticmethod
-    def cube_root(
-        x: List[float], y: List[float], _show_fit: bool, *args
-    ) -> float:
+    def cube_root(x: List[float], y: List[float], _show_fit: bool, *args) -> float:
         """Fit data to a cube root function. This is to say a function of the form :math:`a + b(x+c)^{1/3}`.
 
         :param x: Noise scaling values.
@@ -524,9 +522,7 @@ class Fit(Enum):
         return float(fit_to_zero)
 
     @staticmethod
-    def exponential(
-        x: List[float], y: List[float], _show_fit: bool, *args
-    ) -> float:
+    def exponential(x: List[float], y: List[float], _show_fit: bool, *args) -> float:
         """Fit data to an exponential function. This is to say a function of the form :math:`a+e^{(b+x)}`.
         Note that this is a special case of the poly-exponential function.
 
@@ -545,9 +541,7 @@ class Fit(Enum):
         return Fit.poly_exponential(x, y, _show_fit, 1)
 
     @staticmethod
-    def polynomial(
-        x: List[float], y: List[float], _show_fit: bool, deg: int
-    ) -> float:
+    def polynomial(x: List[float], y: List[float], _show_fit: bool, deg: int) -> float:
         """Fit data to a polynomial function.
 
         :param x: Noise scaling values.
@@ -606,9 +600,7 @@ class Fit(Enum):
         return Fit.polynomial(x, y, _show_fit, 1)
 
     @staticmethod
-    def richardson(
-        x: List[float], y: List[float], _show_fit: bool, *args
-    ) -> float:
+    def richardson(x: List[float], y: List[float], _show_fit: bool, *args) -> float:
         """Use richardson extrapolation. This amounts to fitting to a polynomial of
         degree one less than the number of data points.
 
@@ -974,7 +966,9 @@ def gen_qubit_relabel_task() -> MitTask:
     """
 
     def task(
-        obj, qpo_list: List[QubitPauliOperator], compilation_map_list: List[Dict[Node, Node]]
+        obj,
+        qpo_list: List[QubitPauliOperator],
+        compilation_map_list: List[Dict[Node, Node]],
     ) -> Tuple[List[QubitPauliOperator]]:
         """Use node map returned by compilation unit to undo the relabelling
         performed by gen_initial_compilation_task
@@ -991,7 +985,6 @@ def gen_qubit_relabel_task() -> MitTask:
         new_qpo_list = []
 
         for compilation_map, qpo in zip(compilation_map_list, qpo_list):
-
             node_map = {value: key for key, value in compilation_map.items()}
             new_qpo_list.append(qpo_node_relabel(qpo, node_map))
 
