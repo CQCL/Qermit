@@ -419,7 +419,7 @@ def ccl_result_batching_task_gen(n_state_circuits: int) -> MitTask:
 
         zipped = list(zip(noisy_exp, exact_exp))
         chunked_zipped = [
-            zipped[i : i + n_state_circuits]
+            zipped[i: i + n_state_circuits]
             for i in range(0, len(zipped), n_state_circuits)
         ]
         return (chunked_zipped,)
