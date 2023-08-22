@@ -133,6 +133,8 @@ are several ways to contact us:
    measurement_reduction.rst
    spam.rst
    frame_randomisation.rst
+   postselection.rst
+   leakage_detection.rst
    clifford_noise_characterisation.rst
    zero_noise_extrapolation.rst
    probabilistic_error_cancellation.rst
