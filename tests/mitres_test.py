@@ -33,7 +33,7 @@ from pytket.utils.outcomearray import OutcomeArray
 from qermit.taskgraph.mitres import merge_results
 from qermit.taskgraph.mitres import QermitBackendResult
 import numpy as np
-    
+
 
 def test_qermit_backend_result():
 
@@ -56,8 +56,8 @@ def test_qermit_backend_result():
         c_bits=[Bit(name='A', index=i) for i in range(4)],
     )
 
-    n_shots=123
-    rng=np.random.default_rng(seed=0)
+    n_shots = 123
+    rng = np.random.default_rng(seed=0)
     qermit_result = QermitBackendResult(result=result, rng=rng)
     resample_counts = qermit_result.resample(n_shots=n_shots).get_counts()
     assert resample_counts.total() == n_shots

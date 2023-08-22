@@ -1,12 +1,10 @@
 from pytket import Circuit, OpType, Qubit
 import networkx as nx  # type: ignore
-from pytket.circuit import Command, Bit  # type: ignore
+from pytket.circuit import Command, Bit, CircBox  # type: ignore
 from pytket.passes.auto_rebase import auto_rebase_pass
 from .pauli_sampler import PauliSampler
 from pytket.passes import DecomposeBoxes  # type: ignore
-from pytket.circuit import CircBox
 import math
-import time
 
 
 clifford_ops = [OpType.CZ, OpType.H, OpType.Z, OpType.S, OpType.X]
@@ -31,7 +29,7 @@ class DAGCommand:
 
         if self.command.op.type in [OpType.PhasedX, OpType.Rz]:
             return all(
-                math.isclose(param%0.5, 0) or math.isclose(param%0.5, 0.5)
+                math.isclose(param % 0.5, 0) or math.isclose(param % 0.5, 0.5)
                 for param in self.command.op.params
             )
 
@@ -190,19 +188,19 @@ class QermitDAGCircuit(nx.DiGraph):
 
             # If the circuit is clifford add it as a circbox
             if self.node_command[node_to_implement_list[0]].clifford:
-                
+
                 # Empty circuit to contain clifford subcircuit
                 clifford_subcircuit = Circuit(
-                    n_qubits = len(
+                    n_qubits=len(
                         sub_circuit_qubits[sub_circuit_to_implement]
                     ),
-                    name = 'Clifford Subcircuit'
+                    name='Clifford Subcircuit'
                 )
-                
+
                 # Map from qubits in original circuit to qubits in new
                 # clifford circuit.
                 qubit_to_index = {
-                    qubit:i
+                    qubit: i
                     for i, qubit
                     in enumerate(sub_circuit_qubits[sub_circuit_to_implement])
                 }
@@ -217,7 +215,7 @@ class QermitDAGCircuit(nx.DiGraph):
                         ]
                     )
                     implemented_commands[node] = True
-                    
+
                 clifford_circ_box = CircBox(clifford_subcircuit)
                 clifford_box_circuit.add_circbox(
                     clifford_circ_box,
@@ -287,7 +285,7 @@ class QermitDAGCircuit(nx.DiGraph):
             pauli_check_circuit.add_qubit(qubit)
         for bit in self.bits:
             pauli_check_circuit.add_bit(bit)
-            
+
         ancilla_count = 0
 
         # Add each command in the circuit, wrapped by checks
@@ -295,14 +293,14 @@ class QermitDAGCircuit(nx.DiGraph):
         for command in [
             node_command.command for node_command in self.node_command
         ]:
-            
+
             # Add barriers and check if appropriate
             if (
                 command.op.type == OpType.CircBox
             ) and (
                 command.op.get_circuit().name == 'Clifford Subcircuit'
             ):
-                
+
                 clifford_subcircuit = command.op.get_circuit()
                 qubit_map = {
                     q_subcirc: q_orig
@@ -312,7 +310,7 @@ class QermitDAGCircuit(nx.DiGraph):
                 # TDOO: it may be possible to rename the registers before
                 # this point?
                 clifford_subcircuit.rename_units(qubit_map)
-                
+
                 start_stabiliser_list = pauli_sampler.sample(
                     qubit_list=command.args,
                     circ=clifford_subcircuit,
@@ -323,13 +321,13 @@ class QermitDAGCircuit(nx.DiGraph):
                     Qubit(name='ancilla', index=i)
                     for i in range(
                         ancilla_count,
-                        ancilla_count+len(start_stabiliser_list)
+                        ancilla_count + len(start_stabiliser_list)
                     )
                 ]
                 ancilla_count += len(start_stabiliser_list)
 
                 for start_stabiliser, control_qubit in zip(start_stabiliser_list, control_qubit_list):
-                    
+
                     pauli_check_circuit.add_qubit(control_qubit)
 
                     pauli_check_circuit.add_barrier(
@@ -349,13 +347,13 @@ class QermitDAGCircuit(nx.DiGraph):
                     )
 
                 end_stabiliser_list = [start_stabiliser.dagger() for start_stabiliser in start_stabiliser_list]
-                
+
             # Add command
             pauli_check_circuit.add_gate(
                 command.op,
                 command.args
             )
-            
+
             # Add barriers and checks if appropriate.
             if (
                 command.op.type == OpType.CircBox
@@ -366,13 +364,17 @@ class QermitDAGCircuit(nx.DiGraph):
                 for end_stabiliser, control_qubit in zip(reversed(end_stabiliser_list), reversed(control_qubit_list)):
 
                     for clifford_command in clifford_subcircuit.get_commands():
+                        
+                        if clifford_command.op.type == OpType.Barrier:
+                            continue
+                        
                         # TODO: an error would be raised here if clifford_command
                         # is not Clifford. It could be worth raising a clearer
                         # error.
                         end_stabiliser.apply_gate(
                             clifford_command.op.type, clifford_command.qubits, params=clifford_command.op.params
                         )
-                    
+
                     pauli_check_circuit.add_barrier(
                         command.args + [control_qubit]
                     )
@@ -403,11 +405,10 @@ class QermitDAGCircuit(nx.DiGraph):
                         qubit=control_qubit,
                         bit=measure_bit,
                     )
-                
+
         return pauli_check_circuit
 
     def add_pauli_checks(self, pauli_sampler: PauliSampler, **kwargs):
-
 
         # Convert to clifford boxes, add checks, decompose boxes.
         clifford_box_circuit = self.to_clifford_subcircuit_boxes(**kwargs)

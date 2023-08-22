@@ -20,51 +20,46 @@ from .mittask import (
 )
 from typing import List, Tuple, Union, OrderedDict, cast, Sequence
 from .task_graph import TaskGraph
-from pytket.backends import Backend, ResultHandle
-from pytket.backends.backendresult import BackendResult
 import networkx as nx  # type: ignore
 import inspect
 from copy import deepcopy
 from itertools import repeat
-from pytket.utils.outcomearray import OutcomeArray
-from pytket import Bit
 import numpy as np  # type: ignore
 from pytket import Circuit
 from collections import Counter
-from pytket.backends.backendresult import BackendResult
-from pytket.circuit import Bit
-from collections import Counter
+
 from pytket.utils.outcomearray import OutcomeArray
-import numpy as np
+from pytket.backends import Backend, ResultHandle
+from pytket.backends.backendresult import BackendResult
 
 
-# I think we should move to using QermitBackendResult eveywhere,
+# I think we should move to using QermitBackendResult everywhere,
 # and having it inherit from BackendResult. Then we can do
 # more advanced analysis everywhere. I've never been sure how to
 # 'upgrade' to a child class though. To be discussed.
 class QermitBackendResult:
-    
+
     def __init__(self, result, rng=np.random.default_rng()):
-        
+
         self.result = result
         self.rng = rng
-        
+
     def resample(self, n_shots):
-        
+
         def get_shot_from_index(shot_index):
-            
+
             count_total = 0
             for shot, count in self.result.get_counts(cbits=self.result.c_bits).items():
                 count_total += count
                 if count_total > shot_index:
                     return shot
-        
+
         shot_index_list = self.rng.integers(
             low=0,
             high=self.result.get_counts().total(),
             size=n_shots,
         )
-        
+
         return BackendResult(
             shots=OutcomeArray.from_readouts(
                 [get_shot_from_index(shot_index) for shot_index in shot_index_list]
@@ -489,25 +484,24 @@ def merge_results(result_list: List[BackendResult]):
 
     if all(result.get_result().counts is not None for result in result_list):
 
-        counts = sum(
+        counts: Counter[Tuple[int, ...]] = sum(
             (result.get_counts(cbits=c_bits) for result in result_list),
             Counter()
         )
-        counts = Counter(
-            {
-                OutcomeArray.from_readouts([key]): val
-                for key, val in counts.items()
-            }
-        )
 
         return BackendResult(
-            counts=counts,
+            counts=Counter(
+                {
+                    OutcomeArray.from_readouts([key]): val
+                    for key, val in counts.items()
+                }
+            ),
             c_bits=c_bits,
         )
 
     raise Exception(
-        "Not all given results have measured results. " +
-        "They must either all contain shots, or all contain counts."
+        "Not all given results have measured results. "
+        + "They must either all contain shots, or all contain counts."
     )
 
 

@@ -16,9 +16,13 @@
 from pytket import Circuit
 import numpy as np  # type: ignore
 from typing import List, Tuple
+from numpy.random import Generator
 
 
-def sample_q_mallows(n_qubits: int) -> Tuple[List[int], List[int]]:
+def sample_q_mallows(
+    n_qubits: int,
+    rng: Generator = np.random.default_rng()
+) -> Tuple[List[int], List[int]]:
     """
     Samples definitions of a hadamard layer and and permutation layer. These quantities
     are sampled from the `quantum Mallows distribution' which is detailed in
@@ -47,7 +51,8 @@ def sample_q_mallows(n_qubits: int) -> Tuple[List[int], List[int]]:
         m = len(avail_qubits)
 
         # Sample the hadamard layer and k according to the quantum Mallows distribution
-        r = np.random.uniform(0, 1)
+        # r = np.random.uniform(0, 1)
+        r = rng.uniform()
         index = int(2 * m - np.ceil(np.log(r * (4**m - 1) + 1) / log2))
         hadamard_layer[i] = 1 * (index < m)
         if index < m:
@@ -117,7 +122,10 @@ def clifford_canonical_F(
 
 
 def find_random_gamma_delta(
-    n_qubits: int, hadamard_layer: List[int], permute_layer: List[int]
+    n_qubits: int,
+    hadamard_layer: List[int],
+    permute_layer: List[int],
+    rng: Generator = np.random.default_rng(),
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Generates random gamma and delta matrices for a clifford gates in its canonical
@@ -146,21 +154,21 @@ def find_random_gamma_delta(
     Gamma2 = Gamma1.copy()
 
     for i in range(n_qubits):
-        Gamma2[i][i] = np.random.randint(2)
+        Gamma2[i][i] = rng.integers(2)
         if hadamard_layer[i]:
-            Gamma1[i][i] = np.random.randint(2)
+            Gamma1[i][i] = rng.integers(2)
 
     for j in range(n_qubits):
         for i in range(j + 1, n_qubits):
             # Sample off diagonal elements of Gamma2 and Delta2 uniformly at random
-            b = np.random.randint(2)
+            b = rng.integers(2)
             Gamma2[i][j] = b
             Gamma2[j][i] = b
-            Delta2[i][j] = np.random.randint(2)
+            Delta2[i][j] = rng.integers(2)
 
             # Elements of Gamma1 are conditional on the hadamard and permutation layers
             if hadamard_layer[i] == 1 and hadamard_layer[j] == 1:
-                b = np.random.randint(2)
+                b = rng.integers(2)
                 Gamma1[i][j] = b
                 Gamma1[j][i] = b
             if (
@@ -168,7 +176,7 @@ def find_random_gamma_delta(
                 and hadamard_layer[j] == 0
                 and permute_layer[i] < permute_layer[j]
             ):
-                b = np.random.randint(2)
+                b = rng.integers(2)
                 Gamma1[i][j] = b
                 Gamma1[j][i] = b
             if (
@@ -176,30 +184,34 @@ def find_random_gamma_delta(
                 and hadamard_layer[j] == 1
                 and permute_layer[i] > permute_layer[j]
             ):
-                b = np.random.randint(2)
+                b = rng.integers(2)
                 Gamma1[i][j] = b
                 Gamma1[j][i] = b
 
             # Elements of Delta1 are conditional on the hadamard and permutation layers
             if hadamard_layer[i] == 0 and hadamard_layer[j] == 1:
-                Delta1[i][j] = np.random.randint(2)
+                Delta1[i][j] = rng.integers(2)
             if (
                 hadamard_layer[i] == 1
                 and hadamard_layer[j] == 1
                 and permute_layer[i] > permute_layer[j]
             ):
-                Delta1[i][j] = np.random.randint(2)
+                Delta1[i][j] = rng.integers(2)
             if (
                 hadamard_layer[i] == 0
                 and hadamard_layer[j] == 0
                 and permute_layer[i] < permute_layer[j]
             ):
-                Delta1[i][j] = np.random.randint(2)
+                Delta1[i][j] = rng.integers(2)
 
     return Delta1, Delta2, Gamma1, Gamma2
 
 
-def random_clifford_circ(n_qubits: int, **kwargs) -> Circuit:
+def random_clifford_circ(
+    n_qubits: int,
+    rng: Generator = np.random.default_rng(),
+    # **kwargs,
+) -> Circuit:
     """
     Samples an n qubit Clifford gate, in the form of a circuit, uniformly at random.
     This is adapted from https://arxiv.org/abs/2003.09412.
@@ -213,18 +225,21 @@ def random_clifford_circ(n_qubits: int, **kwargs) -> Circuit:
     :rtype: Circuit
     """
 
-    np.random.seed(kwargs.get("seed", None))
+    # np.random.seed(kwargs.get("seed", None))
 
     circ = Circuit(n_qubits)
 
-    hadamard, permute = sample_q_mallows(n_qubits)
+    hadamard, permute = sample_q_mallows(n_qubits=n_qubits, rng=rng)
     Delta1, Delta2, Gamma1, Gamma2 = find_random_gamma_delta(
-        n_qubits, hadamard, permute
+        n_qubits, hadamard, permute, rng=rng,
     )
 
     # Append Clifford gate. Here the Pauli gates are assigned at random.
     cliff_circ = clifford_canonical_F(
-        [np.random.randint(2) for _ in range(n_qubits)], Gamma2, Delta2
+        # [rng.integers(2) for _ in range(n_qubits)],
+        rng.integers(2, size=n_qubits),
+        Gamma2,
+        Delta2,
     )
     circ = circ.add_circuit(cliff_circ, [i for i in range(n_qubits)], [])
 
