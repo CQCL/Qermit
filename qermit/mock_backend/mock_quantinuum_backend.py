@@ -84,7 +84,9 @@ class MockQuantinuumBackend(QuantinuumBackend):
         ).apply(cu)
         auto_rebase_pass(gateset=self.noisy_backend.noisy_gate_set).apply(cu)
         assert GateSetPredicate(
-            self.noisy_backend.noisy_gate_set
+            self.noisy_backend.noisy_gate_set.union(
+                {OpType.Reset, OpType.Barrier}
+            )
         ).verify(cu.circuit)
 
         handle = self.noisy_backend.process_circuit(cu.circuit, n_shot)
