@@ -1,4 +1,5 @@
-pytket-qiskit~=0.23
+pytket-qiskit
+qiskit-ibmq-provider
 pytest
 pytest-cov
 flake8
