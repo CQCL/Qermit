@@ -1,5 +1,5 @@
 import numpy.random
-from quantinuum_benchmarking.direct_fidelity_estimation import Stabiliser
+from quantinuum_benchmarking.direct_fidelity_estimation import Stabiliser  # type: ignore
 from abc import ABC, abstractmethod
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from itertools import product, combinations

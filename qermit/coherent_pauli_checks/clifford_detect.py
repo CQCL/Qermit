@@ -362,12 +362,11 @@ class QermitDAGCircuit(nx.DiGraph):
             ):
 
                 for end_stabiliser, control_qubit in zip(reversed(end_stabiliser_list), reversed(control_qubit_list)):
-
                     for clifford_command in clifford_subcircuit.get_commands():
-                        
+
                         if clifford_command.op.type == OpType.Barrier:
                             continue
-                        
+
                         # TODO: an error would be raised here if clifford_command
                         # is not Clifford. It could be worth raising a clearer
                         # error.

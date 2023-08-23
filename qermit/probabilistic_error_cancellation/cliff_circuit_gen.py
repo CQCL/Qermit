@@ -236,8 +236,7 @@ def random_clifford_circ(
 
     # Append Clifford gate. Here the Pauli gates are assigned at random.
     cliff_circ = clifford_canonical_F(
-        # [rng.integers(2) for _ in range(n_qubits)],
-        rng.integers(2, size=n_qubits),
+        list(rng.integers(2, size=n_qubits)),
         Gamma2,
         Delta2,
     )
