@@ -37,7 +37,6 @@ jobs:
     - name: Format check
       if: github.event_name == 'pull_request'
       run: flake8 qermit/ tests/ --ignore=E501,W503
-
   linux:
     name: Build and test (Linux)
     runs-on: ubuntu-latest
