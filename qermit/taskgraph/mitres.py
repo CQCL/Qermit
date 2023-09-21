@@ -469,6 +469,9 @@ def group_shots_task_gen() -> MitTask:
 
 def merge_results(result_list: List[BackendResult]):
 
+    if result_list == []:
+        return BackendResult()
+
     c_bits = sorted(result_list[0].c_bits.keys())
     if not all(sorted(result.c_bits.keys()) == c_bits for result in result_list):
         raise Exception("These results to not have matching bits.")

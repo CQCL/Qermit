@@ -3,6 +3,7 @@ from pytket.circuit import Qubit, Bit
 from pytket.pauli import Pauli
 from pytket.passes import DecomposeBoxes
 from pytket.extensions.qiskit import AerBackend
+import numpy.random
 
 from qermit.coherent_pauli_checks import (
     QermitDAGCircuit,
@@ -21,7 +22,40 @@ from quantinuum_benchmarking.noise_model import (
     NoiseModel,
 )
 from quantinuum_benchmarking.direct_fidelity_estimation import Stabiliser
-import numpy as np
+from pytket.circuit import CircBox
+from quantinuum_benchmarking.noise_model import (
+    TranspilerBackend,
+    PauliErrorTranspile,
+    ErrorSampler,
+)
+from qermit.postselection import PostselectMgr
+from collections import Counter
+
+
+def test_decompose_clifford_subcircuit_box():
+
+    cx_circ = Circuit(3)
+    cx_circ.CX(0,1).CX(0,2)
+
+    cx_circbox = CircBox(circ=cx_circ)
+
+    zzmax_circ = Circuit()
+    zzmax_circ.add_q_register(name='my_reg', size=4)
+    qubits = zzmax_circ.qubits
+
+    zzmax_circ.ZZMax(qubits[0], qubits[1]).ZZMax(qubits[2], qubits[3])
+    zzmax_circ.add_circbox(cx_circbox, [qubits[1], qubits[0], qubits[3]])
+
+    dag_circ = QermitDAGCircuit.decompose_clifford_subcircuit_box(zzmax_circ.get_commands()[2])
+
+    ideal_circ = Circuit()
+    ideal_circ.add_qubit(qubits[0])
+    ideal_circ.add_qubit(qubits[1])
+    ideal_circ.add_qubit(qubits[3])
+    ideal_circ.CX(qubits[1], qubits[0])
+    ideal_circ.CX(qubits[1], qubits[3])
+
+    assert dag_circ == ideal_circ
 
 
 def test_get_clifford_subcircuits():
@@ -63,28 +97,28 @@ def test_add_pauli_checks():
     ideal_circ.add_bit(id=ancilla_measure_1)
 
     ideal_circ.add_barrier([ideal_circ.qubits[3], ancilla_0])
-    ideal_circ.H(ancilla_0)
-    ideal_circ.CZ(control_qubit=ancilla_0, target_qubit=ideal_circ.qubits[3])
+    ideal_circ.H(ancilla_0, opgroup='ancilla superposition')
+    ideal_circ.CZ(control_qubit=ancilla_0, target_qubit=ideal_circ.qubits[3], opgroup='pauli check')
     ideal_circ.add_barrier([ideal_circ.qubits[3], ancilla_0])
 
     ideal_circ.H(ideal_circ.qubits[3])
 
     ideal_circ.add_barrier([ideal_circ.qubits[3], ancilla_0])
-    ideal_circ.CX(control_qubit=ancilla_0, target_qubit=ideal_circ.qubits[3])
-    ideal_circ.H(ancilla_0)
+    ideal_circ.CX(control_qubit=ancilla_0, target_qubit=ideal_circ.qubits[3], opgroup='pauli check')
+    ideal_circ.H(ancilla_0, opgroup='ancilla superposition')
     ideal_circ.add_barrier([ideal_circ.qubits[3], ancilla_0])
 
     ideal_circ.add_barrier(
         [ideal_circ.qubits[3], ideal_circ.qubits[2], ancilla_1]
     )
-    ideal_circ.H(ancilla_1)
+    ideal_circ.H(ancilla_1, opgroup='ancilla superposition')
     ideal_circ.CZ(
         control_qubit=ancilla_1,
-        target_qubit=ideal_circ.qubits[3]
+        target_qubit=ideal_circ.qubits[3], opgroup='pauli check'
     )
     ideal_circ.CZ(
         control_qubit=ancilla_1,
-        target_qubit=ideal_circ.qubits[2]
+        target_qubit=ideal_circ.qubits[2], opgroup='pauli check'
     )
     ideal_circ.add_barrier(
         [ideal_circ.qubits[3], ideal_circ.qubits[2], ancilla_1]
@@ -102,9 +136,9 @@ def test_add_pauli_checks():
     )
     ideal_circ.CZ(
         control_qubit=ancilla_1,
-        target_qubit=ideal_circ.qubits[2]
+        target_qubit=ideal_circ.qubits[2], opgroup='pauli check'
     )
-    ideal_circ.H(ancilla_1)
+    ideal_circ.H(ancilla_1, opgroup='ancilla superposition')
     ideal_circ.add_barrier(
         [ideal_circ.qubits[3], ideal_circ.qubits[2], ancilla_1]
     )
@@ -132,9 +166,9 @@ def test_add_pauli_checks():
     ideal_circ.add_barrier(
         [ideal_circ.qubits[2], ideal_circ.qubits[1], ancilla]
     )
-    ideal_circ.H(ancilla)
-    ideal_circ.CZ(control_qubit=ancilla, target_qubit=ideal_circ.qubits[2])
-    ideal_circ.CZ(control_qubit=ancilla, target_qubit=ideal_circ.qubits[1])
+    ideal_circ.H(ancilla, opgroup='ancilla superposition')
+    ideal_circ.CZ(control_qubit=ancilla, target_qubit=ideal_circ.qubits[2], opgroup='pauli check')
+    ideal_circ.CZ(control_qubit=ancilla, target_qubit=ideal_circ.qubits[1], opgroup='pauli check')
     ideal_circ.add_barrier(
         [ideal_circ.qubits[2], ideal_circ.qubits[1], ancilla]
     )
@@ -157,11 +191,11 @@ def test_add_pauli_checks():
     ideal_circ.add_barrier(
         [ideal_circ.qubits[2], ideal_circ.qubits[1], ancilla]
     )
-    ideal_circ.CZ(control_qubit=ancilla, target_qubit=ideal_circ.qubits[2])
-    ideal_circ.CX(control_qubit=ancilla, target_qubit=ideal_circ.qubits[1])
-    ideal_circ.S(ancilla)
-    ideal_circ.S(ancilla)
-    ideal_circ.H(ancilla)
+    ideal_circ.CZ(control_qubit=ancilla, target_qubit=ideal_circ.qubits[2], opgroup='pauli check')
+    ideal_circ.CX(control_qubit=ancilla, target_qubit=ideal_circ.qubits[1], opgroup='pauli check')
+    ideal_circ.S(ancilla, opgroup='phase correction')
+    ideal_circ.S(ancilla, opgroup='phase correction')
+    ideal_circ.H(ancilla, opgroup='ancilla superposition')
     ideal_circ.add_barrier(
         [ideal_circ.qubits[2], ideal_circ.qubits[1], ancilla]
     )
@@ -184,11 +218,11 @@ def test_simple_non_minimal_example():
 
 def test_5q_random_clifford():
 
-    rng = np.random.default_rng(seed=0)
+    rng = numpy.random.default_rng(seed=0)
     clifford_circuit = random_clifford_circ(n_qubits=5, rng=rng)
     cpc_rebase_pass.apply(clifford_circuit)
     dag_circuit = QermitDAGCircuit(clifford_circuit)
-    pauli_sampler = RandomPauliSampler(seed=0)
+    pauli_sampler = RandomPauliSampler(rng=rng)
     dag_circuit.add_pauli_checks(pauli_sampler=pauli_sampler)
 
 
@@ -225,19 +259,19 @@ def test_CZ_circuit_with_phase():
     ideal_circ.add_bit(id=ancilla_measure)
 
     ideal_circ.add_barrier([*list(reversed(comp_qubits)), ancilla])
-    ideal_circ.H(ancilla)
-    ideal_circ.CX(ancilla, comp_qubits[1])
-    ideal_circ.CX(ancilla, comp_qubits[0])
+    ideal_circ.H(ancilla, opgroup='ancilla superposition')
+    ideal_circ.CX(ancilla, comp_qubits[1], opgroup='pauli check')
+    ideal_circ.CX(ancilla, comp_qubits[0], opgroup='pauli check')
     ideal_circ.add_barrier([*list(reversed(comp_qubits)), ancilla])
     ideal_circ.CZ(comp_qubits[0], comp_qubits[1])
     ideal_circ.add_barrier([*list(reversed(comp_qubits)), ancilla])
-    ideal_circ.CZ(ancilla, comp_qubits[1])
-    ideal_circ.CX(ancilla, comp_qubits[1])
-    ideal_circ.CZ(ancilla, comp_qubits[0])
-    ideal_circ.CX(ancilla, comp_qubits[0])
-    ideal_circ.S(ancilla)
-    ideal_circ.S(ancilla)
-    ideal_circ.H(ancilla)
+    ideal_circ.CZ(ancilla, comp_qubits[1], opgroup='pauli check')
+    ideal_circ.CX(ancilla, comp_qubits[1], opgroup='pauli check')
+    ideal_circ.CZ(ancilla, comp_qubits[0], opgroup='pauli check')
+    ideal_circ.CX(ancilla, comp_qubits[0], opgroup='pauli check')
+    ideal_circ.S(ancilla, opgroup='phase correction')
+    ideal_circ.S(ancilla, opgroup='phase correction')
+    ideal_circ.H(ancilla, opgroup='ancilla superposition')
     ideal_circ.add_barrier([*list(reversed(comp_qubits)), ancilla])
     ideal_circ.Measure(comp_qubits[0], comp_bits[0])
     ideal_circ.Measure(comp_qubits[1], comp_bits[1])
@@ -267,11 +301,18 @@ def test_optimal_pauli_sampler():
     error_distribution_dict[(Pauli.X, Pauli.I)] = 0.3
     error_distribution_dict[(Pauli.I, Pauli.X)] = 0.7
 
-    error_distribution = ErrorDistribution(error_distribution_dict, seed=0)
+    error_distribution = ErrorDistribution(
+        error_distribution_dict,
+        rng=numpy.random.default_rng(seed=0)
+    )
     noise_model = NoiseModel({OpType.CZ: error_distribution})
 
     pauli_sampler = OptimalPauliSampler(noise_model)
-    stab = pauli_sampler.sample(cliff_circ.qubits, cliff_circ)
+    stab = pauli_sampler.sample(
+        # cliff_circ.qubits,
+        circ=cliff_circ,
+        n_checks=1
+    )
 
     assert stab[0] == Stabiliser(
         Z_list=[0, 0, 1],
@@ -325,9 +366,9 @@ def test_add_ZX_pauli_checks_to_S():
     ideal_circ.add_bit(id=ancilla_measure)
     ideal_circ.add_bit(id=comp_measure)
 
-    ideal_circ.add_barrier([comp, ancilla]).H(ancilla).CZ(ancilla, comp).CX(ancilla, comp).add_barrier([comp, ancilla])
+    ideal_circ.add_barrier([comp, ancilla]).H(ancilla, opgroup='ancilla superposition').CZ(ancilla, comp, opgroup='pauli check').CX(ancilla, comp, opgroup='pauli check').add_barrier([comp, ancilla])
     ideal_circ.S(comp)
-    ideal_circ.add_barrier([comp, ancilla]).CX(ancilla, comp).S(ancilla).S(ancilla).S(ancilla).H(ancilla).add_barrier([comp, ancilla])
+    ideal_circ.add_barrier([comp, ancilla]).CX(ancilla, comp, opgroup='pauli check').S(ancilla, opgroup='phase correction').S(ancilla, opgroup='phase correction').S(ancilla, opgroup='phase correction').H(ancilla, opgroup='ancilla superposition').add_barrier([comp, ancilla])
     ideal_circ.Measure(ancilla, ancilla_measure)
     ideal_circ.Measure(comp, comp_measure)
 
@@ -339,3 +380,118 @@ def test_add_ZX_pauli_checks_to_S():
     counts = result.get_counts()
 
     assert list(counts.keys()) == [(0, 0)]
+
+@pytest.mark.high_compute
+def test_error_sampler():
+
+    n_shots=1000
+
+    distribution = {
+        (Pauli.Z, Pauli.Z): 0.001,
+        (Pauli.I, Pauli.Z): 0.01,
+        (Pauli.Z, Pauli.I): 0.01,
+    }
+
+    error_distribution = ErrorDistribution(
+        distribution=distribution,
+        rng=numpy.random.default_rng(seed=1),
+    )
+
+    noise_model = NoiseModel(
+        noise_model = {OpType.ZZMax: error_distribution}
+    )
+
+    cliff_circ = Circuit(2, name='Clifford Subcircuit').H(0)
+    for _ in range(32):
+        cliff_circ.ZZMax(0,1)
+    cliff_circ = cliff_circ.H(0)
+
+    circuit = Circuit()
+    circuit.add_q_register(
+        name='my_reg',
+        size=2,
+    )
+    circuit.H(circuit.qubits[0])
+    circuit.add_circbox(
+        circbox=CircBox(cliff_circ),
+        args=list(reversed(circuit.qubits))
+    )
+    circuit.H(circuit.qubits[0])
+    circuit.measure_all()
+
+    dag_circuit = QermitDAGCircuit(circuit)
+
+    pauli_sampler=OptimalPauliSampler(
+        noise_model=noise_model
+    )
+    checked_circuit = dag_circuit.add_pauli_checks_to_circbox(
+        pauli_sampler=pauli_sampler,
+        n_rand=n_shots,
+        n_checks=1,
+    )
+
+    error_sampler = ErrorSampler(noise_model=noise_model)
+
+    transpiler = PauliErrorTranspile(noise_model=noise_model)
+    backend = TranspilerBackend(transpiler=transpiler)
+
+    DecomposeBoxes().apply(checked_circuit)
+
+    postselect_mgr = PostselectMgr(
+        compute_cbits=checked_circuit.bits[1:],
+        postselect_cbits=checked_circuit.bits[:1],
+    )
+
+    result = backend.run_circuit(checked_circuit, n_shots=n_shots)
+    postselected_result = postselect_mgr.postselect_result(result=result)
+    # These asserts reveal that the least dominant error is not detected
+    assert result.get_counts() == Counter(
+        {
+            (0, 0, 0): 551,
+            (1, 1, 0): 196,
+            (1, 0, 1): 188,
+            (0, 1, 1): 65,
+        }
+    )
+    assert postselected_result.get_counts() == Counter(
+        {(0, 0): 551, (1, 1): 65}
+    )
+
+    error_counter = error_sampler.counter_propagate(
+        cliff_circ=checked_circuit,
+        n_counts=n_shots,
+        direction='forward',
+    )
+    ideal = Counter(
+        {
+            Stabiliser(
+                Z_list=[0,0,0],
+                X_list=[1,1,0],
+                qubit_list=[
+                    Qubit(name='ancilla', index=0),
+                    Qubit(name='my_reg', index=0),
+                    Qubit(name='my_reg', index=1),
+                ]
+            ): 190,
+            Stabiliser(
+                Z_list=[0,0,0],
+                X_list=[1,0,1],
+                qubit_list=[
+                    Qubit(name='ancilla', index=0),
+                    Qubit(name='my_reg', index=0),
+                    Qubit(name='my_reg', index=1),
+                ]
+            ): 164,
+            Stabiliser(
+                Z_list=[0,0,0],
+                X_list=[0,1,1],
+                qubit_list=[
+                    Qubit(name='ancilla', index=0),
+                    Qubit(name='my_reg', index=0),
+                    Qubit(name='my_reg', index=1),
+                ]
+            ): 81,
+        }
+    )
+    # We see here again that the IXX error will be undetected.
+    assert error_counter == ideal

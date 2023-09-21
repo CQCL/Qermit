@@ -278,7 +278,25 @@ class QermitDAGCircuit(nx.DiGraph):
 
         return can_implement
 
-    def add_pauli_checks_to_circbox(self, pauli_sampler: PauliSampler, **kwargs):
+    @staticmethod
+    def decompose_clifford_subcircuit_box(clifford_subcircuit_box):
+
+        clifford_subcircuit = clifford_subcircuit_box.op.get_circuit()
+        qubit_map = {
+            q_subcirc: q_orig
+            for q_subcirc, q_orig
+            in zip(clifford_subcircuit.qubits, clifford_subcircuit_box.args)
+        }
+        clifford_subcircuit.rename_units(qubit_map)
+
+        return clifford_subcircuit
+
+    def add_pauli_checks_to_circbox(
+        self,
+        pauli_sampler: PauliSampler = None,
+        pauli_list_dict = None,
+        **kwargs,
+    ):
 
         pauli_check_circuit = Circuit()
         for qubit in self.qubits:
@@ -298,24 +316,32 @@ class QermitDAGCircuit(nx.DiGraph):
             if (
                 command.op.type == OpType.CircBox
             ) and (
-                command.op.get_circuit().name == 'Clifford Subcircuit'
+                command.op.get_circuit().name != None
+            ) and (
+                command.op.get_circuit().name.startswith('Clifford Subcircuit')
             ):
 
-                clifford_subcircuit = command.op.get_circuit()
-                qubit_map = {
-                    q_subcirc: q_orig
-                    for q_subcirc, q_orig
-                    in zip(clifford_subcircuit.qubits, command.args)
-                }
-                # TDOO: it may be possible to rename the registers before
-                # this point?
-                clifford_subcircuit.rename_units(qubit_map)
+                clifford_subcircuit = self.decompose_clifford_subcircuit_box(command)
 
-                start_stabiliser_list = pauli_sampler.sample(
-                    qubit_list=command.args,
-                    circ=clifford_subcircuit,
-                    **kwargs,
-                )
+                if pauli_list_dict == None and pauli_sampler != None:
+
+                    start_stabiliser_list = pauli_sampler.sample(
+                        qubit_list=command.args,
+                        circ=clifford_subcircuit,
+                        **kwargs,
+                    )
+
+                elif pauli_list_dict != None:
+
+                    start_stabiliser_list = pauli_list_dict[
+                        command.op.get_circuit().name
+                    ]
+
+                else:
+                    raise Exception(
+                        "Either a pauli sampler or a pauli list dictionary"
+                        + "must be passed"
+                    )
                 # TODO: check that register names do not already exist
                 control_qubit_list = [
                     Qubit(name='ancilla', index=i)
@@ -333,7 +359,10 @@ class QermitDAGCircuit(nx.DiGraph):
                     pauli_check_circuit.add_barrier(
                         command.args + [control_qubit]
                     )
-                    pauli_check_circuit.H(control_qubit)
+                    pauli_check_circuit.H(
+                        control_qubit,
+                        opgroup='ancilla superposition',
+                    )
 
                     stabiliser_circuit = start_stabiliser.get_control_circuit(
                         control_qubit=control_qubit
@@ -384,7 +413,10 @@ class QermitDAGCircuit(nx.DiGraph):
                     pauli_check_circuit.append(
                         circuit=stabiliser_circuit,
                     )
-                    pauli_check_circuit.H(control_qubit)
+                    pauli_check_circuit.H(
+                        control_qubit,
+                        opgroup='ancilla superposition',
+                    )
                     pauli_check_circuit.add_barrier(
                         command.args + [control_qubit]
                     )
