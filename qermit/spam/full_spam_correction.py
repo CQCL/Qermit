@@ -100,11 +100,6 @@ def gen_full_tomography_spam_characterisation_task(
         :return: bool confirming characterisation complete.
         :rtype: bool
         """
-
-        # print("results:")
-        # for result in results:
-        #     print(result.get_counts())
-        
         if len(results) != len(state_infos):
             raise ValueError(
                 "SPAM Characterisation requires the same number of prepared states and results."
@@ -220,8 +215,6 @@ def gen_get_bit_maps_task() -> MitTask:
             else:
                 # else, just invert map for later correction
                 bq_maps.append((qb_map, dict()))
-        # print("circuit_shots", circuit_shots)
-        # print("bq_maps", bq_maps)
         return (circuit_shots, bq_maps)
 
     return MitTask(

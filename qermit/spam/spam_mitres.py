@@ -48,8 +48,6 @@ def gen_FullyCorrelated_SPAM_MitRes(
     :param correlations: Each sublist of Node corresponds to some set of fully correlated nodes.
     :type correlations: List[List[Node]]
     """
-    # print("calibration_shots", calibration_shots)
-    # print("correlations", correlations)
     _mitres_spam_calib = copy(
         kwargs.get("calibration_mitres", MitRes(backend, _label="SPAMCalibration"))
     )
