@@ -112,25 +112,14 @@ jobs:
   formatting-checks:
     name: Check typing and formatting
     runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     python-version: ['3.9', '3.10', '3.11']
     steps:
-    - uses: actions/checkout@v2
-    # - name: Set up Python ${{ matrix.python-version }}
-    #   uses: actions/setup-python@v2
-    #   with:
-    #     python-version: ${{ matrix.python-version }}
+    - name: Checkout
+      uses: actions/checkout@v2
     - name: Build qermit
-      # if: github.event_name == 'pull_request'
       run: |
         pip install -e . -v
-    # - name: Test qermit 
-    #   if: github.event_name == 'pull_request'
-    #   run: |
         cd tests
         pip install -r test_requirements.txt
-    #     pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
     - name: Run mypy
       if: github.event_name == 'pull_request'
       run: mypy -p qermit
