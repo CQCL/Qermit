@@ -36,6 +36,8 @@ from pytket.passes import auto_rebase_pass
 
 
 class FrameRandomisation(Enum):
+
+    @staticmethod
     def PauliFrameRandomisation(
         circuit: Circuit, shots: int, samples: int
     ) -> List[CircuitShots]:
@@ -56,6 +58,7 @@ class FrameRandomisation(Enum):
         pfr_circuits = pfr.sample_circuits(circuit, samples)
         return [CircuitShots(Circuit=c, Shots=pfr_shots) for c in pfr_circuits]
 
+    @staticmethod
     def UniversalFrameRandomisation(
         circuit: Circuit, shots: int, samples: int
     ) -> List[CircuitShots]:

@@ -224,7 +224,7 @@ class MeasurementCircuit(object):
         :rtype: Circuit
         """
         _circuit = self._symbolic_circuit.copy()
-        _circuit.symbol_substitution(self._symbols._symbolic_map)
+        _circuit.symbol_substitution(self._symbols._symbolic_map)  # type: ignore
         return _circuit
 
 
@@ -255,7 +255,7 @@ class ObservableTracker:
         for k in self._qubit_pauli_operator._dict.keys():
             self._qps_to_indices[k] = list()
         self._measurement_circuits: List[MeasurementCircuit] = list()
-        self._partitions: List[QubitPauliString] = list()
+        self._partitions: List[List[QubitPauliString]] = list()
 
     def from_ObservableTracker(to_copy: "ObservableTracker") -> "ObservableTracker":
         """
