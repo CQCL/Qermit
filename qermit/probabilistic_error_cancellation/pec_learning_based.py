@@ -561,7 +561,6 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
                     # matrices needed for methods of least square
                     # P is a pair of noisy and noiseless qubit pauli operators
                     for i, P in enumerate(cliff):
-                        print(P)
                         noisy_i_qpo = P[0]
                         ideal_i_qpo = P[1]
                         # TODO: can this one liner be shrunk?

@@ -87,7 +87,6 @@ def get_full_transition_tomography_circuits(
         should be processed without compilation.
     :rtype: List[Circuit]
     """
-    # added to appease mypy
     def to_tuple(correlation_list: List[Node]) -> Tuple[Node, ...]:
         return tuple(correlation_list)
 
@@ -193,7 +192,6 @@ def calculate_correlation_matrices(
     :rtype: FullCorrelatedNoiseCharacterisation
     """
 
-    # added to appease mypy
     def to_tuple(correlation_list: List[Node]) -> Tuple[Node, ...]:
         return tuple(correlation_list)
 
