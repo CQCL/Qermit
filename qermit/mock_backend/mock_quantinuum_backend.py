@@ -19,76 +19,21 @@ from pytket.predicates import GateSetPredicate  # type: ignore
 from pytket.extensions.quantinuum import QuantinuumBackend  # type: ignore
 from pytket.extensions.quantinuum.backends.quantinuum import _GATE_SET  # type: ignore
 from pytket.predicates import CompilationUnit  # type: ignore
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-import qiskit.providers.aer.noise as noise  # type: ignore
 from pytket import OpType
 from pytket import Circuit
 from pytket.backends.resulthandle import ResultHandle
 from typing import List, Union
 from pytket.backends.backendresult import BackendResult
-
-
-class NoisyAerBackend(AerBackend):
-    noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Rz, OpType.Measure}
-
-    def __init__(self, n_qubits: int, prob_1: float, prob_2: float, prob_ro: float):
-        """AerBacked with simple depolarising and SPAM noise model.
-
-        :param n_qubits: The number of qubits available on the backend.
-        :type n_qubits: int
-        :param prob_1: The depolarising noise error rates on single qubit gates.
-        :type prob_1: float
-        :param prob_2: The depolarising noise error rates on two qubit gates.
-        :type prob_2: float
-        :param prob_ro: Error rates of symmetric uncorrelated SPAM errors.
-        :type prob_ro: float
-        """
-
-        noise_model = self.depolarizing_noise_model(n_qubits, prob_1, prob_2, prob_ro)
-        super().__init__(noise_model=noise_model)
-
-    def depolarizing_noise_model(
-        self,
-        n_qubits: int,
-        prob_1: float,
-        prob_2: float,
-        prob_ro: float,
-    ) -> noise.NoiseModel:
-        """Generates noise model, may be passed to `noise_model` parameter of
-        AerBacked.
-
-        :param n_qubits: Number of qubits noise model applies to.
-        :type n_qubits: int
-        :param prob_1: The depolarising noise error rates on single qubit gates.
-        :type prob_1: float
-        :param prob_2: The depolarising noise error rates on two qubit gates.
-        :type prob_2: float
-        :param prob_ro: Error rates of symmetric uncorrelated SPAM errors.
-        :type prob_ro: float
-        :return: Noise model
-        :rtype: noise.NoiseModel
-        """
-
-        noise_model = noise.NoiseModel()
-
-        error_2 = noise.depolarizing_error(prob_2, 2)
-        for edge in [[i, j] for i in range(n_qubits) for j in range(i)]:
-            noise_model.add_quantum_error(error_2, ["cx"], [edge[0], edge[1]])
-            noise_model.add_quantum_error(error_2, ["cx"], [edge[1], edge[0]])
-
-        error_1 = noise.depolarizing_error(prob_1, 1)
-        for node in range(n_qubits):
-            noise_model.add_quantum_error(error_1, ["h", "rx", "rz"], [node])
-
-        probabilities = [[1 - prob_ro, prob_ro], [prob_ro, 1 - prob_ro]]
-        error_ro = noise.ReadoutError(probabilities)
-        for i in range(n_qubits):
-            noise_model.add_readout_error(error_ro, [i])
-
-        return noise_model
+from .noisy_aer_backend import NoisyAerBackend
 
 
 class MockQuantinuumBackend(QuantinuumBackend):
+    """Backend mocking some of the features of QuantinuumBackend.
+    In particular the gateset and connectivity of the backend is replicated
+    so that compilation behaviour is reproduced. Some noise (unrelated to
+    that on the device) is also applied.
+    """
+
     gate_set = _GATE_SET
     gate_set.add(OpType.ZZPhase)
 
@@ -96,11 +41,10 @@ class MockQuantinuumBackend(QuantinuumBackend):
         name="MockQuantinuumBackend",
         device_name="mock-quantinuum",
         version="n/a",
-        architecture=FullyConnected(10, "node"),
+        architecture=FullyConnected(10, "q"),
         gate_set=gate_set,
+        n_cl_reg=100,
     )
-
-    noisy_gate_set = {OpType.CX, OpType.H, OpType.Rz, OpType.Rz, OpType.Measure}
 
     def __init__(self):
         super(MockQuantinuumBackend, self).__init__(device_name="H1-1SC")
@@ -125,7 +69,8 @@ class MockQuantinuumBackend(QuantinuumBackend):
         :param valid_check: Explicitly check that all circuits satisfy all
             required predicates to run on the backend, defaults to True
         :type valid_check: bool, optional
-        :return: Handles to results for each input circuit, as an interable in the same order as the circuits.
+        :return: Handles to results for each input circuit, as an interable
+            in the same order as the circuits.
         :rtype: ResultHandle
         """
 
@@ -134,10 +79,12 @@ class MockQuantinuumBackend(QuantinuumBackend):
 
         noisy_circuit = circuit.copy()
         cu = CompilationUnit(noisy_circuit)
-        auto_rebase_pass(gateset=self.noisy_gate_set).apply(cu)
-        self.noisy_backend.default_compilation_pass(optimisation_level=0).apply(cu)
 
-        assert GateSetPredicate(self.noisy_gate_set).verify(cu.circuit)
+        self.noisy_backend.default_compilation_pass(optimisation_level=0).apply(cu)
+        auto_rebase_pass(gateset=self.noisy_backend.noisy_gate_set).apply(cu)
+        assert GateSetPredicate(
+            self.noisy_backend.noisy_gate_set.union({OpType.Reset, OpType.Barrier})
+        ).verify(cu.circuit)
 
         handle = self.noisy_backend.process_circuit(cu.circuit, n_shot)
         self.handle_cu_dict[handle] = cu

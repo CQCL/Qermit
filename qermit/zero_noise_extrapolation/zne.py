@@ -21,19 +21,21 @@ from qermit import (
     ObservableExperiment,
     TaskGraph,
 )
-from copy import copy
+from pytket.unit_id import UnitID
+from copy import copy, deepcopy
 from pytket.pauli import QubitPauliString  # type: ignore
 from enum import Enum
 import numpy as np  # type: ignore
 from scipy.optimize import curve_fit  # type: ignore
-from typing import List, Tuple, cast, Dict
-from pytket import Circuit, OpType
+from typing import List, Tuple, cast, Dict, Union
+from pytket import Circuit, OpType, Qubit
 from pytket.predicates import CompilationUnit  # type: ignore
 from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial  # type: ignore
 from pytket.circuit import Node  # type: ignore
 from math import isclose
+from pytket.pauli import Pauli
 
 
 box_types = {
@@ -56,6 +58,7 @@ class Folding(Enum):
 
     # TODO: circ does not appear as input in docs
     # TODO Generalise with 'partial folding' to allow for non integer noise scaling
+    @staticmethod
     def circuit(circ: Circuit, noise_scaling: int, **kwargs) -> Circuit:
         """Noise scaling by circuit folding. In this case the folded circuit is of
         the form :math:`CC^{-1}CC^{-1}...C` where :math:`C` is the original circuit. As such noise may be scaled by
@@ -79,7 +82,7 @@ class Folding(Enum):
         folded_circ = circ.copy()
         for _ in range(noise_scaling // 2):
             # Add barrier between circuit and its inverse
-            folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
+            folded_circ.add_barrier(cast(List[UnitID], folded_circ.qubits + folded_circ.bits))
 
             # Add inverse circuit by iterating though commands and inverting them
             for gate in reversed(circ.get_commands()):
@@ -91,7 +94,7 @@ class Folding(Enum):
                     folded_circ.add_gate(gate.op.dagger, gate.args)
 
             # Add barrier between circuit and its inverse
-            folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
+            folded_circ.add_barrier(cast(List[UnitID], folded_circ.qubits + folded_circ.bits))
 
             # Add original circuit
             for gate in circ.get_commands():
@@ -104,6 +107,7 @@ class Folding(Enum):
 
         return folded_circ
 
+    @staticmethod
     def two_qubit_gate(circ: Circuit, noise_scaling: float, **kwargs) -> Circuit:
         """Noise scaling by folding 2 qubit gates. It is implicitly
         assumed that the noise on the 2 qubit gates dominate. Two qubit gates
@@ -209,6 +213,7 @@ class Folding(Enum):
 
         return folded_circuit
 
+    @staticmethod
     def gate(circ: Circuit, noise_scaling: float, **kwargs) -> Circuit:
         """Noise scaling by gate folding. In this case gates :math:`G` are replaced at random
         with :math:`GG^{-1}G` until the number of gates is sufficiently scaled.
@@ -319,6 +324,7 @@ class Folding(Enum):
 
         return folded_c
 
+    @staticmethod
     def odd_gate(circ: Circuit, noise_scaling: int, **kwargs) -> Circuit:
         """Noise scaling by gate folding. In this case odd gates :math:`G` are
         replaced :math:`GG^{-1}G` until the number of gates is sufficiently
@@ -425,9 +431,8 @@ class Fit(Enum):
     """
 
     # TODO Consider adding adaptive exponential extrapolation
-    def cube_root(
-        self, x: List[float], y: List[float], _show_fit: bool, *args
-    ) -> float:
+    @staticmethod
+    def cube_root(x: List[float], y: List[float], _show_fit: bool, *args) -> float:
         """Fit data to a cube root function. This is to say a function of the form :math:`a + b(x+c)^{1/3}`.
 
         :param x: Noise scaling values.
@@ -455,8 +460,9 @@ class Fit(Enum):
 
         return float(fit_to_zero)
 
+    @staticmethod
     def poly_exponential(
-        self, x: List[float], y: List[float], _show_fit: bool, deg: int
+        x: List[float], y: List[float], _show_fit: bool, deg: int
     ) -> float:
         """Fit data to a poly-exponential, which is to say a function of the
         form :math:`a+e^{z}`, where :math:`z` is a polynomial.
@@ -517,9 +523,8 @@ class Fit(Enum):
 
         return float(fit_to_zero)
 
-    def exponential(
-        self, x: List[float], y: List[float], _show_fit: bool, *args
-    ) -> float:
+    @staticmethod
+    def exponential(x: List[float], y: List[float], _show_fit: bool, *args) -> float:
         """Fit data to an exponential function. This is to say a function of the form :math:`a+e^{(b+x)}`.
         Note that this is a special case of the poly-exponential function.
 
@@ -535,11 +540,10 @@ class Fit(Enum):
 
         # As the exponential function is a special case of the
         # poly-exponential function, it is called here
-        return Fit.poly_exponential(self, x, y, _show_fit, 1)
+        return Fit.poly_exponential(x, y, _show_fit, 1)
 
-    def polynomial(
-        self, x: List[float], y: List[float], _show_fit: bool, deg: int
-    ) -> float:
+    @staticmethod
+    def polynomial(x: List[float], y: List[float], _show_fit: bool, deg: int) -> float:
         """Fit data to a polynomial function.
 
         :param x: Noise scaling values.
@@ -579,7 +583,8 @@ class Fit(Enum):
 
         return float(fit_to_zero)
 
-    def linear(self, x: List[float], y: List[float], _show_fit: bool, *args) -> float:
+    @staticmethod
+    def linear(x: List[float], y: List[float], _show_fit: bool, *args) -> float:
         """Fit data to a linear function. This is to say a function of the form :math:`ax+b`.
         Note that this is a special case of the polynomial fitting function.
 
@@ -594,11 +599,10 @@ class Fit(Enum):
         """
         # As this is a special case of a fit to a polynomial, the polynomial
         # fitting function is called here with a degree 1
-        return Fit.polynomial(self, x, y, _show_fit, 1)
+        return Fit.polynomial(x, y, _show_fit, 1)
 
-    def richardson(
-        self, x: List[float], y: List[float], _show_fit: bool, *args
-    ) -> float:
+    @staticmethod
+    def richardson(x: List[float], y: List[float], _show_fit: bool, *args) -> float:
         """Use richardson extrapolation. This amounts to fitting to a polynomial of
         degree one less than the number of data points.
 
@@ -613,7 +617,7 @@ class Fit(Enum):
         """
         # As this is a special case of the polynomial fitting function, the polynomial fitting
         # function is called here with degree one less than the number of data points.
-        return Fit.polynomial(self, x, y, _show_fit, len(x) - 1)
+        return Fit.polynomial(x, y, _show_fit, len(x) - 1)
 
 
 def plot_fit(
@@ -770,7 +774,7 @@ def extrapolation_task_gen(
                 QubitPauliOperator(
                     {
                         qpo_k: _fit_type(  # type: ignore
-                            obj, all_fold_vals, qpo_list_float[qpo_k], _show_fit, deg
+                            all_fold_vals, qpo_list_float[qpo_k], _show_fit, deg
                         )
                         for qpo_k in qpo_list_float
                     }
@@ -798,9 +802,9 @@ def copy_mitex_wire(wire: ObservableExperiment) -> ObservableExperiment:
 
     # Copy ansatz circuit
     new_ansatz_circuit = AnsatzCircuit(
-        Circuit=wire.AnsatzCircuit.Circuit.copy(),
-        Shots=copy(wire.AnsatzCircuit.Shots),
-        SymbolsDict=copy(wire.AnsatzCircuit.SymbolsDict),
+        Circuit=deepcopy(wire.AnsatzCircuit.Circuit),
+        Shots=deepcopy(wire.AnsatzCircuit.Shots),
+        SymbolsDict=deepcopy(wire.AnsatzCircuit.SymbolsDict),
     )
 
     # copy qps and instantiate new measurement setup
@@ -860,7 +864,10 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
     )
 
 
-def qpo_node_relabel(qpo: QubitPauliOperator, node_map: Dict[Node, Node]):
+def qpo_node_relabel(
+    qpo: QubitPauliOperator,
+    node_map: Dict[Union[UnitID, Qubit, Node], Union[UnitID, Qubit, Node]]
+):
     """Relabel the nodes of qpo according to node_map
 
     :param qpo: Original qubit pauli operator
@@ -878,7 +885,7 @@ def qpo_node_relabel(qpo: QubitPauliOperator, node_map: Dict[Node, Node]):
         new_qps_dict = {}
         for q in orig_qps_dict:
             new_qps_dict[node_map[q]] = orig_qps_dict[q]
-        new_qps = QubitPauliString(new_qps_dict)
+        new_qps = QubitPauliString(cast(Dict[Qubit, Pauli], new_qps_dict))
         new_qpo_dict[new_qps] = orig_qpo_dict[orig_qps]
 
     return QubitPauliOperator(new_qpo_dict)
@@ -899,7 +906,7 @@ def gen_initial_compilation_task(
 
     def task(
         obj, wire: List[ObservableExperiment]
-    ) -> Tuple[List[ObservableExperiment], List[Dict[Node, Node]]]:
+    ) -> Tuple[List[ObservableExperiment], List[Dict[UnitID, UnitID]]]:
         """Performs initial compilation before folding. This is to ensure minimal compilation
         after folding, as this could disrupt by how much the noise is increased.
 
@@ -964,7 +971,9 @@ def gen_qubit_relabel_task() -> MitTask:
     """
 
     def task(
-        obj, qpo_list: List[QubitPauliOperator], compilation_map_list: List[Dict[Node, Node]]
+        obj,
+        qpo_list: List[QubitPauliOperator],
+        compilation_map_list: List[Dict[Node, Node]],
     ) -> Tuple[List[QubitPauliOperator]]:
         """Use node map returned by compilation unit to undo the relabelling
         performed by gen_initial_compilation_task
@@ -981,9 +990,8 @@ def gen_qubit_relabel_task() -> MitTask:
         new_qpo_list = []
 
         for compilation_map, qpo in zip(compilation_map_list, qpo_list):
-
             node_map = {value: key for key, value in compilation_map.items()}
-            new_qpo_list.append(qpo_node_relabel(qpo, node_map))
+            new_qpo_list.append(qpo_node_relabel(qpo, cast(Dict[Union[UnitID, Qubit, Node], Union[UnitID, Qubit, Node]], node_map)))
 
         return (new_qpo_list,)
 
@@ -1008,14 +1016,14 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
     :return: MitEx object performing noise mitigation by ZNE.
     :rtype: MitEx
     """
-    _experiment_mitres = copy(
+    _experiment_mitres = deepcopy(
         kwargs.get(
             "experiment_mitres",
             MitRes(backend),
         )
     )
 
-    _experiment_mitex = copy(
+    _experiment_mitex = deepcopy(
         kwargs.get(
             "experiment_mitex",
             MitEx(backend, _label="ExperimentMitex", mitres=_experiment_mitres),
@@ -1035,18 +1043,7 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
 
     for fold in noise_scaling_list:
         _label = str(fold) + "FoldMitEx"
-        _fold_mitres = copy(
-            kwargs.get(
-                "experiment_mitres",
-                MitRes(backend),
-            )
-        )
-        _fold_mitex = copy(
-            kwargs.get(
-                "experiment_mitex",
-                MitEx(backend, _label=_label, mitres=_fold_mitres),
-            )
-        )
+        _fold_mitex = deepcopy(_experiment_mitex)
         _fold_mitex._label = _label + _fold_mitex._label
         digital_folding_task = digital_folding_task_gen(
             backend, fold, _folding_type, _allow_approx_fold

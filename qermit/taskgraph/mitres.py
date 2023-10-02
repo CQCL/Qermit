@@ -29,6 +29,7 @@ from itertools import repeat
 from pytket.utils.outcomearray import OutcomeArray
 from pytket import Bit
 import numpy as np  # type: ignore
+from pytket import Circuit
 
 
 def backend_compile_circuit_shots_task_gen(
@@ -88,7 +89,7 @@ def backend_handle_task_gen(backend: Backend) -> MitTask:
             circs, shots = map(list, zip(*circuit_wires))
 
             results = backend.process_circuits(
-                circs, n_shots=cast(Sequence[int], shots)
+                cast(List[Circuit], circs), n_shots=cast(Sequence[int], shots)
             )
 
             return (results,)
@@ -110,7 +111,6 @@ def backend_res_task_gen(backend: Backend) -> MitTask:
     """
 
     def task(obj, handles: List[ResultHandle]) -> Tuple[List[BackendResult]]:
-
         results = backend.get_results(handles)
 
         return (results,)
@@ -216,11 +216,13 @@ class MitRes(TaskGraph):
     def __str__(self) -> str:
         return f"<MitRes::{self._label}>"
 
-    def __call__(self, circuits_wire: List[List[CircuitShots]], characterisation: dict = {}) -> Tuple[List[BackendResult]]:  # type: ignore[override]
+    def __call__(self, circuits_wire: List[List[CircuitShots]], cache: bool = False, characterisation: dict = {}) -> Tuple[List[BackendResult]]:  # type: ignore[override]
         return cast(
             Tuple[List[BackendResult]],
             super().run(
-                cast(List[Wire], circuits_wire), characterisation=characterisation
+                cast(List[Wire], circuits_wire),
+                cache=cache,
+                characterisation=characterisation,
             ),
         )
 
@@ -297,7 +299,7 @@ class MitRes(TaskGraph):
         """
         raise TypeError("MitRes.add_wire forbidden.")
 
-    def run(self, circuit_shots: List[CircuitShots], characterisation: dict = {}) -> List[BackendResult]:  # type: ignore[override]
+    def run(self, circuit_shots: List[CircuitShots], cache: bool = False, characterisation: dict = {}) -> List[BackendResult]:  # type: ignore[override]
         """
         Overloaded run method from TaskGraph class to add type checking.
         A single experiment is defined by a Tuple containing a circuit to be run
@@ -312,7 +314,7 @@ class MitRes(TaskGraph):
         :return: A BackendResult object for each combination of circuit and shots.
         :rtype: List[BackendResult]
         """
-        return self([circuit_shots], characterisation)[0]
+        return self([circuit_shots], cache, characterisation)[0]
 
 
 def split_shots_task_gen(max_shots: int) -> MitTask:

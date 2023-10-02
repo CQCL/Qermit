@@ -41,6 +41,7 @@ from pytket.placement import place_with_map  # type: ignore
 
 from pytket.pauli import QubitPauliString  # type: ignore
 from pytket.predicates import CliffordCircuitPredicate  # type: ignore
+from pytket.unit_id import Qubit
 
 import re
 from typing import List, Tuple, Dict, cast, Union, Any
@@ -66,7 +67,7 @@ def str_to_pauli_op(pauli_str: str) -> Op:
         "Y": Op.create(OpType.Y),
         "I": Op.create(OpType.noop),
     }
-    return switcher.get(pauli_str)
+    return switcher[pauli_str]
 
 
 def random_commuting_clifford(
@@ -142,7 +143,7 @@ def random_commuting_clifford(
             new_qps_qbs.append(n_q_map[x])
             qps_paulis.append(qps_dict[x])
 
-        new_qps = QubitPauliString(new_qps_qbs, qps_paulis)
+        new_qps = QubitPauliString(cast(List[Qubit], new_qps_qbs), qps_paulis)
 
         place_with_map(rand_cliff_circ, n_q_map)
 
@@ -177,7 +178,7 @@ def random_commuting_clifford(
     return rand_cliff_circ
 
 
-def substitute_pauli(circ: Circuit, frame_name: str, pauli_pair: List[str]) -> Circuit:
+def substitute_pauli(circ: Circuit, frame_name: str, pauli_pair: List[Op]) -> Circuit:
     """
     Replace 2 qubit Pauli gate pair which surrounds Frame gate with a 2 qubit pauli gate and its inverse.
 
@@ -185,8 +186,8 @@ def substitute_pauli(circ: Circuit, frame_name: str, pauli_pair: List[str]) -> C
     :type circ: Circuit
     :param frame_name: The opgroup of the Frame gate that the pauli gates will act either side of
     :type frame_name: str
-    :param pauli_pair: Two strings describing the 2 qubit Pauli gate
-    :type pauli_pair: List[str]
+    :param pauli_pair: Two Ops describing the 2 qubit Pauli gate
+    :type pauli_pair: List[Op]
     :return: A circuit, with the Pauli gates inserted either side of the given frame gate.
     :rtype: Circuit
     """
@@ -211,7 +212,7 @@ def substitute_pauli(circ: Circuit, frame_name: str, pauli_pair: List[str]) -> C
 
 
 def substitute_pauli_but_one(
-    circ: Circuit, to_replace_opgroup: str, pauli_pair: List[str]
+    circ: Circuit, to_replace_opgroup: str, pauli_pair: List[Op]
 ) -> Circuit:
     """Sets all Pauli gates to the identity, apart from those around the
     inputted Frame gate, described by its opgroup.
@@ -221,8 +222,8 @@ def substitute_pauli_but_one(
     :param to_replace_opgroup: The opgroup of the frame gate who's corresponding
         Pauli gates should be replaced with the inputted gate.
     :type to_replace_opgroup: str
-    :param pauli_pair: Two strings describing the Pauli gate to be substituted in
-    :type pauli_pair: List[str]
+    :param pauli_pair: Two Ops describing the Pauli gate to be substituted in
+    :type pauli_pair: List[Op]
     :raises RuntimeError: Raised if the inputted circuit does not have a gate in the opgroup inputted.
     :return: The final circuit with the Pauli gates substituted in.
     :rtype: Circuit
@@ -443,7 +444,6 @@ def collate_results_task_gen() -> MitTask:
             all_obs_exp_index.add(obs_exp["experiment"])
 
         for obs_exp_index in all_obs_exp_index:
-
             # For each experiment index, create a list of the list structure information
             # of results corresponding to that experiment index.
             fixed_obs_exp_details = [
@@ -461,7 +461,6 @@ def collate_results_task_gen() -> MitTask:
             fixed_obs_exp_results = []
 
             for qps_index in all_qps_index:
-
                 # For each QubitPauliString index, create a list of the list structure information
                 # of results corresponding to that QubitPauliString index.
                 fixed_qps_details = [
@@ -473,7 +472,6 @@ def collate_results_task_gen() -> MitTask:
                 fixed_qps_results = []
 
                 for cliff_details in fixed_qps_details:
-
                     # For each Clifford circuit corresponding to a fixed experiment and
                     # QuasiPauliString, gather the noisy results list structure information.
                     fixed_cliff_details = [
@@ -485,7 +483,6 @@ def collate_results_task_gen() -> MitTask:
                     fixed_cliff_results = []
 
                     for noisy_details in fixed_cliff_details:
-
                         # For each noisy circuit corresponding to a fixed experiment,
                         # QubitPauliString and Clifford circuit, gather the noisy ideal result pair.
                         fixed_cliff_results.append(
@@ -526,7 +523,7 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
 
     def task(
         obj,
-        results: List[List[List[Tuple[QubitPauliOperator]]]],
+        results: List[List[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]],
     ) -> Tuple[List[List[QuasiProbabilities]]]:
         """This implementation of learning base probabilistic error cancellation is
          based on the significant error approach of https://arxiv.org/abs/2005.07601
@@ -535,7 +532,7 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
             expectation results for a fixed ObservableExperiment, QubitPauliString,
             clifford circuit, and Pauli noise. Each list level fixes consecutively
             an ObservableExperiment, QubitPauliString, and clifford circuit.
-        :type results: List[ List[List[Tuple[QubitPauliOperator]]] ]
+        :type results: List[List[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]]
         :return: List of quasi probabilities. The outer list corresponds to circuits,
             the second level list corresponds to Pauli strings, and the inner most
             list corresponds to quasi probabilities.
@@ -543,12 +540,11 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
         """
 
         prob_list = []
-        # qps_results is List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]
+        # qps_results is List[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]
         # each tuple is a noisy, noiseless pair of results for perturbed fixed Clifford circuit
         # each inner list is results for fixed clifford circuit
         # each outerlist is for a single Qubit Pauli String in experiment
         for qps_results in results:
-
             qps_quasi_prob_list = []
             # qps is List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]
             # containing all results for all fixed Clifford circuits
@@ -797,13 +793,11 @@ def wrap_frame_gates(circ: Circuit) -> Circuit:
     framed_circ_command_list = []
 
     for command in circ_command_list:
-
         # Add command to new list if not a Frame gate.
         if "Computing" in command["opgroup"]:
             framed_circ_command_list.append(command.copy())
 
         elif "Frame" in command["opgroup"]:
-
             match_return = re.match(r"Frame (.*)", command["opgroup"])
             if match_return is None:
                 raise ValueError(
@@ -926,10 +920,8 @@ def list_pauli_gates(circ: Circuit) -> List[Dict]:
     # the error acts on at most one Frame gate, it is enough to specify the error
     # and the Frame gate on which it acts.
     for opgroup in frame_opgroup_list:
-
         for q1_pauli in ["X", "Y", "Z", "I"]:
             for q2_pauli in ["X", "Y", "Z", "I"]:
-
                 if (q1_pauli == "I") and (q2_pauli == "I"):
                     continue
 
@@ -973,7 +965,6 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
         # For each circuit, create an equivalent circuit but on which one of the
         # possible errors occur.
         for experiment_num, experiment in enumerate(wire):
-
             pauli_errors = list_pauli_gates(experiment.AnsatzCircuit.Circuit)
 
             for error_num, error in enumerate(pauli_errors):

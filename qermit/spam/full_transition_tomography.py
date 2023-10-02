@@ -26,6 +26,7 @@ from pytket.passes import DecomposeBoxes, FlattenRegisters  # type: ignore
 from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 from enum import Enum
+from pytket.unit_id import UnitID
 
 FullCorrelatedNoiseCharacterisation = namedtuple(
     "FullCorrelatedNoiseCharacterisation",
@@ -86,8 +87,11 @@ def get_full_transition_tomography_circuits(
         should be processed without compilation.
     :rtype: List[Circuit]
     """
+    def to_tuple(correlation_list: List[Node]) -> Tuple[Node, ...]:
+        return tuple(correlation_list)
+
     subsets_matrix_map = OrderedDict.fromkeys(
-        sorted(map(tuple, correlations), key=len, reverse=True)
+        sorted(map(to_tuple, correlations), key=len, reverse=True)
     )
     # ordered from largest to smallest via OrderedDict & sorted
     subset_dimensions = [len(subset) for subset in subsets_matrix_map]
@@ -108,13 +112,14 @@ def get_full_transition_tomography_circuits(
 
     # set up CircBox of X gate for preparing basis states
     xcirc = Circuit(1).X(0)
-    xcirc = backend.get_compiled_circuit(xcirc)
+    xcirc = backend.get_compiled_circuit(xcirc, optimisation_level=0)
     FlattenRegisters().apply(xcirc)
     xbox = CircBox(xcirc)
     # need to be default register to add as box suitably
 
     n_qubits_pre_compile = process_circuit.n_qubits
-    process_circuit = backend.get_compiled_circuit(process_circuit)
+    # This needs to be optimisation level 0 to avoid using simplify initial
+    process_circuit = backend.get_compiled_circuit(process_circuit, optimisation_level=0)
 
     while process_circuit.n_qubits < n_qubits_pre_compile:
         process_circuit.add_qubit(Qubit("temp_q", process_circuit.n_qubits))
@@ -122,7 +127,8 @@ def get_full_transition_tomography_circuits(
     rename_map_pc = {}
     for index, qb in enumerate(process_circuit.qubits):
         rename_map_pc[qb] = Qubit(index)
-    process_circuit.rename_units(rename_map_pc)
+    process_circuit.rename_units(cast(Dict[UnitID, UnitID], rename_map_pc))
+
     pbox = CircBox(process_circuit)
 
     # set up base circuit for appending xbox to
@@ -148,14 +154,14 @@ def get_full_transition_tomography_circuits(
             new_state_dicts[qubits] = major_state[:dim]
             # find only qubits that are expected to be in 1 state, add xbox to given qubits
             for flipped_qb in itertools.compress(qubits, major_state[:dim]):
-                state_circuit.add_circbox(xbox, [flipped_qb])
+                state_circuit.add_circbox(xbox, [cast(UnitID, flipped_qb)])
         # Decompose boxes, add barriers to preserve circuit, add measures
-        state_circuit.add_barrier(all_qubits)
+        state_circuit.add_barrier(cast(List[UnitID], all_qubits))
 
         # add process circuit to measure
-        state_circuit.add_circbox(pbox, state_circuit.qubits)
+        state_circuit.add_circbox(pbox, cast(List[UnitID], state_circuit.qubits))
         DecomposeBoxes().apply(state_circuit)
-        state_circuit.add_barrier(all_qubits)
+        state_circuit.add_barrier(cast(List[UnitID], all_qubits))
         for q in measures:
             state_circuit.Measure(q, measures[q])
         # add to returned types
@@ -168,7 +174,7 @@ def get_full_transition_tomography_circuits(
 def calculate_correlation_matrices(
     results_list: List[BackendResult],
     states_info: List[StateInfo],
-    correlations: List[List[Qubit]],
+    correlations: List[List[Node]],
 ) -> FullCorrelatedNoiseCharacterisation:
     """Calculate the calibration matrices corresponding to some pure noise from the results of running calibration
     circuits.
@@ -180,14 +186,17 @@ def calculate_correlation_matrices(
         representation and the qubit_to_bit_map for the corresponding state circuit.
     :type states_info: List[StateInfo]
     :param correlations: List of dict corresponding to each prepared basis state
-    :type correlations: List[List[Qubit]]
+    :type correlations: List[List[Node]]
 
     :return: Characterisation for pure noise given by process circuit
     :rtype: FullCorrelatedNoiseCharacterisation
     """
 
+    def to_tuple(correlation_list: List[Node]) -> Tuple[Node, ...]:
+        return tuple(correlation_list)
+
     subsets_matrix_map = OrderedDict.fromkeys(
-        sorted(map(tuple, correlations), key=len, reverse=True)
+        sorted(map(to_tuple, correlations), key=len, reverse=True)
     )
     # ordered from largest to smallest via OrderedDict & sorted
     subset_dimensions = [len(subset) for subset in subsets_matrix_map]

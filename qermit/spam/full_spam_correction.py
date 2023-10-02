@@ -28,10 +28,11 @@ from qermit.spam.full_transition_tomography import (
     StateInfo,
     CorrectionMethod,
 )
+from pytket.unit_id import Node
 
 
 def gen_full_tomography_spam_circuits_task(
-    backend: Backend, shots: int, qubit_subsets: List[List[Qubit]]
+    backend: Backend, shots: int, qubit_subsets: List[List[Node]]
 ) -> MitTask:
     """Generate MitTask for calibration circuits according to the specified correlation and given backend.
 
@@ -56,7 +57,7 @@ def gen_full_tomography_spam_circuits_task(
             # check correlations distance
             if (
                 obj.characterisation["FullCorrelatedSpamCorrection"].CorrelatedNodes
-                is qubit_subsets
+                == qubit_subsets
             ):
                 return (wire, [], [])
 
@@ -78,7 +79,7 @@ def gen_full_tomography_spam_circuits_task(
 
 
 def gen_full_tomography_spam_characterisation_task(
-    qubit_subsets: List[List[Qubit]],
+    qubit_subsets: List[List[Node]],
 ) -> MitTask:
     """
     Uses results from device for characterisation circuits to characterise transition matrices

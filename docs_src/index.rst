@@ -1,14 +1,10 @@
 Qermit
 ======
 
-.. image:: CQCLogo.png
-   :width: 120px
-   :align: right
-
-``qermit`` is a python module for running error-mitigation protocols on quantum computers using ``pytket``, 
-CQC's python module for interfacing with `CQC <https://cambridgequantum.com/>`_ tket, a set of quantum programming tools. 
+``qermit`` is a python module for running error-mitigation protocols on quantum computers using the ``pytket`` 
+python module for interfacing with tket, a set of quantum programming tools developed by `Quantinuum <https://www.quantinuum.com/>`_. 
 ``qermit`` functions using the ``pytket`` :py:class:`Backend` class, meaning ``qermit`` supports any of the 
-`numerous providers <https://github.com/CQCL/pytket-extensions>`_ ``pytket`` does.
+`numerous providers <https://cqcl.github.io/pytket-extensions/api/index.html>`_ ``pytket`` does.
 ``qermit`` also provides easy composability of error-mitigation methods, meaning 
 it is practically straightforward to run an experiment with multiple forms of error-mitigation 
 where appropriate.
@@ -137,6 +133,8 @@ are several ways to contact us:
    measurement_reduction.rst
    spam.rst
    frame_randomisation.rst
+   postselection.rst
+   leakage_detection.rst
    clifford_noise_characterisation.rst
    zero_noise_extrapolation.rst
    probabilistic_error_cancellation.rst

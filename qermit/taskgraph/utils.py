@@ -22,7 +22,7 @@ from pytket.pauli import QubitPauliString  # type: ignore
 from pytket.backends.backendresult import BackendResult
 from copy import copy
 from sympy import Symbol  # type: ignore
-from typing import Iterable, Dict, Union, Tuple, List
+from typing import Iterable, Dict, Union, Tuple, List, Optional
 from collections import OrderedDict
 from numpy import ndarray  # type: ignore
 
@@ -36,7 +36,7 @@ class SymbolsDict(object):
     symbols.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Default constructor, creates an empty OrderedDict() object for future symbols to be added to.
         """
@@ -177,7 +177,7 @@ class MeasurementCircuit(object):
     for some Ansatz Circuit.
     """
 
-    def __init__(self, symbolic_circuit: Circuit, symbols: SymbolsDict = None):
+    def __init__(self, symbolic_circuit: Circuit, symbols: Optional[SymbolsDict] = None):
         """
         Stores information required to instantiate any MeasurementCircuit with parameterised symbols.
 
@@ -187,7 +187,7 @@ class MeasurementCircuit(object):
         :type symbols: SymbolsDict
         """
         self._symbolic_circuit: Circuit = symbolic_circuit
-        if symbols is None:
+        if not symbols:
             self._symbols: SymbolsDict = SymbolsDict.symbols_from_circuit(
                 symbolic_circuit
             )
@@ -224,7 +224,7 @@ class MeasurementCircuit(object):
         :rtype: Circuit
         """
         _circuit = self._symbolic_circuit.copy()
-        _circuit.symbol_substitution(self._symbols._symbolic_map)
+        _circuit.symbol_substitution(self._symbols._symbolic_map)  # type: ignore
         return _circuit
 
 
@@ -255,7 +255,7 @@ class ObservableTracker:
         for k in self._qubit_pauli_operator._dict.keys():
             self._qps_to_indices[k] = list()
         self._measurement_circuits: List[MeasurementCircuit] = list()
-        self._partitions: List[QubitPauliString] = list()
+        self._partitions: List[List[QubitPauliString]] = list()
 
     def from_ObservableTracker(to_copy: "ObservableTracker") -> "ObservableTracker":
         """
@@ -284,15 +284,15 @@ class ObservableTracker:
     def __repr__(self):
         return str(self)
 
-    def clear(self):
+    def clear(self) -> None:
         """
         Erases all held information that is not the qubit pauli operator.
         """
-        self._qps_to_indices = dict()
+        self._qps_to_indices.clear()
         for k in self._qubit_pauli_operator._dict.keys():
             self._qps_to_indices[k] = list()
-        self._measurement_circuits: List[MeasurementCircuit] = list()
-        self._partitions: List[QubitPauliString] = list()
+        self._measurement_circuits.clear()
+        self._partitions.clear()
 
     def modify_coefficients(
         self, new_coefficients: List[Tuple[QubitPauliString, float]]

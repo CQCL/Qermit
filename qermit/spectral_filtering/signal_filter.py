@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 import numpy as np
 from copy import deepcopy
 from numpy.typing import NDArray
@@ -7,6 +7,7 @@ from numpy.typing import NDArray
 class SignalFilter(ABC):
     """Base class for signal filtering."""
 
+    @abstractmethod
     def filter(self, fft_result_val_grid: NDArray[np.float64]) -> NDArray[np.float64]:
         """Method transforming array of floats into filtered array of
         floats."""

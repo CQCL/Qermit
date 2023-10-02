@@ -112,7 +112,6 @@ def cdr_quality_check_task_gen(
         """
 
         for calibration, original in zip(state_circuit_exp, noisy_expectation):
-
             # The noisy expectation value of the original circuit.
             original_coefficient = original.to_list()[0]["coefficient"][0]
 
