@@ -67,7 +67,7 @@ def str_to_pauli_op(pauli_str: str) -> Op:
         "Y": Op.create(OpType.Y),
         "I": Op.create(OpType.noop),
     }
-    return switcher.get(pauli_str)
+    return switcher[pauli_str]
 
 
 def random_commuting_clifford(
@@ -143,7 +143,7 @@ def random_commuting_clifford(
             new_qps_qbs.append(n_q_map[x])
             qps_paulis.append(qps_dict[x])
 
-        new_qps = QubitPauliString(new_qps_qbs, qps_paulis)
+        new_qps = QubitPauliString(cast(List[Qubit], new_qps_qbs), qps_paulis)
 
         place_with_map(rand_cliff_circ, n_q_map)
 

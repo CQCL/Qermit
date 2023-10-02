@@ -238,7 +238,7 @@ def gen_state_circuits(
                     original_angle = com.op.params[0]
                     if not isinstance(original_angle, float):
                         raise Exception("Circuit cannot include parameters which are not floats.")
-                    angle = sample_weighted_clifford_angle(original_angle)                        
+                    angle = sample_weighted_clifford_angle(original_angle)
                     new_circuit.add_gate(com.op.type, [angle], cast(List[UnitID], com.qubits))
                     new_circuit.add_barrier(cast(List[UnitID], com.qubits))
                 # in cliffords mean it is denominated as Clifford, and hasn't been sampled for a pair

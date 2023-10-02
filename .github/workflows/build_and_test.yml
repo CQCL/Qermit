@@ -31,12 +31,6 @@ jobs:
         cd tests
         pip install -r test_requirements.txt
         pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
-    # - name: Run mypy
-    #   if: github.event_name == 'pull_request'
-    #   run: mypy -p qermit
-    # - name: Format check
-    #   if: github.event_name == 'pull_request'
-    #   run: flake8 qermit/ tests/ --ignore=E501,W503
 
   linux:
     name: Build and test (Linux)

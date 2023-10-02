@@ -224,7 +224,7 @@ class MeasurementCircuit(object):
         :rtype: Circuit
         """
         _circuit = self._symbolic_circuit.copy()
-        _circuit.symbol_substitution(self._symbols._symbolic_map)
+        _circuit.symbol_substitution(self._symbols._symbolic_map)  # type: ignore
         return _circuit
 
 
