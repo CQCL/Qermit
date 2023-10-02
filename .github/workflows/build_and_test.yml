@@ -128,8 +128,8 @@ jobs:
     # - name: Test qermit 
     #   if: github.event_name == 'pull_request'
     #   run: |
-    #     cd tests
-    #     pip install -r test_requirements.txt
+        cd tests
+        pip install -r test_requirements.txt
     #     pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
     - name: Run mypy
       if: github.event_name == 'pull_request'
