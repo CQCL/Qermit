@@ -29,6 +29,7 @@ from itertools import repeat
 from pytket.utils.outcomearray import OutcomeArray
 from pytket import Bit
 import numpy as np  # type: ignore
+from pytket import Circuit
 
 
 def backend_compile_circuit_shots_task_gen(
@@ -88,7 +89,7 @@ def backend_handle_task_gen(backend: Backend) -> MitTask:
             circs, shots = map(list, zip(*circuit_wires))
 
             results = backend.process_circuits(
-                circs, n_shots=cast(Sequence[int], shots)
+                cast(List[Circuit], circs), n_shots=cast(Sequence[int], shots)
             )
 
             return (results,)

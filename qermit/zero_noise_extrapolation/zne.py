@@ -21,19 +21,21 @@ from qermit import (
     ObservableExperiment,
     TaskGraph,
 )
+from pytket.unit_id import UnitID
 from copy import copy, deepcopy
 from pytket.pauli import QubitPauliString  # type: ignore
 from enum import Enum
 import numpy as np  # type: ignore
 from scipy.optimize import curve_fit  # type: ignore
-from typing import List, Tuple, cast, Dict
-from pytket import Circuit, OpType
+from typing import List, Tuple, cast, Dict, Union
+from pytket import Circuit, OpType, Qubit
 from pytket.predicates import CompilationUnit  # type: ignore
 from pytket.utils import QubitPauliOperator
 import matplotlib.pyplot as plt  # type: ignore
 from numpy.polynomial.polynomial import Polynomial  # type: ignore
 from pytket.circuit import Node  # type: ignore
 from math import isclose
+from pytket.pauli import Pauli
 
 
 box_types = {
@@ -80,7 +82,7 @@ class Folding(Enum):
         folded_circ = circ.copy()
         for _ in range(noise_scaling // 2):
             # Add barrier between circuit and its inverse
-            folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
+            folded_circ.add_barrier(cast(List[UnitID], folded_circ.qubits + folded_circ.bits))
 
             # Add inverse circuit by iterating though commands and inverting them
             for gate in reversed(circ.get_commands()):
@@ -92,7 +94,7 @@ class Folding(Enum):
                     folded_circ.add_gate(gate.op.dagger, gate.args)
 
             # Add barrier between circuit and its inverse
-            folded_circ.add_barrier(folded_circ.qubits + folded_circ.bits)
+            folded_circ.add_barrier(cast(List[UnitID], folded_circ.qubits + folded_circ.bits))
 
             # Add original circuit
             for gate in circ.get_commands():
@@ -862,7 +864,10 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
     )
 
 
-def qpo_node_relabel(qpo: QubitPauliOperator, node_map: Dict[Node, Node]):
+def qpo_node_relabel(
+    qpo: QubitPauliOperator,
+    node_map: Dict[Union[UnitID, Qubit, Node], Union[UnitID, Qubit, Node]]
+):
     """Relabel the nodes of qpo according to node_map
 
     :param qpo: Original qubit pauli operator
@@ -880,7 +885,9 @@ def qpo_node_relabel(qpo: QubitPauliOperator, node_map: Dict[Node, Node]):
         new_qps_dict = {}
         for q in orig_qps_dict:
             new_qps_dict[node_map[q]] = orig_qps_dict[q]
-        new_qps = QubitPauliString(new_qps_dict)
+        # This is questionable typing, and when the type hints in
+        # tket are updated it should be changed.
+        new_qps = QubitPauliString(cast(Dict[Qubit, Pauli], new_qps_dict))
         new_qpo_dict[new_qps] = orig_qpo_dict[orig_qps]
 
     return QubitPauliOperator(new_qpo_dict)
@@ -901,7 +908,7 @@ def gen_initial_compilation_task(
 
     def task(
         obj, wire: List[ObservableExperiment]
-    ) -> Tuple[List[ObservableExperiment], List[Dict[Node, Node]]]:
+    ) -> Tuple[List[ObservableExperiment], List[Dict[UnitID, UnitID]]]:
         """Performs initial compilation before folding. This is to ensure minimal compilation
         after folding, as this could disrupt by how much the noise is increased.
 
@@ -986,7 +993,11 @@ def gen_qubit_relabel_task() -> MitTask:
 
         for compilation_map, qpo in zip(compilation_map_list, qpo_list):
             node_map = {value: key for key, value in compilation_map.items()}
-            new_qpo_list.append(qpo_node_relabel(qpo, node_map))
+            # This casting is a little of as the correct fix would be
+            # to use a TypedDict I believe. However as we are relying on some
+            # updates to type hints in pytket this seems like a fine
+            # temporary fix.
+            new_qpo_list.append(qpo_node_relabel(qpo, cast(Dict[Union[UnitID, Qubit, Node], Union[UnitID, Qubit, Node]], node_map)))
 
         return (new_qpo_list,)
 

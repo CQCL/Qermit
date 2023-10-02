@@ -87,8 +87,12 @@ def get_full_transition_tomography_circuits(
         should be processed without compilation.
     :rtype: List[Circuit]
     """
+    # added to appease mypy
+    def to_tuple(correlation_list: List[Node]) -> Tuple[Node, ...]:
+        return tuple(correlation_list)
+
     subsets_matrix_map = OrderedDict.fromkeys(
-        sorted(map(tuple, correlations), key=len, reverse=True)
+        sorted(map(to_tuple, correlations), key=len, reverse=True)
     )
     # ordered from largest to smallest via OrderedDict & sorted
     subset_dimensions = [len(subset) for subset in subsets_matrix_map]
@@ -158,7 +162,7 @@ def get_full_transition_tomography_circuits(
         # add process circuit to measure
         state_circuit.add_circbox(pbox, cast(List[UnitID], state_circuit.qubits))
         DecomposeBoxes().apply(state_circuit)
-        state_circuit.add_barrier(all_qubits)
+        state_circuit.add_barrier(cast(List[UnitID], all_qubits))
         for q in measures:
             state_circuit.Measure(q, measures[q])
         # add to returned types
@@ -171,7 +175,7 @@ def get_full_transition_tomography_circuits(
 def calculate_correlation_matrices(
     results_list: List[BackendResult],
     states_info: List[StateInfo],
-    correlations: List[List[Qubit]],
+    correlations: List[List[Node]],
 ) -> FullCorrelatedNoiseCharacterisation:
     """Calculate the calibration matrices corresponding to some pure noise from the results of running calibration
     circuits.
@@ -183,14 +187,18 @@ def calculate_correlation_matrices(
         representation and the qubit_to_bit_map for the corresponding state circuit.
     :type states_info: List[StateInfo]
     :param correlations: List of dict corresponding to each prepared basis state
-    :type correlations: List[List[Qubit]]
+    :type correlations: List[List[Node]]
 
     :return: Characterisation for pure noise given by process circuit
     :rtype: FullCorrelatedNoiseCharacterisation
     """
 
+    # added to appease mypy
+    def to_tuple(correlation_list: List[Node]) -> Tuple[Node, ...]:
+        return tuple(correlation_list)
+
     subsets_matrix_map = OrderedDict.fromkeys(
-        sorted(map(tuple, correlations), key=len, reverse=True)
+        sorted(map(to_tuple, correlations), key=len, reverse=True)
     )
     # ordered from largest to smallest via OrderedDict & sorted
     subset_dimensions = [len(subset) for subset in subsets_matrix_map]
