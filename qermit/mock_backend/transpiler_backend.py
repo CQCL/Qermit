@@ -1,6 +1,5 @@
 from pytket.extensions.qiskit import AerBackend
 from collections import Counter
-from tqdm import tqdm  # type: ignore
 from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 import uuid
@@ -75,12 +74,7 @@ class TranspilerBackend:
                     for _ in range(n_shots % self.max_batch_size)
                 ]
 
-        for circuit_list in tqdm(
-            gen_batches(circuit, n_shots),
-            desc='Simulating shot batches',
-            total=n_shots // self.max_batch_size +
-                min(1, n_shots % self.max_batch_size)
-        ):
+        for circuit_list in gen_batches(circuit, n_shots):
             result_list = self.backend.run_circuits(circuit_list, n_shots=1)
             counter += sum((result.get_counts(cbits=cbits)
                            for result in result_list), Counter())
