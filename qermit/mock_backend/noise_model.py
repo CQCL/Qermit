@@ -184,7 +184,7 @@ class ErrorDistribution:
     @classmethod
     def from_stabiliser_counter(cls, stabiliser_counter, **kwargs):
 
-        total = kwargs.get('total', stabiliser_counter.total())
+        total = kwargs.get('total', sum(stabiliser_counter.values()))
         
         error_distribution_dict = {}
         for stab, count in dict(stabiliser_counter).items():

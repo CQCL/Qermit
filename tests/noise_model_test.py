@@ -108,7 +108,7 @@ def test_transpiler_backend():
     handle = backend.process_circuit(circuit=circuit, n_shots=n_shots)
     result = backend.get_result(handle)
 
-    assert result.get_counts().total() == n_shots
+    assert sum(result.get_counts().values()) == n_shots
 
 
 def test_pauli_error_transpile():
