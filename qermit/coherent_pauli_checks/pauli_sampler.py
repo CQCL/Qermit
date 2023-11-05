@@ -42,7 +42,7 @@ class RandomPauliSampler(PauliSampler):
         self,
         # qubit_list,
         circ,
-        n_checks=1,
+        n_checks=2,
         **kwargs
     ):
 
@@ -70,7 +70,7 @@ class RandomPauliSampler(PauliSampler):
                     )
                 )
 
-        print("stabiliser_list", *stabiliser_list)
+        # print("stabiliser_list", *stabiliser_list)
 
         return stabiliser_list
 
@@ -132,7 +132,7 @@ class OptimalPauliSampler(PauliSampler):
             for error, prob in error_counter.distribution.items():
                 if all(error.commutes_with(qubit_pauli_string) for qubit_pauli_string in qubit_pauli_string_list):
                     commute_prob += prob
-            print(qubit_pauli_string_list, commute_prob)
+            # print(qubit_pauli_string_list, commute_prob)
             if smallest_commute_prob >= commute_prob:
                 smallest_commute_prob = commute_prob
                 smallest_commute_prob_pauli_list = qubit_pauli_string_list
@@ -144,8 +144,8 @@ class OptimalPauliSampler(PauliSampler):
         print("smallest_commute_prob_pauli_list", smallest_commute_prob_pauli_list)
         print("smallest_commute_prob", smallest_commute_prob)
         print("average commute_prob", average_commute_prob)
-
-        if abs(1-(smallest_commute_prob/average_commute_prob)) < 0.1:
+ 
+        if (average_commute_prob == 0) or (abs(1-(smallest_commute_prob/average_commute_prob)) < 0.1):
             warnings.warn(
                 'The smallest commute probability is close to the average. '
                 + 'Random check sampling will probably work just as well.'
