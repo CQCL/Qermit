@@ -1,5 +1,5 @@
 from pytket import OpType
-from quantinuum_benchmarking.direct_fidelity_estimation import Stabiliser
+from .stabiliser import Stabiliser
 from collections import Counter
 from tqdm import tqdm  # type: ignore
 

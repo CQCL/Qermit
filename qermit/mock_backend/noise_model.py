@@ -1,6 +1,6 @@
 from __future__ import annotations
 import numpy as np
-from quantinuum_benchmarking.direct_fidelity_estimation import Stabiliser
+from .stabiliser import Stabiliser
 # from collections import Counter
 import math
 from pytket.circuit import OpType  # type: ignore
