@@ -200,17 +200,27 @@ class ErrorDistribution:
 
         def string_to_pauli(pauli_string):
             qubit = Qubit(name=pauli_string[0][0], index=pauli_string[0][1][0])
-            match pauli_string[1]:
-                case 'I':
-                    pauli = Pauli.I
-                case 'X':
-                    pauli = Pauli.X
-                case 'Y':
-                    pauli = Pauli.Y
-                case 'Z':
-                    pauli = Pauli.Z
-                case _:
-                    raise Exception("How did you get here?")
+            if pauli_string[1] == 'I':
+                pauli = Pauli.I
+            elif pauli_string[1] == 'X':
+                pauli = Pauli.X
+            elif pauli_string[1] == 'Y':
+                pauli = Pauli.Y
+            elif pauli_string[1] == 'Z':
+                pauli = Pauli.Z
+            else:
+                raise Exception("How did you get here?")
+            # match pauli_string[1]:
+            #     case 'I':
+            #         pauli = Pauli.I
+            #     case 'X':
+            #         pauli = Pauli.X
+            #     case 'Y':
+            #         pauli = Pauli.Y
+            #     case 'Z':
+            #         pauli = Pauli.Z
+            #     case _:
+            #         raise Exception("How did you get here?")
             return qubit, pauli
 
         def reduce_pauli_error(pauli_error):
