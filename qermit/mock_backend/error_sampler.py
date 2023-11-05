@@ -1,7 +1,6 @@
 from pytket import OpType
 from .stabiliser import Stabiliser
 from collections import Counter
-from tqdm import tqdm  # type: ignore
 
 # TODO: there should of course be checks all over the place to see
 # if the circuits used are Clifford
@@ -18,7 +17,7 @@ class ErrorSampler:
         # There is some time wasted here, if for example there is no error in
         # back_propagate_random_error. There may be a saving to be made here
         # if there errors are sampled before the back propagation occurs?
-        for _ in tqdm(range(n_counts), desc='Sampling errors'):
+        for _ in range(n_counts):
             stabiliser = self.random_propagate(cliff_circ, **kwargs)
 
             if not stabiliser.is_identity():
