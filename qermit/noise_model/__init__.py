@@ -14,8 +14,8 @@
 
 
 """
-The noise_model module provides an assortment of
-noisy simulators, for local testing.
+The noise_model module provides an assortment of noise modeling an simulation
+tools for local testing.
 """
 
 from .mock_quantinuum_backend import MockQuantinuumBackend  # noqa:F401

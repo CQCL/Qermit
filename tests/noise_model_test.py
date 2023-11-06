@@ -5,7 +5,7 @@ from qermit.noise_model import (
     TranspilerBackend,
     NoiseModel,
     ErrorDistribution,
-    ErrorSampler,
+    # ErrorSampler,
     Stabiliser,
 )
 from collections import Counter
@@ -228,9 +228,9 @@ def test_back_propagate_random_error():
     )
     noise_model = NoiseModel({OpType.CZ: error_distribution})
 
-    error_sampler = ErrorSampler(noise_model=noise_model)
+    # error_sampler = ErrorSampler(noise_model=noise_model)
 
-    stabiliser = error_sampler.random_propagate(cliff_circ)
+    stabiliser = noise_model.random_propagate(cliff_circ)
 
     assert stabiliser.Z_list == {qubit_list[0]: 0, qubit_list[1]: 1}
     assert stabiliser.X_list == {qubit_list[0]: 0, qubit_list[1]: 0}
