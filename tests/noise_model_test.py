@@ -5,16 +5,132 @@ from qermit.noise_model import (
     TranspilerBackend,
     NoiseModel,
     ErrorDistribution,
-    # ErrorSampler,
     Stabiliser,
+    LogicalErrorDistribution,
 )
 from collections import Counter
 from pytket.circuit import Qubit
 from pytket.pauli import QubitPauliString, Pauli
-import pytest
 import json
 import numpy as np
 from copy import deepcopy
+import pytest
+
+
+def test_noise_model_logical_error_propagation():
+
+    pytket_ciruit = Circuit(2).H(0).CX(0,1).measure_all()
+
+    error_distribution_dict = {
+        (Pauli.X, Pauli.I): 0.1,
+    }
+    error_distribution = ErrorDistribution(
+        distribution=error_distribution_dict,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    noise_model = NoiseModel({OpType.CX: error_distribution})
+    logical_distribution = noise_model.get_effective_pre_error_distribution(pytket_ciruit, n_rand=10000)
+
+    ideal_error = QubitPauliString(
+        map={
+            Qubit(0): Pauli.Z,
+            Qubit(1): Pauli.X
+        }
+    )
+    assert list(logical_distribution.distribution.keys()) == [ideal_error]
+    assert abs(logical_distribution.distribution[ideal_error] - 0.1) <= 0.01
+
+    logical_distribution = noise_model.counter_propagate(
+        pytket_ciruit, n_counts=10000, direction='forward'
+    )
+    ideal_error = Stabiliser.from_qubit_pauli_string(
+        QubitPauliString(
+            map={
+                Qubit(0): Pauli.X,
+                Qubit(1): Pauli.I
+            }
+        )
+    )
+    assert list(logical_distribution.keys()) == [ideal_error]
+    assert abs(logical_distribution[ideal_error] - 1000) <= 1
+
+
+def test_error_distribution_utilities(tmp_path_factory):
+
+    # Test that the probabilities must be less than 1.
+    error_distribution_dict = {(Pauli.X, Pauli.I): 1.1}
+    with pytest.raises(Exception):
+        error_distribution = ErrorDistribution(
+            distribution=error_distribution_dict,
+            rng=np.random.default_rng(seed=0),
+        )
+
+    # Test that averaging works as expected.
+    error_distribution_dict = {
+        (Pauli.X, Pauli.I): 0.1,
+        (Pauli.I, Pauli.Z): 0.1,
+    }
+    error_distribution_one = ErrorDistribution(
+        distribution=error_distribution_dict,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    error_distribution_dict = {
+        (Pauli.X, Pauli.I): 0.1,
+        (Pauli.Z, Pauli.I): 0.1,
+    }
+    error_distribution_two = ErrorDistribution(
+        distribution=error_distribution_dict,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    error_distribution = ErrorDistribution.average([error_distribution_one, error_distribution_two])
+
+    # Test that equality spots differences
+    assert error_distribution != ErrorDistribution(
+        distribution={
+            (Pauli.X, Pauli.I): 0.1,
+            (Pauli.Z, Pauli.I): 0.05,
+        }
+    )
+
+    assert error_distribution != ErrorDistribution(
+        distribution={
+            (Pauli.X, Pauli.I): 0.1,
+            (Pauli.Z, Pauli.I): 0.05,
+            (Pauli.I, Pauli.Y): 0.05,
+        }
+    )
+
+    assert error_distribution != ErrorDistribution(
+        distribution={
+            (Pauli.X, Pauli.I): 0.05,
+            (Pauli.Z, Pauli.I): 0.05,
+            (Pauli.I, Pauli.Z): 0.05,
+        }
+    )
+
+    assert error_distribution == ErrorDistribution(
+        distribution={
+            (Pauli.X, Pauli.I): 0.1,
+            (Pauli.Z, Pauli.I): 0.05,
+            (Pauli.I, Pauli.Z): 0.05,
+        }
+    )
+
+    error_distribution.order(reverse=False)
+    assert list(error_distribution.distribution)[-1] == (Pauli.X, Pauli.I)
+
+    # Test that distribution can be saved a loaded
+    dist_path = tmp_path_factory.mktemp("distribution") / "dist.json"
+    with dist_path.open(mode='w') as fp:
+        json.dump(error_distribution.to_dict(), fp)
+
+    with dist_path.open(mode='r') as fp:
+        error_distribution_loaded = ErrorDistribution.from_dict(json.load(fp))
+
+    assert error_distribution_loaded == error_distribution
 
 
 def test_error_distribution_post_select():
@@ -29,8 +145,12 @@ def test_error_distribution_post_select():
             name='ancilla', index=1), Qubit(name='compute', index=0)],
         paulis=[Pauli.I, Pauli.Z, Pauli.Y]
     )
-    distribution = {qps_remove: 0.5, qps_keep: 0.5}
-    error_distribution = ErrorDistribution(distribution=distribution)
+    stabiliser_counter = Counter(
+        {
+            Stabiliser.from_qubit_pauli_string(qps_remove): 50,
+            Stabiliser.from_qubit_pauli_string(qps_keep): 50}
+    )
+    error_distribution = LogicalErrorDistribution(stabiliser_counter=stabiliser_counter)
     post_selected = error_distribution.post_select(
         qubit_list=[Qubit(name='ancilla', index=0),
                     Qubit(name='ancilla', index=1)]

@@ -1,24 +1,18 @@
 from __future__ import annotations
 import numpy as np
 from .stabiliser import Stabiliser
-# from collections import Counter
+from collections import Counter
 import math
 from pytket.circuit import OpType  # type: ignore
 from matplotlib.pyplot import subplots  # type: ignore
-# from pytket.pauli import Pauli  # type: ignore
-# from tqdm import tqdm  # type: ignore
-# from .pauli_error_transpile import PauliErrorTranspile
 from typing import Dict, Tuple, List
 from pytket.pauli import Pauli
-# from .error_sampler import ErrorSampler
 from pytket import Qubit
 from pytket.pauli import QubitPauliString
-from collections import Counter
 
 
 # TODO: For now we should make this explicitly a Pauli error distribution,
 # and conduct the appropriate checks.
-# TODO: Think about if we insist that the user specifies the identity 'error'
 class ErrorDistribution:
 
     def __init__(
@@ -31,7 +25,7 @@ class ErrorDistribution:
             if not math.isclose(sum(distribution.values()), 1):
                 raise Exception(
                     f"Probabilities sum to {sum(distribution.values())}"
-                    + " but should be less than 1."
+                    + " but should be less than or equal to 1."
                 )
 
         self.distribution = distribution
@@ -56,13 +50,6 @@ class ErrorDistribution:
                 distribution.distribution.get(error, 0)
                 for distribution in distribution_list
             ) / len(distribution_list)
-
-        # total = sum(
-        #     sum(distribution.distribution.values())
-        #     for distribution in distribution_list
-        # )
-        # for error in merged_distribution:
-        #     merged_distribution[error] = merged_distribution[error] / total
 
         return cls(distribution=merged_distribution)
 
@@ -89,11 +76,11 @@ class ErrorDistribution:
             return False
         return True
 
-    def order(self):
+    def order(self, reverse=True):
         self.distribution = {
             error: probability
             for error, probability
-            in sorted(self.distribution.items(), key=lambda x: x[1], reverse=True)
+            in sorted(self.distribution.items(), key=lambda x: x[1], reverse=reverse)
         }
 
     def __str__(self):
@@ -105,52 +92,24 @@ class ErrorDistribution:
         self.rng = rng
 
     def to_dict(self):
-        if all(
-            isinstance(error, QubitPauliString)
-            for error in self.distribution.keys()
-        ):
-            return [
-                {
-                    "op_list": op_list.to_list(),
-                    "noise_level": noise_level,
-                    "error_type": "QubitPauliString"
-                }
-                for op_list, noise_level in self.distribution.items()
-            ]
-        else:
-            return [
-                {
-                    "op_list": [op.value for op in op_list],
-                    "noise_level": noise_level,
-                    "error_type":"Tuple[Pauli]"
-                }
-                for op_list, noise_level in self.distribution.items()
-            ]
+        return [
+            {
+                "op_list": [op.value for op in op_list],
+                "noise_level": noise_level,
+            }
+            for op_list, noise_level in self.distribution.items()
+        ]
 
     @classmethod
     def from_dict(cls, distribution_dict: Dict) -> ErrorDistribution:
 
         distribution = {}
         for noise_op in distribution_dict:
-            if noise_op["error_type"] == "QubitPauliString":
-                distribution[QubitPauliString.from_list(
-                    noise_op["op_list"])] = noise_op['noise_level']
-            else:
-                distribution[
-                    tuple(Pauli(op) for op in noise_op['op_list'])
-                ] = noise_op['noise_level']
+            distribution[
+                tuple(Pauli(op) for op in noise_op['op_list'])
+            ] = noise_op['noise_level']
 
         return cls(distribution=distribution)
-
-        # return cls(
-        #     distribution={
-        #         tuple(
-        #             Pauli(op)
-        #             for op in noise_op['op_list']
-        #         ): noise_op['noise_level']
-        #         for noise_op in distribution_dict
-        #     }
-        # )
 
     def sample(self):
 
@@ -171,7 +130,6 @@ class ErrorDistribution:
         to_plot = {
             key: value
             for key, value in self.distribution.items()
-            # if key != (Pauli.I, Pauli.I)
         }
 
         ax.bar(range(len(to_plot)), list(to_plot.values()), align='center')
@@ -183,8 +141,24 @@ class ErrorDistribution:
 
         return fig
 
-    @classmethod
-    def from_stabiliser_counter(cls, stabiliser_counter, **kwargs):
+    # @classmethod
+    # def from_stabiliser_counter(cls, stabiliser_counter, **kwargs):
+
+    #     total = kwargs.get('total', sum(stabiliser_counter.values()))
+
+    #     error_distribution_dict = {}
+    #     for stab, count in dict(stabiliser_counter).items():
+    #         # Note that I am ignoring the phase here
+    #         pauli_string, _ = stab.qubit_pauli_string
+    #         error_distribution_dict[
+    #             pauli_string
+    #         ] = error_distribution_dict.get(pauli_string, 0) + count / total
+
+    #     return cls(error_distribution_dict)
+
+class LogicalErrorDistribution:
+
+    def __init__(self, stabiliser_counter, **kwargs):
 
         total = kwargs.get('total', sum(stabiliser_counter.values()))
 
@@ -195,8 +169,7 @@ class ErrorDistribution:
             error_distribution_dict[
                 pauli_string
             ] = error_distribution_dict.get(pauli_string, 0) + count / total
-
-        return cls(error_distribution_dict)
+        self.distribution = error_distribution_dict
 
     def post_select(self, qubit_list):
 
@@ -212,17 +185,7 @@ class ErrorDistribution:
                 pauli = Pauli.Z
             else:
                 raise Exception("How did you get here?")
-            # match pauli_string[1]:
-            #     case 'I':
-            #         pauli = Pauli.I
-            #     case 'X':
-            #         pauli = Pauli.X
-            #     case 'Y':
-            #         pauli = Pauli.Y
-            #     case 'Z':
-            #         pauli = Pauli.Z
-            #     case _:
-            #         raise Exception("How did you get here?")
+
             return qubit, pauli
 
         def reduce_pauli_error(pauli_error):
@@ -250,8 +213,6 @@ class NoiseModel:
     def __init__(self, noise_model: Dict[OpType, ErrorDistribution]):
 
         self.noise_model = noise_model
-        # self.transpiiler = PauliErrorTranspile(self)
-        # self.error_sampler = ErrorSampler(self)
 
     def reset_seed(self, rng):
         for distribution in self.noise_model.values():
@@ -312,25 +273,7 @@ class NoiseModel:
         cliff_circ,
         n_rand=1000,
         **kwargs,
-    ) -> ErrorDistribution:
-
-        print("n_rand", n_rand)
-
-        # error_counter = Counter()
-        # is_identity_count = 0
-
-        # # There is some time wasted here, if for example there is no error in
-        # # back_propagate_random_error. There may be a saving to be made here
-        # # if there errors are sampled before the back propagation occurs?
-        # for _ in tqdm(range(n_rand), desc='Sampling effective error channel'):
-        #     # stabiliser = self.back_propagate_random_error(cliff_circ)
-        #     stabiliser = self.error_sampler.random_back_propagate(cliff_circ)
-
-        #     if stabiliser.is_identity():
-        #         is_identity_count+=1
-        #         continue
-
-        #     error_counter.update([stabiliser])
+    ) -> LogicalErrorDistribution:
 
         error_counter = self.counter_propagate(
             cliff_circ=cliff_circ,
@@ -338,23 +281,7 @@ class NoiseModel:
             direction='backward',
         )
 
-        # error_distribution_dict = {}
-        # for stab, count in dict(error_counter).items():
-        #     # Note that I am ignoring the phase here which is safe
-        #     pauli_string, _ = stab.qubit_pauli_string
-        #     error_distribution_dict[
-        #         pauli_string
-        #     ] = error_distribution_dict.get(pauli_string, 0) + count/n_rand
-
-        # error_distribution = ErrorDistribution(error_distribution_dict)
-
-        error_distribution = ErrorDistribution.from_stabiliser_counter(
-            error_counter, total=n_rand)
-
-        # print("error_distribution \n", error_distribution)
-        # print("is_identity_count", is_identity_count)
-
-        return error_distribution
+        return LogicalErrorDistribution(error_counter, total=n_rand)
 
     def counter_propagate(self, cliff_circ, n_counts=1000, **kwargs):
 
