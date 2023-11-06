@@ -19,7 +19,7 @@ import pytest
 
 def test_noise_model_logical_error_propagation():
 
-    pytket_ciruit = Circuit(2).H(0).CX(0,1).measure_all()
+    pytket_ciruit = Circuit(2).H(0).CX(0, 1).measure_all()
 
     error_distribution_dict = {
         (Pauli.X, Pauli.I): 0.1,

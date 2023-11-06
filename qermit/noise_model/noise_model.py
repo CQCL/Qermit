@@ -141,20 +141,6 @@ class ErrorDistribution:
 
         return fig
 
-    # @classmethod
-    # def from_stabiliser_counter(cls, stabiliser_counter, **kwargs):
-
-    #     total = kwargs.get('total', sum(stabiliser_counter.values()))
-
-    #     error_distribution_dict = {}
-    #     for stab, count in dict(stabiliser_counter).items():
-    #         # Note that I am ignoring the phase here
-    #         pauli_string, _ = stab.qubit_pauli_string
-    #         error_distribution_dict[
-    #             pauli_string
-    #         ] = error_distribution_dict.get(pauli_string, 0) + count / total
-
-    #     return cls(error_distribution_dict)
 
 class LogicalErrorDistribution:
 

@@ -36,6 +36,7 @@ from numpy.polynomial.polynomial import Polynomial  # type: ignore
 from pytket.circuit import Node  # type: ignore
 from math import isclose
 from pytket.pauli import Pauli
+from sympy import Expr
 
 
 box_types = {
@@ -879,7 +880,7 @@ def qpo_node_relabel(
     """
 
     orig_qpo_dict = qpo._dict.copy()
-    new_qpo_dict = {}
+    new_qpo_dict: Dict[QubitPauliString, Union[int, float, complex, Expr]] = {}
     for orig_qps in orig_qpo_dict:
         orig_qps_dict = orig_qps.map
         new_qps_dict = {}
