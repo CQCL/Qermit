@@ -43,7 +43,7 @@ from pytket.circuit import OpType  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
 from pytket.circuit import Node  # type: ignore
-from qermit.mock_backend import MockQuantinuumBackend  # type: ignore
+from qermit.noise_model import MockQuantinuumBackend  # type: ignore
 from qermit.taskgraph import gen_MeasurementReduction_MitEx
 
 n_qubits = 2

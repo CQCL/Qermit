@@ -4,6 +4,8 @@ from collections import Counter
 
 # TODO: there should of course be checks all over the place to see
 # if the circuits used are Clifford
+
+
 class ErrorSampler:
 
     def __init__(self, noise_model):
@@ -27,7 +29,7 @@ class ErrorSampler:
 
         return error_counter
 
-    def random_propagate(self, cliff_circ, direction='backward'):            
+    def random_propagate(self, cliff_circ, direction='backward'):
 
         qubit_list = cliff_circ.qubits
         stabiliser = Stabiliser(
@@ -41,7 +43,8 @@ class ErrorSampler:
         elif direction == 'forward':
             command_list = cliff_circ.get_commands()
         else:
-            raise Exception(f"direction must be 'backward' or 'forward'. Is {direction}")
+            raise Exception(
+                f"direction must be 'backward' or 'forward'. Is {direction}")
 
         for command in command_list:
 
@@ -63,15 +66,16 @@ class ErrorSampler:
                 )
                 error = error_distribution.sample()
 
-                if error != None:
+                if error is not None:
                     for pauli, qubit in zip(error, command.args):
                         if direction == 'backward':
-                            stabiliser.pre_apply_pauli(pauli=pauli, qubit=qubit)
+                            stabiliser.pre_apply_pauli(
+                                pauli=pauli, qubit=qubit)
                         elif direction == 'forward':
-                            stabiliser.post_apply_pauli(pauli=pauli, qubit=qubit)
+                            stabiliser.post_apply_pauli(
+                                pauli=pauli, qubit=qubit)
                         else:
                             raise Exception("How did you get here?")
-                        
 
             if direction == 'backward':
 

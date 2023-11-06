@@ -4,7 +4,7 @@ import math
 import numpy as np
 from numpy.random import Generator
 from typing import List
-from pytket import Qubit
+# from pytket import Qubit
 
 
 class Stabiliser:
@@ -15,10 +15,10 @@ class Stabiliser:
     """
 
     phase_dict = {
-        0: 1+0j,
-        1: 0+1j,
-        2: -1+0j,
-        3: 0-1j,
+        0: 1 + 0j,
+        1: 0 + 1j,
+        2: -1 + 0j,
+        3: 0 - 1j,
     }
 
     def __init__(
@@ -45,9 +45,10 @@ class Stabiliser:
         self.phase = phase
         self.qubit_list = qubit_list
 
-    def is_measureable(self, qubit_list:List[Qubit]):
+    def is_measureable(self, qubit_list: List[Qubit]):
         if not all(qubit in self.qubit_list for qubit in qubit_list):
-            raise Exception(f"{qubit_list} is not a subset of {self.qubit_list}.")
+            raise Exception(
+                f"{qubit_list} is not a subset of {self.qubit_list}.")
         return any(self.X_list[qubit] == 1 for qubit in qubit_list)
 
     # def contains(self, sub_stabiliser):
@@ -88,12 +89,12 @@ class Stabiliser:
 
         # the phase is the conjugate of the original
         phase = self.phase
-        phase += 2*(self.phase % 2)
+        phase += 2 * (self.phase % 2)
 
         Z_list = list(self.Z_list.values())
         X_list = list(self.X_list.values())
         for Z, X in zip(Z_list, X_list):
-            phase += 2*Z*X
+            phase += 2 * Z * X
         phase %= 4
 
         return Stabiliser(
@@ -250,15 +251,15 @@ class Stabiliser:
                 self.apply_gate(OpType.Rz, qubits=qubits, params=[params[1]])
             else:
                 raise Exception(
-                    f"{params} are not clifford angles for " +
-                    "PhasedX."
+                    f"{params} are not clifford angles for "
+                    + "PhasedX."
                 )
         elif op_type == OpType.Rz:
             params = kwargs.get("params", None)
             angle = params[0]
             if math.isclose(angle % 0.5, 0) or math.isclose(angle % 0.5, 0.5):
                 angle = round(angle, 1)
-                for _ in range(int((angle % 2)//0.5)):
+                for _ in range(int((angle % 2) // 0.5)):
                     self.S(qubit=qubits[0])
             else:
                 raise Exception(
@@ -270,7 +271,7 @@ class Stabiliser:
             if math.isclose(angle % 0.5, 0) or math.isclose(angle % 0.5, 0.5):
                 angle = round(angle, 1)
                 self.H(qubit=qubits[0])
-                for _ in range(int((angle % 2)//0.5)):
+                for _ in range(int((angle % 2) // 0.5)):
                     self.S(qubit=qubits[0])
                 self.H(qubit=qubits[0])
             else:
@@ -286,7 +287,7 @@ class Stabiliser:
             angle = params[0]
             if math.isclose(angle % 0.5, 0) or math.isclose(angle % 0.5, 0.5):
                 angle = round(angle, 1)
-                for _ in range(int((angle % 2)//0.5)):
+                for _ in range(int((angle % 2) // 0.5)):
                     self.apply_gate(op_type=OpType.ZZMax, qubits=qubits)
             else:
                 raise Exception(
@@ -296,8 +297,8 @@ class Stabiliser:
             pass
         else:
             raise Exception(
-                f"{op_type} is an unrecognised gate type. " +
-                "Please use only Clifford gates."
+                f"{op_type} is an unrecognised gate type. "
+                + "Please use only Clifford gates."
             )
 
     def S(self, qubit: Qubit):
@@ -323,7 +324,7 @@ class Stabiliser:
         :type qubit: Qubit
         """
 
-        self.phase += 2*self.X_list[qubit]*self.Z_list[qubit]
+        self.phase += 2 * self.X_list[qubit] * self.Z_list[qubit]
         self.phase %= 4
 
         temp_X = self.X_list[qubit]
@@ -466,7 +467,7 @@ class Stabiliser:
                 circ.Z(qubit)
             if self.X_list[qubit] == 1:
                 circ.X(qubit)
-        circ.add_phase(a=self.phase/2)
+        circ.add_phase(a=self.phase / 2)
 
         return circ
 

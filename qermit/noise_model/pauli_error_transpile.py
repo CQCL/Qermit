@@ -24,7 +24,7 @@ def PauliErrorTranspile(noise_model):
                 error = noise_model.get_error_distribution(
                     command.op.type
                 ).sample()
-                if error != None:
+                if error is not None:
                     for qubit, pauli in zip(
                         command.args,
                         error
@@ -39,7 +39,7 @@ def PauliErrorTranspile(noise_model):
                             pass
                         else:
                             raise Exception(
-                                f"Not a Pauli noise model."
+                                "Not a Pauli noise model."
                                 + f" Contains {pauli} error"
                             )
 
