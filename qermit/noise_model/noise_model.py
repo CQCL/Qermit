@@ -5,21 +5,41 @@ from collections import Counter
 import math
 from pytket.circuit import OpType  # type: ignore
 from matplotlib.pyplot import subplots  # type: ignore
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Union, cast
 from pytket.pauli import Pauli
 from pytket import Qubit
 from pytket.pauli import QubitPauliString
+from numpy.random import Generator
 
 
-# TODO: For now we should make this explicitly a Pauli error distribution,
-# and conduct the appropriate checks.
 class ErrorDistribution:
+    """
+    Model of a Pauli error channel. Contains utilities to analyse and
+    sample from distributions of errors.
+
+    Attributes:
+        distribution: Dictionary mapping a string of Pauli errors
+            to the probability that they occur.
+        rng: Randomness generator.
+    """
+
+    distribution: Dict[Tuple[Pauli, ...], float]
+    rng: Generator
 
     def __init__(
         self,
         distribution: Dict[Tuple[Pauli, ...], float],
-        rng=np.random.default_rng(),
+        rng: Generator = np.random.default_rng(),
     ):
+        """Initialisation method.
+
+        :param distribution: Dictionary mapping a string of Pauli errors
+            to the probability that they occur.
+        :type distribution: Dict[Tuple[Pauli, ...], float]
+        :param rng: Randomness generator, defaults to np.random.default_rng()
+        :type rng: Generator, optional
+        :raises Exception: Raised if error probabilities sum to greater than 1.
+        """
 
         if sum(distribution.values()) > 1:
             if not math.isclose(sum(distribution.values()), 1):
@@ -31,8 +51,66 @@ class ErrorDistribution:
         self.distribution = distribution
         self.rng = rng
 
+    def __eq__(self, other: object) -> bool:
+        """Check equality of two instances of ErrorDistribution by ensuring
+        that all keys in distribution match, and that the probabilities are
+        close for each value.
+
+        :param other: Instance of ErrorDistribution to be compared against.
+        :type other: object
+        :return: True if two instances are equal, false otherwise.
+        :rtype: bool
+        """
+
+        if not isinstance(other, ErrorDistribution):
+            return False
+
+        # Check all pauli error in this distribution are in the other.
+        if not all(
+            paulis in self.distribution.keys()
+            for paulis in other.distribution.keys()
+        ):
+            return False
+        # Check all pauli errors in the other distribution are in this one.
+        if not all(
+            paulis in other.distribution.keys()
+            for paulis in self.distribution.keys()
+        ):
+            return False
+        # Check all probabilities are close.
+        if not all(
+            math.isclose(
+                self.distribution[error],
+                other.distribution[error],
+                abs_tol=0.01
+            )
+            for error in self.distribution.keys()
+        ):
+            return False
+
+        # Otherwise they are equal.
+        return True
+
+    def __str__(self) -> str:
+        """Generates string representation of error distribution.
+
+        :return: String representation of error distribution.
+        :rtype: str
+        """
+        return ''.join(
+            f"{key}:{value} \n" for key, value in self.distribution.items()
+        )
+
     @classmethod
-    def average(cls, distribution_list: List[ErrorDistribution]):
+    def mixture(cls, distribution_list: List[ErrorDistribution]) -> ErrorDistribution:
+        """Generates the distribution corresponding to the mixture of a
+        list of distributions.
+
+        :param distribution_list: List of instances of ErrorDistribution.
+        :type distribution_list: List[ErrorDistribution]
+        :return: Mixture distribution.
+        :rtype: ErrorDistribution
+        """
 
         merged_distribution = {}
 
@@ -53,45 +131,32 @@ class ErrorDistribution:
 
         return cls(distribution=merged_distribution)
 
-    def __eq__(self, other):
+    def order(self, reverse: bool = True):
+        """Reorders the distribution dictionary based on probabilities.
 
-        if not all(
-            paulis in self.distribution.keys()
-            for paulis in other.distribution.keys()
-        ):
-            return False
-        if not all(
-            paulis in other.distribution.keys()
-            for paulis in self.distribution.keys()
-        ):
-            return False
-        if not all(
-            math.isclose(
-                self.distribution[error],
-                other.distribution[error],
-                abs_tol=0.01
-            )
-            for error in self.distribution.keys()
-        ):
-            return False
-        return True
-
-    def order(self, reverse=True):
+        :param reverse: Order from hight to low, defaults to True
+        :type reverse: bool, optional
+        """
         self.distribution = {
             error: probability
             for error, probability
             in sorted(self.distribution.items(), key=lambda x: x[1], reverse=reverse)
         }
 
-    def __str__(self):
-        return ''.join(
-            f"{key}:{value} \n" for key, value in self.distribution.items()
-        )
+    def reset_seed(self, rng: Generator):
+        """Reset randomness generator.
 
-    def reset_seed(self, rng):
+        :param rng: Randomness generator.
+        :type rng: Generator
+        """
         self.rng = rng
 
-    def to_dict(self):
+    def to_dict(self) -> List[Dict[str, Union[List[int], float]]]:
+        """Produces json serialisable representation of ErrorDistribution.
+
+        :return: Json serialisable representation of ErrorDistribution.
+        :rtype: List[Dict[str, Union[List[int], float]]]
+        """
         return [
             {
                 "op_list": [op.value for op in op_list],
@@ -101,20 +166,39 @@ class ErrorDistribution:
         ]
 
     @classmethod
-    def from_dict(cls, distribution_dict: Dict) -> ErrorDistribution:
+    def from_dict(
+        cls,
+        distribution_dict: List[Dict[str, Union[List[int], float]]]
+    ) -> ErrorDistribution:
+        """Generates ErrorDistribution from json serialisable representation.
+
+        :param distribution_dict: List of dictionaries, each of which map
+            a property of the distribution to its value.
+        :type distribution_dict: List[Dict[str, Union[List[int], float]]]
+        :return: ErrorDistribution created from serialised representation.
+        :rtype: ErrorDistribution
+        """
 
         distribution = {}
         for noise_op in distribution_dict:
             distribution[
-                tuple(Pauli(op) for op in noise_op['op_list'])
-            ] = noise_op['noise_level']
+                tuple(Pauli(op) for op in cast(List[int], noise_op['op_list']))
+            ] = cast(float, noise_op['noise_level'])
 
         return cls(distribution=distribution)
 
-    def sample(self):
+    def sample(self) -> Union[Tuple[Pauli, ...], None]:
+        """Draw sample from distribution.
+
+        :return: Either one of the pauli strings in the support of the
+            distribution, or None. None can be returned if the total proability
+            of the distribution not 1, and should be interpreted as the
+            the unspecified support.
+        :rtype: Union[Tuple[Pauli, ...], None]
+        """
 
         return_val = self.rng.uniform(0, 1)
-        total = 0
+        total = 0.0
         for error, prob in self.distribution.items():
             total += prob
             if total >= return_val:
@@ -123,10 +207,12 @@ class ErrorDistribution:
         return None
 
     def plot(self):
+        """
+        Generates plot of distribution.
+        """
 
         fig, ax = subplots()
 
-        # TODO: There should be a neater way of doing this
         to_plot = {
             key: value
             for key, value in self.distribution.items()

@@ -22,5 +22,4 @@ from .mock_quantinuum_backend import MockQuantinuumBackend  # noqa:F401
 from .noise_model import ErrorDistribution, NoiseModel, LogicalErrorDistribution  # noqa:F401
 from .pauli_error_transpile import PauliErrorTranspile  # noqa:F401
 from .transpiler_backend import TranspilerBackend  # noqa:F401
-# from .error_sampler import ErrorSampler  # noqa:F401
 from .stabiliser import Stabiliser  # noqa:F401

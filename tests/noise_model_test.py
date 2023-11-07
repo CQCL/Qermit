@@ -85,7 +85,7 @@ def test_error_distribution_utilities(tmp_path_factory):
         rng=np.random.default_rng(seed=0),
     )
 
-    error_distribution = ErrorDistribution.average([error_distribution_one, error_distribution_two])
+    error_distribution = ErrorDistribution.mixture([error_distribution_one, error_distribution_two])
 
     # Test that equality spots differences
     assert error_distribution != ErrorDistribution(
