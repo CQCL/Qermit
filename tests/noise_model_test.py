@@ -368,7 +368,6 @@ def test_effective_error_distribution():
     error_distribution_dict = {}
     error_distribution_dict[(Pauli.X, Pauli.I)] = error_rate
     error_distribution_dict[(Pauli.I, Pauli.X)] = error_rate
-    error_distribution_dict[(Pauli.I, Pauli.I)] = 1 - 2 * error_rate
 
     error_distribution = ErrorDistribution(
         error_distribution_dict,
@@ -377,18 +376,12 @@ def test_effective_error_distribution():
     noise_model = NoiseModel({OpType.CZ: error_distribution})
 
     error_distribution = noise_model.get_effective_pre_error_distribution(
-        cliff_circ, n_rand=100000)
-    ideal_error_distribution = ErrorDistribution(
-        distribution={
-            QubitPauliString(qubits=qubits, paulis=[Pauli.I, Pauli.Z]): 0.25,
-            QubitPauliString(qubits=qubits, paulis=[Pauli.X, Pauli.Y]): 0.25,
-            QubitPauliString(qubits=qubits, paulis=[Pauli.Y, Pauli.X]): 0.25,
-            QubitPauliString(qubits=qubits, paulis=[Pauli.Z, Pauli.I]): 0.25,
-        }
+        cliff_circ, n_rand=10000
     )
-    assert error_distribution == ideal_error_distribution
 
-    # I've checked this second half
+    assert all(
+        abs(count - 2500) < 100 for count in error_distribution.stabiliser_counter.values()
+    )
 
     cliff_circ = Circuit()
     cliff_circ.add_q_register(name='my_reg', size=3)
@@ -406,25 +399,34 @@ def test_effective_error_distribution():
     noise_model = NoiseModel({OpType.CZ: error_distribution})
 
     effective_error_dist = noise_model.get_effective_pre_error_distribution(
-        cliff_circ, n_rand=100000
+        cliff_circ, n_rand=10000
     )
-    ideal_error_distribution = ErrorDistribution(
-        distribution={
-            QubitPauliString(
-                qubits=qubits, paulis=[Pauli.Y, Pauli.Y, Pauli.Z]
-            ): 0.09,
-            QubitPauliString(
-                qubits=qubits, paulis=[Pauli.Z, Pauli.Y, Pauli.X]
-            ): 0.49,
-            QubitPauliString(
-                qubits=qubits, paulis=[Pauli.X, Pauli.I, Pauli.X]
-            ): 0.21,
-            QubitPauliString(
-                qubits=qubits, paulis=[Pauli.I, Pauli.I, Pauli.Z]
-            ): 0.21,
-        }
+    print(effective_error_dist.stabiliser_counter)
+    for stabiliser in effective_error_dist.stabiliser_counter.keys():
+        print(stabiliser)
+    assert abs(effective_error_dist.stabiliser_counter[
+        Stabiliser.from_qubit_pauli_string(
+            QubitPauliString(qubits=qubits, paulis=[Pauli.X, Pauli.I, Pauli.X])
+        )
+    ] - 2100) < 100
+
+    assert abs(effective_error_dist.stabiliser_counter[
+        Stabiliser.from_qubit_pauli_string(
+            QubitPauliString(qubits=qubits, paulis=[Pauli.Y, Pauli.Y, Pauli.Z])
+        )
+    ] - 900) < 100
+
+    assert abs(effective_error_dist.stabiliser_counter[
+        Stabiliser.from_qubit_pauli_string(
+            QubitPauliString(qubits=qubits, paulis=[Pauli.I, Pauli.I, Pauli.Z])
+        )
+    ] - 2100) < 100
+
+    stabiliser = Stabiliser.from_qubit_pauli_string(
+        QubitPauliString(qubits=qubits, paulis=[Pauli.Z, Pauli.Y, Pauli.X])
     )
-    assert effective_error_dist == ideal_error_distribution
+    stabiliser.phase = 2
+    assert abs(effective_error_dist.stabiliser_counter[stabiliser] - 4900) < 100
 
 
 def test_stabiliser_circuit():
