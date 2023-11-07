@@ -155,14 +155,12 @@ def test_error_distribution_post_select():
         qubit_list=[Qubit(name='ancilla', index=0),
                     Qubit(name='ancilla', index=1)]
     )
-    assert post_selected == ErrorDistribution(
-        distribution={
-            QubitPauliString(
-                qubits=[Qubit(name='compute', index=0)],
-                paulis=[Pauli.Y]
-            ): 0.5
-        }
-    )
+    assert post_selected.distribution == {
+        QubitPauliString(
+            qubits=[Qubit(name='compute', index=0)],
+            paulis=[Pauli.Y]
+        ): 1
+    }
 
 
 def test_to_dict(tmpdir_factory):

@@ -229,55 +229,103 @@ class ErrorDistribution:
 
 
 class LogicalErrorDistribution:
+    """
+    Class for managing distributions of logical errors from a noisy
+    simulation of a circuit. This differs from ErrorDistribution in that
+    the errors are pauli strings rather than tuples of Paulis. That is to
+    say that the errors are fixed to qubits.
 
-    def __init__(self, stabiliser_counter, **kwargs):
+    Attributes:
+        stabiliser_counter: Counts number of stabilisers in error distribution
+    """
 
-        total = kwargs.get('total', sum(stabiliser_counter.values()))
+    stabiliser_counter: Counter[Stabiliser]
 
-        error_distribution_dict = {}
-        for stab, count in dict(stabiliser_counter).items():
+    def __init__(self, stabiliser_counter: Counter[Stabiliser], **kwargs):
+        """Initialisation method. Stores stabiliser counter.
+
+        :param stabiliser_counter: Counter of Stabilisers.
+        :type stabiliser_counter: Counter[Stabiliser]
+
+        :key total: The total number of shots taken when measuring the
+            errors. By default this will be taken to be the total
+            number of errors.
+        """
+
+        self.stabiliser_counter = stabiliser_counter
+        self.total = kwargs.get('total', sum(self.stabiliser_counter.values()))
+
+        print(self.stabiliser_counter.values())
+        print(self.total)
+
+    @property
+    def distribution(self) -> Dict[QubitPauliString, float]:
+        """Probability distribution equivalent to counts distribution.
+
+        :return: Dictionary mapping QubitPauliString to probability that
+            that error occurs.
+        :rtype: Dict[QubitPauliString, float]
+        """
+
+        distribution: Dict[QubitPauliString, float] = {}
+        for stab, count in dict(self.stabiliser_counter).items():
             # Note that I am ignoring the phase here
             pauli_string, _ = stab.qubit_pauli_string
-            error_distribution_dict[
+            distribution[
                 pauli_string
-            ] = error_distribution_dict.get(pauli_string, 0) + count / total
-        self.distribution = error_distribution_dict
+            ] = distribution.get(pauli_string, 0) + count / self.total
 
-    def post_select(self, qubit_list):
+        return distribution
 
-        def string_to_pauli(pauli_string):
-            qubit = Qubit(name=pauli_string[0][0], index=pauli_string[0][1][0])
-            if pauli_string[1] == 'I':
-                pauli = Pauli.I
-            elif pauli_string[1] == 'X':
-                pauli = Pauli.X
-            elif pauli_string[1] == 'Y':
-                pauli = Pauli.Y
-            elif pauli_string[1] == 'Z':
-                pauli = Pauli.Z
-            else:
-                raise Exception("How did you get here?")
+    def post_select(self, qubit_list:List[Qubit]) -> LogicalErrorDistribution:
 
-            return qubit, pauli
+        # def string_to_pauli(pauli_string):
+        #     qubit = Qubit(name=pauli_string[0][0], index=pauli_string[0][1][0])
+        #     if pauli_string[1] == 'I':
+        #         pauli = Pauli.I
+        #     elif pauli_string[1] == 'X':
+        #         pauli = Pauli.X
+        #     elif pauli_string[1] == 'Y':
+        #         pauli = Pauli.Y
+        #     elif pauli_string[1] == 'Z':
+        #         pauli = Pauli.Z
+        #     else:
+        #         raise Exception("How did you get here?")
 
-        def reduce_pauli_error(pauli_error):
-            qubits_paulis = [string_to_pauli(
-                pauli_string) for pauli_string in pauli_error.to_list()]
-            qubits, paulis = zip(
-                *[(qubits, paulis) for qubits, paulis in qubits_paulis if qubits not in qubit_list])
-            return QubitPauliString(
-                qubits=qubits,
-                paulis=paulis,
+        #     return qubit, pauli
+
+        def reduce_pauli_error(pauli_error_stabiliser):
+
+            return Stabiliser(
+                Z_list = [Z for qubit, Z in pauli_error_stabiliser.Z_list.items() if qubit not in qubit_list],
+                X_list = [X for qubit, X in pauli_error_stabiliser.X_list.items() if qubit not in qubit_list],
+                qubit_list = [qubit for qubit in pauli_error_stabiliser.qubit_list if qubit not in qubit_list],
+                phase = pauli_error_stabiliser.phase
             )
+            # pauli_error = pauli_error_stabiliser.qubit_pauli_string
+            # qubits_paulis = [string_to_pauli(
+            #     pauli_string) for pauli_string in pauli_error.to_list()]
+            # qubits, paulis = zip(
+            #     *[(qubits, paulis) for qubits, paulis in qubits_paulis if qubits not in qubit_list])
+            # return Stabiliser.from_qubit_pauli_string(
+            #     QubitPauliString(
+            #         qubits=qubits,
+            #         paulis=paulis,
+            #     )
+            # )
 
-        distribution = {}
-        for pauli_error, probability in self.distribution.items():
-            pauli_error_stabiliser = Stabiliser.from_qubit_pauli_string(
-                pauli_error)
+        # the number of error free shots.
+        total = self.total - sum(self.stabiliser_counter.values())
+
+        distribution = Counter()
+        for pauli_error_stabiliser, count in self.stabiliser_counter.items():
             if not pauli_error_stabiliser.is_measureable(qubit_list):
-                distribution[reduce_pauli_error(pauli_error)] = distribution.get(
-                    reduce_pauli_error(pauli_error), 0) + probability
-        return ErrorDistribution(distribution=distribution)
+                distribution[reduce_pauli_error(pauli_error_stabiliser)] += count
+                # distribution[reduce_pauli_error(pauli_error_stabiliser)] = distribution.get(
+                #     reduce_pauli_error(pauli_error_stabiliser), 0) + count
+                total += count
+        
+        return LogicalErrorDistribution(stabiliser_counter=distribution, total=total)
 
 
 class NoiseModel:
