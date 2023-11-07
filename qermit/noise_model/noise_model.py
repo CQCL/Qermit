@@ -7,7 +7,7 @@ from pytket.circuit import OpType  # type: ignore
 from matplotlib.pyplot import subplots  # type: ignore
 from typing import Dict, Tuple, List, Union, cast
 from pytket.pauli import Pauli
-from pytket import Qubit
+from pytket import Qubit, Circuit
 from pytket.pauli import QubitPauliString
 from numpy.random import Generator
 
@@ -275,15 +275,16 @@ class LogicalErrorDistribution:
         return distribution
 
     def post_select(self, qubit_list: List[Qubit]) -> LogicalErrorDistribution:
+        """Post select based on the given qubits. In particular remove the
+        the given qubits, an the shots with measurable errors on those qubits.
 
-        def reduce_pauli_error(pauli_error_stabiliser):
-
-            return Stabiliser(
-                Z_list=[Z for qubit, Z in pauli_error_stabiliser.Z_list.items() if qubit not in qubit_list],
-                X_list=[X for qubit, X in pauli_error_stabiliser.X_list.items() if qubit not in qubit_list],
-                qubit_list=[qubit for qubit in pauli_error_stabiliser.qubit_list if qubit not in qubit_list],
-                phase=pauli_error_stabiliser.phase
-            )
+        :param qubit_list: List of qubits to be post selected on.
+        :type qubit_list: List[Qubit]
+        :return: New LogicalErrorDistribution with given quibts removed,
+            and those shots where there are measurable errors on those
+            quibts removed.
+        :rtype: LogicalErrorDistribution
+        """
 
         # the number of error free shots.
         total = self.total - sum(self.stabiliser_counter.values())
@@ -291,23 +292,46 @@ class LogicalErrorDistribution:
         distribution: Counter[Stabiliser] = Counter()
         for pauli_error_stabiliser, count in self.stabiliser_counter.items():
             if not pauli_error_stabiliser.is_measureable(qubit_list):
-                distribution[reduce_pauli_error(pauli_error_stabiliser)] += count
+                distribution[pauli_error_stabiliser.reduce_qubits(qubit_list)] += count
                 total += count
 
         return LogicalErrorDistribution(stabiliser_counter=distribution, total=total)
 
 
 class NoiseModel:
+    """
+    Module for managing and executing a circuit noise model. In particular
+    error models are assigned to each gate, and logical errors from
+    circuits can be sampled.
+
+    Attributes:
+        noise_model: Mapping from gates to the error model which corresponds
+            to that gate.
+    """
+
+    noise_model: Dict[OpType, ErrorDistribution]
 
     def __init__(self, noise_model: Dict[OpType, ErrorDistribution]):
+        """Initialisation method.
+
+        :param noise_model: Map from gates to their error models.
+        :type noise_model: Dict[OpType, ErrorDistribution]
+        """
 
         self.noise_model = noise_model
 
-    def reset_seed(self, rng):
+    def reset_seed(self, rng: Generator):
+        """Reset randomness generator.
+
+        :param rng: Randomness generator to be reset to.
+        :type rng: Generator
+        """
         for distribution in self.noise_model.values():
             distribution.reset_seed(rng=rng)
 
     def plot(self):
+        """Generates plot of noise model.
+        """
 
         fig_list = []
         for noisy_gate, distribution in self.noise_model.items():
@@ -318,7 +342,18 @@ class NoiseModel:
 
         return fig_list
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        """Checks equality by checking all gates in the two noise models match,
+        and that the noise models of each gate match.
+
+        :param other: Noise model to be compared against.
+        :type other: object
+        :return: True if equivalent, false otherwise.
+        :rtype: bool
+        """
+
+        if not isinstance(other, NoiseModel):
+            return False
 
         if not (
             sorted(self.noise_model.keys())
@@ -333,14 +368,28 @@ class NoiseModel:
 
         return True
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, List[Dict[str, Union[List[int], float]]]]:
+        """Json serialisable object representing noise model.
+
+        :return: Json serialisable object representing noise model.
+        :rtype: Dict[str, List[Dict[str, Union[List[int], float]]]]
+        """
         return {
             op.name: distribution.to_dict()
             for op, distribution in self.noise_model.items()
         }
 
     @classmethod
-    def from_dict(cls, noise_model_dict: Dict) -> NoiseModel:
+    def from_dict(cls, noise_model_dict: Dict[str, List[Dict[str, Union[List[int], float]]]]) -> NoiseModel:
+        """Convert JSON serialised version of noise model back to an instance
+        of NoiseModel.
+
+        :param noise_model_dict: JSON serialised version of NoiseModel
+        :type noise_model_dict: Dict[str, List[Dict[str, Union[List[int], float]]]]
+        :return: Instance of noise model corresponding to JSON serialised
+            version.
+        :rtype: NoiseModel
+        """
         return cls(
             noise_model={
                 OpType.from_name(op): ErrorDistribution.from_dict(
@@ -351,18 +400,43 @@ class NoiseModel:
         )
 
     @property
-    def noisy_gates(self):
+    def noisy_gates(self) -> List[OpType]:
+        """List of OpTypes with noise.
+
+        :return: List of OpTypes with noise.
+        :rtype: List[OpType]
+        """
         return list(self.noise_model.keys())
 
-    def get_error_distribution(self, optype):
+    def get_error_distribution(self, optype: OpType) -> ErrorDistribution:
+        """Recovers error model corresponding to particular OpType.
+
+        :param optype: OpType for which noise model should be retrieved.
+        :type optype: OpType
+        :return: Error model corresponding to particular OpType.
+        :rtype: ErrorDistribution
+        """
         return self.noise_model[optype]
 
     def get_effective_pre_error_distribution(
         self,
-        cliff_circ,
-        n_rand=1000,
+        cliff_circ: Circuit,
+        n_rand: int = 1000,
         **kwargs,
     ) -> LogicalErrorDistribution:
+        """Retrieve the effective noise model of a given circuit. This is to
+        say, repeatedly generate circuits with coherent noise added at random.
+        Push all errors to the front of the circuit. Return a counter of the
+        errors which have been pushed to the front.
+
+        :param cliff_circ: Circuit to be simulated. This should be a Clifford
+            circuit.
+        :type cliff_circ: Circuit
+        :param n_rand: Number of random circuit instances, defaults to 1000
+        :type n_rand: int, optional
+        :return: Resulting distribution of errors.
+        :rtype: LogicalErrorDistribution
+        """
 
         error_counter = self.counter_propagate(
             cliff_circ=cliff_circ,
@@ -372,9 +446,26 @@ class NoiseModel:
 
         return LogicalErrorDistribution(error_counter, total=n_rand)
 
-    def counter_propagate(self, cliff_circ, n_counts=1000, **kwargs):
+    def counter_propagate(
+        self,
+        cliff_circ: Circuit,
+        n_counts: int = 1000,
+        **kwargs
+    ) -> Counter[Stabiliser]:
+        """Generate random noisy instances of the given circuit and propagate
+        the noise to create a counter of logical errors. Note that
+        kwargs are passed onto `random_propagate`.
 
-        error_counter = Counter()
+        :param cliff_circ: Circuit to be simulated. This should be a Clifford
+            circuit.
+        :type cliff_circ: Circuit
+        :param n_counts: Number of random instances, defaults to 1000
+        :type n_counts: int, optional
+        :return: Counter of logical errors.
+        :rtype: Counter[Stabiliser]
+        """
+
+        error_counter: Counter[Stabiliser] = Counter()
 
         # There is some time wasted here, if for example there is no error in
         # back_propagate_random_error. There may be a saving to be made here
@@ -387,8 +478,26 @@ class NoiseModel:
 
         return error_counter
 
-    def random_propagate(self, cliff_circ, direction='backward'):
+    def random_propagate(
+        self,
+        cliff_circ: Circuit,
+        direction: str = 'backward',
+    ) -> Stabiliser:
+        """Generate a random noisy instance of the given circuit and
+        propagate the noise forward or backward to recover the logical error.
 
+        :param cliff_circ: Circuit to be simulated. This should be a Clifford
+            circuit.
+        :type cliff_circ: Circuit
+        :param direction: Direction in which noise should be propagated,
+            defaults to 'backward'
+        :type direction: str, optional
+        :raises Exception: Raised if direction is invalid.
+        :return: Resulting logical error.
+        :rtype: Stabiliser
+        """
+
+        # Create identity error.
         qubit_list = cliff_circ.qubits
         stabiliser = Stabiliser(
             Z_list=[0] * len(qubit_list),
@@ -396,6 +505,8 @@ class NoiseModel:
             qubit_list=qubit_list,
         )
 
+        # Commands are ordered in reverse or original order depending on which
+        # way the noise is being pushed.
         if direction == 'backward':
             command_list = list(reversed(cliff_circ.get_commands()))
         elif direction == 'forward':
@@ -405,6 +516,8 @@ class NoiseModel:
                 f"Direction must be 'backward' or 'forward'. Is {direction}"
             )
 
+        # For each command in the circuit, add an error ass appropriate, and
+        # push the total error through the command.
         for command in command_list:
 
             if command.op.type in [OpType.Measure, OpType.Barrier]:
@@ -412,12 +525,13 @@ class NoiseModel:
 
             if direction == 'forward':
 
+                # Apply gate to total error.
                 stabiliser.apply_gate(
                     op_type=command.op.type,
-                    qubits=command.args,
+                    qubits=cast(List[Qubit], command.args),
                     params=command.op.params,
                 )
-
+            # Add noise operation if appropriate.
             if command.op.type in self.noisy_gates:
 
                 error_distribution = self.get_error_distribution(
@@ -446,7 +560,7 @@ class NoiseModel:
                 # dagger.
                 stabiliser.apply_gate(
                     op_type=command.op.dagger.type,
-                    qubits=command.args,
+                    qubits=cast(List[Qubit], command.args),
                     params=command.op.dagger.params,
                 )
 

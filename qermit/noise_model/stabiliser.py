@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pytket.pauli import QubitPauliString, Pauli  # type: ignore
 from pytket.circuit import Qubit, OpType, Circuit  # type: ignore
 import math
@@ -50,6 +51,15 @@ class Stabiliser:
             raise Exception(
                 f"{qubit_list} is not a subset of {self.qubit_list}.")
         return any(self.X_list[qubit] == 1 for qubit in qubit_list)
+
+    def reduce_qubits(self, qubit_list: List[Qubit]) -> Stabiliser:
+
+        return Stabiliser(
+            Z_list=[Z for qubit, Z in self.Z_list.items() if qubit not in qubit_list],
+            X_list=[X for qubit, X in self.X_list.items() if qubit not in qubit_list],
+            qubit_list=[qubit for qubit in self.qubit_list if qubit not in qubit_list],
+            phase=self.phase
+        )
 
     # def contains(self, sub_stabiliser):
     #     return (
