@@ -1,15 +1,14 @@
 from __future__ import annotations
-from pytket.pauli import QubitPauliString, Pauli  # type: ignore
-from pytket.circuit import Qubit, OpType, Circuit  # type: ignore
+from pytket.pauli import QubitPauliString, Pauli
+from pytket.circuit import Qubit, OpType, Circuit
 import math
 import numpy as np
 from numpy.random import Generator
-from typing import List
-# from pytket import Qubit
+from typing import List, Union, Tuple
 
 
 class Stabiliser:
-    """For the manipulation of stabilisers. In particular, how they are
+    """For the manipulation of Pauli strings. In particular, how they are
     changed by the action of Clifford circuits. Note that each term in the
     tensor product of the stabiliser should be thought of as:
     (i)^{phase}X^{X_list}Z^{Z_list}
@@ -27,15 +26,19 @@ class Stabiliser:
         Z_list: list[int],
         X_list: list[int],
         qubit_list: list[Qubit],
-        phase=0
+        phase: int = 0
     ):
-        """Initialisation is by a list of qubits, and a list of 0, 1
-        values indicating that a Z operator acts there.
+        """Initialisation is by a list of qubits, and lists of 0, 1
+        values indicating that a Z or X operator acts there.
 
         :param Z_list: 0 indicates no Z, 1 indicates Z.
         :type Z_list: list[int]
+        :param X_list: 0 indicates no X, 1 indicates X.
+        :type X_list: list[int]
         :param qubit_list: List of qubits on which the stabiliser acts.
         :type qubit_list: list[Qubit]
+        :param phase: Phase as a power of i
+        :type phase: int
         """
 
         assert all([Z in {0, 1} for Z in Z_list])
@@ -46,13 +49,33 @@ class Stabiliser:
         self.phase = phase
         self.qubit_list = qubit_list
 
-    def is_measureable(self, qubit_list: List[Qubit]):
+    def is_measureable(self, qubit_list: List[Qubit]) -> bool:
+        """Checks if this Pauli would be measurable on the given qubits in the
+        computational bases. That is to say if at least one  Pauli on the given
+        qubits anticommutes with Z.
+
+        :param qubit_list: Qubits on which if measurable should be checked.
+        :type qubit_list: List[Qubit]
+        :raises Exception: Raised if the given qubits are not contained
+            in this Pauli.
+        :return: True if at least one Pauli on the given
+            qubits anticommutes with Z. False otherwise.
+        :rtype: bool
+        """
         if not all(qubit in self.qubit_list for qubit in qubit_list):
             raise Exception(
                 f"{qubit_list} is not a subset of {self.qubit_list}.")
         return any(self.X_list[qubit] == 1 for qubit in qubit_list)
 
     def reduce_qubits(self, qubit_list: List[Qubit]) -> Stabiliser:
+        """Reduces stabiliser onto given list of qubits. A new reduced
+        stabiliser is created.
+
+        :param qubit_list: Qubits onto which stabiliser should be reduced.
+        :type qubit_list: List[Qubit]
+        :return: Reduced stabiliser.
+        :rtype: Stabiliser
+        """
 
         return Stabiliser(
             Z_list=[Z for qubit, Z in self.Z_list.items() if qubit not in qubit_list],
@@ -61,21 +84,13 @@ class Stabiliser:
             phase=self.phase
         )
 
-    # def contains(self, sub_stabiliser):
-    #     return (
-    #         all(
-    #             qubit in self.qubit_list
-    #             for qubit in sub_stabiliser.qubit_list
-    #         ) and all(
-    #             sub_stabiliser.Z_list[qubit] == self.Z_list[qubit]
-    #             for qubit in sub_stabiliser.qubit_list
-    #         ) and all(
-    #             sub_stabiliser.X_list[qubit] == self.X_list[qubit]
-    #             for qubit in sub_stabiliser.qubit_list
-    #         )
-    #     )
+    @property
+    def is_identity(self) -> bool:
+        """True is the pauli represents the all I string.
 
-    def is_identity(self):
+        :return: True is the pauli represents the all I string.
+        :rtype: bool
+        """
         return all(
             Z == 0 for Z in self.Z_list.values()
         ) and all(
@@ -87,7 +102,16 @@ class Stabiliser:
         cls,
         qubit_list: list[Qubit],
         rng: Generator = np.random.default_rng(),
-    ):
+    ) -> Stabiliser:
+        """Generates a uniformly random stabiliser.
+
+        :param qubit_list: Qubits on which the stabiliser acts.
+        :type qubit_list: list[Qubit]
+        :param rng: Randomness generator, defaults to np.random.default_rng()
+        :type rng: Generator, optional
+        :return: Random stabiliiser.
+        :rtype: Stabiliser
+        """
 
         return cls(
             Z_list=list(rng.integers(2, size=len(qubit_list))),
@@ -95,7 +119,12 @@ class Stabiliser:
             qubit_list=qubit_list,
         )
 
-    def dagger(self):
+    def dagger(self) -> Stabiliser:
+        """Generates the inverse of the stabiliser.
+
+        :return: Conjugate transpose of the stabiliser.
+        :rtype: Stabiliser
+        """
 
         # the phase is the conjugate of the original
         phase = self.phase
@@ -103,6 +132,8 @@ class Stabiliser:
 
         Z_list = list(self.Z_list.values())
         X_list = list(self.X_list.values())
+        # The phase is altered here as the order Z and X is reversed by
+        # the inversion.
         for Z, X in zip(Z_list, X_list):
             phase += 2 * Z * X
         phase %= 4
@@ -115,7 +146,14 @@ class Stabiliser:
         )
 
     @classmethod
-    def from_qubit_pauli_string(cls, qps):
+    def from_qubit_pauli_string(cls, qps: QubitPauliString) -> Stabiliser:
+        """Create a stabiliser from a qubit pauli string.
+
+        :param qps: Qubit pauli string to be converted to a stabiliser.
+        :type qps: QubitPauliString
+        :return: Stabiliser created from qubit pauli string.
+        :rtype: Stabiliser
+        """
 
         Z_list = []
         X_list = []
@@ -158,15 +196,21 @@ class Stabiliser:
         return hash(key)
 
     def __str__(self) -> str:
-        # stab_str = f"X | {self.X_list}"
-        # stab_str += f"\nZ | {self.Z_list}"
-        # stab_str += f"\nphase = {self.phase_dict[self.phase]}"
-        # return stab_str
-
         qubit_pauli_string, operator_phase = self.qubit_pauli_string
         return f"{qubit_pauli_string}, {operator_phase}"
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        """Checks for equality by checking all qubits match, and that all
+        Paulis on those qubits match.
+
+        :param other: Stabiliser to compare against.
+        :type other: Stabiliser
+        :return: True is equivalent.
+        :rtype: bool
+        """
+
+        if not isinstance(other, Stabiliser):
+            return False
 
         if (
             sorted(list(self.X_list.keys()))
@@ -357,7 +401,12 @@ class Stabiliser:
         self.X_list[target_qubit] += self.X_list[control_qubit]
         self.X_list[target_qubit] %= 2
 
-    def pre_multiply(self, stabiliser):
+    def pre_multiply(self, stabiliser: Stabiliser):
+        """Pre-multiply by a Stabiliser.
+
+        :param stabiliser: Stabiliser to pre multiply by.
+        :type stabiliser: Stabiliser
+        """
 
         for qubit in self.qubit_list:
             if stabiliser.X_list[qubit]:
@@ -367,7 +416,15 @@ class Stabiliser:
             self.phase += stabiliser.phase
             self.phase %= 4
 
-    def pre_apply_pauli(self, pauli, qubit):
+    def pre_apply_pauli(self, pauli: Union[Pauli, OpType], qubit: Qubit):
+        """Pre apply by a pauli on a particular qubit.
+
+        :param pauli: Pauli to pre-apply.
+        :type pauli: Union[Pauli, OpType]
+        :param qubit: Qubit to apply Pauli to.
+        :type qubit: Qubit
+        :raises Exception: Raised if pauli is not a pauli operation.
+        """
 
         if pauli in [Pauli.X, OpType.X]:
             self.pre_apply_X(qubit)
@@ -386,6 +443,11 @@ class Stabiliser:
             )
 
     def pre_apply_X(self, qubit: Qubit):
+        """Pre-apply X Pauli ito qubit.
+
+        :param qubit: Qubit to which X is pre-applied.
+        :type qubit: Qubit
+        """
 
         self.X_list[qubit] += 1
         self.X_list[qubit] %= 2
@@ -393,11 +455,24 @@ class Stabiliser:
         self.phase %= 4
 
     def pre_apply_Z(self, qubit: Qubit):
+        """Pre-apply Z Pauli ito qubit.
+
+        :param qubit: Qubit to which Z is pre-applied.
+        :type qubit: Qubit
+        """
 
         self.Z_list[qubit] += 1
         self.Z_list[qubit] %= 2
 
-    def post_apply_pauli(self, pauli, qubit):
+    def post_apply_pauli(self, pauli: Union[Pauli, OpType], qubit: Qubit):
+        """Post apply a Pauli operation.
+
+        :param pauli: Pauli to post-apply.
+        :type pauli: Union[Pauli, OpType]
+        :param qubit: Qubit to post-apply pauli to.
+        :type qubit: Qubit
+        :raises Exception: Raised if pauli is not a Pauli operation.
+        """
 
         if pauli in [Pauli.X, OpType.X]:
             self.post_apply_X(qubit)
@@ -416,11 +491,21 @@ class Stabiliser:
             )
 
     def post_apply_X(self, qubit: Qubit):
+        """Post-apply X Pauli ito qubit.
+
+        :param qubit: Qubit to which X is post-applied.
+        :type qubit: Qubit
+        """
 
         self.X_list[qubit] += 1
         self.X_list[qubit] %= 2
 
     def post_apply_Z(self, qubit: Qubit):
+        """Post-apply Z Pauli ito qubit.
+
+        :param qubit: Qubit to which Z is post-applied.
+        :type qubit: Qubit
+        """
 
         self.Z_list[qubit] += 1
         self.Z_list[qubit] %= 2
@@ -428,9 +513,9 @@ class Stabiliser:
         self.phase %= 4
 
     def get_control_circuit(self, control_qubit: Qubit) -> Circuit:
-        """Circuit which acts stabiliser.
+        """Controlled circuit which acts stabiliser.
 
-        :return: Circuit acting stabiliser.
+        :return: Controlled circuit acting stabiliser.
         :rtype: Circuit
         """
 
@@ -482,7 +567,12 @@ class Stabiliser:
         return circ
 
     @property
-    def pauli_string(self):
+    def pauli_string(self) -> Tuple[List[Pauli], complex]:
+        """List of Paulis which correspond to Stabiliser, and the phase.
+
+        :return: [description]
+        :rtype: Tuple[List[Pauli], complex]
+        """
 
         operator_phase = self.phase
         paulis = []
@@ -511,23 +601,8 @@ class Stabiliser:
 
         paulis, operator_phase = self.pauli_string
 
-        # operator_phase = self.phase
-        # paulis = []
-        # for X, Z in zip(self.X_list.values(), self.Z_list.values()):
-        #     if X == 0 and Z == 0:
-        #         paulis.append(Pauli.I)
-        #     elif X == 1 and Z == 0:
-        #         paulis.append(Pauli.X)
-        #     elif X == 0 and Z == 1:
-        #         paulis.append(Pauli.Z)
-        #     elif X == 1 and Z == 1:
-        #         paulis.append(Pauli.Y)
-        #         operator_phase += 3
-        #         operator_phase %= 4
-
         qubit_pauli_string = QubitPauliString(
             qubits=self.qubit_list, paulis=paulis
         )
 
-        # return qubit_pauli_string, self.phase_dict[operator_phase]
         return qubit_pauli_string, operator_phase

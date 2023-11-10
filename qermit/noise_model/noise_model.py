@@ -473,7 +473,7 @@ class NoiseModel:
         for _ in range(n_counts):
             stabiliser = self.random_propagate(cliff_circ, **kwargs)
 
-            if not stabiliser.is_identity():
+            if not stabiliser.is_identity:
                 error_counter.update([stabiliser])
 
         return error_counter
@@ -516,7 +516,7 @@ class NoiseModel:
                 f"Direction must be 'backward' or 'forward'. Is {direction}"
             )
 
-        # For each command in the circuit, add an error ass appropriate, and
+        # For each command in the circuit, add an error as appropriate, and
         # push the total error through the command.
         for command in command_list:
 
@@ -543,10 +543,12 @@ class NoiseModel:
                     for pauli, qubit in zip(error, command.args):
                         if direction == 'backward':
                             stabiliser.pre_apply_pauli(
-                                pauli=pauli, qubit=qubit)
+                                pauli=pauli, qubit=cast(Qubit, qubit)
+                            )
                         elif direction == 'forward':
                             stabiliser.post_apply_pauli(
-                                pauli=pauli, qubit=qubit)
+                                pauli=pauli, qubit=cast(Qubit, qubit)
+                            )
                         else:
                             raise Exception(
                                 "Direction must be 'backward' or 'forward'. "
