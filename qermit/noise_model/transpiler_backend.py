@@ -4,7 +4,7 @@ from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 import uuid
 from pytket.passes import BasePass
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Iterator
 from pytket import Circuit, Bit
 
 
@@ -134,7 +134,7 @@ class TranspilerBackend:
         :rtype: Iterator[Counter]
         """
 
-        counter = Counter()
+        counter: Counter = Counter()
 
         def gen_transpiled_circuit(circuit: Circuit) -> Circuit:
             """Generate compiled circuit by copying and compiling it.
@@ -150,7 +150,7 @@ class TranspilerBackend:
             self.backend.rebase_pass().apply(transpiled_circuit)
             return transpiled_circuit
 
-        def gen_batches(circuit: Circuit, n_shots: int) -> List[Circuit]:
+        def gen_batches(circuit: Circuit, n_shots: int) -> Iterator[List[Circuit]]:
             """Iterator generating lists of circuits of size `max_batch_size`
                 until all shots have been accounted for.
 

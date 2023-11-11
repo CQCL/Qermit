@@ -5,7 +5,7 @@ from qermit.noise_model import (
     TranspilerBackend,
     NoiseModel,
     ErrorDistribution,
-    Stabiliser,
+    QermitPauli,
     LogicalErrorDistribution,
 )
 from collections import Counter
@@ -44,7 +44,7 @@ def test_noise_model_logical_error_propagation():
     logical_distribution = noise_model.counter_propagate(
         pytket_ciruit, n_counts=10000, direction='forward'
     )
-    ideal_error = Stabiliser.from_qubit_pauli_string(
+    ideal_error = QermitPauli.from_qubit_pauli_string(
         QubitPauliString(
             map={
                 Qubit(0): Pauli.X,
@@ -145,12 +145,12 @@ def test_error_distribution_post_select():
             name='ancilla', index=1), Qubit(name='compute', index=0)],
         paulis=[Pauli.I, Pauli.Z, Pauli.Y]
     )
-    stabiliser_counter = Counter(
+    pauli_error_counter = Counter(
         {
-            Stabiliser.from_qubit_pauli_string(qps_remove): 50,
-            Stabiliser.from_qubit_pauli_string(qps_keep): 50}
+            QermitPauli.from_qubit_pauli_string(qps_remove): 50,
+            QermitPauli.from_qubit_pauli_string(qps_keep): 50}
     )
-    error_distribution = LogicalErrorDistribution(stabiliser_counter=stabiliser_counter)
+    error_distribution = LogicalErrorDistribution(pauli_error_counter=pauli_error_counter)
     post_selected = error_distribution.post_select(
         qubit_list=[Qubit(name='ancilla', index=0),
                     Qubit(name='ancilla', index=1)]
@@ -299,7 +299,7 @@ def test_error_backpropagation():
     name = 'my_reg'
     qubit_list = [Qubit(name=name, index=0), Qubit(name=name, index=1)]
 
-    stabilise = Stabiliser(
+    stabilise = QermitPauli(
         Z_list=[0] * len(qubit_list),
         X_list=[0] * len(qubit_list),
         qubit_list=qubit_list,
@@ -315,7 +315,7 @@ def test_error_backpropagation():
     assert stabilise.X_list == {qubit_list[0]: 1, qubit_list[1]: 1}
     assert stabilise.phase == 0
 
-    stabilise = Stabiliser(
+    stabilise = QermitPauli(
         Z_list=[0] * len(qubit_list),
         X_list=[0] * len(qubit_list),
         qubit_list=qubit_list,
@@ -352,11 +352,11 @@ def test_back_propagate_random_error():
 
     # error_sampler = ErrorSampler(noise_model=noise_model)
 
-    stabiliser = noise_model.random_propagate(cliff_circ)
+    pauli_error = noise_model.random_propagate(cliff_circ)
 
-    assert stabiliser.Z_list == {qubit_list[0]: 0, qubit_list[1]: 1}
-    assert stabiliser.X_list == {qubit_list[0]: 0, qubit_list[1]: 0}
-    assert stabiliser.phase == 2
+    assert pauli_error.Z_list == {qubit_list[0]: 0, qubit_list[1]: 1}
+    assert pauli_error.X_list == {qubit_list[0]: 0, qubit_list[1]: 0}
+    assert pauli_error.phase == 2
 
 # TODO: check this test by hand. It also takes a long time to run, which
 # is unfortunate. It's also probabilistic at present which is not ideal.
@@ -384,7 +384,7 @@ def test_effective_error_distribution():
     )
 
     assert all(
-        abs(count - 2500) < 100 for count in error_distribution.stabiliser_counter.values()
+        abs(count - 2500) < 100 for count in error_distribution.pauli_error_counter.values()
     )
 
     cliff_circ = Circuit()
@@ -405,40 +405,37 @@ def test_effective_error_distribution():
     effective_error_dist = noise_model.get_effective_pre_error_distribution(
         cliff_circ, n_rand=10000
     )
-    print(effective_error_dist.stabiliser_counter)
-    for stabiliser in effective_error_dist.stabiliser_counter.keys():
-        print(stabiliser)
-    assert abs(effective_error_dist.stabiliser_counter[
-        Stabiliser.from_qubit_pauli_string(
+    assert abs(effective_error_dist.pauli_error_counter[
+        QermitPauli.from_qubit_pauli_string(
             QubitPauliString(qubits=qubits, paulis=[Pauli.X, Pauli.I, Pauli.X])
         )
     ] - 2100) < 100
 
-    assert abs(effective_error_dist.stabiliser_counter[
-        Stabiliser.from_qubit_pauli_string(
+    assert abs(effective_error_dist.pauli_error_counter[
+        QermitPauli.from_qubit_pauli_string(
             QubitPauliString(qubits=qubits, paulis=[Pauli.Y, Pauli.Y, Pauli.Z])
         )
     ] - 900) < 100
 
-    assert abs(effective_error_dist.stabiliser_counter[
-        Stabiliser.from_qubit_pauli_string(
+    assert abs(effective_error_dist.pauli_error_counter[
+        QermitPauli.from_qubit_pauli_string(
             QubitPauliString(qubits=qubits, paulis=[Pauli.I, Pauli.I, Pauli.Z])
         )
     ] - 2100) < 100
 
-    stabiliser = Stabiliser.from_qubit_pauli_string(
+    pauli_error = QermitPauli.from_qubit_pauli_string(
         QubitPauliString(qubits=qubits, paulis=[Pauli.Z, Pauli.Y, Pauli.X])
     )
-    stabiliser.phase = 2
-    assert abs(effective_error_dist.stabiliser_counter[stabiliser] - 4900) < 100
+    pauli_error.phase = 2
+    assert abs(effective_error_dist.pauli_error_counter[pauli_error] - 4900) < 100
 
 
-def test_stabiliser_circuit():
+def test_qermit_pauli_circuit():
 
     circ = Circuit(3)
     circ.CZ(0, 1).add_barrier([0, 2]).H(1).H(2).SWAP(1, 2).S(1).Y(0)
 
-    L = Stabiliser(
+    L = QermitPauli(
         Z_list=[1, 1, 1],
         X_list=[0, 0, 0],
         qubit_list=circ.qubits
@@ -463,13 +460,16 @@ def test_stabiliser_circuit():
 def test_initialisation():
 
     qubit_list = [Qubit(0), Qubit(1), Qubit(2)]
-    stabiliser = Stabiliser(Z_list=[0, 0, 1], X_list=[
-                            0, 0, 0], qubit_list=qubit_list)
-    assert stabiliser.X_list == {
+    pauli = QermitPauli(
+        Z_list=[0, 0, 1],
+        X_list=[0, 0, 0],
+        qubit_list=qubit_list,
+    )
+    assert pauli.X_list == {
         qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert stabiliser.Z_list == {
+    assert pauli.Z_list == {
         qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 1}
-    assert stabiliser.phase == 0
+    assert pauli.phase == 0
 
 
 def test_identity_clifford():
@@ -478,34 +478,37 @@ def test_identity_clifford():
     circ.X(1).H(1).X(1).X(0).Sdg(1).X(0).CZ(1, 0)
 
     qubit_list = circ.qubits
-    stabiliser = Stabiliser(
+    pauli = QermitPauli(
         Z_list=circ.n_qubits * [1],
         X_list=circ.n_qubits * [0],
         qubit_list=qubit_list
     )
-    stabiliser.apply_circuit(circ)
+    pauli.apply_circuit(circ)
 
-    stabiliser_qubit_pauli_string, phase = stabiliser.qubit_pauli_string
-    assert stabiliser_qubit_pauli_string == QubitPauliString(
-        qubits=qubit_list, paulis=[Pauli.Z, Pauli.Z])
+    qubit_pauli_string, phase = pauli.qubit_pauli_string
+    assert qubit_pauli_string == QubitPauliString(
+        qubits=qubit_list, paulis=[Pauli.Z, Pauli.Z]
+    )
     assert phase == 1
 
 
 def test_H():
 
     qubit_list = [Qubit(0)]
-    stabiliser = Stabiliser(Z_list=[1], X_list=[0], qubit_list=qubit_list)
+    pauli = QermitPauli(Z_list=[1], X_list=[0], qubit_list=qubit_list)
 
-    stabiliser.H(qubit=qubit_list[0])
-    stabiliser_qubit_pauli_string, phase = stabiliser.qubit_pauli_string
-    assert stabiliser_qubit_pauli_string == QubitPauliString(
-        qubits=qubit_list, paulis=[Pauli.X])
+    pauli.H(qubit=qubit_list[0])
+    qubit_pauli_string, phase = pauli.qubit_pauli_string
+    assert qubit_pauli_string == QubitPauliString(
+        qubits=qubit_list, paulis=[Pauli.X]
+    )
     assert phase == 1
 
-    stabiliser.H(qubit=qubit_list[0])
-    stabiliser_qubit_pauli_string, phase = stabiliser.qubit_pauli_string
-    assert stabiliser_qubit_pauli_string == QubitPauliString(
-        qubits=qubit_list, paulis=[Pauli.Z])
+    pauli.H(qubit=qubit_list[0])
+    qubit_pauli_string, phase = pauli.qubit_pauli_string
+    assert qubit_pauli_string == QubitPauliString(
+        qubits=qubit_list, paulis=[Pauli.Z]
+    )
     assert phase == 1
 
 
@@ -513,7 +516,7 @@ def test_H():
 def test_h_series_gates():
 
     circ = Circuit(2).ZZPhase(3.5, 0, 1).PhasedX(1.5, 0.5, 0)
-    stab = Stabiliser(Z_list=[1, 1], X_list=[1, 1], qubit_list=circ.qubits)
+    stab = QermitPauli(Z_list=[1, 1], X_list=[1, 1], qubit_list=circ.qubits)
     stab.apply_circuit(circ)
 
 
@@ -521,164 +524,177 @@ def test_apply_circuit():
 
     circ = Circuit(2).H(0).S(0).CX(0, 1)
     qubit_list = circ.qubits
-    stabiliser = Stabiliser(
+    pauli = QermitPauli(
         Z_list=circ.n_qubits * [1],
         X_list=circ.n_qubits * [0],
         qubit_list=qubit_list
     )
 
-    stabiliser.apply_circuit(circ)
+    pauli.apply_circuit(circ)
 
-    stabiliser_qubit_pauli_string, phase = stabiliser.qubit_pauli_string
-    assert stabiliser_qubit_pauli_string == QubitPauliString(
-        qubits=qubit_list, paulis=[Pauli.X, Pauli.Y])
+    qubit_pauli_string, phase = pauli.qubit_pauli_string
+    assert qubit_pauli_string == QubitPauliString(
+        qubits=qubit_list, paulis=[Pauli.X, Pauli.Y]
+    )
     assert phase == 1
 
 
 def test_apply_gate():
 
     qubit_list = [Qubit(0), Qubit(1), Qubit(2)]
-    stabiliser = Stabiliser(Z_list=[1, 1, 1], X_list=[
-                            0, 0, 0], qubit_list=qubit_list)
+    pauli = QermitPauli(
+        Z_list=[1, 1, 1],
+        X_list=[0, 0, 0],
+        qubit_list=qubit_list,
+    )
 
-    stabiliser.apply_gate(op_type=OpType.H, qubits=[qubit_list[0]])
+    pauli.apply_gate(op_type=OpType.H, qubits=[qubit_list[0]])
 
-    stabiliser_qubit_pauli_string, phase = stabiliser.qubit_pauli_string
-    assert stabiliser_qubit_pauli_string == QubitPauliString(
+    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
+    assert qermit_qubit_pauli_string == QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.Z, Pauli.Z])
     assert phase == 1
 
-    stabiliser.apply_gate(op_type=OpType.CX, qubits=[
-                          qubit_list[1], qubit_list[2]])
+    pauli.apply_gate(
+        op_type=OpType.CX,
+        qubits=[qubit_list[1], qubit_list[2]],
+    )
 
     qubit_pauli_string = QubitPauliString(
-        qubits=qubit_list, paulis=[Pauli.X, Pauli.I, Pauli.Z])
-    stabiliser_qubit_pauli_string, phase = stabiliser.qubit_pauli_string
-    assert stabiliser_qubit_pauli_string == qubit_pauli_string
+        qubits=qubit_list, paulis=[Pauli.X, Pauli.I, Pauli.Z]
+    )
+    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
+    assert qermit_qubit_pauli_string == qubit_pauli_string
     assert phase == 1
 
-    stabiliser.apply_gate(op_type=OpType.S, qubits=[qubit_list[1]])
-    stabiliser_qubit_pauli_string, phase = stabiliser.qubit_pauli_string
+    pauli.apply_gate(op_type=OpType.S, qubits=[qubit_list[1]])
+    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
 
-    assert stabiliser_qubit_pauli_string == qubit_pauli_string
+    assert qermit_qubit_pauli_string == qubit_pauli_string
     assert phase == 1
 
 
 def test_qubit_pauli_string():
 
     qubit_list = [Qubit(0), Qubit(1), Qubit(2)]
-    stabiliser = Stabiliser(Z_list=[1, 1, 1], X_list=[
-                            0, 0, 0], qubit_list=qubit_list)
+    pauli = QermitPauli(
+        Z_list=[1, 1, 1],
+        X_list=[0, 0, 0],
+        qubit_list=qubit_list,
+    )
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.Z, Pauli.Z, Pauli.Z])
-    stabiliser_qubit_pauli_string, phase = stabiliser.qubit_pauli_string
-    assert stabiliser_qubit_pauli_string == qubit_pauli_string
+    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
+    assert qermit_qubit_pauli_string == qubit_pauli_string
     assert phase == 1
 
-    stabiliser.H(qubit_list[0])
-    stabiliser.S(qubit_list[0])
+    pauli.H(qubit_list[0])
+    pauli.S(qubit_list[0])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.Y, Pauli.Z, Pauli.Z])
-    stabiliser_qubit_pauli_string, phase = stabiliser.qubit_pauli_string
-    assert stabiliser_qubit_pauli_string == qubit_pauli_string
+    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
+    assert qermit_qubit_pauli_string == qubit_pauli_string
     assert phase == 1
 
-    stabiliser.CX(qubit_list[0], qubit_list[1])
+    pauli.CX(qubit_list[0], qubit_list[1])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.Y, Pauli.Z])
-    stabiliser_qubit_pauli_string, phase = stabiliser.qubit_pauli_string
-    assert stabiliser_qubit_pauli_string == qubit_pauli_string
+    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
+    assert qermit_qubit_pauli_string == qubit_pauli_string
     assert phase == 1
 
-    stabiliser.S(qubit_list[1])
+    pauli.S(qubit_list[1])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.X, Pauli.Z])
-    stabiliser_qubit_pauli_string, phase = stabiliser.qubit_pauli_string
-    assert stabiliser_qubit_pauli_string == qubit_pauli_string
+    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
+    assert qermit_qubit_pauli_string == qubit_pauli_string
     assert phase == -1
 
-    stabiliser.S(qubit_list[0])
-    stabiliser.CX(qubit_list[0], qubit_list[2])
+    pauli.S(qubit_list[0])
+    pauli.CX(qubit_list[0], qubit_list[2])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.X, Pauli.Y])
-    stabiliser_qubit_pauli_string, phase = stabiliser.qubit_pauli_string
-    assert stabiliser_qubit_pauli_string == qubit_pauli_string
+    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
+    assert qermit_qubit_pauli_string == qubit_pauli_string
     assert phase == -1
 
 
 def test_clifford_incremental():
 
     qubit_list = [Qubit(0), Qubit(1), Qubit(2)]
-    stabiliser = Stabiliser(Z_list=[0, 0, 1], X_list=[
-                            0, 0, 0], qubit_list=qubit_list)
+    pauli = QermitPauli(
+        Z_list=[0, 0, 1],
+        X_list=[0, 0, 0],
+        qubit_list=qubit_list,
+    )
 
-    stabiliser.H(qubit_list[0])
-    assert stabiliser.X_list == {
+    pauli.H(qubit_list[0])
+    assert pauli.X_list == {
         qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert stabiliser.Z_list == {
+    assert pauli.Z_list == {
         qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 1}
-    assert stabiliser.phase == 0
+    assert pauli.phase == 0
 
-    stabiliser.CX(qubit_list[1], qubit_list[2])
-    assert stabiliser.X_list == {
+    pauli.CX(qubit_list[1], qubit_list[2])
+    assert pauli.X_list == {
         qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert stabiliser.Z_list == {
+    assert pauli.Z_list == {
         qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert stabiliser.phase == 0
+    assert pauli.phase == 0
 
-    stabiliser.H(qubit_list[1])
-    assert stabiliser.X_list == {
+    pauli.H(qubit_list[1])
+    assert pauli.X_list == {
         qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 0}
-    assert stabiliser.Z_list == {
+    assert pauli.Z_list == {
         qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 1}
-    assert stabiliser.phase == 0
+    assert pauli.phase == 0
 
-    stabiliser.S(qubit_list[1])
-    assert stabiliser.X_list == {
+    pauli.S(qubit_list[1])
+    assert pauli.X_list == {
         qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 0}
-    assert stabiliser.Z_list == {
+    assert pauli.Z_list == {
         qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert stabiliser.phase == 1
+    assert pauli.phase == 1
 
-    stabiliser.CX(qubit_list[1], qubit_list[2])
-    assert stabiliser.X_list == {
+    pauli.CX(qubit_list[1], qubit_list[2])
+    assert pauli.X_list == {
         qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert stabiliser.Z_list == {
+    assert pauli.Z_list == {
         qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 1}
-    assert stabiliser.phase == 1
+    assert pauli.phase == 1
 
-    stabiliser.S(qubit_list[2])
-    assert stabiliser.X_list == {
+    pauli.S(qubit_list[2])
+    assert pauli.X_list == {
         qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert stabiliser.Z_list == {
+    assert pauli.Z_list == {
         qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert stabiliser.phase == 2
+    assert pauli.phase == 2
 
-    stabiliser.CX(qubit_list[1], qubit_list[0])
-    assert stabiliser.X_list == {
+    pauli.CX(qubit_list[1], qubit_list[0])
+    assert pauli.X_list == {
         qubit_list[0]: 1, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert stabiliser.Z_list == {
+    assert pauli.Z_list == {
         qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert stabiliser.phase == 2
+    assert pauli.phase == 2
 
-    stabiliser.S(qubit_list[0])
-    assert stabiliser.X_list == {
+    pauli.S(qubit_list[0])
+    assert pauli.X_list == {
         qubit_list[0]: 1, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert stabiliser.Z_list == {
+    assert pauli.Z_list == {
         qubit_list[0]: 1, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert stabiliser.phase == 3
+    assert pauli.phase == 3
 
-    stabiliser.H(qubit_list[0])
-    assert stabiliser.X_list == {
+    pauli.H(qubit_list[0])
+    assert pauli.X_list == {
         qubit_list[0]: 1, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert stabiliser.Z_list == {
+    assert pauli.Z_list == {
         qubit_list[0]: 1, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert stabiliser.phase == 1
+    assert pauli.phase == 1
 
 
 def test_to_from_qps():
@@ -688,7 +704,7 @@ def test_to_from_qps():
     qubit_pauli_string = QubitPauliString(
         qubits=qubits, paulis=paulis,
     )
-    stab = Stabiliser.from_qubit_pauli_string(qubit_pauli_string)
+    stab = QermitPauli.from_qubit_pauli_string(qubit_pauli_string)
     stab_qps, stab_phase = stab.qubit_pauli_string
     assert stab_qps == qubit_pauli_string
     assert stab_phase == 1 + 0j
@@ -696,7 +712,7 @@ def test_to_from_qps():
 
 def test_is_measureable():
 
-    stab = Stabiliser(
+    stab = QermitPauli(
         Z_list=[1, 0, 0],
         X_list=[1, 0, 1],
         qubit_list=[Qubit(name='A', index=0), Qubit(name='B', index=0), Qubit(name='A', index=1)]

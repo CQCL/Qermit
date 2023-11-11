@@ -1,6 +1,6 @@
 from __future__ import annotations
 import numpy as np
-from .stabiliser import Stabiliser
+from .qermit_pauli import QermitPauli
 from collections import Counter
 import math
 from pytket.circuit import OpType  # type: ignore
@@ -236,24 +236,24 @@ class LogicalErrorDistribution:
     say that the errors are fixed to qubits.
 
     Attributes:
-        stabiliser_counter: Counts number of stabilisers in error distribution
+        pauli_error_counter: Counts number of pauli errors in distribution
     """
 
-    stabiliser_counter: Counter[Stabiliser]
+    pauli_error_counter: Counter[QermitPauli]
 
-    def __init__(self, stabiliser_counter: Counter[Stabiliser], **kwargs):
-        """Initialisation method. Stores stabiliser counter.
+    def __init__(self, pauli_error_counter: Counter[QermitPauli], **kwargs):
+        """Initialisation method. Stores pauli error counter.
 
-        :param stabiliser_counter: Counter of Stabilisers.
-        :type stabiliser_counter: Counter[Stabiliser]
+        :param pauli_error_counter: Counter of pauli errors.
+        :type pauli_error_counter: Counter[QermitPauli]
 
         :key total: The total number of shots taken when measuring the
             errors. By default this will be taken to be the total
             number of errors.
         """
 
-        self.stabiliser_counter = stabiliser_counter
-        self.total = kwargs.get('total', sum(self.stabiliser_counter.values()))
+        self.pauli_error_counter = pauli_error_counter
+        self.total = kwargs.get('total', sum(self.pauli_error_counter.values()))
 
     @property
     def distribution(self) -> Dict[QubitPauliString, float]:
@@ -265,7 +265,7 @@ class LogicalErrorDistribution:
         """
 
         distribution: Dict[QubitPauliString, float] = {}
-        for stab, count in dict(self.stabiliser_counter).items():
+        for stab, count in dict(self.pauli_error_counter).items():
             # Note that I am ignoring the phase here
             pauli_string, _ = stab.qubit_pauli_string
             distribution[
@@ -287,15 +287,18 @@ class LogicalErrorDistribution:
         """
 
         # the number of error free shots.
-        total = self.total - sum(self.stabiliser_counter.values())
+        total = self.total - sum(self.pauli_error_counter.values())
 
-        distribution: Counter[Stabiliser] = Counter()
-        for pauli_error_stabiliser, count in self.stabiliser_counter.items():
-            if not pauli_error_stabiliser.is_measureable(qubit_list):
-                distribution[pauli_error_stabiliser.reduce_qubits(qubit_list)] += count
+        distribution: Counter[QermitPauli] = Counter()
+        for pauli_error, count in self.pauli_error_counter.items():
+            if not pauli_error.is_measureable(qubit_list):
+                distribution[pauli_error.reduce_qubits(qubit_list)] += count
                 total += count
 
-        return LogicalErrorDistribution(stabiliser_counter=distribution, total=total)
+        return LogicalErrorDistribution(
+            pauli_error_counter=distribution,
+            total=total,
+        )
 
 
 class NoiseModel:
@@ -451,7 +454,7 @@ class NoiseModel:
         cliff_circ: Circuit,
         n_counts: int = 1000,
         **kwargs
-    ) -> Counter[Stabiliser]:
+    ) -> Counter[QermitPauli]:
         """Generate random noisy instances of the given circuit and propagate
         the noise to create a counter of logical errors. Note that
         kwargs are passed onto `random_propagate`.
@@ -462,19 +465,19 @@ class NoiseModel:
         :param n_counts: Number of random instances, defaults to 1000
         :type n_counts: int, optional
         :return: Counter of logical errors.
-        :rtype: Counter[Stabiliser]
+        :rtype: Counter[QermitPauli]
         """
 
-        error_counter: Counter[Stabiliser] = Counter()
+        error_counter: Counter[QermitPauli] = Counter()
 
         # There is some time wasted here, if for example there is no error in
         # back_propagate_random_error. There may be a saving to be made here
         # if there errors are sampled before the back propagation occurs?
         for _ in range(n_counts):
-            stabiliser = self.random_propagate(cliff_circ, **kwargs)
+            pauli_error = self.random_propagate(cliff_circ, **kwargs)
 
-            if not stabiliser.is_identity:
-                error_counter.update([stabiliser])
+            if not pauli_error.is_identity:
+                error_counter.update([pauli_error])
 
         return error_counter
 
@@ -482,7 +485,7 @@ class NoiseModel:
         self,
         cliff_circ: Circuit,
         direction: str = 'backward',
-    ) -> Stabiliser:
+    ) -> QermitPauli:
         """Generate a random noisy instance of the given circuit and
         propagate the noise forward or backward to recover the logical error.
 
@@ -494,12 +497,12 @@ class NoiseModel:
         :type direction: str, optional
         :raises Exception: Raised if direction is invalid.
         :return: Resulting logical error.
-        :rtype: Stabiliser
+        :rtype: QermitPauli
         """
 
         # Create identity error.
         qubit_list = cliff_circ.qubits
-        stabiliser = Stabiliser(
+        pauli_error = QermitPauli(
             Z_list=[0] * len(qubit_list),
             X_list=[0] * len(qubit_list),
             qubit_list=qubit_list,
@@ -526,7 +529,7 @@ class NoiseModel:
             if direction == 'forward':
 
                 # Apply gate to total error.
-                stabiliser.apply_gate(
+                pauli_error.apply_gate(
                     op_type=command.op.type,
                     qubits=cast(List[Qubit], command.args),
                     params=command.op.params,
@@ -542,11 +545,11 @@ class NoiseModel:
                 if error is not None:
                     for pauli, qubit in zip(error, command.args):
                         if direction == 'backward':
-                            stabiliser.pre_apply_pauli(
+                            pauli_error.pre_apply_pauli(
                                 pauli=pauli, qubit=cast(Qubit, qubit)
                             )
                         elif direction == 'forward':
-                            stabiliser.post_apply_pauli(
+                            pauli_error.post_apply_pauli(
                                 pauli=pauli, qubit=cast(Qubit, qubit)
                             )
                         else:
@@ -560,10 +563,10 @@ class NoiseModel:
                 # Note that here we wish to pull the pauli back through the gate,
                 # which has the same effect on the pauli as pushing through the
                 # dagger.
-                stabiliser.apply_gate(
+                pauli_error.apply_gate(
                     op_type=command.op.dagger.type,
                     qubits=cast(List[Qubit], command.args),
                     params=command.op.dagger.params,
                 )
 
-        return stabiliser
+        return pauli_error
