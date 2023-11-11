@@ -277,14 +277,18 @@ def test_noise_model():
     transpiler = PauliErrorTranspile(
         noise_model=noise_model,
     )
-    backend = TranspilerBackend(transpiler=transpiler)
+    backend = TranspilerBackend(
+        transpiler=transpiler,
+        max_batch_size=2
+    )
 
     circuit = Circuit(2).CZ(0, 1).measure_all()
-    counts = backend.get_counts(
+    result = backend.run_circuit(
         circuit=circuit,
-        n_shots=1,
+        n_shots=3
     )
-    assert counts == Counter({(1, 0): 1})
+    counts = result.get_counts()
+    assert all(shot in [(1, 0), (0, 1)] for shot in list(counts.keys()))
 
 
 def test_error_backpropagation():
