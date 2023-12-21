@@ -105,7 +105,7 @@ class TranspilerBackend:
         return handle
 
     def get_result(self, handle: uuid.UUID) -> BackendResult:
-        """Retrive result from backend.
+        """Retrieve result from backend.
 
         :param handle: Handle identifying result.
         :type handle: uuid.UUID

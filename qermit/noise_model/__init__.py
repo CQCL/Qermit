@@ -14,7 +14,7 @@
 
 
 """
-The noise_model module provides an assortment of noise modeling an simulation
+The noise_model module provides an assortment of noise modeling and simulation
 tools for local testing.
 """
 

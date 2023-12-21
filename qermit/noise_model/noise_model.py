@@ -10,6 +10,10 @@ from pytket.pauli import Pauli
 from pytket import Qubit, Circuit
 from pytket.pauli import QubitPauliString
 from numpy.random import Generator
+from enum import Enum
+
+
+Direction = Enum('Direction', ['forward', 'backward'])
 
 
 class ErrorDistribution:
@@ -65,18 +69,10 @@ class ErrorDistribution:
         if not isinstance(other, ErrorDistribution):
             return False
 
-        # Check all pauli error in this distribution are in the other.
-        if not all(
-            paulis in self.distribution.keys()
-            for paulis in other.distribution.keys()
-        ):
+        # Check all pauli error in this distributions are the same.
+        if set(self.distribution.keys()) != set(other.distribution.keys()):
             return False
-        # Check all pauli errors in the other distribution are in this one.
-        if not all(
-            paulis in other.distribution.keys()
-            for paulis in self.distribution.keys()
-        ):
-            return False
+
         # Check all probabilities are close.
         if not all(
             math.isclose(
@@ -112,29 +108,15 @@ class ErrorDistribution:
         :rtype: ErrorDistribution
         """
 
-        merged_distribution = {}
-
-        support = set(
-            sum(
-                [
-                    list(distribution.distribution.keys())
-                    for distribution in distribution_list
-                ], []
-            )
-        )
-
-        for error in support:
-            merged_distribution[error] = sum(
-                distribution.distribution.get(error, 0)
-                for distribution in distribution_list
-            ) / len(distribution_list)
-
-        return cls(distribution=merged_distribution)
+        return cls(distribution={
+            error: sum(distribution.distribution.get(error, 0) for distribution in distribution_list) / len(distribution_list)
+            for error in set(error for distribution in distribution_list for error in distribution.distribution)
+        })
 
     def order(self, reverse: bool = True):
         """Reorders the distribution dictionary based on probabilities.
 
-        :param reverse: Order from hight to low, defaults to True
+        :param reverse: Order from high to low, defaults to True
         :type reverse: bool, optional
         """
         self.distribution = {
@@ -143,7 +125,7 @@ class ErrorDistribution:
             in sorted(self.distribution.items(), key=lambda x: x[1], reverse=reverse)
         }
 
-    def reset_seed(self, rng: Generator):
+    def reset_rng_generator(self, rng: Generator):
         """Reset randomness generator.
 
         :param rng: Randomness generator.
@@ -179,13 +161,12 @@ class ErrorDistribution:
         :rtype: ErrorDistribution
         """
 
-        distribution = {}
-        for noise_op in distribution_dict:
-            distribution[
-                tuple(Pauli(op) for op in cast(List[int], noise_op['op_list']))
-            ] = cast(float, noise_op['noise_level'])
-
-        return cls(distribution=distribution)
+        return cls(
+            distribution={
+                tuple(Pauli(op) for op in cast(List[int], noise_op['op_list'])): cast(float, noise_op['noise_level'])
+                for noise_op in distribution_dict
+            }
+        )
 
     def sample(self) -> Union[Tuple[Pauli, ...], None]:
         """Draw sample from distribution.
@@ -266,7 +247,7 @@ class LogicalErrorDistribution:
 
         distribution: Dict[QubitPauliString, float] = {}
         for stab, count in dict(self.pauli_error_counter).items():
-            # Note that I am ignoring the phase here
+            # Note that the phase is ignored here
             pauli_string, _ = stab.qubit_pauli_string
             distribution[
                 pauli_string
@@ -276,13 +257,13 @@ class LogicalErrorDistribution:
 
     def post_select(self, qubit_list: List[Qubit]) -> LogicalErrorDistribution:
         """Post select based on the given qubits. In particular remove the
-        the given qubits, an the shots with measurable errors on those qubits.
+        the given qubits, and the shots with measurable errors on those qubits.
 
         :param qubit_list: List of qubits to be post selected on.
         :type qubit_list: List[Qubit]
-        :return: New LogicalErrorDistribution with given quibts removed,
+        :return: New LogicalErrorDistribution with given qubits removed,
             and those shots where there are measurable errors on those
-            quibts removed.
+            qubits removed.
         :rtype: LogicalErrorDistribution
         """
 
@@ -323,14 +304,14 @@ class NoiseModel:
 
         self.noise_model = noise_model
 
-    def reset_seed(self, rng: Generator):
+    def reset_rng_generator(self, rng: Generator):
         """Reset randomness generator.
 
         :param rng: Randomness generator to be reset to.
         :type rng: Generator
         """
         for distribution in self.noise_model.values():
-            distribution.reset_seed(rng=rng)
+            distribution.reset_rng_generator(rng=rng)
 
     def plot(self):
         """Generates plot of noise model.
@@ -444,7 +425,7 @@ class NoiseModel:
         error_counter = self.counter_propagate(
             cliff_circ=cliff_circ,
             n_counts=n_rand,
-            direction='backward',
+            direction=Direction.backward,
         )
 
         return LogicalErrorDistribution(error_counter, total=n_rand)
@@ -452,7 +433,7 @@ class NoiseModel:
     def counter_propagate(
         self,
         cliff_circ: Circuit,
-        n_counts: int = 1000,
+        n_counts: int,
         **kwargs
     ) -> Counter[QermitPauli]:
         """Generate random noisy instances of the given circuit and propagate
@@ -462,17 +443,18 @@ class NoiseModel:
         :param cliff_circ: Circuit to be simulated. This should be a Clifford
             circuit.
         :type cliff_circ: Circuit
-        :param n_counts: Number of random instances, defaults to 1000
-        :type n_counts: int, optional
+        :param n_counts: Number of random instances.
+        :type n_counts: int
         :return: Counter of logical errors.
         :rtype: Counter[QermitPauli]
         """
 
         error_counter: Counter[QermitPauli] = Counter()
 
-        # There is some time wasted here, if for example there is no error in
-        # back_propagate_random_error. There may be a saving to be made here
-        # if there errors are sampled before the back propagation occurs?
+        # TODO: There is some time wasted here, if for example there is
+        # no error in back_propagate_random_error. There may be a saving to
+        # be made here if there errors are sampled before the back
+        # propagation occurs?
         for _ in range(n_counts):
             pauli_error = self.random_propagate(cliff_circ, **kwargs)
 
@@ -484,7 +466,7 @@ class NoiseModel:
     def random_propagate(
         self,
         cliff_circ: Circuit,
-        direction: str = 'backward',
+        direction: Direction = Direction.backward,
     ) -> QermitPauli:
         """Generate a random noisy instance of the given circuit and
         propagate the noise forward or backward to recover the logical error.
@@ -494,7 +476,7 @@ class NoiseModel:
         :type cliff_circ: Circuit
         :param direction: Direction in which noise should be propagated,
             defaults to 'backward'
-        :type direction: str, optional
+        :type direction: Direction, optional
         :raises Exception: Raised if direction is invalid.
         :return: Resulting logical error.
         :rtype: QermitPauli
@@ -510,13 +492,13 @@ class NoiseModel:
 
         # Commands are ordered in reverse or original order depending on which
         # way the noise is being pushed.
-        if direction == 'backward':
+        if direction == Direction.backward:
             command_list = list(reversed(cliff_circ.get_commands()))
-        elif direction == 'forward':
+        elif direction == Direction.forward:
             command_list = cliff_circ.get_commands()
         else:
             raise Exception(
-                f"Direction must be 'backward' or 'forward'. Is {direction}"
+                "Direction must be Direction.backward or Direction.forward."
             )
 
         # For each command in the circuit, add an error as appropriate, and
@@ -526,7 +508,7 @@ class NoiseModel:
             if command.op.type in [OpType.Measure, OpType.Barrier]:
                 continue
 
-            if direction == 'forward':
+            if direction == Direction.forward:
 
                 # Apply gate to total error.
                 pauli_error.apply_gate(
@@ -544,21 +526,20 @@ class NoiseModel:
 
                 if error is not None:
                     for pauli, qubit in zip(error, command.args):
-                        if direction == 'backward':
+                        if direction == Direction.backward:
                             pauli_error.pre_apply_pauli(
                                 pauli=pauli, qubit=cast(Qubit, qubit)
                             )
-                        elif direction == 'forward':
+                        elif direction == Direction.forward:
                             pauli_error.post_apply_pauli(
                                 pauli=pauli, qubit=cast(Qubit, qubit)
                             )
                         else:
                             raise Exception(
-                                "Direction must be 'backward' or 'forward'. "
-                                + f"Is {direction}"
+                                "Direction must be Direction.backward or Direction.forward. "
                             )
 
-            if direction == 'backward':
+            if direction == Direction.backward:
 
                 # Note that here we wish to pull the pauli back through the gate,
                 # which has the same effect on the pauli as pushing through the

@@ -4,7 +4,7 @@ from pytket.circuit import Qubit, OpType, Circuit
 import math
 import numpy as np
 from numpy.random import Generator
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Dict
 
 
 class QermitPauli:
@@ -14,7 +14,7 @@ class QermitPauli:
     (i)^{phase}X^{X_list}Z^{Z_list}
     """
 
-    phase_dict = {
+    phase_dict: Dict[int, complex] = {
         0: 1 + 0j,
         1: 0 + 1j,
         2: -1 + 0j,
@@ -23,20 +23,20 @@ class QermitPauli:
 
     def __init__(
         self,
-        Z_list: list[int],
-        X_list: list[int],
-        qubit_list: list[Qubit],
+        Z_list: List[int],
+        X_list: List[int],
+        qubit_list: List[Qubit],
         phase: int = 0
     ):
         """Initialisation is by a list of qubits, and lists of 0, 1
         values indicating that a Z or X operator acts there.
 
         :param Z_list: 0 indicates no Z, 1 indicates Z.
-        :type Z_list: list[int]
+        :type Z_list: List[int]
         :param X_list: 0 indicates no X, 1 indicates X.
-        :type X_list: list[int]
+        :type X_list: List[int]
         :param qubit_list: List of qubits on which the Pauli acts.
-        :type qubit_list: list[Qubit]
+        :type qubit_list: List[Qubit]
         :param phase: Phase as a power of i
         :type phase: int
         """
@@ -100,13 +100,13 @@ class QermitPauli:
     @classmethod
     def random_pauli(
         cls,
-        qubit_list: list[Qubit],
+        qubit_list: List[Qubit],
         rng: Generator = np.random.default_rng(),
     ) -> QermitPauli:
         """Generates a uniformly random Pauli.
 
         :param qubit_list: Qubits on which the Pauli acts.
-        :type qubit_list: list[Qubit]
+        :type qubit_list: List[Qubit]
         :param rng: Randomness generator, defaults to np.random.default_rng()
         :type rng: Generator, optional
         :return: Random pauli.
@@ -254,7 +254,7 @@ class QermitPauli:
                 params=command.op.params,
             )
 
-    def apply_gate(self, op_type: OpType, qubits: list[Qubit], **kwargs):
+    def apply_gate(self, op_type: OpType, qubits: List[Qubit], **kwargs):
         """Apply operation of given type to given qubit in the pauli. At
         present the recognised operation types are H, S, CX, Z, Sdg,
         X, Y, CZ, SWAP, and Barrier.
@@ -262,7 +262,7 @@ class QermitPauli:
         :param op_type: Type of operator to be applied.
         :type op_type: OpType
         :param qubits: Qubits to which operator is applied.
-        :type qubits: list[Qubit]
+        :type qubits: List[Qubit]
         :raises Exception: Raised if operator is not recognised.
         """
 
@@ -591,12 +591,12 @@ class QermitPauli:
         return paulis, self.phase_dict[operator_phase]
 
     @property
-    def qubit_pauli_string(self) -> tuple[QubitPauliString, complex]:
+    def qubit_pauli_string(self) -> Tuple[QubitPauliString, complex]:
         """Qubit pauli string corresponding to Paulii,
         along with the appropriate phase.
 
         :return: Pauli string and phase corresponding to Pauli.
-        :rtype: tuple[QubitPauliString, complex]
+        :rtype: Tuple[QubitPauliString, complex]
         """
 
         paulis, operator_phase = self.pauli_string

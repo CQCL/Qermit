@@ -15,9 +15,10 @@ import json
 import numpy as np
 from copy import deepcopy
 import pytest
+from qermit.noise_model.noise_model import Direction
 
 
-def test_noise_model_logical_error_propagation():
+def test_noise_model_logical_error_propagation() -> None:
 
     pytket_ciruit = Circuit(2).H(0).CX(0, 1).measure_all()
 
@@ -42,7 +43,7 @@ def test_noise_model_logical_error_propagation():
     assert abs(logical_distribution.distribution[ideal_error] - 0.1) <= 0.01
 
     logical_distribution = noise_model.counter_propagate(
-        pytket_ciruit, n_counts=10000, direction='forward'
+        pytket_ciruit, n_counts=10000, direction=Direction.forward
     )
     ideal_error = QermitPauli.from_qubit_pauli_string(
         QubitPauliString(
@@ -56,7 +57,7 @@ def test_noise_model_logical_error_propagation():
     assert abs(logical_distribution[ideal_error] - 1000) <= 1
 
 
-def test_error_distribution_utilities(tmp_path_factory):
+def test_error_distribution_utilities(tmp_path_factory) -> None:
 
     # Test that the probabilities must be less than 1.
     error_distribution_dict = {(Pauli.X, Pauli.I): 1.1}
@@ -133,7 +134,7 @@ def test_error_distribution_utilities(tmp_path_factory):
     assert error_distribution_loaded == error_distribution
 
 
-def test_error_distribution_post_select():
+def test_error_distribution_post_select() -> None:
 
     qps_remove = QubitPauliString(
         qubits=[Qubit(name='ancilla', index=0), Qubit(
@@ -163,7 +164,7 @@ def test_error_distribution_post_select():
     }
 
 
-def test_to_dict(tmpdir_factory):
+def test_to_dict(tmpdir_factory) -> None:
 
     error_distribution_dict_zzmax = {}
     error_distribution_dict_zzmax[(Pauli.X, Pauli.I)] = 0.0002
@@ -204,7 +205,7 @@ def test_to_dict(tmpdir_factory):
 
 
 @pytest.mark.high_compute
-def test_transpiler_backend():
+def test_transpiler_backend() -> None:
 
     circuit = Circuit(3)
     for _ in range(32):
@@ -233,7 +234,7 @@ def test_transpiler_backend():
     assert sum(result.get_counts().values()) == n_shots
 
 
-def test_pauli_error_transpile():
+def test_pauli_error_transpile() -> None:
 
     error_distribution_dict = {
         error: 0 for error in product(
@@ -263,7 +264,7 @@ def test_pauli_error_transpile():
     assert transpiled_circ == circ
 
 
-def test_noise_model():
+def test_noise_model() -> None:
 
     error_distribution_dict = {}
     error_rate = 0.5
@@ -291,7 +292,7 @@ def test_noise_model():
     assert all(shot in [(1, 0), (0, 1)] for shot in list(counts.keys()))
 
 
-def test_error_backpropagation():
+def test_error_backpropagation() -> None:
 
     # This is a backwards propagation of two X errors through a circuit
     # containing 2 CZ gates.
@@ -333,7 +334,7 @@ def test_error_backpropagation():
     assert stabilise.phase == 1
 
 
-def test_back_propagate_random_error():
+def test_back_propagate_random_error() -> None:
 
     cliff_circ = Circuit(2).CZ(0, 1).X(1).CZ(1, 0)
     qubit_list = cliff_circ.qubits
@@ -363,7 +364,7 @@ def test_back_propagate_random_error():
 
 
 @pytest.mark.high_compute
-def test_effective_error_distribution():
+def test_effective_error_distribution() -> None:
 
     cliff_circ = Circuit(2).CZ(0, 1).X(1).CZ(1, 0)
     qubits = cliff_circ.qubits
@@ -430,7 +431,7 @@ def test_effective_error_distribution():
     assert abs(effective_error_dist.pauli_error_counter[pauli_error] - 4900) < 100
 
 
-def test_qermit_pauli_circuit():
+def test_qermit_pauli_circuit() -> None:
 
     circ = Circuit(3)
     circ.CZ(0, 1).add_barrier([0, 2]).H(1).H(2).SWAP(1, 2).S(1).Y(0)
@@ -457,7 +458,7 @@ def test_qermit_pauli_circuit():
     assert np.allclose(circ.get_unitary(), check_circ.get_unitary())
 
 
-def test_initialisation():
+def test_initialisation() -> None:
 
     qubit_list = [Qubit(0), Qubit(1), Qubit(2)]
     pauli = QermitPauli(
@@ -472,7 +473,7 @@ def test_initialisation():
     assert pauli.phase == 0
 
 
-def test_identity_clifford():
+def test_identity_clifford() -> None:
 
     circ = Circuit(2).CZ(1, 0).X(0).S(1).X(0).X(1).H(1).X(1)
     circ.X(1).H(1).X(1).X(0).Sdg(1).X(0).CZ(1, 0)
@@ -492,7 +493,7 @@ def test_identity_clifford():
     assert phase == 1
 
 
-def test_H():
+def test_H() -> None:
 
     qubit_list = [Qubit(0)]
     pauli = QermitPauli(Z_list=[1], X_list=[0], qubit_list=qubit_list)
@@ -512,15 +513,14 @@ def test_H():
     assert phase == 1
 
 
-# TODO: this needs more thorough checking
-def test_h_series_gates():
+def test_h_series_gates() -> None:
 
     circ = Circuit(2).ZZPhase(3.5, 0, 1).PhasedX(1.5, 0.5, 0)
     stab = QermitPauli(Z_list=[1, 1], X_list=[1, 1], qubit_list=circ.qubits)
     stab.apply_circuit(circ)
 
 
-def test_apply_circuit():
+def test_apply_circuit() -> None:
 
     circ = Circuit(2).H(0).S(0).CX(0, 1)
     qubit_list = circ.qubits
@@ -539,7 +539,7 @@ def test_apply_circuit():
     assert phase == 1
 
 
-def test_apply_gate():
+def test_apply_gate() -> None:
 
     qubit_list = [Qubit(0), Qubit(1), Qubit(2)]
     pauli = QermitPauli(
@@ -574,7 +574,7 @@ def test_apply_gate():
     assert phase == 1
 
 
-def test_qubit_pauli_string():
+def test_qubit_pauli_string() -> None:
 
     qubit_list = [Qubit(0), Qubit(1), Qubit(2)]
     pauli = QermitPauli(
@@ -624,7 +624,7 @@ def test_qubit_pauli_string():
     assert phase == -1
 
 
-def test_clifford_incremental():
+def test_clifford_incremental() -> None:
 
     qubit_list = [Qubit(0), Qubit(1), Qubit(2)]
     pauli = QermitPauli(
@@ -697,7 +697,7 @@ def test_clifford_incremental():
     assert pauli.phase == 1
 
 
-def test_to_from_qps():
+def test_to_from_qps() -> None:
 
     qubits = [Qubit(name=f'reg_name_{i}', index=0) for i in range(5)]
     paulis = [Pauli.I, Pauli.Y, Pauli.X, Pauli.Y, Pauli.Z]
@@ -710,7 +710,7 @@ def test_to_from_qps():
     assert stab_phase == 1 + 0j
 
 
-def test_is_measureable():
+def test_is_measureable() -> None:
 
     stab = QermitPauli(
         Z_list=[1, 0, 0],
@@ -720,3 +720,26 @@ def test_is_measureable():
     assert stab.is_measureable(qubit_list=[Qubit(name='A', index=1)])
     assert stab.is_measureable(qubit_list=[Qubit(name='A', index=0)])
     assert not stab.is_measureable(qubit_list=[Qubit(name='B', index=0)])
+
+
+if __name__ == "__main__":
+
+    test_is_measureable()
+    test_to_from_qps()
+    test_clifford_incremental()
+    test_qubit_pauli_string()
+    test_apply_gate()
+    test_apply_circuit()
+    test_h_series_gates()
+    test_H()
+    test_identity_clifford()
+    test_initialisation()
+    test_qermit_pauli_circuit()
+    test_effective_error_distribution()
+    test_back_propagate_random_error()
+    test_error_backpropagation()
+    test_noise_model()
+    test_pauli_error_transpile()
+    test_transpiler_backend()
+    test_error_distribution_post_select()
+    test_noise_model_logical_error_propagation()
