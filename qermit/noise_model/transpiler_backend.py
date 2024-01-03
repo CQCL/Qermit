@@ -114,6 +114,48 @@ class TranspilerBackend:
         """
         return self.result_dict[handle]
 
+    def _gen_transpiled_circuit(self, circuit: Circuit) -> Circuit:
+        """Generate compiled circuit by copying and compiling it.
+
+        :param circuit: Circuit to be compiled.
+        :type circuit: Circuit
+        :return: Compiled circuit.
+        :rtype: Circuit
+        """
+
+        transpiled_circuit = circuit.copy()
+        self.transpiler.apply(transpiled_circuit)
+        self.backend.rebase_pass().apply(transpiled_circuit)
+        return transpiled_circuit
+
+    def _gen_batches(self, circuit: Circuit, n_shots: int) -> Iterator[List[Circuit]]:
+        """Iterator generating lists of circuits of size `max_batch_size`
+            until all shots have been accounted for.
+
+        :param circuit: Circuit to batch into shots.
+        :type circuit: Circuit
+        :param n_shots: Number of shots to take from circuit.
+        :type n_shots: int
+        :return: List of compiled circuits, which is to say noisy circuits.
+        :rtype: Iterator[List[Circuit]]
+        """
+
+        # Return lists of size max_batch_size containing unique
+        # compiled instances of the given circuit.
+        for _ in range(n_shots // self.max_batch_size):
+            yield [
+                self._gen_transpiled_circuit(circuit)
+                for _ in range(self.max_batch_size)
+            ]
+
+        # If less than max_batch_size shots remain to be returned,
+        # return what's left.
+        if n_shots % self.max_batch_size > 0:
+            yield [
+                self._gen_transpiled_circuit(circuit)
+                for _ in range(n_shots % self.max_batch_size)
+            ]
+
     def get_counts(
         self,
         circuit: Circuit,
@@ -136,49 +178,7 @@ class TranspilerBackend:
 
         counter: Counter = Counter()
 
-        def gen_transpiled_circuit(circuit: Circuit) -> Circuit:
-            """Generate compiled circuit by copying and compiling it.
-
-            :param circuit: Circuit to be compiled.
-            :type circuit: Circuit
-            :return: Compiled circuit.
-            :rtype: Circuit
-            """
-
-            transpiled_circuit = circuit.copy()
-            self.transpiler.apply(transpiled_circuit)
-            self.backend.rebase_pass().apply(transpiled_circuit)
-            return transpiled_circuit
-
-        def gen_batches(circuit: Circuit, n_shots: int) -> Iterator[List[Circuit]]:
-            """Iterator generating lists of circuits of size `max_batch_size`
-                until all shots have been accounted for.
-
-            :param circuit: Circuit to batch into shots.
-            :type circuit: Circuit
-            :param n_shots: Number of shots to take from circuit.
-            :type n_shots: int
-            :return: List of compiled circuits, which is to say noisy circuits.
-            :rtype: Iterator[List[Circuit]]
-            """
-
-            # Return lists of size max_batch_size containing unique
-            # compiled instances of the given circuit.
-            for _ in range(n_shots // self.max_batch_size):
-                yield [
-                    gen_transpiled_circuit(circuit)
-                    for _ in range(self.max_batch_size)
-                ]
-
-            # If less than max_batch_size shots remain to be returned,
-            # return what's left.
-            if n_shots % self.max_batch_size > 0:
-                yield [
-                    gen_transpiled_circuit(circuit)
-                    for _ in range(n_shots % self.max_batch_size)
-                ]
-
-        for circuit_list in gen_batches(circuit, n_shots):
+        for circuit_list in self._gen_batches(circuit, n_shots):
             result_list = self.backend.run_circuits(circuit_list, n_shots=1)
             counter += sum((result.get_counts(cbits=cbits)
                            for result in result_list), Counter())

@@ -125,7 +125,7 @@ class ErrorDistribution:
             in sorted(self.distribution.items(), key=lambda x: x[1], reverse=reverse)
         }
 
-    def reset_rng_generator(self, rng: Generator):
+    def reset_rng(self, rng: Generator):
         """Reset randomness generator.
 
         :param rng: Randomness generator.
@@ -304,14 +304,14 @@ class NoiseModel:
 
         self.noise_model = noise_model
 
-    def reset_rng_generator(self, rng: Generator):
+    def reset_rng(self, rng: Generator):
         """Reset randomness generator.
 
         :param rng: Randomness generator to be reset to.
         :type rng: Generator
         """
         for distribution in self.noise_model.values():
-            distribution.reset_rng_generator(rng=rng)
+            distribution.reset_rng(rng=rng)
 
     def plot(self):
         """Generates plot of noise model.
