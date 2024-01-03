@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from qermit.mock_backend import MockQuantinuumBackend
+from qermit.noise_model import MockQuantinuumBackend
 from pytket import Circuit
 from qermit.taskgraph import gen_compiled_MitRes
 from qermit import CircuitShots

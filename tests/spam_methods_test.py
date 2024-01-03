@@ -23,7 +23,7 @@ from qermit.spam import (  # type: ignore
     CorrectionMethod,
 )
 from qermit import CircuitShots
-from qermit.mock_backend import MockQuantinuumBackend  # type: ignore
+from qermit.noise_model import MockQuantinuumBackend  # type: ignore
 
 
 def test_mock_quantinuum_all_qubits() -> None:

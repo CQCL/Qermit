@@ -25,6 +25,7 @@ from sympy import Symbol  # type: ignore
 from typing import Iterable, Dict, Union, Tuple, List, Optional
 from collections import OrderedDict
 from numpy import ndarray  # type: ignore
+from pytket.utils.operators import _coeff_convert
 
 
 class SymbolsDict(object):
@@ -311,7 +312,7 @@ class ObservableTracker:
                         coeff[0]
                     )
                 )
-            self._qubit_pauli_operator._dict[coeff[0]] = coeff[1]
+            self._qubit_pauli_operator._dict[coeff[0]] = _coeff_convert(coeff[1])
 
     def extend_operator(self, new_operator: QubitPauliOperator):
         """
