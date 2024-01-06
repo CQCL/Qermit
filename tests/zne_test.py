@@ -142,7 +142,7 @@ def test_measurement_reduction_integration():
 
     folding_type = Folding.two_qubit_gate
     fit_type = Fit.linear
-    noise_scaling_list = [1.5, 2, 2.5, 3, 3.5]
+    noise_scaling_list = [1, 1.5, 2, 2.5, 3, 3.5]
     zne_mitex = gen_ZNE_MitEx(
         backend=backend,
         experiment_mitex=reduction_mitex,
@@ -174,9 +174,7 @@ def test_measurement_reduction_integration():
 @pytest.mark.high_compute
 def test_no_qubit_relabel():
 
-    lagos_backend = IBMQEmulatorBackend(
-        "ibm_lagos", instance='partner-cqc/internal/default'
-    )
+    lagos_backend = IBMQEmulatorBackend("ibmq_mumbai")
     zne_mitex = gen_ZNE_MitEx(backend=lagos_backend, noise_scaling_list=[3, 5, 7])
 
     c = Circuit(3)
@@ -322,11 +320,11 @@ def test_gen_duplication_task():
 
 def test_extrapolation_task_gen():
 
-    n_folds = [2, 3, 4, 5]
+    n_folds = [1, 2, 3, 4, 5]
 
     task = extrapolation_task_gen(n_folds, Fit.polynomial, False, 2)
 
-    assert task.n_in_wires == len(n_folds) + 1
+    assert task.n_in_wires == len(n_folds)
     assert task.n_out_wires == 1
 
     # Defines the function (x/10 - 1)**2
@@ -345,14 +343,11 @@ def test_extrapolation_task_gen():
             {QubitPauliString([Qubit(1)], [Pauli.X]): polyval(noise_level, coef_2)}
         )
 
-    # Expectation results from noise as it is on the device.
-    qpo = [qpo_1(1), qpo_2(1)]
-
     # Expectation values at defined noise scaling
     args = [[qpo_1(i), qpo_2(i)] for i in n_folds]
     args = tuple(args)
 
-    result = task([qpo, *args])[0]
+    result = task(args)[0]
 
     experiment_1_result = result[0]._dict
     experiment_2_result = result[1]._dict
@@ -371,7 +366,7 @@ def test_extrapolation_task_gen():
 @pytest.mark.high_compute
 def test_folding_compiled_circuit():
 
-    emulator_backend = IBMQEmulatorBackend("ibmq_quito")
+    emulator_backend = IBMQEmulatorBackend("ibmq_mumbai")
 
     n_folds_1 = 3
 
@@ -534,7 +529,7 @@ def test_zne_identity():
 
     me = gen_ZNE_MitEx(
         backend,
-        [7, 5, 3],
+        [1, 7, 5, 3],
         _label="TestZNEMitEx",
         optimisation_level=0,
     )
@@ -559,7 +554,7 @@ def test_simple_run_end_to_end():
 
     me = gen_ZNE_MitEx(
         be,
-        [2, 3, 4],
+        [1, 2, 3, 4],
         _label="TestZNEMitEx",
         optimisation_level=0,
         folding_type=Folding.gate,

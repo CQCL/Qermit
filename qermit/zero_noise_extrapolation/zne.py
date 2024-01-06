@@ -750,8 +750,6 @@ def extrapolation_task_gen(
         experiment, all with noise scaled by a fixed amount.
         :rtype: Tuple[List[QubitPauliOperator]]
         """
-        # Combine noise folding levels with the unfolded experiment
-        all_fold_vals = [1, *noise_scaling_list]
 
         # Reformats to create list, where each list has fixed noise folding. Each element of
         # the list is a list of experiments
@@ -775,7 +773,7 @@ def extrapolation_task_gen(
                 QubitPauliOperator(
                     {
                         qpo_k: _fit_type(  # type: ignore
-                            all_fold_vals, qpo_list_float[qpo_k], _show_fit, deg
+                            noise_scaling_list, qpo_list_float[qpo_k], _show_fit, deg
                         )
                         for qpo_k in qpo_list_float
                     }
@@ -786,7 +784,7 @@ def extrapolation_task_gen(
 
     return MitTask(
         _label="CollateZNEResults",
-        _n_in_wires=len(noise_scaling_list) + 1,
+        _n_in_wires=len(noise_scaling_list),
         _n_out_wires=1,
         _method=task,
     )
@@ -1030,7 +1028,6 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
             MitEx(backend, _label="ExperimentMitex", mitres=_experiment_mitres),
         )
     )
-    _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
 
     _optimisation_level = kwargs.get("optimisation_level", 0)
     _show_fit = kwargs.get("show_fit", False)
@@ -1042,7 +1039,8 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
 
     np.random.seed(seed=_seed)
 
-    for fold in noise_scaling_list:
+    def gen_scaled_mitex(fold):
+        
         _label = str(fold) + "FoldMitEx"
         _fold_mitex = deepcopy(_experiment_mitex)
         _fold_mitex._label = _label + _fold_mitex._label
@@ -1050,19 +1048,28 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
             backend, fold, _folding_type, _allow_approx_fold
         )
         _fold_mitex.prepend(digital_folding_task)
-        _experiment_taskgraph.parallel(_fold_mitex)
+        
+        return _fold_mitex
 
-    extrapolation_task = extrapolation_task_gen(
-        noise_scaling_list, _fit_type, _show_fit, _deg
+    _zne_taskgraph = TaskGraph().from_TaskGraph(
+        gen_scaled_mitex(fold=noise_scaling_list[0])
     )
 
-    _experiment_taskgraph.prepend(gen_duplication_task(len(noise_scaling_list) + 1))
-    _experiment_taskgraph.append(extrapolation_task)
+    for fold in noise_scaling_list[1:]:
+        _zne_taskgraph.parallel(gen_scaled_mitex(fold))
 
-    _experiment_taskgraph.add_wire()
+    _zne_taskgraph.prepend(gen_duplication_task(len(noise_scaling_list)))
+    _zne_taskgraph.append(
+        extrapolation_task_gen(
+            noise_scaling_list, _fit_type, _show_fit, _deg
+        )
+    )
 
-    _experiment_taskgraph.prepend(
+    _zne_taskgraph.add_wire()
+
+    _zne_taskgraph.prepend(
         gen_initial_compilation_task(backend, _optimisation_level)
     )
-    _experiment_taskgraph.append(gen_qubit_relabel_task())
-    return MitEx(backend).from_TaskGraph(_experiment_taskgraph)
+    _zne_taskgraph.append(gen_qubit_relabel_task())
+
+    return MitEx(backend).from_TaskGraph(_zne_taskgraph)
