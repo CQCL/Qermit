@@ -106,7 +106,7 @@ class Folding(Enum):
                 else:
                     folded_circ.add_gate(gate.op, gate.args)
 
-        return folded_circ
+        return [folded_circ]
 
     @staticmethod
     def two_qubit_gate(circ: Circuit, noise_scaling: float, **kwargs) -> Circuit:
@@ -212,7 +212,7 @@ class Folding(Enum):
             else:
                 folded_circuit.add_gate(gate.op, gate.args)
 
-        return folded_circuit
+        return [folded_circuit]
 
     @staticmethod
     def gate(circ: Circuit, noise_scaling: float, **kwargs) -> Circuit:
@@ -323,7 +323,7 @@ class Folding(Enum):
         folded_c_dict["commands"] = folded_command_list
         folded_c = Circuit().from_dict(folded_c_dict)
 
-        return folded_c
+        return [folded_c]
 
     @staticmethod
     def odd_gate(circ: Circuit, noise_scaling: int, **kwargs) -> Circuit:
@@ -396,7 +396,7 @@ class Folding(Enum):
         c_dict.update({"commands": folded_command_list})
         folded_c = Circuit.from_dict(c_dict)
 
-        return folded_c
+        return [folded_c]
 
 
 def poly_exp_func(x: float, *params) -> float:
@@ -683,7 +683,7 @@ def digital_folding_task_gen(
     def task(
         obj,
         mitex_wire: List[ObservableExperiment],
-    ) -> Tuple[List[ObservableExperiment]]:
+    ) -> Tuple[List[ObservableExperiment], List[int]]:
         """Increase the noise levels impacting the circuit by increasing the
         number of gates. This preserves the action of the circuit.
 
@@ -694,34 +694,51 @@ def digital_folding_task_gen(
         """
 
         folded_circuits = []
+        experiment_index = []
 
         # For each circuit in the input wire, extract the circuit, apply the fold,
         # and perform the necessary compilation.
-        for experiment in mitex_wire:
+        for index, experiment in enumerate(mitex_wire):
             # Apply the necessary folding method
-            zne_circ = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold)  # type: ignore
+            zne_circ_list = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold)  # type: ignore
 
-            # TODO: This additional compilation pass may result in the circuit noise being
-            # increased too much, and should be removed or better accounted for.
+            for zne_circ in zne_circ_list:
 
-            # This compilation pass was added to account for the case that
-            # the inverse of a gate is not in the gateset of the backend.
-            backend.rebase_pass().apply(zne_circ)
+                # TODO: This additional compilation pass may result in the circuit noise being
+                # increased too much, and should be removed or better accounted for.
 
-            folded_circuits.append(
-                ObservableExperiment(
-                    AnsatzCircuit=AnsatzCircuit(
-                        Circuit=zne_circ,
-                        Shots=experiment.AnsatzCircuit.Shots,
-                        SymbolsDict=experiment.AnsatzCircuit.SymbolsDict,
-                    ),
-                    ObservableTracker=experiment.ObservableTracker,
+                # This compilation pass was added to account for the case that
+                # the inverse of a gate is not in the gateset of the backend.
+                backend.rebase_pass().apply(zne_circ)
+
+                folded_circuits.append(
+                    ObservableExperiment(
+                        AnsatzCircuit=AnsatzCircuit(
+                            Circuit=zne_circ,
+                            Shots=experiment.AnsatzCircuit.Shots // len(zne_circ_list),
+                            SymbolsDict=experiment.AnsatzCircuit.SymbolsDict,
+                        ),
+                        ObservableTracker=experiment.ObservableTracker,
+                    )
                 )
-            )
+                experiment_index.append(index)
 
-        return (folded_circuits,)
+        return (folded_circuits, experiment_index)
 
-    return MitTask(_label="DigitalFolding", _n_in_wires=1, _n_out_wires=1, _method=task)
+    return MitTask(_label="DigitalFolding", _n_in_wires=1, _n_out_wires=2, _method=task)
+
+
+def merge_experiments_task_gen() -> MitTask:
+
+    def task(
+        obj,
+        exp_list: List[QubitPauliOperator],
+        exp_index: List[int]
+    ) -> Tuple[List[QubitPauliOperator]]:
+
+        return (exp_list, )
+
+    return MitTask(_label="MergeExperiments", _n_in_wires=2, _n_out_wires=1, _method=task)
 
 
 def extrapolation_task_gen(
@@ -1002,19 +1019,8 @@ def gen_qubit_relabel_task() -> MitTask:
     )
 
 
-# TODO: Backend does not appear as input in documentation
-def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -> MitEx:
-    """Generates MitEx object which mitigates for noise using Zero Noise Extrapolation. This is the
-    process by which noise is amplified incrementally, and the zero noise case arrived at by
-    extrapolating backwards. For further explanantion see https://arxiv.org/abs/2005.10921.
+def gen_noise_scaled_mitex(backend, noise_scaling, **kwargs):
 
-    :param backend: Backend on which the circuits are to be run.
-    :type backend: Backend
-    :param noise_scaling_list: A list of the amounts by which the noise should be scaled.
-    :type noise_scaling_list: List[float]
-    :return: MitEx object performing noise mitigation by ZNE.
-    :rtype: MitEx
-    """
     _experiment_mitres = deepcopy(
         kwargs.get(
             "experiment_mitres",
@@ -1029,34 +1035,61 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
         )
     )
 
+    _allow_approx_fold = kwargs.get("allow_approx_fold", True)
+    _folding_type = kwargs.get("folding_type", Folding.circuit)
+    
+    _fold_mitex = deepcopy(_experiment_mitex)
+    _fold_mitex._label = str(noise_scaling) + "FoldMitEx" + _fold_mitex._label
+
+    digital_folding_task = digital_folding_task_gen(
+        backend, noise_scaling, _folding_type, _allow_approx_fold
+    )
+
+    _fold_taskgraph = TaskGraph().from_TaskGraph(_fold_mitex)
+    _fold_taskgraph.add_wire()
+    _fold_taskgraph.prepend(digital_folding_task)
+    _fold_taskgraph.append(merge_experiments_task_gen())
+    
+    return MitEx(backend).from_TaskGraph(_fold_taskgraph)
+
+
+# TODO: Backend does not appear as input in documentation
+def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -> MitEx:
+    """Generates MitEx object which mitigates for noise using Zero Noise Extrapolation. This is the
+    process by which noise is amplified incrementally, and the zero noise case arrived at by
+    extrapolating backwards. For further explanantion see https://arxiv.org/abs/2005.10921.
+
+    :param backend: Backend on which the circuits are to be run.
+    :type backend: Backend
+    :param noise_scaling_list: A list of the amounts by which the noise should be scaled.
+    :type noise_scaling_list: List[float]
+    :return: MitEx object performing noise mitigation by ZNE.
+    :rtype: MitEx
+    """
     _optimisation_level = kwargs.get("optimisation_level", 0)
     _show_fit = kwargs.get("show_fit", False)
-    _folding_type = kwargs.get("folding_type", Folding.circuit)
     _fit_type = kwargs.get("fit_type", Fit.linear)
     _deg = kwargs.get("deg", len(noise_scaling_list) - 1)
     _seed = kwargs.get("seed", None)
-    _allow_approx_fold = kwargs.get("allow_approx_fold", True)
 
     np.random.seed(seed=_seed)
 
-    def gen_scaled_mitex(fold):
-        
-        _label = str(fold) + "FoldMitEx"
-        _fold_mitex = deepcopy(_experiment_mitex)
-        _fold_mitex._label = _label + _fold_mitex._label
-        digital_folding_task = digital_folding_task_gen(
-            backend, fold, _folding_type, _allow_approx_fold
-        )
-        _fold_mitex.prepend(digital_folding_task)
-        
-        return _fold_mitex
-
     _zne_taskgraph = TaskGraph().from_TaskGraph(
-        gen_scaled_mitex(fold=noise_scaling_list[0])
+        gen_noise_scaled_mitex(
+            noise_scaling=noise_scaling_list[0],
+            backend=backend,
+            **kwargs,
+        )
     )
 
     for fold in noise_scaling_list[1:]:
-        _zne_taskgraph.parallel(gen_scaled_mitex(fold))
+        _zne_taskgraph.parallel(
+            gen_noise_scaled_mitex(
+                noise_scaling=fold,
+                backend=backend,
+                **kwargs,
+            )
+        )
 
     _zne_taskgraph.prepend(gen_duplication_task(len(noise_scaling_list)))
     _zne_taskgraph.append(

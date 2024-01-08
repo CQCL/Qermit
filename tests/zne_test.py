@@ -378,7 +378,7 @@ def test_folding_compiled_circuit():
     )
 
     assert task_1.n_in_wires == 1
-    assert task_1.n_out_wires == 1
+    assert task_1.n_out_wires == 2
 
     c_1 = Circuit(1).Rz(3.5, 0)
     c_1 = emulator_backend.get_compiled_circuit(c_1)
@@ -424,13 +424,13 @@ def test_digital_folding_task_gen():
     )
 
     assert task_1.n_in_wires == 1
-    assert task_1.n_out_wires == 1
+    assert task_1.n_out_wires == 2
     assert task_2.n_in_wires == 1
-    assert task_2.n_out_wires == 1
+    assert task_2.n_out_wires == 2
     assert task_3.n_in_wires == 1
-    assert task_3.n_out_wires == 1
+    assert task_3.n_out_wires == 2
     assert task_4.n_in_wires == 1
-    assert task_4.n_out_wires == 1
+    assert task_4.n_out_wires == 2
 
     c_1 = Circuit(2).CZ(0, 1).T(1)
     c_2 = Circuit(2).CZ(0, 1).T(0).X(1)
@@ -600,7 +600,7 @@ def test_circuit_folding_TK1():
     circ.add_gate(OpType.TK1, (0, 0.1, 0), [0])
     circ.CX(0, 1)
 
-    folded_circ = Folding.circuit(circ, 3)
+    folded_circ = Folding.circuit(circ, 3)[0]
 
     circ_unitary = circ.get_unitary()
     folded_circ_unitary = folded_circ.get_unitary()
@@ -610,7 +610,7 @@ def test_circuit_folding_TK1():
 def test_odd_gate_folding():
 
     circ = Circuit(2).CX(0, 1).X(0).CX(1, 0).X(1)
-    folded_circ = Folding.odd_gate(circ, 2)
+    folded_circ = Folding.odd_gate(circ, 2)[0]
     correct_folded_circ = (
         Circuit(2)
         .CX(0, 1)
@@ -629,7 +629,7 @@ def test_odd_gate_folding():
     assert folded_circ == correct_folded_circ
 
     circ = Circuit(3).CX(0, 1).CX(1, 2)
-    folded_circ = Folding.odd_gate(circ, 3)
+    folded_circ = Folding.odd_gate(circ, 3)[0]
     correct_folded_circ = (
         Circuit(3)
         .CX(0, 1)
@@ -668,11 +668,11 @@ def test_two_qubit_gate_folding():
     )
 
     assert task_1.n_in_wires == 1
-    assert task_1.n_out_wires == 1
+    assert task_1.n_out_wires == 2
     assert task_2.n_in_wires == 1
-    assert task_2.n_out_wires == 1
+    assert task_2.n_out_wires == 2
     assert task_invalid.n_in_wires == 1
-    assert task_invalid.n_out_wires == 1
+    assert task_invalid.n_out_wires == 2
 
     c_1 = Circuit(2).Rz(0.3, 0).ZZPhase(0.3, 1, 0)
     # This is to ensure that the barrier is not folded, even though it
