@@ -3,8 +3,8 @@ from collections import Counter
 from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 import uuid
-from pytket.passes import BasePass
-from typing import Dict, List, Optional, Iterator
+from pytket.passes import BasePass, CustomPass
+from typing import Dict, List, Optional, Iterator, Sequence, Iterable
 from pytket import Circuit, Bit
 
 
@@ -51,6 +51,20 @@ class TranspilerBackend:
         self.max_batch_size = max_batch_size
         self.result_dict = result_dict
 
+    def default_compilation_pass(self, **kwargs) -> BasePass:
+
+        def transform(circuit: Circuit) -> Circuit:
+            return circuit
+
+        return CustomPass(transform=transform)
+
+    def rebase_pass(self):
+        
+        def transform(circuit: Circuit) -> Circuit:
+            return circuit
+
+        return CustomPass(transform=transform)
+
     def run_circuit(
         self,
         circuit: Circuit,
@@ -69,6 +83,17 @@ class TranspilerBackend:
 
         handle = self.process_circuit(circuit, n_shots, **kwargs)
         return self.get_result(handle=handle)
+
+    def process_circuits(
+        self,
+        circuits: Sequence[Circuit],
+        n_shots: Sequence[int],
+    ) -> List[uuid.UUID]:
+
+        return [
+            self.process_circuit(circuit=circuit, n_shots=n)
+            for circuit, n in zip(circuits, n_shots)
+        ]
 
     def process_circuit(
         self,
@@ -103,6 +128,11 @@ class TranspilerBackend:
         )
 
         return handle
+
+    def get_results(self, handles: Iterable[uuid.UUID]) -> List[BackendResult]:
+        return [
+            self.get_result(handle) for handle in handles
+        ]
 
     def get_result(self, handle: uuid.UUID) -> BackendResult:
         """Retrieve result from backend.

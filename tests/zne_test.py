@@ -47,6 +47,7 @@ from qermit.noise_model import MockQuantinuumBackend  # type: ignore
 from qermit.taskgraph import gen_MeasurementReduction_MitEx
 from qermit.noise_model import NoiseModel, ErrorDistribution
 from qermit.zero_noise_extrapolation.zne import gen_noise_scaled_mitex
+from qermit.noise_model import TranspilerBackend, PauliErrorTranspile
 
 n_qubits = 2
 
@@ -840,6 +841,60 @@ def test_end_to_end_noise_scaled_mitex():
     assert abs(qubit_pauli_operator_list[0]._dict[qps_noisy_noisless]) < 0.1
     assert abs(qubit_pauli_operator_list[1]._dict[qps_noisless_one] - 1) < 0.1
     assert abs(qubit_pauli_operator_list[1]._dict[qps_noisless_zero]) < 0.1
+
+
+@pytest.mark.high_compute
+def test_end_to_end_noise_aware_zne():
+
+    error_rate = 0.1
+    error_distribution = ErrorDistribution(
+        distribution={(Pauli.X, Pauli.I): error_rate}
+    )
+    noise_model = NoiseModel(
+        noise_model={OpType.CZ: error_distribution}
+    )
+    transpiler = PauliErrorTranspile(noise_model=noise_model)
+    backend = TranspilerBackend(transpiler=transpiler)
+
+    zne_mitex = gen_ZNE_MitEx(
+        backend=backend,
+        noise_scaling_list=[2, 5, 3, 1, 4],
+        show_fit=True,
+        folding_type=Folding.noise_aware,
+        fit_type=Fit.exponential,
+        noise_model=noise_model,
+        n_noisy_circuit_samples=1000,
+    )
+
+    circuit_noisy = Circuit(2).CZ(0, 1)
+
+    qps_noisy_noisy = QubitPauliString(map={Qubit(0): Pauli.Z, Qubit(1): Pauli.Z})
+
+    qubit_pauli_operator_noisy = QubitPauliOperator(
+        dictionary={qps_noisy_noisy: 1}
+    )
+
+    observable_tracker_noisy = ObservableTracker(
+        qubit_pauli_operator=qubit_pauli_operator_noisy
+    )
+
+    shots = 10000
+    ansatz_circuit_noisy = AnsatzCircuit(
+        Circuit=circuit_noisy,
+        Shots=shots,
+        SymbolsDict={}
+    )
+
+    observable_experiment_noisy = ObservableExperiment(
+        AnsatzCircuit=ansatz_circuit_noisy,
+        ObservableTracker=observable_tracker_noisy,
+    )
+
+    qubit_pauli_operator_list = zne_mitex.run(
+        mitex_wires=[observable_experiment_noisy]
+    )
+
+    assert abs(qubit_pauli_operator_list[0]._dict[qps_noisy_noisy] - 1) < 0.1
 
 
 if __name__ == "__main__":
