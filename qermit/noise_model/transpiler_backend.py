@@ -59,7 +59,7 @@ class TranspilerBackend:
         return CustomPass(transform=transform)
 
     def rebase_pass(self):
-        
+
         def transform(circuit: Circuit) -> Circuit:
             return circuit
 

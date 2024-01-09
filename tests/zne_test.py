@@ -860,7 +860,6 @@ def test_end_to_end_noise_aware_zne_mitex():
     zne_mitex = gen_ZNE_MitEx(
         backend=backend,
         noise_scaling_list=[2, 5, 3, 1, 4],
-        show_fit=True,
         folding_type=Folding.noise_aware,
         fit_type=Fit.exponential,
         noise_model=noise_model,
