@@ -45,6 +45,8 @@ import pytest
 from pytket.circuit import Node  # type: ignore
 from qermit.noise_model import MockQuantinuumBackend  # type: ignore
 from qermit.taskgraph import gen_MeasurementReduction_MitEx
+from qermit.noise_model import NoiseModel, ErrorDistribution
+from qermit.zero_noise_extrapolation.zne import gen_noise_scaled_mitex
 
 n_qubits = 2
 
@@ -753,6 +755,93 @@ def test_two_qubit_gate_folding():
     assert np.allclose(c_3_unitary, folded_c_3_unitary)
 
 
+@pytest.mark.high_compute
+def test_end_to_end_noise_scaled_mitex():
+
+    error_rate = 0.1
+    error_distribution = ErrorDistribution(
+        distribution={
+            (Pauli.X, Pauli.I): error_rate,
+        }
+    )
+    noise_model = NoiseModel(
+        noise_model={
+            OpType.CZ: error_distribution
+        }
+    )
+
+    noise_scaling = 5
+    noise_scaled_mitex = gen_noise_scaled_mitex(
+        backend=AerBackend(),
+        noise_scaling=noise_scaling,
+        folding_type=Folding.noise_aware,
+        noise_model=noise_model,
+        n_noisy_circuit_samples=10000,
+    )
+
+    circuit_noisy = Circuit(2).CZ(0, 1)
+    circuit_noisless = Circuit(2).CX(0, 1)
+
+    qps_noisy_noisy = QubitPauliString(map={Qubit(0): Pauli.Z, Qubit(1): Pauli.Z})
+    qps_noisy_noisless = QubitPauliString(map={Qubit(0): Pauli.X})
+
+    qubit_pauli_operator_noisy = QubitPauliOperator(
+        dictionary={
+            qps_noisy_noisy: 1,
+            qps_noisy_noisless: 1,
+        }
+    )
+
+    qps_noisless_one = QubitPauliString(map={Qubit(0): Pauli.Z})
+    qps_noisless_zero = QubitPauliString(map={Qubit(1): Pauli.X})
+
+    qubit_pauli_operator_noisless = QubitPauliOperator(
+        dictionary={
+            qps_noisless_one: 1,
+            qps_noisless_zero: 1,
+        }
+    )
+
+    observable_tracker_noisy = ObservableTracker(
+        qubit_pauli_operator=qubit_pauli_operator_noisy
+    )
+    observable_tracker_noisless = ObservableTracker(
+        qubit_pauli_operator=qubit_pauli_operator_noisless
+    )
+
+    shots = 1000000
+    ansatz_circuit_noisy = AnsatzCircuit(
+        Circuit=circuit_noisy,
+        Shots=shots,
+        SymbolsDict={}
+    )
+    ansatz_circuit_noisless = AnsatzCircuit(
+        Circuit=circuit_noisless,
+        Shots=shots,
+        SymbolsDict={}
+    )
+
+    observable_experiment_noisy = ObservableExperiment(
+        AnsatzCircuit=ansatz_circuit_noisy,
+        ObservableTracker=observable_tracker_noisy,
+    )
+    observable_experiment_noisless = ObservableExperiment(
+        AnsatzCircuit=ansatz_circuit_noisless,
+        ObservableTracker=observable_tracker_noisless,
+    )
+
+    qubit_pauli_operator_list = noise_scaled_mitex.run(
+        mitex_wires=[observable_experiment_noisy, observable_experiment_noisless]
+    )
+    assert qubit_pauli_operator_list[0]._dict.keys() == qubit_pauli_operator_noisy._dict.keys()
+    assert qubit_pauli_operator_list[1]._dict.keys() == qubit_pauli_operator_noisless._dict.keys()
+
+    assert abs(qubit_pauli_operator_list[0]._dict[qps_noisy_noisy] - 0.3439) < 0.1
+    assert abs(qubit_pauli_operator_list[0]._dict[qps_noisy_noisless]) < 0.1
+    assert abs(qubit_pauli_operator_list[1]._dict[qps_noisless_one] - 1) < 0.1
+    assert abs(qubit_pauli_operator_list[1]._dict[qps_noisless_zero]) < 0.1
+
+
 if __name__ == "__main__":
     test_no_qubit_relabel()
     test_extrapolation_task_gen()
@@ -766,3 +855,4 @@ if __name__ == "__main__":
     test_gen_qubit_relabel_task()
     test_two_qubit_gate_folding()
     test_gen_initial_compilation_task_quantinuum_qubit_names()
+    test_end_to_end_noise_scaled_mitex()

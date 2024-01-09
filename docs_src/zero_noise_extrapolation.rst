@@ -5,6 +5,8 @@ qermit.zero_noise_extrapolation
 
 .. automethod:: qermit.zero_noise_extrapolation.zne.gen_ZNE_MitEx
 
+.. automethod:: qermit.zero_noise_extrapolation.zne.merge_experiments_task_gen
+
 .. autoclass:: qermit.zero_noise_extrapolation.zne.Folding
     :members:
 

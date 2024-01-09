@@ -208,6 +208,29 @@ class ErrorDistribution:
 
         return fig
 
+    @staticmethod
+    def _scale_error_rate(scaling_factor, error_rate):
+        return 1 - math.exp(scaling_factor * math.log(1 - error_rate))
+
+    def scale(self, scaling_factor: float) -> ErrorDistribution:
+        """Generates new ErrorDistribution but with all error rates scaled
+        by the given factor. This assumes that errors are distributed like
+        poisson point processes.
+
+        :param scaling_factor: Factor to scaled error rates by.
+        :type scaling_factor: float
+        :return: New ErrorDistribution with scaled error rates.
+        :rtype: ErrorDistribution
+        """
+        return ErrorDistribution(
+            distribution={
+                # error: scaling_factor*error_rate
+                error: self._scale_error_rate(scaling_factor, error_rate)
+                for error, error_rate in self.distribution.items()
+            },
+            rng=self.rng,
+        )
+
 
 class LogicalErrorDistribution:
     """
@@ -303,6 +326,22 @@ class NoiseModel:
         """
 
         self.noise_model = noise_model
+
+    def scale(self, scaling_factor: float) -> NoiseModel:
+        """Generate new error model where all error rates have been scaled by
+        the given scaling factor.
+
+        :param scaling_factor: Factor by which to scale the error rates.
+        :type scaling_factor: float
+        :return: New noise model with scaled error rates.
+        :rtype: NoiseModel
+        """
+        return NoiseModel(
+            noise_model={
+                op_type: error_distribution.scale(scaling_factor=scaling_factor)
+                for op_type, error_distribution in self.noise_model.items()
+            }
+        )
 
     def reset_rng(self, rng: Generator):
         """Reset randomness generator.
