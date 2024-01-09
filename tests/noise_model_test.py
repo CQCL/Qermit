@@ -722,6 +722,30 @@ def test_is_measureable() -> None:
     assert not stab.is_measureable(qubit_list=[Qubit(name='B', index=0)])
 
 
+def test_noise_model_scaling() -> None:
+
+    error_distribution = ErrorDistribution(
+        distribution={
+            (Pauli.X, Pauli.I): 0.1,
+            (Pauli.Z, Pauli.I): 0.01,
+        }
+    )
+    noise_model = NoiseModel(
+        noise_model={
+            OpType.CZ: error_distribution,
+            OpType.CX: error_distribution
+        }
+    )
+
+    two_scaled_noise_model = noise_model.scale(scaling_factor=2)
+    assert abs(two_scaled_noise_model.noise_model[OpType.CZ].distribution[(Pauli.X, Pauli.I)] - 0.19) < 0.001
+    assert abs(two_scaled_noise_model.noise_model[OpType.CZ].distribution[(Pauli.Z, Pauli.I)] - 0.02) < 0.001
+
+    zero_scaled_noise_model = noise_model.scale(scaling_factor=0)
+    assert abs(zero_scaled_noise_model.noise_model[OpType.CX].distribution[(Pauli.X, Pauli.I)]) < 0.01
+    assert abs(zero_scaled_noise_model.noise_model[OpType.CX].distribution[(Pauli.Z, Pauli.I)]) < 0.01
+
+
 if __name__ == "__main__":
 
     test_is_measureable()

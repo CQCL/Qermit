@@ -222,6 +222,9 @@ class ErrorDistribution:
         :return: Scaled error rate.
         :rtype: float
         """
+        if error_rate == 1:
+            return 1
+
         return 1 - math.exp(scaling_factor * math.log(1 - error_rate))
 
     def scale(self, scaling_factor: float) -> ErrorDistribution:

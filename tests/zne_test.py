@@ -27,6 +27,7 @@ from qermit.zero_noise_extrapolation.zne import (  # type: ignore
     extrapolation_task_gen,
     digital_folding_task_gen,
     gen_qubit_relabel_task,
+    merge_experiments_task_gen,
 )
 from pytket.predicates import GateSetPredicate  # type: ignore
 from pytket.extensions.qiskit import AerBackend, IBMQEmulatorBackend  # type: ignore
@@ -844,7 +845,7 @@ def test_end_to_end_noise_scaled_mitex():
 
 
 @pytest.mark.high_compute
-def test_end_to_end_noise_aware_zne():
+def test_end_to_end_noise_aware_zne_mitex():
 
     error_rate = 0.1
     error_distribution = ErrorDistribution(
@@ -897,6 +898,50 @@ def test_end_to_end_noise_aware_zne():
     assert abs(qubit_pauli_operator_list[0]._dict[qps_noisy_noisy] - 1) < 0.1
 
 
+def test_noise_aware_folding():
+
+    error_distribution = ErrorDistribution(
+        distribution={(Pauli.X, Pauli.I): 1}
+    )
+    noise_model = NoiseModel(
+        noise_model={OpType.CZ: error_distribution}
+    )
+    circ = Circuit(2).CZ(0, 1)
+    scaled_circ = Folding.noise_aware(
+        circ=circ,
+        noise_scaling=2,
+        noise_model=noise_model,
+        n_noisy_circuit_samples=1,
+    )
+    scaled_circ[0]
+    assert scaled_circ[0] == Circuit(2).CZ(0, 1).X(0, opgroup='noisy')
+
+
+def test_merge_experiments_task_gen():
+
+    task = merge_experiments_task_gen()
+
+    qps_one = QubitPauliString(map={Qubit(0): Pauli.Z})
+    qps_two = QubitPauliString(map={Qubit(1): Pauli.X})
+
+    qpo_one = QubitPauliOperator(
+        dictionary={qps_one: 1, qps_two: 1}
+    )
+    qpo_two = QubitPauliOperator(
+        dictionary={qps_one: 1, qps_two: -1}
+    )
+    qpo_three = QubitPauliOperator(
+        dictionary={qps_one: 1, qps_two: -1}
+    )
+    merged_qpo_list = task(
+        ([qpo_one, qpo_two, qpo_three], [0, 0, 1])
+    )
+    assert merged_qpo_list[0][0]._dict[qps_one] == 1
+    assert merged_qpo_list[0][0]._dict[qps_two] == 0
+    assert merged_qpo_list[0][1]._dict[qps_one] == 1
+    assert merged_qpo_list[0][1]._dict[qps_two] == -1
+
+
 if __name__ == "__main__":
     test_no_qubit_relabel()
     test_extrapolation_task_gen()
@@ -911,3 +956,6 @@ if __name__ == "__main__":
     test_two_qubit_gate_folding()
     test_gen_initial_compilation_task_quantinuum_qubit_names()
     test_end_to_end_noise_scaled_mitex()
+    test_end_to_end_noise_aware_zne_mitex()
+    test_merge_experiments_task_gen()
+    test_noise_aware_folding()
