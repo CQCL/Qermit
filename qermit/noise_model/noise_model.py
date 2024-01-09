@@ -209,13 +209,25 @@ class ErrorDistribution:
         return fig
 
     @staticmethod
-    def _scale_error_rate(scaling_factor, error_rate):
+    def _scale_error_rate(scaling_factor: float, error_rate: float) -> float:
+        """Assuming error is distributed like Poisson point process, scale
+        error rate.
+
+        :param scaling_factor: The factor by which error rate should be
+            scaled. This is the factor by which the time the Poisson process
+            is acted for should be scaled.
+        :type scaling_factor: float
+        :param error_rate: Original error rate.
+        :type error_rate: float
+        :return: Scaled error rate.
+        :rtype: float
+        """
         return 1 - math.exp(scaling_factor * math.log(1 - error_rate))
 
     def scale(self, scaling_factor: float) -> ErrorDistribution:
         """Generates new ErrorDistribution but with all error rates scaled
         by the given factor. This assumes that errors are distributed like
-        poisson point processes.
+        Poisson point processes.
 
         :param scaling_factor: Factor to scaled error rates by.
         :type scaling_factor: float
@@ -224,7 +236,6 @@ class ErrorDistribution:
         """
         return ErrorDistribution(
             distribution={
-                # error: scaling_factor*error_rate
                 error: self._scale_error_rate(scaling_factor, error_rate)
                 for error, error_rate in self.distribution.items()
             },

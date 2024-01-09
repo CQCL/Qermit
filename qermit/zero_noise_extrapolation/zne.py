@@ -73,7 +73,7 @@ class Folding(Enum):
         :type noise_scaling: int
         :raises ValueError: Raised if the amount by which the noise should be scaled is not an odd integer.
         :return: Folded circuit implementing identical unitary to the initial circuit.
-        :rtype: Circuit
+        :rtype: List[Circuit]
         """
 
         # Raise if the amount by which the noise should be scaled is not an odd integer
@@ -135,7 +135,7 @@ class Folding(Enum):
             approximate folding is allowed. Defaults to True.
 
         :return: Circuit with noise scaled.
-        :rtype: Circuit
+        :rtype: List[Circuit]
         """
 
         if noise_scaling < 1:
@@ -236,7 +236,7 @@ class Folding(Enum):
         :raises ValueError: Raised if the requested noise scaling cannot be exactly achieved. This can be
             avoided by appropriately setting _allow_approx_fold.
         :return: Folded circuit implementing identical unitary to the initial circuit.
-        :rtype: Circuit
+        :rtype: List[Circuit]
         """
 
         _allow_approx_fold = kwargs.get("_allow_approx_fold", 0)
@@ -338,7 +338,7 @@ class Folding(Enum):
         :param noise_scaling: Factor by which to increase the noise.
         :type noise_scaling: float
         :return: Folded circuit implementing identical unitary to the initial circuit.
-        :rtype: Circuit
+        :rtype: List[Circuit]
         """
 
         c_dict = circ.to_dict()
@@ -401,13 +401,27 @@ class Folding(Enum):
         return [folded_c]
 
     @staticmethod
-    def noise_aware(circ, noise_scaling: int, **kwargs) -> List[Circuit]:
+    def noise_aware(circ: Circuit, noise_scaling: int, **kwargs) -> List[Circuit]:
+        """Scale noise in a circuit by adding noisy gates as defined
+        by the given noise model.
+
+        :param circ: Circuit with noise to be scaled.
+        :type circ: Circuit
+        :param noise_scaling: Factor by which noise should be scaled.
+        :type noise_scaling: int
+        :return: List of circuits with additional noise gates added.
+        :rtype: List[Circuit]
+
+        :key noise_model: Noise model defining noise types and rates.
+            Defaults to noiseless model.
+        :type noise_model: NoiseModel
+        :key n_noisy_circuit_samples: The number of random noisy
+            circuits to generate. Defaults to 1.
+        :type n_noisy_circuit_samples: int
+        """
 
         noise_model = kwargs.get("noise_model", NoiseModel(noise_model={}))
         n_noisy_circuit_samples = kwargs.get("n_noisy_circuit_samples", 1)
-
-        if n_noisy_circuit_samples < 1:
-            raise Exception("The number of noisy circuits sampled must be greater than 0.")
 
         scaled_noise_model = noise_model.scale(scaling_factor=noise_scaling - 1)
         error_transpiler = PauliErrorTranspile(noise_model=scaled_noise_model)
@@ -713,7 +727,10 @@ def digital_folding_task_gen(
         :param mitex_wire: List of experiments
         :type mitex_wire: List[ObservableExperiment]
         :return: List of equivalent circuits, but with noise levels increased.
-        :rtype: Tuple[List[ObservableExperiment]]
+            Each noise scaling value may generate multiple circuits.
+            As such the return includes a lit of integers indicating to which
+            of the original circuits the new circuits belong.
+        :rtype: Tuple[List[ObservableExperiment], List[int]]
         """
 
         folded_circuits = []
@@ -1099,7 +1116,33 @@ def gen_qubit_relabel_task() -> MitTask:
     )
 
 
-def gen_noise_scaled_mitex(backend, noise_scaling, **kwargs):
+def gen_noise_scaled_mitex(
+    backend: Backend,
+    noise_scaling: float,
+    **kwargs,
+) -> MitEx:
+    """Generates MitEx with noise scaled by the Qermit Folding methods.
+
+    :param backend: Backend on which circuits are run.
+    :type backend: Backend
+    :param noise_scaling: Factor by which noise is scaled.
+    :type noise_scaling: float
+
+    :return: MitEx with scaled noise.
+    :rtype: MitEx
+
+    :key experiment_mitres: MitRes on which circuits are run, defaults to
+        a MitRes wrapped around the given backend.
+    :type experiment_mitres: MitRes
+    :key experiment_mitex: MitEx on which the circuits are run, defaults
+        to a MitEx wrapped around experiment_mitres
+    :type experiment_mitex: MitEx
+    :key allow_approx_fold: Allow approximate folding which may occur as a
+        result of discreet folding due to adding gates.
+    :type allow_approx_fold: bool
+    :key folding_type: The noise scaling method to use.
+    :type folding_type: Folding
+    """
 
     _experiment_mitres = deepcopy(
         kwargs.get(
