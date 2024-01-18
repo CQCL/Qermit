@@ -70,7 +70,7 @@ class QermitDAGCircuit(nx.DiGraph):
 
         # a list indicating the clifford subcircuit to which a command belongs.
         node_sub_circuit = [None] * self.number_of_nodes()
-        sub_circuit_count = 0
+        next_sub_circuit_id = 0
 
         # Iterate through all commands and check if their neighbours should
         # be added to the same clifford subcircuit.
@@ -79,8 +79,8 @@ class QermitDAGCircuit(nx.DiGraph):
             # If the command is not in a clifford sub circuit, start a
             # new one and add it to that new one,
             if node_sub_circuit[node] is None:
-                node_sub_circuit[node] = sub_circuit_count
-                sub_circuit_count += 1
+                node_sub_circuit[node] = next_sub_circuit_id
+                next_sub_circuit_id += 1
 
             # Ignore the command if it is not clifford
             if not command.clifford:
@@ -145,7 +145,7 @@ class QermitDAGCircuit(nx.DiGraph):
 
     # TODO: I'm not sure if this should return a circuit, or changes this
     # QermitDagCircuit in place
-    def to_clifford_subcircuit_boxes(self):
+    def to_clifford_subcircuit_boxes(self) -> Circuit:
 
         # TODO: It could be worth insisting that the given circuit does not
         # include any boxes called 'Clifford Subcircuit'. i.e. that the
@@ -263,10 +263,10 @@ class QermitDAGCircuit(nx.DiGraph):
 
     def can_implement(
         self,
-        sub_circuit,
-        node_sub_circuit_list,
-        implemented_commands,
-    ):
+        sub_circuit: int,
+        node_sub_circuit_list: List[int],
+        implemented_commands: List[bool],
+    ) -> bool:
 
         can_implement = True
         for node in self.nodes:
@@ -283,7 +283,7 @@ class QermitDAGCircuit(nx.DiGraph):
         return can_implement
 
     @staticmethod
-    def decompose_clifford_subcircuit_box(clifford_subcircuit_box):
+    def decompose_clifford_subcircuit_box(clifford_subcircuit_box: CircBox) -> Circuit:
 
         clifford_subcircuit = clifford_subcircuit_box.op.get_circuit()
         qubit_map = {
@@ -300,7 +300,7 @@ class QermitDAGCircuit(nx.DiGraph):
         pauli_sampler: PauliSampler = None,
         pauli_list_dict = None,
         **kwargs,
-    ):
+    ) -> Circuit:
 
         pauli_check_circuit = Circuit()
         for qubit in self.qubits:
