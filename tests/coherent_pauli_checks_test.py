@@ -17,25 +17,23 @@ from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
 import pytest
-from quantinuum_benchmarking.noise_model import (
-    ErrorDistribution,
-    NoiseModel,
-)
-from quantinuum_benchmarking.direct_fidelity_estimation import Stabiliser
 from pytket.circuit import CircBox
-from quantinuum_benchmarking.noise_model import (
+from qermit.noise_model import (
+    NoiseModel,
+    ErrorDistribution,
+    Direction,
     TranspilerBackend,
     PauliErrorTranspile,
-    ErrorSampler,
 )
 from qermit.postselection import PostselectMgr
 from collections import Counter
+from qermit.noise_model.qermit_pauli import QermitPauli
 
 
 def test_decompose_clifford_subcircuit_box():
 
     cx_circ = Circuit(3)
-    cx_circ.CX(0,1).CX(0,2)
+    cx_circ.CX(0, 1).CX(0, 2)
 
     cx_circbox = CircBox(circ=cx_circ)
 
@@ -314,7 +312,7 @@ def test_optimal_pauli_sampler():
         n_checks=1
     )
 
-    assert stab[0] == Stabiliser(
+    assert stab[0] == QermitPauli(
         Z_list=[0, 0, 1],
         X_list=[0, 0, 1],
         qubit_list=qubits,
@@ -339,7 +337,7 @@ def test_add_ZX_pauli_checks_to_S():
     class DeterministicPauliSampler:
 
         def sample(self, qubit_list, **kwargs):
-            return [Stabiliser(
+            return [QermitPauli(
                 Z_list=[1],
                 X_list=[1],
                 qubit_list=qubits,
@@ -381,10 +379,11 @@ def test_add_ZX_pauli_checks_to_S():
 
     assert list(counts.keys()) == [(0, 0)]
 
+
 @pytest.mark.high_compute
 def test_error_sampler():
 
-    n_shots=1000
+    n_shots = 1000
 
     distribution = {
         (Pauli.Z, Pauli.Z): 0.001,
@@ -398,12 +397,12 @@ def test_error_sampler():
     )
 
     noise_model = NoiseModel(
-        noise_model = {OpType.ZZMax: error_distribution}
+        noise_model={OpType.ZZMax: error_distribution}
     )
 
     cliff_circ = Circuit(2, name='Clifford Subcircuit').H(0)
     for _ in range(32):
-        cliff_circ.ZZMax(0,1)
+        cliff_circ.ZZMax(0, 1)
     cliff_circ = cliff_circ.H(0)
 
     circuit = Circuit()
@@ -421,7 +420,7 @@ def test_error_sampler():
 
     dag_circuit = QermitDAGCircuit(circuit)
 
-    pauli_sampler=OptimalPauliSampler(
+    pauli_sampler = OptimalPauliSampler(
         noise_model=noise_model
     )
     checked_circuit = dag_circuit.add_pauli_checks_to_circbox(
@@ -430,7 +429,7 @@ def test_error_sampler():
         n_checks=1,
     )
 
-    error_sampler = ErrorSampler(noise_model=noise_model)
+    # error_sampler = ErrorSampler(noise_model=noise_model)
 
     transpiler = PauliErrorTranspile(noise_model=noise_model)
     backend = TranspilerBackend(transpiler=transpiler)
@@ -457,34 +456,34 @@ def test_error_sampler():
         {(0, 0): 551, (1, 1): 65}
     )
 
-    error_counter = error_sampler.counter_propagate(
+    error_counter = noise_model.counter_propagate(
         cliff_circ=checked_circuit,
         n_counts=n_shots,
-        direction='forward',
+        direction=Direction.forward,
     )
     ideal = Counter(
         {
-            Stabiliser(
-                Z_list=[0,0,0],
-                X_list=[1,1,0],
+            QermitPauli(
+                Z_list=[0, 0, 0],
+                X_list=[1, 1, 0],
                 qubit_list=[
                     Qubit(name='ancilla', index=0),
                     Qubit(name='my_reg', index=0),
                     Qubit(name='my_reg', index=1),
                 ]
             ): 190,
-            Stabiliser(
-                Z_list=[0,0,0],
-                X_list=[1,0,1],
+            QermitPauli(
+                Z_list=[0, 0, 0],
+                X_list=[1, 0, 1],
                 qubit_list=[
                     Qubit(name='ancilla', index=0),
                     Qubit(name='my_reg', index=0),
                     Qubit(name='my_reg', index=1),
                 ]
             ): 164,
-            Stabiliser(
-                Z_list=[0,0,0],
-                X_list=[0,1,1],
+            QermitPauli(
+                Z_list=[0, 0, 0],
+                X_list=[0, 1, 1],
                 qubit_list=[
                     Qubit(name='ancilla', index=0),
                     Qubit(name='my_reg', index=0),

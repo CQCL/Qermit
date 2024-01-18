@@ -5,6 +5,7 @@ from pytket.passes.auto_rebase import auto_rebase_pass
 from .pauli_sampler import PauliSampler
 from pytket.passes import DecomposeBoxes  # type: ignore
 import math
+from typing import cast
 
 
 clifford_ops = [OpType.CZ, OpType.H, OpType.Z, OpType.S, OpType.X]
@@ -316,14 +317,14 @@ class QermitDAGCircuit(nx.DiGraph):
             if (
                 command.op.type == OpType.CircBox
             ) and (
-                command.op.get_circuit().name != None
+                cast(CircBox, command.op).get_circuit().name is not None
             ) and (
-                command.op.get_circuit().name.startswith('Clifford Subcircuit')
+                str(cast(CircBox, command.op).get_circuit().name).startswith('Clifford Subcircuit')
             ):
 
                 clifford_subcircuit = self.decompose_clifford_subcircuit_box(command)
 
-                if pauli_list_dict == None and pauli_sampler != None:
+                if pauli_list_dict is None and pauli_sampler is not None:
 
                     start_stabiliser_list = pauli_sampler.sample(
                         qubit_list=command.args,
@@ -331,10 +332,10 @@ class QermitDAGCircuit(nx.DiGraph):
                         **kwargs,
                     )
 
-                elif pauli_list_dict != None:
+                elif pauli_list_dict is not None:
 
                     start_stabiliser_list = pauli_list_dict[
-                        command.op.get_circuit().name
+                        cast(CircBox, command.op).get_circuit().name
                     ]
 
                 else:
@@ -387,7 +388,7 @@ class QermitDAGCircuit(nx.DiGraph):
             if (
                 command.op.type == OpType.CircBox
             ) and (
-                command.op.get_circuit().name == 'Clifford Subcircuit'
+                cast(CircBox, command.op).get_circuit().name == 'Clifford Subcircuit'
             ):
 
                 for end_stabiliser, control_qubit in zip(reversed(end_stabiliser_list), reversed(control_qubit_list)):
