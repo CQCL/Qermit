@@ -5,7 +5,7 @@ from pytket.passes.auto_rebase import auto_rebase_pass
 from .pauli_sampler import PauliSampler
 from pytket.passes import DecomposeBoxes  # type: ignore
 import math
-from typing import cast
+from typing import cast, Optional, List
 
 
 clifford_ops = [OpType.CZ, OpType.H, OpType.Z, OpType.S, OpType.X]
@@ -18,12 +18,11 @@ cpc_rebase_pass = auto_rebase_pass(
 
 class DAGCommand:
 
-    def __init__(self, command: Command):
-
+    def __init__(self, command: Command) -> None:
         self.command = command
 
     @property
-    def clifford(self):
+    def clifford(self) -> bool:
 
         if self.command.op.is_clifford_type():
             return True
@@ -39,7 +38,7 @@ class DAGCommand:
 
 class QermitDAGCircuit(nx.DiGraph):
 
-    def __init__(self, circuit: Circuit):
+    def __init__(self, circuit: Circuit, cutoff: Optional[int] = None) -> None:
 
         # TODO: There are other things to be saved, like the phase.
 
@@ -50,11 +49,13 @@ class QermitDAGCircuit(nx.DiGraph):
         ]
         self.qubits = circuit.qubits
         self.bits = circuit.bits
+        self.cutoff = cutoff
 
         # Lists the most recent node to act on a particular qubits. If a
         # new gate is found to act on that qubit then an edge between the
         # node which corresponds to the new gate and the node which
-        # most recently acted on that qubit is added.
+        # most recently acted on that qubit is added. This builds a DAG
+        # showing the temporal order of gates.
         current_node: dict[Qubit, int] = {}
         for node, command in enumerate(self.node_command):
             self.add_node(node)
@@ -65,10 +66,10 @@ class QermitDAGCircuit(nx.DiGraph):
                     self.add_edge(current_node[qubit], node)
                 current_node[qubit] = node
 
-    def get_clifford_subcircuits(self, **kwargs):
+    def get_clifford_subcircuits(self) -> List[int]:
 
         # a list indicating the clifford subcircuit to which a command belongs.
-        node_sub_circuit = [None for _ in self.nodes]
+        node_sub_circuit = [None] * self.number_of_nodes()
         sub_circuit_count = 0
 
         # Iterate through all commands and check if their neighbours should
@@ -118,11 +119,13 @@ class QermitDAGCircuit(nx.DiGraph):
                 same_clifford_circuit = True
                 for same_sub_circuit_node in same_sub_circuit_node_list:
 
-                    # I'm allowing kwarg to pass cutoff, but that should
-                    # not be allowed. all_simple_paths is quite slow otherwise.
-                    cutoff = kwargs.get("cutoff", None)
+                    # I'm allowing to pass cutoff, but that should
+                    # not be allowed. In particular paths of arbitrary
+                    # lengths should be checked in practice.
+                    # however all_simple_paths is quite slow otherwise as it
+                    # spends a lot of time looking for paths that don't exist.
                     for path in nx.all_simple_paths(
-                        self, same_sub_circuit_node, neighbour_id, cutoff=cutoff
+                        self, same_sub_circuit_node, neighbour_id, cutoff=self.cutoff
                     ):
 
                         if not all(
@@ -142,13 +145,13 @@ class QermitDAGCircuit(nx.DiGraph):
 
     # TODO: I'm not sure if this should return a circuit, or changes this
     # QermitDagCircuit in place
-    def to_clifford_subcircuit_boxes(self, **kwargs):
+    def to_clifford_subcircuit_boxes(self):
 
         # TODO: It could be worth insisting that the given circuit does not
         # include any boxes called 'Clifford Subcircuit'. i.e. that the
         # circuit is 'clean'.
 
-        node_sub_circuit_list = self.get_clifford_subcircuits(**kwargs)
+        node_sub_circuit_list = self.get_clifford_subcircuits()
         sub_circuit_qubits = self.get_sub_circuit_qubits(node_sub_circuit_list)
 
         # List indicating if a command has been implemented
@@ -443,8 +446,8 @@ class QermitDAGCircuit(nx.DiGraph):
     def add_pauli_checks(self, pauli_sampler: PauliSampler, **kwargs):
 
         # Convert to clifford boxes, add checks, decompose boxes.
-        clifford_box_circuit = self.to_clifford_subcircuit_boxes(**kwargs)
-        cliff_box_dag_circ = QermitDAGCircuit(clifford_box_circuit)
+        clifford_box_circuit = self.to_clifford_subcircuit_boxes()
+        cliff_box_dag_circ = QermitDAGCircuit(clifford_box_circuit, cutoff=self.cutoff)
         pauli_check_circ = cliff_box_dag_circ.add_pauli_checks_to_circbox(
             pauli_sampler=pauli_sampler, **kwargs
         )

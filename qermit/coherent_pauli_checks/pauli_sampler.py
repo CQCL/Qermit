@@ -1,21 +1,26 @@
 import numpy.random
 from qermit.noise_model.qermit_pauli import QermitPauli
+from qermit.noise_model.noise_model import LogicalErrorDistribution
 from abc import ABC, abstractmethod
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from itertools import product, combinations
 import warnings
+from pytket.circuit import Qubit
+from typing import List, Optional
+from numpy.random import Generator
+from pytket import Circuit
 
 
 class PauliSampler(ABC):
 
     @abstractmethod
-    def sample(self, **kwargs):
+    def sample(self, **kwargs) -> List[QermitPauli]:
         pass
 
 
 class DeterministicZPauliSampler(PauliSampler):
 
-    def sample(self, qubit_list, **kwargs):
+    def sample(self, qubit_list: List[Qubit], **kwargs) -> List[QermitPauli]:
         return [QermitPauli(
             Z_list=[1] * len(qubit_list),
             X_list=[0] * len(qubit_list),
@@ -25,7 +30,7 @@ class DeterministicZPauliSampler(PauliSampler):
 
 class DeterministicXPauliSampler(PauliSampler):
 
-    def sample(self, qubit_list, **kwargs):
+    def sample(self, qubit_list: List[Qubit], **kwargs) -> List[QermitPauli]:
         return [QermitPauli(
             Z_list=[0] * len(qubit_list),
             X_list=[1] * len(qubit_list),
@@ -35,26 +40,20 @@ class DeterministicXPauliSampler(PauliSampler):
 
 class RandomPauliSampler(PauliSampler):
 
-    def __init__(self, rng=numpy.random.default_rng()):
+    def __init__(self, rng: Generator = numpy.random.default_rng()):
         self.rng = rng
 
     def sample(
         self,
-        # qubit_list,
-        circ,
-        n_checks=2,
+        circ: Circuit,
+        n_checks: int = 2,
         **kwargs
-    ):
-
-        print("n_checks", n_checks)
+    ) -> List[QermitPauli]:
 
         # TODO: Make sure sampling is done without replacement
 
         stabiliser_list = []
         while len(stabiliser_list) < n_checks:
-
-            # Z_list = [self.rng.integers(2) for _ in qubit_list]
-            # X_list = [self.rng.integers(2) for _ in qubit_list]
 
             Z_list = [self.rng.integers(2) for _ in circ.qubits]
             X_list = [self.rng.integers(2) for _ in circ.qubits]
@@ -65,12 +64,9 @@ class RandomPauliSampler(PauliSampler):
                     QermitPauli(
                         Z_list=Z_list,
                         X_list=X_list,
-                        # qubit_list=qubit_list,
                         qubit_list=circ.qubits,
                     )
                 )
-
-        # print("stabiliser_list", *stabiliser_list)
 
         return stabiliser_list
 
@@ -82,13 +78,11 @@ class OptimalPauliSampler(PauliSampler):
 
     def sample(
         self,
-        circ,
-        error_counter=None,
-        n_checks=2,
+        circ: Circuit,
+        error_counter: Optional[LogicalErrorDistribution] = None,
+        n_checks: int = 2,
         **kwargs,
-    ):
-
-        print("n_checks", n_checks)
+    ) -> List[QermitPauli]:
 
         # TODO: assert that the registers match in this case
 
