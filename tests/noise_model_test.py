@@ -30,8 +30,11 @@ def test_noise_model_logical_error_propagation() -> None:
         rng=np.random.default_rng(seed=0),
     )
 
-    noise_model = NoiseModel({OpType.CX: error_distribution})
-    logical_distribution = noise_model.get_effective_pre_error_distribution(pytket_ciruit, n_rand=10000)
+    noise_model = NoiseModel(
+        noise_model={OpType.CX: error_distribution},
+        n_rand=10000,
+    )
+    logical_distribution = noise_model.get_effective_pre_error_distribution(pytket_ciruit)
 
     ideal_error = QubitPauliString(
         map={
@@ -151,7 +154,10 @@ def test_error_distribution_post_select() -> None:
             QermitPauli.from_qubit_pauli_string(qps_remove): 50,
             QermitPauli.from_qubit_pauli_string(qps_keep): 50}
     )
-    error_distribution = LogicalErrorDistribution(pauli_error_counter=pauli_error_counter)
+    error_distribution = LogicalErrorDistribution(
+        pauli_error_counter=pauli_error_counter,
+        total=pauli_error_counter.total(),
+    )
     post_selected = error_distribution.post_select(
         qubit_list=[Qubit(name='ancilla', index=0),
                     Qubit(name='ancilla', index=1)]
@@ -182,10 +188,11 @@ def test_to_dict(tmpdir_factory) -> None:
         error_distribution_dict_zzmax, rng=np.random.default_rng(seed=0))
 
     noise_model = NoiseModel(
-        {
+        noise_model={
             OpType.ZZMax: error_distribution_zzmax,
             OpType.CZ: error_distribution_cz,
-        }
+        },
+        n_rand=1000,
     )
 
     noise_model_dict = noise_model.to_dict()
@@ -222,7 +229,10 @@ def test_transpiler_backend() -> None:
         distribution=error_distribution_dict,
         rng=np.random.default_rng(seed=0),
     )
-    noise_model = NoiseModel({OpType.ZZMax: error_distribution})
+    noise_model = NoiseModel(
+        noise_model={OpType.ZZMax: error_distribution},
+        n_rand=1000,
+    )
 
     n_shots = 123
     transpiler = PauliErrorTranspile(noise_model=noise_model)
@@ -251,7 +261,10 @@ def test_pauli_error_transpile() -> None:
     error_distribution = ErrorDistribution(
         error_distribution_dict, rng=np.random.default_rng(seed=2))
 
-    noise_model = NoiseModel({OpType.ZZMax: error_distribution})
+    noise_model = NoiseModel(
+        noise_model={OpType.ZZMax: error_distribution},
+        n_rand=1000,
+    )
 
     circ = Circuit(2).ZZMax(0, 1).measure_all()
     transpiled_circ = Circuit(2).ZZMax(0, 1).X(
@@ -274,7 +287,10 @@ def test_noise_model() -> None:
     error_distribution = ErrorDistribution(
         error_distribution_dict, rng=np.random.default_rng(seed=2))
 
-    noise_model = NoiseModel({OpType.CZ: error_distribution})
+    noise_model = NoiseModel(
+        noise_model={OpType.CZ: error_distribution},
+        n_rand=1000
+    )
     transpiler = PauliErrorTranspile(
         noise_model=noise_model,
     )
@@ -349,7 +365,10 @@ def test_back_propagate_random_error() -> None:
         error_distribution_dict,
         rng=np.random.default_rng(seed=0)
     )
-    noise_model = NoiseModel({OpType.CZ: error_distribution})
+    noise_model = NoiseModel(
+        noise_model={OpType.CZ: error_distribution},
+        n_rand=1000,
+    )
 
     # error_sampler = ErrorSampler(noise_model=noise_model)
 
@@ -378,10 +397,13 @@ def test_effective_error_distribution() -> None:
         error_distribution_dict,
         rng=np.random.default_rng(seed=0),
     )
-    noise_model = NoiseModel({OpType.CZ: error_distribution})
+    noise_model = NoiseModel(
+        noise_model={OpType.CZ: error_distribution},
+        n_rand=10000,
+    )
 
     error_distribution = noise_model.get_effective_pre_error_distribution(
-        cliff_circ, n_rand=10000
+        cliff_circ
     )
 
     assert all(
@@ -401,10 +423,13 @@ def test_effective_error_distribution() -> None:
         error_distribution_dict,
         rng=np.random.default_rng(seed=0)
     )
-    noise_model = NoiseModel({OpType.CZ: error_distribution})
+    noise_model = NoiseModel(
+        noise_model={OpType.CZ: error_distribution},
+        n_rand=10000,
+    )
 
     effective_error_dist = noise_model.get_effective_pre_error_distribution(
-        cliff_circ, n_rand=10000
+        cliff_circ
     )
     assert abs(effective_error_dist.pauli_error_counter[
         QermitPauli.from_qubit_pauli_string(

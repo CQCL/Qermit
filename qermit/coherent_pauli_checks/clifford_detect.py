@@ -1,11 +1,9 @@
 from pytket import Circuit, OpType, Qubit
 import networkx as nx  # type: ignore
-from pytket.circuit import Command, Bit, CircBox  # type: ignore
+from pytket.circuit import Command, CircBox  # type: ignore
 from pytket.passes.auto_rebase import auto_rebase_pass
-from .pauli_sampler import PauliSampler
-from pytket.passes import DecomposeBoxes  # type: ignore
 import math
-from typing import cast, Optional, List
+from typing import Optional, List, Union, cast
 
 
 clifford_ops = [OpType.CZ, OpType.H, OpType.Z, OpType.S, OpType.X]
@@ -69,7 +67,7 @@ class QermitDAGCircuit(nx.DiGraph):
     def get_clifford_subcircuits(self) -> List[int]:
 
         # a list indicating the clifford subcircuit to which a command belongs.
-        node_sub_circuit = [None] * self.number_of_nodes()
+        node_sub_circuit: List[Union[int, None]] = [None] * self.number_of_nodes()
         next_sub_circuit_id = 0
 
         # Iterate through all commands and check if their neighbours should
@@ -141,7 +139,10 @@ class QermitDAGCircuit(nx.DiGraph):
                 if same_clifford_circuit:
                     node_sub_circuit[neighbour_id] = node_sub_circuit[node]
 
-        return node_sub_circuit
+        if any(sub_circuit is None for sub_circuit in node_sub_circuit):  # pragma: no cover
+            raise Exception("Some nodes have been left unassigned.")
+
+        return cast(List[int], node_sub_circuit)
 
     # TODO: I'm not sure if this should return a circuit, or changes this
     # QermitDagCircuit in place
@@ -281,185 +282,3 @@ class QermitDAGCircuit(nx.DiGraph):
                     can_implement = False
 
         return can_implement
-
-    @staticmethod
-    def decompose_clifford_subcircuit_box(clifford_subcircuit_box: CircBox) -> Circuit:
-
-        clifford_subcircuit = clifford_subcircuit_box.op.get_circuit()
-        qubit_map = {
-            q_subcirc: q_orig
-            for q_subcirc, q_orig
-            in zip(clifford_subcircuit.qubits, clifford_subcircuit_box.args)
-        }
-        clifford_subcircuit.rename_units(qubit_map)
-
-        return clifford_subcircuit
-
-    def add_pauli_checks_to_circbox(
-        self,
-        pauli_sampler: PauliSampler = None,
-        pauli_list_dict = None,
-        **kwargs,
-    ) -> Circuit:
-
-        pauli_check_circuit = Circuit()
-        for qubit in self.qubits:
-            pauli_check_circuit.add_qubit(qubit)
-        for bit in self.bits:
-            pauli_check_circuit.add_bit(bit)
-
-        ancilla_count = 0
-
-        # Add each command in the circuit, wrapped by checks
-        # if the command is a circbox named 'Clifford Subcircuit'
-        for command in [
-            node_command.command for node_command in self.node_command
-        ]:
-
-            # Add barriers and check if appropriate
-            if (
-                command.op.type == OpType.CircBox
-            ) and (
-                cast(CircBox, command.op).get_circuit().name is not None
-            ) and (
-                str(cast(CircBox, command.op).get_circuit().name).startswith('Clifford Subcircuit')
-            ):
-
-                clifford_subcircuit = self.decompose_clifford_subcircuit_box(command)
-
-                if pauli_list_dict is None and pauli_sampler is not None:
-
-                    start_stabiliser_list = pauli_sampler.sample(
-                        qubit_list=command.args,
-                        circ=clifford_subcircuit,
-                        **kwargs,
-                    )
-
-                elif pauli_list_dict is not None:
-
-                    start_stabiliser_list = pauli_list_dict[
-                        cast(CircBox, command.op).get_circuit().name
-                    ]
-
-                else:
-                    raise Exception(
-                        "Either a pauli sampler or a pauli list dictionary"
-                        + "must be passed"
-                    )
-                # TODO: check that register names do not already exist
-                control_qubit_list = [
-                    Qubit(name='ancilla', index=i)
-                    for i in range(
-                        ancilla_count,
-                        ancilla_count + len(start_stabiliser_list)
-                    )
-                ]
-                ancilla_count += len(start_stabiliser_list)
-
-                for start_stabiliser, control_qubit in zip(start_stabiliser_list, control_qubit_list):
-
-                    pauli_check_circuit.add_qubit(control_qubit)
-
-                    pauli_check_circuit.add_barrier(
-                        command.args + [control_qubit]
-                    )
-                    pauli_check_circuit.H(
-                        control_qubit,
-                        opgroup='ancilla superposition',
-                    )
-
-                    stabiliser_circuit = start_stabiliser.get_control_circuit(
-                        control_qubit=control_qubit
-                    )
-                    pauli_check_circuit.append(
-                        circuit=stabiliser_circuit,
-                    )
-
-                    pauli_check_circuit.add_barrier(
-                        command.args + [control_qubit]
-                    )
-
-                end_stabiliser_list = [start_stabiliser.dagger() for start_stabiliser in start_stabiliser_list]
-
-            # Add command
-            pauli_check_circuit.add_gate(
-                command.op,
-                command.args
-            )
-
-            # Add barriers and checks if appropriate.
-            if (
-                command.op.type == OpType.CircBox
-            ) and (
-                cast(CircBox, command.op).get_circuit().name == 'Clifford Subcircuit'
-            ):
-
-                for end_stabiliser, control_qubit in zip(reversed(end_stabiliser_list), reversed(control_qubit_list)):
-                    for clifford_command in clifford_subcircuit.get_commands():
-
-                        if clifford_command.op.type == OpType.Barrier:
-                            continue
-
-                        # TODO: an error would be raised here if clifford_command
-                        # is not Clifford. It could be worth raising a clearer
-                        # error.
-                        end_stabiliser.apply_gate(
-                            clifford_command.op.type, clifford_command.qubits, params=clifford_command.op.params
-                        )
-
-                    pauli_check_circuit.add_barrier(
-                        command.args + [control_qubit]
-                    )
-
-                    stabiliser_circuit = end_stabiliser.get_control_circuit(
-                        control_qubit=control_qubit
-                    )
-                    pauli_check_circuit.append(
-                        circuit=stabiliser_circuit,
-                    )
-                    pauli_check_circuit.H(
-                        control_qubit,
-                        opgroup='ancilla superposition',
-                    )
-                    pauli_check_circuit.add_barrier(
-                        command.args + [control_qubit]
-                    )
-
-                    # measure_bit = Bit(
-                    #     name='ancilla_measure',
-                    #     index=ancilla_count,
-                    # )
-                    measure_bit = Bit(
-                        name='ancilla_measure',
-                        index=control_qubit.index,
-                    )
-                    pauli_check_circuit.add_bit(
-                        id=measure_bit
-                    )
-                    pauli_check_circuit.Measure(
-                        qubit=control_qubit,
-                        bit=measure_bit,
-                    )
-
-        return pauli_check_circuit
-
-    def add_pauli_checks(self, pauli_sampler: PauliSampler, **kwargs):
-
-        # Convert to clifford boxes, add checks, decompose boxes.
-        clifford_box_circuit = self.to_clifford_subcircuit_boxes()
-        cliff_box_dag_circ = QermitDAGCircuit(clifford_box_circuit, cutoff=self.cutoff)
-        pauli_check_circ = cliff_box_dag_circ.add_pauli_checks_to_circbox(
-            pauli_sampler=pauli_sampler, **kwargs
-        )
-        # TODO: This decompose boxes may be problematic if there are
-        # already boxes in the circuit. Not easy to avoid though I think.
-        # I cant think at the moment why this would be a problem though,
-        # especially as the user has surrendered their circuit to Qermit
-        # at this point.
-        DecomposeBoxes().apply(pauli_check_circ)
-
-        # TODO: Given more time it would be nice to add a check here
-        # which XZ reduces the circuits with and without the checks and
-        # asserts that they are the same.
-
-        return pauli_check_circ

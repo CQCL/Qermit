@@ -222,7 +222,12 @@ class LogicalErrorDistribution:
 
     pauli_error_counter: Counter[QermitPauli]
 
-    def __init__(self, pauli_error_counter: Counter[QermitPauli], **kwargs):
+    def __init__(
+        self,
+        pauli_error_counter: Counter[QermitPauli],
+        total: int,
+        # **kwargs
+    ):
         """Initialisation method. Stores pauli error counter.
 
         :param pauli_error_counter: Counter of pauli errors.
@@ -234,7 +239,8 @@ class LogicalErrorDistribution:
         """
 
         self.pauli_error_counter = pauli_error_counter
-        self.total = kwargs.get('total', sum(self.pauli_error_counter.values()))
+        # self.total = kwargs.get('total', sum(self.pauli_error_counter.values()))
+        self.total = total
 
     @property
     def distribution(self) -> Dict[QubitPauliString, float]:
@@ -295,7 +301,11 @@ class NoiseModel:
 
     noise_model: Dict[OpType, ErrorDistribution]
 
-    def __init__(self, noise_model: Dict[OpType, ErrorDistribution]):
+    def __init__(
+        self,
+        noise_model: Dict[OpType, ErrorDistribution],
+        n_rand: int,
+    ):
         """Initialisation method.
 
         :param noise_model: Map from gates to their error models.
@@ -303,6 +313,7 @@ class NoiseModel:
         """
 
         self.noise_model = noise_model
+        self.n_rand = n_rand
 
     def reset_rng(self, rng: Generator):
         """Reset randomness generator.
@@ -352,19 +363,19 @@ class NoiseModel:
 
         return True
 
-    def to_dict(self) -> Dict[str, List[Dict[str, Union[List[int], float]]]]:
+    def to_dict(self) -> Dict[str, Union[int, List[Dict[str, Union[List[int], float]]]]]:
         """Json serialisable object representing noise model.
 
         :return: Json serialisable object representing noise model.
-        :rtype: Dict[str, List[Dict[str, Union[List[int], float]]]]
+        :rtype: Dict[str, Union[int, List[Dict[str, Union[List[int], float]]]]]
         """
         return {
             op.name: distribution.to_dict()
             for op, distribution in self.noise_model.items()
-        }
+        } | {'n_rand': self.n_rand}
 
     @classmethod
-    def from_dict(cls, noise_model_dict: Dict[str, List[Dict[str, Union[List[int], float]]]]) -> NoiseModel:
+    def from_dict(cls, noise_model_dict: Dict[str, Union[int, List[Dict[str, Union[List[int], float]]]]]) -> NoiseModel:
         """Convert JSON serialised version of noise model back to an instance
         of NoiseModel.
 
@@ -380,7 +391,9 @@ class NoiseModel:
                     error_distribution
                 )
                 for op, error_distribution in noise_model_dict.items()
-            }
+                if op != 'n_rand'
+            },
+            n_rand=int(noise_model_dict['n_rand']),
         )
 
     @property
@@ -405,8 +418,8 @@ class NoiseModel:
     def get_effective_pre_error_distribution(
         self,
         cliff_circ: Circuit,
-        n_rand: int = 1000,
-        **kwargs,
+        # n_rand: int = 1000,
+        # **kwargs,
     ) -> LogicalErrorDistribution:
         """Retrieve the effective noise model of a given circuit. This is to
         say, repeatedly generate circuits with coherent noise added at random.
@@ -424,17 +437,18 @@ class NoiseModel:
 
         error_counter = self.counter_propagate(
             cliff_circ=cliff_circ,
-            n_counts=n_rand,
+            n_counts=self.n_rand,
             direction=Direction.backward,
         )
 
-        return LogicalErrorDistribution(error_counter, total=n_rand)
+        return LogicalErrorDistribution(error_counter, total=self.n_rand)
 
     def counter_propagate(
         self,
         cliff_circ: Circuit,
         n_counts: int,
-        **kwargs
+        direction: Direction = Direction.backward,
+        # **kwargs
     ) -> Counter[QermitPauli]:
         """Generate random noisy instances of the given circuit and propagate
         the noise to create a counter of logical errors. Note that
@@ -456,7 +470,7 @@ class NoiseModel:
         # be made here if there errors are sampled before the back
         # propagation occurs?
         for _ in range(n_counts):
-            pauli_error = self.random_propagate(cliff_circ, **kwargs)
+            pauli_error = self.random_propagate(cliff_circ=cliff_circ, direction=direction)
 
             if not pauli_error.is_identity:
                 error_counter.update([pauli_error])
