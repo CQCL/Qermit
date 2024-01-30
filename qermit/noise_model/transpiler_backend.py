@@ -4,8 +4,10 @@ from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 import uuid
 from pytket.passes import BasePass
-from typing import Dict, List, Optional, Iterator
+from typing import Dict, List, Optional, Iterator, Tuple
 from pytket import Circuit, Bit
+from pytket.backends.status import CircuitStatus
+from pytket.backends.status import StatusEnum
 
 
 class TranspilerBackend:
@@ -50,6 +52,12 @@ class TranspilerBackend:
 
         self.max_batch_size = max_batch_size
         self.result_dict = result_dict
+
+    def circuit_status(self, handle):
+        if handle in self.result_dict.keys():
+            return CircuitStatus(status=StatusEnum.COMPLETED)
+        else:
+            return CircuitStatus(status=StatusEnum.ERROR)
 
     def run_circuit(
         self,
@@ -161,7 +169,7 @@ class TranspilerBackend:
         circuit: Circuit,
         n_shots: int,
         cbits: Optional[List[Bit]] = None,
-    ) -> Counter:
+    ) -> Counter[Tuple[int, ...], int]:
         """Generate shots from the given circuit.
 
         :param circuit: Circuit to take shots from.
@@ -176,11 +184,13 @@ class TranspilerBackend:
         :rtype: Iterator[Counter]
         """
 
-        counter: Counter = Counter()
+        counter: Counter[Tuple[int, ...], int] = Counter()
 
         for circuit_list in self._gen_batches(circuit, n_shots):
             result_list = self.backend.run_circuits(circuit_list, n_shots=1)
             counter += sum((result.get_counts(cbits=cbits)
                            for result in result_list), Counter())
+
+        counter = Counter({shot: int(count) for shot, count in counter.items()})
 
         return counter

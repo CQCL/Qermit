@@ -4,7 +4,7 @@ from .qermit_pauli import QermitPauli
 from collections import Counter
 import math
 from pytket.circuit import OpType  # type: ignore
-from matplotlib.pyplot import subplots  # type: ignore
+import matplotlib.pyplot as plt  # type: ignore
 from typing import Dict, Tuple, List, Union, cast
 from pytket.pauli import Pauli
 from pytket import Qubit, Circuit
@@ -187,12 +187,12 @@ class ErrorDistribution:
 
         return None
 
-    def plot(self):
+    def plot(self) -> plt.Figure:
         """
         Generates plot of distribution.
         """
 
-        fig, ax = subplots()
+        fig, ax = plt.subplots()
 
         to_plot = {
             key: value
