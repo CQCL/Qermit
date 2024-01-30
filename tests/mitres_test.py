@@ -31,7 +31,7 @@ from collections import Counter
 from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 from qermit.taskgraph.mitres import merge_results
-from qermit.taskgraph.mitres import QermitBackendResult
+from qermit.taskgraph.mitres import resample_result
 import numpy as np
 
 
@@ -58,8 +58,8 @@ def test_qermit_backend_result():
 
     n_shots = 123
     rng = np.random.default_rng(seed=0)
-    qermit_result = QermitBackendResult(result=result, rng=rng)
-    resample_counts = qermit_result.resample(n_shots=n_shots).get_counts()
+    # qermit_result = QermitBackendResult(result=result, rng=rng)
+    resample_counts = resample_result(n_shots=n_shots, result=result, rng=rng).get_counts()
     assert resample_counts.total() == n_shots
     assert sorted(counts.keys()) == sorted(resample_counts.keys())
 

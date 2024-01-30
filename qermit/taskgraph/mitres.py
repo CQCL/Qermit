@@ -27,6 +27,7 @@ from itertools import repeat
 import numpy as np  # type: ignore
 from pytket import Circuit
 from collections import Counter
+from numpy.random import Generator
 
 from pytket.utils.outcomearray import OutcomeArray
 from pytket.backends import Backend, ResultHandle
@@ -37,35 +38,35 @@ from pytket.backends.backendresult import BackendResult
 # and having it inherit from BackendResult. Then we can do
 # more advanced analysis everywhere. I've never been sure how to
 # 'upgrade' to a child class though. To be discussed.
-class QermitBackendResult:
+# class QermitBackendResult:
 
-    def __init__(self, result, rng=np.random.default_rng()):
+#     def __init__(self, result, rng=np.random.default_rng()):
 
-        self.result = result
-        self.rng = rng
+#         self.result = result
+#         self.rng = rng
 
-    def resample(self, n_shots):
+#     def resample(self, n_shots):
 
-        def get_shot_from_index(shot_index):
+#         def get_shot_from_index(shot_index):
 
-            count_total = 0
-            for shot, count in self.result.get_counts(cbits=self.result.c_bits).items():
-                count_total += count
-                if count_total > shot_index:
-                    return shot
+#             count_total = 0
+#             for shot, count in self.result.get_counts(cbits=self.result.c_bits).items():
+#                 count_total += count
+#                 if count_total > shot_index:
+#                     return shot
 
-        shot_index_list = self.rng.integers(
-            low=0,
-            high=self.result.get_counts().total(),
-            size=n_shots,
-        )
+#         shot_index_list = self.rng.integers(
+#             low=0,
+#             high=self.result.get_counts().total(),
+#             size=n_shots,
+#         )
 
-        return BackendResult(
-            shots=OutcomeArray.from_readouts(
-                [get_shot_from_index(shot_index) for shot_index in shot_index_list]
-            ),
-            c_bits=self.result.c_bits
-        )
+#         return BackendResult(
+#             shots=OutcomeArray.from_readouts(
+#                 [get_shot_from_index(shot_index) for shot_index in shot_index_list]
+#             ),
+#             c_bits=self.result.c_bits
+#         )
 
 
 def backend_compile_circuit_shots_task_gen(
@@ -465,6 +466,34 @@ def group_shots_task_gen() -> MitTask:
         return (merged_results,)
 
     return MitTask(_label="MergeShots", _n_in_wires=2, _n_out_wires=1, _method=task)
+
+
+def resample_result(
+    result: BackendResult,
+    n_shots: int,
+    rng: Generator = np.random.default_rng(),
+) -> BackendResult:
+
+    def get_shot_from_index(shot_index: int):
+
+        count_total = 0
+        for shot, count in result.get_counts(cbits=result.c_bits).items():
+            count_total += count
+            if count_total > shot_index:
+                return shot
+
+    shot_index_list = rng.integers(
+        low=0,
+        high=result.get_counts().total(),
+        size=n_shots,
+    )
+
+    return BackendResult(
+        shots=OutcomeArray.from_readouts(
+            [get_shot_from_index(shot_index) for shot_index in shot_index_list]
+        ),
+        c_bits=result.c_bits
+    )
 
 
 def merge_results(result_list: List[BackendResult]):
