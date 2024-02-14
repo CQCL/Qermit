@@ -211,7 +211,6 @@ def test_to_dict(tmpdir_factory) -> None:
     assert new_noise_model == noise_model
 
 
-@pytest.mark.high_compute
 def test_transpiler_backend() -> None:
 
     circuit = Circuit(3)
@@ -382,7 +381,6 @@ def test_back_propagate_random_error() -> None:
 # is unfortunate. It's also probabilistic at present which is not ideal.
 
 
-@pytest.mark.high_compute
 def test_effective_error_distribution() -> None:
 
     cliff_circ = Circuit(2).CZ(0, 1).X(1).CZ(1, 0)

@@ -171,7 +171,6 @@ def test_measurement_reduction_integration():
 
 
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
-@pytest.mark.high_compute
 def test_no_qubit_relabel():
 
     lagos_backend = IBMQEmulatorBackend(
@@ -368,7 +367,6 @@ def test_extrapolation_task_gen():
 
 
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
-@pytest.mark.high_compute
 def test_folding_compiled_circuit():
 
     emulator_backend = IBMQEmulatorBackend("ibmq_quito")
