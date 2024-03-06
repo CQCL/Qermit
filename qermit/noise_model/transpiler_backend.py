@@ -53,17 +53,11 @@ class TranspilerBackend:
 
     def default_compilation_pass(self, **kwargs) -> BasePass:
 
-        def transform(circuit: Circuit) -> Circuit:
-            return circuit
+        return CustomPass(transform=lambda circuit: circuit)
 
-        return CustomPass(transform=transform)
+    def rebase_pass(self) -> BasePass:
 
-    def rebase_pass(self):
-
-        def transform(circuit: Circuit) -> Circuit:
-            return circuit
-
-        return CustomPass(transform=transform)
+        return CustomPass(transform=lambda circuit: circuit)
 
     def run_circuit(
         self,

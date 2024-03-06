@@ -420,10 +420,10 @@ class Folding(Enum):
         :type n_noisy_circuit_samples: int
         """
 
-        noise_model = kwargs.get("noise_model", NoiseModel(noise_model={}))
-        n_noisy_circuit_samples = kwargs.get("n_noisy_circuit_samples", 1)
+        noise_model: NoiseModel = kwargs.get("noise_model", NoiseModel(noise_model={}))
+        n_noisy_circuit_samples: int = kwargs.get("n_noisy_circuit_samples", 1)
 
-        scaled_noise_model = noise_model.scale(scaling_factor=noise_scaling - 1)
+        scaled_noise_model: NoiseModel = noise_model.scale(scaling_factor=noise_scaling - 1)
         error_transpiler = PauliErrorTranspile(noise_model=scaled_noise_model)
 
         scaled_circ_list = []
@@ -828,12 +828,13 @@ def merge_experiments_task_gen() -> MitTask:
                 for qps, coeff in merged_qpo_dict.items()
             }
 
-        # Convert the dictionary to a list.
-        merged_qpo_list = [QubitPauliOperator({})] * (max(experiment_index_list) + 1)
-        for index in experiment_index_list:
-            merged_qpo_list[index] = QubitPauliOperator(dictionary=index_to_merged_qpo_dict[index])
-
-        return (merged_qpo_list, )
+        # Convert the dictionary to a list and return.
+        return (
+            [
+                QubitPauliOperator(dictionary=index_to_merged_qpo_dict.get(index, {}))
+                for index in range(max(experiment_index_list) + 1)
+            ],
+        )
 
     return MitTask(_label="MergeExperiments", _n_in_wires=2, _n_out_wires=1, _method=task)
 
