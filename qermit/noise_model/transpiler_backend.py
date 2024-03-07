@@ -6,6 +6,7 @@ import uuid
 from pytket.passes import BasePass, CustomPass
 from typing import Dict, List, Optional, Iterator, Sequence, Iterable
 from pytket import Circuit, Bit
+from pytket.backends.resulthandle import ResultHandle
 
 
 class TranspilerBackend:
@@ -25,14 +26,14 @@ class TranspilerBackend:
 
     transpiler: BasePass
     max_batch_size: int
-    result_dict: Dict[uuid.UUID, BackendResult]
+    result_dict: Dict[ResultHandle, BackendResult]
     backend = AerBackend()
 
     def __init__(
         self,
         transpiler: BasePass,
         max_batch_size: int = 100,
-        result_dict: Dict[uuid.UUID, BackendResult] = {},
+        result_dict: Dict[ResultHandle, BackendResult] = {},
     ):
         """Initialisation method.
 
@@ -43,7 +44,7 @@ class TranspilerBackend:
         :type max_batch_size: int, optional
         :param result_dict: Results dictionary, may be used to store existing
             results within backend, defaults to {}
-        :type result_dict: Dict[uuid.UUID, BackendResult], optional
+        :type result_dict: Dict[ResultHandle, BackendResult], optional
         """
 
         self.transpiler = transpiler
@@ -82,7 +83,7 @@ class TranspilerBackend:
         self,
         circuits: Sequence[Circuit],
         n_shots: Sequence[int],
-    ) -> List[uuid.UUID]:
+    ) -> List[ResultHandle]:
 
         return [
             self.process_circuit(circuit=circuit, n_shots=n)
@@ -94,7 +95,7 @@ class TranspilerBackend:
         circuit: Circuit,
         n_shots: int,
         **kwargs,
-    ) -> uuid.UUID:
+    ) -> ResultHandle:
         """[summary]
 
         :param circuit: Submits circuit to run on noisy backend.
@@ -102,10 +103,10 @@ class TranspilerBackend:
         :param n_shots: Number of shots to take from circuit.
         :type n_shots: int
         :return: Handle identifying results in `result_dict`.
-        :rtype: uuid.UUID
+        :rtype: ResultHandle
         """
 
-        handle = uuid.uuid4()
+        handle = ResultHandle(str(uuid.uuid4()))
 
         counts = self.get_counts(
             circuit=circuit,
@@ -123,16 +124,16 @@ class TranspilerBackend:
 
         return handle
 
-    def get_results(self, handles: Iterable[uuid.UUID]) -> List[BackendResult]:
+    def get_results(self, handles: Iterable[ResultHandle]) -> List[BackendResult]:
         return [
             self.get_result(handle) for handle in handles
         ]
 
-    def get_result(self, handle: uuid.UUID) -> BackendResult:
+    def get_result(self, handle: ResultHandle) -> BackendResult:
         """Retrieve result from backend.
 
         :param handle: Handle identifying result.
-        :type handle: uuid.UUID
+        :type handle: ResultHandle
         :return: Result corresponding to handle.
         :rtype: BackendResult
         """
