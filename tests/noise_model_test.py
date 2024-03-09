@@ -18,6 +18,99 @@ import pytest
 from qermit.noise_model.noise_model import Direction
 
 
+def test_to_ptm() -> None:
+
+    # A simple test with an only X noise model on one qubit
+    error_distribution = ErrorDistribution(distribution={(Pauli.X,):0.1})
+    ptm, pauli_index = error_distribution.to_ptm()
+
+    assert ptm[pauli_index[(Pauli.I, )]][pauli_index[(Pauli.I, )]] == 1
+    assert ptm[pauli_index[(Pauli.X, )]][pauli_index[(Pauli.X, )]] == 1
+    assert ptm[pauli_index[(Pauli.Y, )]][pauli_index[(Pauli.Y, )]] == 0.8
+    assert ptm[pauli_index[(Pauli.Z, )]][pauli_index[(Pauli.Z, )]] == 0.8
+
+    # A slightly more complicated example with some verified entries.
+    error_distribution = ErrorDistribution(
+        distribution={
+            (Pauli.X, Pauli.Z):0.08,
+            (Pauli.Y, Pauli.Z):0.02,
+        }
+    )
+
+    ptm, pauli_index = error_distribution.to_ptm()
+
+    assert abs(ptm[pauli_index[(Pauli.I, Pauli.I)]][pauli_index[(Pauli.I, Pauli.I)]] - 1) < 10**(-6)
+    assert abs(ptm[pauli_index[(Pauli.Z, Pauli.Z)]][pauli_index[(Pauli.Z, Pauli.Z)]] - 0.8) < 10**(-6)
+    assert abs(ptm[pauli_index[(Pauli.X, Pauli.Z)]][pauli_index[(Pauli.X, Pauli.Z)]] - 0.96) < 10**(-6)
+    assert abs(ptm[pauli_index[(Pauli.X, Pauli.X)]][pauli_index[(Pauli.X, Pauli.X)]] - 0.84) < 10**(-6)
+
+def test_from_ptm() -> None:
+
+    # Test that the error distribution to and from ptm is the same as the initial
+    distribution={
+        (Pauli.X, Pauli.X):0.1,
+        (Pauli.Y, Pauli.Z):0.2,
+        (Pauli.Z, Pauli.X):0.3,
+    }
+
+    error_distribution = ErrorDistribution(
+        distribution=distribution,
+    )
+
+    ptm, pauli_index = error_distribution.to_ptm()
+    recovered_error_distribution = ErrorDistribution.from_ptm(ptm=ptm, pauli_index=pauli_index)
+
+    for pauli, error_rate in distribution.items():
+        assert abs(recovered_error_distribution.distribution[pauli] - error_rate) < 10**(-6)
+
+    # Test that from ptm is robust to moving Pauli indices
+    ptm[pauli_index[(Pauli.Y, Pauli.Z)]][pauli_index[(Pauli.Y, Pauli.Z)]], ptm[pauli_index[(Pauli.Z, Pauli.X)]][pauli_index[(Pauli.Z, Pauli.X)]] = ptm[pauli_index[(Pauli.Z, Pauli.X)]][pauli_index[(Pauli.Z, Pauli.X)]], ptm[pauli_index[(Pauli.Y, Pauli.Z)]][pauli_index[(Pauli.Y, Pauli.Z)]]
+    pauli_index[(Pauli.Y, Pauli.Z)], pauli_index[(Pauli.Z, Pauli.X)] = pauli_index[(Pauli.Z, Pauli.X)], pauli_index[(Pauli.Y, Pauli.Z)]
+    recovered_error_distribution = ErrorDistribution.from_ptm(ptm=ptm, pauli_index=pauli_index)
+
+    for pauli, error_rate in distribution.items():
+        assert abs(recovered_error_distribution.distribution[pauli] - error_rate) < 10**(-6)
+
+
+def test_qermit_pauli_from_iterable() -> None:
+
+    qubit_pauli_string = QubitPauliString(
+        qubits=[Qubit(i) for i in range(5)],
+        paulis=[Pauli.X, Pauli.Y, Pauli.Z, Pauli.Y, Pauli.Z]
+    )
+    pauli = QermitPauli.from_pauli_iterable(
+        pauli_iterable=qubit_pauli_string.map.values(),
+        qubit_list=list(qubit_pauli_string.map.keys())
+    )
+    pauli.qubit_pauli_string == (qubit_pauli_string, 1+0j)
+
+def test_qermit_pauli_commute_coeff() -> None:
+
+    # This tests a few commutation coefficients
+    # which have been verified by hand.
+    verified_list = [
+        # Single qubit Paulis
+        ((([0], [1]), ([1], [0])), -1),
+        ((([1], [1]), ([1], [1])), 1),
+        ((([1], [0]), ([0], [1])), -1),
+        ((([0], [0]), ([0], [1])), 1),
+        ((([1], [0]), ([0], [0])), 1),
+        ((([1], [1]), ([0], [1])), -1),
+        # Two qubit Paulis
+        ((([0, 1], [1, 0]), ([1, 0], [0, 1])), 1),
+        ((([0, 1], [1, 0]), ([0, 0], [1, 1])), -1),
+        ((([0, 0], [0, 0]), ([0, 0], [1, 1])), 1),
+    ]
+
+    for verified in verified_list:
+        
+        n_qubits = len(verified[0][0][0])
+
+        pauli_one = QermitPauli(Z_list=verified[0][0][0], X_list=verified[0][0][1], qubit_list=[Qubit(i) for i in range(n_qubits)])
+        pauli_two = QermitPauli(Z_list=verified[0][1][0], X_list=verified[0][1][1], qubit_list=[Qubit(i) for i in range(n_qubits)])
+        assert QermitPauli.commute_coeff(pauli_one=pauli_one, pauli_two=pauli_two) == verified[1]
+
+
 def test_noise_model_logical_error_propagation() -> None:
 
     pytket_ciruit = Circuit(2).H(0).CX(0, 1).measure_all()
@@ -724,26 +817,53 @@ def test_is_measureable() -> None:
 
 def test_noise_model_scaling() -> None:
 
-    error_distribution = ErrorDistribution(
+    # Here we test a couple of hand calculated examples.
+    error_distribution_cz = ErrorDistribution(
         distribution={
             (Pauli.X, Pauli.I): 0.1,
             (Pauli.Z, Pauli.I): 0.01,
         }
     )
+    error_distribution_cx = ErrorDistribution(
+        distribution={
+            (Pauli.X, Pauli.Y): 0.2,
+            (Pauli.Z, Pauli.X): 0.3,
+        }
+    )
     noise_model = NoiseModel(
         noise_model={
-            OpType.CZ: error_distribution,
-            OpType.CX: error_distribution
+            OpType.CZ: error_distribution_cz,
+            OpType.CX: error_distribution_cx
         }
     )
 
-    two_scaled_noise_model = noise_model.scale(scaling_factor=2)
-    assert abs(two_scaled_noise_model.noise_model[OpType.CZ].distribution[(Pauli.X, Pauli.I)] - 0.19) < 0.001
-    assert abs(two_scaled_noise_model.noise_model[OpType.CZ].distribution[(Pauli.Z, Pauli.I)] - 0.02) < 0.001
-
+    # In the zero folding case we should end up with an empty noise model.
     zero_scaled_noise_model = noise_model.scale(scaling_factor=0)
-    assert abs(zero_scaled_noise_model.noise_model[OpType.CX].distribution[(Pauli.X, Pauli.I)]) < 0.01
-    assert abs(zero_scaled_noise_model.noise_model[OpType.CX].distribution[(Pauli.Z, Pauli.I)]) < 0.01
+    assert zero_scaled_noise_model.noise_model[OpType.CX].distribution == {}
+    assert zero_scaled_noise_model.noise_model[OpType.CZ].distribution == {}
+
+    # In the two folded case, we first check the PTM on the noise
+    # on the CZ gate. Note that the PTM values for the original
+    # error channel are being squared in this case.
+    two_scaled_noise_model = noise_model.scale(scaling_factor=2)
+    ptm, pauli_index = two_scaled_noise_model.noise_model[OpType.CZ].to_ptm()
+    for pauli_one, ptm_entry in zip([Pauli.I, Pauli.X, Pauli.Y, Pauli.Z], [1, 0.98**2, 0.78**2, 0.8**2]):
+        assert all(
+            ptm[pauli_index[(pauli_one, pauli_two)]][pauli_index[(pauli_one, pauli_two)]] == ptm_entry
+            for pauli_two in [Pauli.I, Pauli.X, Pauli.Y, Pauli.Z]
+        )
+
+    # Here we work through pre computed values for the
+    # error rates.
+    assert list(two_scaled_noise_model.noise_model[OpType.CZ].distribution.keys()) == [(Pauli.X, Pauli.I), (Pauli.Y, Pauli.I), (Pauli.Z, Pauli.I)]
+    assert abs(two_scaled_noise_model.noise_model[OpType.CZ].distribution[(Pauli.X, Pauli.I)] - 0.178) < 10**(-6)
+    assert abs(two_scaled_noise_model.noise_model[OpType.CZ].distribution[(Pauli.Y, Pauli.I)] - 0.002) < 10**(-6)
+    assert abs(two_scaled_noise_model.noise_model[OpType.CZ].distribution[(Pauli.Z, Pauli.I)] - 0.0178) < 10**(-6)
+
+    assert list(two_scaled_noise_model.noise_model[OpType.CX].distribution.keys()) == [(Pauli.X, Pauli.Y), (Pauli.Y, Pauli.Z), (Pauli.Z, Pauli.X)]
+    assert abs(two_scaled_noise_model.noise_model[OpType.CX].distribution[(Pauli.X, Pauli.Y)] - 0.2) < 10**(-6)
+    assert abs(two_scaled_noise_model.noise_model[OpType.CX].distribution[(Pauli.Y, Pauli.Z)] - 0.12) < 10**(-6)
+    assert abs(two_scaled_noise_model.noise_model[OpType.CX].distribution[(Pauli.Z, Pauli.X)] - 0.3) < 10**(-6)
 
 
 if __name__ == "__main__":

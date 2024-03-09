@@ -11,6 +11,8 @@ from pytket import Qubit, Circuit
 from pytket.pauli import QubitPauliString
 from numpy.random import Generator
 from enum import Enum
+from itertools import product
+from scipy.linalg import fractional_matrix_power
 
 
 Direction = Enum('Direction', ['forward', 'backward'])
@@ -51,9 +53,100 @@ class ErrorDistribution:
                     f"Probabilities sum to {sum(distribution.values())}"
                     + " but should be less than or equal to 1."
                 )
+        
+        if distribution == {}:
+            pass
+        else:
+            n_qubits = len(list(distribution.keys())[0])
+            if not all(len(error) == n_qubits for error in distribution.keys()):
+                raise Exception("Errors must all act on the same number of qubits.")
 
         self.distribution = distribution
         self.rng = rng
+
+    @property
+    def identity_error_rate(self):
+        return 1 - sum(self.distribution.values())
+
+    def to_ptm(self) -> Tuple[np.array, Dict[Tuple[Pauli], int]]:
+        
+        ptm = np.zeros((4**self.n_qubits, 4**self.n_qubits))
+        pauli_index = {
+            pauli:index
+            for index, pauli
+            in enumerate(product({Pauli.I, Pauli.X, Pauli.Y, Pauli.Z}, repeat=self.n_qubits))
+        }
+        
+        for pauli_tuple, index in pauli_index.items():
+                    
+            pauli = QermitPauli.from_pauli_iterable(
+                pauli_iterable=pauli_tuple,
+                qubit_list=[Qubit(i) for i in range(self.n_qubits)]
+            )
+            
+            ptm[index][index] += self.identity_error_rate
+                        
+            for error, error_rate in self.distribution.items():
+                error_pauli = QermitPauli.from_pauli_iterable(
+                    pauli_iterable=error,
+                    qubit_list=[Qubit(i) for i in range(self.n_qubits)]
+                )
+                
+                ptm[index][index] += error_rate * QermitPauli.commute_coeff(pauli_one=pauli, pauli_two=error_pauli)
+
+        identity = tuple(Pauli.I for _ in range(self.n_qubits))
+        if not abs(ptm[pauli_index[identity]][pauli_index[identity]] - 1.0) < 10**(-6):
+            raise Exception(
+                "The identity entry of the PTM is incorrect. "
+                + "This is a fault in Qermit. "
+                + "Please report this as an issue."
+            )
+        
+        if not self == ErrorDistribution.from_ptm(ptm=ptm, pauli_index=pauli_index):
+            raise Exception(
+                "From PTM does not match to PTM. "
+                + "This is a bug. "
+                + "Please report to developers. "
+            )
+                
+        return ptm, pauli_index
+    
+    @classmethod
+    def from_ptm(cls, ptm, pauli_index):
+
+        assert ptm.ndim == 2
+        assert ptm.shape[0] == ptm.shape[1]
+        n_qubit = math.log(ptm.shape[0], 4)
+        assert n_qubit % 1 == 0.0
+
+        assert np.array_equal(ptm, np.diag(np.diag(ptm)))
+
+        commutation_matrix = np.zeros(ptm.shape)
+
+        for pauli_one_tuple, index_one in pauli_index.items():
+            pauli_one = QermitPauli.from_pauli_iterable(
+                pauli_iterable=pauli_one_tuple,
+                qubit_list=[Qubit(i) for i in range(len(pauli_one_tuple))]
+            )
+            for pauli_two_tuple, index_two in pauli_index.items():
+                pauli_two = QermitPauli.from_pauli_iterable(
+                    pauli_iterable=pauli_two_tuple,
+                    qubit_list=[Qubit(i) for i in range(len(pauli_two_tuple))]
+                )
+                commutation_matrix[index_one][index_two] = QermitPauli.commute_coeff(pauli_one=pauli_one, pauli_two=pauli_two)
+
+        error_rate_list = np.matmul(ptm.diagonal(), np.linalg.inv(commutation_matrix))
+        distribution = {
+            error: error_rate_list[index]
+            for error, index in pauli_index.items()
+            if (error_rate_list[index] > 10**(-6)) and error != tuple(Pauli.I for _ in range(int(n_qubit)))
+        }
+        return cls(distribution=distribution)
+
+
+    @property
+    def n_qubits(self) -> int:
+        return len(list(self.distribution.keys())[0])
 
     def __eq__(self, other: object) -> bool:
         """Check equality of two instances of ErrorDistribution by ensuring
@@ -208,42 +301,11 @@ class ErrorDistribution:
 
         return fig
 
-    @staticmethod
-    def _scale_error_rate(scaling_factor: float, error_rate: float) -> float:
-        """Assuming error is distributed like Poisson point process, scale
-        error rate.
+    def scale(self, scaling_factor:float) -> ErrorDistribution:
 
-        :param scaling_factor: The factor by which error rate should be
-            scaled. This is the factor by which the time the Poisson process
-            is acted for should be scaled.
-        :type scaling_factor: float
-        :param error_rate: Original error rate.
-        :type error_rate: float
-        :return: Scaled error rate.
-        :rtype: float
-        """
-        if error_rate == 1:
-            return 1
-
-        return 1 - math.exp(scaling_factor * math.log(1 - error_rate))
-
-    def scale(self, scaling_factor: float) -> ErrorDistribution:
-        """Generates new ErrorDistribution but with all error rates scaled
-        by the given factor. This assumes that errors are distributed like
-        Poisson point processes.
-
-        :param scaling_factor: Factor to scaled error rates by.
-        :type scaling_factor: float
-        :return: New ErrorDistribution with scaled error rates.
-        :rtype: ErrorDistribution
-        """
-        return ErrorDistribution(
-            distribution={
-                error: self._scale_error_rate(scaling_factor, error_rate)
-                for error, error_rate in self.distribution.items()
-            },
-            rng=self.rng,
-        )
+        ptm, pauli_index = self.to_ptm()
+        scaled_ptm = fractional_matrix_power(ptm, scaling_factor)
+        return ErrorDistribution.from_ptm(ptm=scaled_ptm, pauli_index=pauli_index)
 
 
 class LogicalErrorDistribution:
