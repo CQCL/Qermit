@@ -55,8 +55,12 @@ class ErrorDistribution:
                     + " but should be less than or equal to 1."
                 )
 
+        # If the given distribution is empty then no
+        # noise will be acted.
         if distribution == {}:
             pass
+        # If it it not empty then we check that the number
+        # of qubits in each of the errors match.
         else:
             n_qubits = len(list(distribution.keys())[0])
             if not all(len(error) == n_qubits for error in distribution.keys()):
@@ -67,7 +71,7 @@ class ErrorDistribution:
 
     @property
     def identity_error_rate(self) -> float:
-        """Rate at which no error occurs.
+        """The rate at which no error occurs.
 
         :return: Rate at which no error occurs.
             Calculated as 1 minus the total error rate of
@@ -85,6 +89,8 @@ class ErrorDistribution:
         :rtype: Tuple[NDArray, Dict[Tuple[Pauli, ...], int]]
         """
 
+        # Initialise an empty PTM and index dictionary
+        # of the appropriate size.
         ptm = np.zeros((4**self.n_qubits, 4**self.n_qubits))
         pauli_index = {
             pauli: index
@@ -92,6 +98,9 @@ class ErrorDistribution:
             in enumerate(product({Pauli.I, Pauli.X, Pauli.Y, Pauli.Z}, repeat=self.n_qubits))
         }
 
+        # For each pauli, calculate the corresponding
+        # PTM entry as a sum pf error weights multiplied by +/-1
+        # Depending on commutation relations.
         for pauli_tuple, index in pauli_index.items():
 
             pauli = QermitPauli.from_pauli_iterable(
@@ -99,6 +108,10 @@ class ErrorDistribution:
                 qubit_list=[Qubit(i) for i in range(self.n_qubits)]
             )
 
+            # Can add the identity error rate.
+            # This will not come up in the following for loop
+            # as the error distribution does not save
+            # the rate at which no errors occur.
             ptm[index][index] += self.identity_error_rate
 
             for error, error_rate in self.distribution.items():
@@ -109,6 +122,7 @@ class ErrorDistribution:
 
                 ptm[index][index] += error_rate * QermitPauli.commute_coeff(pauli_one=pauli, pauli_two=error_pauli)
 
+        # Some checks that the form of the PTM is correct.
         identity = tuple(Pauli.I for _ in range(self.n_qubits))
         if not abs(ptm[pauli_index[identity]][pauli_index[identity]] - 1.0) < 10**(-6):
             raise Exception(
@@ -140,15 +154,35 @@ class ErrorDistribution:
         :rtype: ErrorDistribution
         """
 
-        assert ptm.ndim == 2
-        assert ptm.shape[0] == ptm.shape[1]
+        if ptm.ndim != 2:
+            raise Exception(
+                f"This given matrix is not has dimension {ptm.ndim} "
+                + "but should have dimension 2."
+            )
+
+        if ptm.shape[0] != ptm.shape[1]:
+            raise Exception(
+                "The dimensions of the given PTM are "
+                + f"{ptm.shape[0]} and {ptm.shape[1]} "
+                + "but they should match."
+            )
+
         n_qubit = math.log(ptm.shape[0], 4)
-        assert n_qubit % 1 == 0.0
+        if n_qubit % 1 != 0.0:
+            raise Exception(
+                "The given PTM should have a dimension of the form 4^n "
+                + "where n is the number of qubits."
+            )
 
-        assert np.array_equal(ptm, np.diag(np.diag(ptm)))
+        if not np.array_equal(ptm, np.diag(np.diag(ptm))):
+            raise Exception(
+                "The given PTM is not diagonal as it should be."
+            )
 
+        # calculate the error rates by solving simultaneous
+        # linear equations. In particular the matrix to invert
+        # is the matrix of commutation values.
         commutation_matrix = np.zeros(ptm.shape)
-
         for pauli_one_tuple, index_one in pauli_index.items():
             pauli_one = QermitPauli.from_pauli_iterable(
                 pauli_iterable=pauli_one_tuple,
@@ -329,6 +363,16 @@ class ErrorDistribution:
         return fig
 
     def scale(self, scaling_factor: float) -> ErrorDistribution:
+        """Scale the error rates of this error distribution.
+        This is done by converting the error distribution to a PTM,
+        scaling that matrix appropriately, and converting back to a
+        new error distribution.
+
+        :param scaling_factor: The factor by which the noise should be scaled.
+        :type scaling_factor: float
+        :return: A new error distribution with the noise scaled.
+        :rtype: ErrorDistribution
+        """
 
         ptm, pauli_index = self.to_ptm()
         scaled_ptm = fractional_matrix_power(ptm, scaling_factor)

@@ -635,6 +635,15 @@ class QermitPauli:
 
     @classmethod
     def from_pauli_iterable(cls, pauli_iterable: Iterable[Pauli], qubit_list: List[Qubit]) -> QermitPauli:
+        """Create a QermitPauli from a Pauli iterable.
+
+        :param pauli_iterable: The Pauli iterable to convert.
+        :type pauli_iterable: Iterable[Pauli]
+        :param qubit_list: The qubits on which the resulting pauli will act.
+        :type qubit_list: List[Qubit]
+        :return: The pauli corresponding to the given iterable.
+        :rtype: QermitPauli
+        """
         return cls(
             Z_list=[int(pauli in (Pauli.Z, Pauli.Y)) for pauli in pauli_iterable],
             X_list=[int(pauli in (Pauli.X, Pauli.Y)) for pauli in pauli_iterable],

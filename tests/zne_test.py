@@ -1015,5 +1015,6 @@ if __name__ == "__main__":
     test_gen_initial_compilation_task_quantinuum_qubit_names()
     test_end_to_end_noise_scaled_mitex()
     test_end_to_end_noise_aware_zne_mitex()
+    test_end_to_end_noise_aware_zne_mitex_starting_from_ptm()
     test_merge_experiments_task_gen()
     test_noise_aware_folding()

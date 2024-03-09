@@ -53,11 +53,13 @@ class TranspilerBackend:
         self.result_dict = result_dict
 
     def default_compilation_pass(self, **kwargs) -> BasePass:
-
+        """Return a compiler pass which has no affect on the circuit.
+        """
         return CustomPass(transform=lambda circuit: circuit)
 
     def rebase_pass(self) -> BasePass:
-
+        """Return a compiler pass which has no affect on the circuit.
+        """
         return CustomPass(transform=lambda circuit: circuit)
 
     def run_circuit(
@@ -84,6 +86,17 @@ class TranspilerBackend:
         circuits: Sequence[Circuit],
         n_shots: Sequence[int],
     ) -> List[ResultHandle]:
+        """Processes a collection of circuits by making use multiple calls
+        to process_circuit.
+
+        :param circuits: A collection of circuit to run.
+        :type circuits: Sequence[Circuit]
+        :param n_shots: The number of shots which should be taken from
+            each circuit.
+        :type n_shots: Sequence[int]
+        :return: The result handle for each circuit.
+        :rtype: List[ResultHandle]
+        """
 
         return [
             self.process_circuit(circuit=circuit, n_shots=n)
@@ -125,6 +138,13 @@ class TranspilerBackend:
         return handle
 
     def get_results(self, handles: Iterable[ResultHandle]) -> List[BackendResult]:
+        """Get the results corresponding to a collection of result handles.
+
+        :param handles: A collection of handles to retrieve.
+        :type handles: Iterable[ResultHandle]
+        :return: The results corresponding to the given collection of
+        :rtype: List[BackendResult]
+        """
         return [
             self.get_result(handle) for handle in handles
         ]
