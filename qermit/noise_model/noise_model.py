@@ -12,7 +12,8 @@ from pytket.pauli import QubitPauliString
 from numpy.random import Generator
 from enum import Enum
 from itertools import product
-from scipy.linalg import fractional_matrix_power
+from scipy.linalg import fractional_matrix_power  # type: ignore
+from numpy.typing import NDArray
 
 
 Direction = Enum('Direction', ['forward', 'backward'])
@@ -53,7 +54,7 @@ class ErrorDistribution:
                     f"Probabilities sum to {sum(distribution.values())}"
                     + " but should be less than or equal to 1."
                 )
-        
+
         if distribution == {}:
             pass
         else:
@@ -65,33 +66,47 @@ class ErrorDistribution:
         self.rng = rng
 
     @property
-    def identity_error_rate(self):
+    def identity_error_rate(self) -> float:
+        """Rate at which no error occurs.
+
+        :return: Rate at which no error occurs.
+            Calculated as 1 minus the total error rate of
+            error in this distribution.
+        :rtype: float
+        """
         return 1 - sum(self.distribution.values())
 
-    def to_ptm(self) -> Tuple[np.array, Dict[Tuple[Pauli], int]]:
-        
+    def to_ptm(self) -> Tuple[NDArray, Dict[Tuple[Pauli, ...], int]]:
+        """Convert error distribution to Pauli Transfer Matrix (PTM) form.
+
+        :return: PTM of error distribution and Pauli index dictionary.
+            The Pauli index dictionary maps Pauli errors to their
+            index in the PTM
+        :rtype: Tuple[NDArray, Dict[Tuple[Pauli, ...], int]]
+        """
+
         ptm = np.zeros((4**self.n_qubits, 4**self.n_qubits))
         pauli_index = {
-            pauli:index
+            pauli: index
             for index, pauli
             in enumerate(product({Pauli.I, Pauli.X, Pauli.Y, Pauli.Z}, repeat=self.n_qubits))
         }
-        
+
         for pauli_tuple, index in pauli_index.items():
-                    
+
             pauli = QermitPauli.from_pauli_iterable(
                 pauli_iterable=pauli_tuple,
                 qubit_list=[Qubit(i) for i in range(self.n_qubits)]
             )
-            
+
             ptm[index][index] += self.identity_error_rate
-                        
+
             for error, error_rate in self.distribution.items():
                 error_pauli = QermitPauli.from_pauli_iterable(
                     pauli_iterable=error,
                     qubit_list=[Qubit(i) for i in range(self.n_qubits)]
                 )
-                
+
                 ptm[index][index] += error_rate * QermitPauli.commute_coeff(pauli_one=pauli, pauli_two=error_pauli)
 
         identity = tuple(Pauli.I for _ in range(self.n_qubits))
@@ -101,18 +116,29 @@ class ErrorDistribution:
                 + "This is a fault in Qermit. "
                 + "Please report this as an issue."
             )
-        
+
         if not self == ErrorDistribution.from_ptm(ptm=ptm, pauli_index=pauli_index):
             raise Exception(
                 "From PTM does not match to PTM. "
-                + "This is a bug. "
-                + "Please report to developers. "
+                + "This is a fault in Qermit. "
+                + "Please report this as an issue."
             )
-                
+
         return ptm, pauli_index
-    
+
     @classmethod
-    def from_ptm(cls, ptm, pauli_index):
+    def from_ptm(cls, ptm: NDArray, pauli_index: Dict[Tuple[Pauli, ...], int]) -> ErrorDistribution:
+        """Convert a Pauli Transfer Matrix (PTM) to an error distribution.
+
+        :param ptm: Pauli Transfer Matrix to convert. Should be a 4^n by 4^n matrix
+            where n is the number of qubits.
+        :type ptm: NDArray
+        :param pauli_index: A dictionary mapping Pauli errors to
+            their index in the PTM.
+        :type pauli_index: Dict[Tuple[Pauli, ...], int]
+        :return: The converted error distribution.
+        :rtype: ErrorDistribution
+        """
 
         assert ptm.ndim == 2
         assert ptm.shape[0] == ptm.shape[1]
@@ -143,9 +169,10 @@ class ErrorDistribution:
         }
         return cls(distribution=distribution)
 
-
     @property
     def n_qubits(self) -> int:
+        """The number of qubits this error distribution acts on.
+        """
         return len(list(self.distribution.keys())[0])
 
     def __eq__(self, other: object) -> bool:
@@ -301,7 +328,7 @@ class ErrorDistribution:
 
         return fig
 
-    def scale(self, scaling_factor:float) -> ErrorDistribution:
+    def scale(self, scaling_factor: float) -> ErrorDistribution:
 
         ptm, pauli_index = self.to_ptm()
         scaled_ptm = fractional_matrix_power(ptm, scaling_factor)

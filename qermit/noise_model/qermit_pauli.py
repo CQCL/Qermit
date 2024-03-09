@@ -632,12 +632,12 @@ class QermitPauli:
         )
 
         return qubit_pauli_string, operator_phase
-    
+
     @classmethod
     def from_pauli_iterable(cls, pauli_iterable: Iterable[Pauli], qubit_list: List[Qubit]) -> QermitPauli:
         return cls(
             Z_list=[int(pauli in (Pauli.Z, Pauli.Y)) for pauli in pauli_iterable],
             X_list=[int(pauli in (Pauli.X, Pauli.Y)) for pauli in pauli_iterable],
             qubit_list=qubit_list,
-            phase=sum(int(pauli==Pauli.Y) for pauli in pauli_iterable) % 4,
+            phase=sum(int(pauli == Pauli.Y) for pauli in pauli_iterable) % 4,
         )

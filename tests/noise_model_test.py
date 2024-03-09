@@ -21,7 +21,7 @@ from qermit.noise_model.noise_model import Direction
 def test_to_ptm() -> None:
 
     # A simple test with an only X noise model on one qubit
-    error_distribution = ErrorDistribution(distribution={(Pauli.X,):0.1})
+    error_distribution = ErrorDistribution(distribution={(Pauli.X,): 0.1})
     ptm, pauli_index = error_distribution.to_ptm()
 
     assert ptm[pauli_index[(Pauli.I, )]][pauli_index[(Pauli.I, )]] == 1
@@ -32,8 +32,8 @@ def test_to_ptm() -> None:
     # A slightly more complicated example with some verified entries.
     error_distribution = ErrorDistribution(
         distribution={
-            (Pauli.X, Pauli.Z):0.08,
-            (Pauli.Y, Pauli.Z):0.02,
+            (Pauli.X, Pauli.Z): 0.08,
+            (Pauli.Y, Pauli.Z): 0.02,
         }
     )
 
@@ -44,13 +44,14 @@ def test_to_ptm() -> None:
     assert abs(ptm[pauli_index[(Pauli.X, Pauli.Z)]][pauli_index[(Pauli.X, Pauli.Z)]] - 0.96) < 10**(-6)
     assert abs(ptm[pauli_index[(Pauli.X, Pauli.X)]][pauli_index[(Pauli.X, Pauli.X)]] - 0.84) < 10**(-6)
 
+
 def test_from_ptm() -> None:
 
     # Test that the error distribution to and from ptm is the same as the initial
-    distribution={
-        (Pauli.X, Pauli.X):0.1,
-        (Pauli.Y, Pauli.Z):0.2,
-        (Pauli.Z, Pauli.X):0.3,
+    distribution = {
+        (Pauli.X, Pauli.X): 0.1,
+        (Pauli.Y, Pauli.Z): 0.2,
+        (Pauli.Z, Pauli.X): 0.3,
     }
 
     error_distribution = ErrorDistribution(
@@ -82,7 +83,8 @@ def test_qermit_pauli_from_iterable() -> None:
         pauli_iterable=qubit_pauli_string.map.values(),
         qubit_list=list(qubit_pauli_string.map.keys())
     )
-    pauli.qubit_pauli_string == (qubit_pauli_string, 1+0j)
+    pauli.qubit_pauli_string == (qubit_pauli_string, 1 + 0j)
+
 
 def test_qermit_pauli_commute_coeff() -> None:
 
@@ -103,7 +105,7 @@ def test_qermit_pauli_commute_coeff() -> None:
     ]
 
     for verified in verified_list:
-        
+
         n_qubits = len(verified[0][0][0])
 
         pauli_one = QermitPauli(Z_list=verified[0][0][0], X_list=verified[0][0][1], qubit_list=[Qubit(i) for i in range(n_qubits)])
