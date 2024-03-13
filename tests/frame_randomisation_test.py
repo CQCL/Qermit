@@ -22,7 +22,46 @@ from qermit.frame_randomisation.frame_randomisation import (  # type: ignore
 )
 from pytket import Circuit
 from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.extensions.quantinuum import QuantinuumBackend, QuantinuumAPIOffline
+from qermit.frame_randomisation.h_series_randomisation import gen_randomised_circuit
+from pytket.unit_id import BitRegister
+from collections import Counter
 
+
+def test_h_series_randomisation():
+
+    api_offline = QuantinuumAPIOffline()
+    backend = QuantinuumBackend(
+        device_name="H1-1LE",
+        api_handler = api_offline,
+    )
+
+    circuit = Circuit(3)
+    meas_reg = BitRegister(name='measure', size=2)
+    circuit.add_c_register(meas_reg)
+
+    circuit.ZZMax(0,1)
+    circuit.Measure(
+        qubit=circuit.qubits[0],
+        bit=meas_reg[0]
+    )
+    circuit.Measure(
+        qubit=circuit.qubits[1],
+        bit=meas_reg[1]
+    )
+
+    randomised_circuit, wfh = gen_randomised_circuit(circuit)
+
+    compiled_circuit = backend.get_compiled_circuit(randomised_circuit, optimisation_level=0)
+
+    n_shots = 100
+    result = backend.run_circuit(
+        compiled_circuit, 
+        n_shots=n_shots,
+        wasm_file_handler=wfh,
+        no_opt=True
+    )
+    assert result.get_counts(cbits=meas_reg) == Counter({(0,0,): n_shots})
 
 def test_frame_randomisation_circuits_task_gen():
     c = Circuit(2).CX(0, 1).Rx(0.289, 1).CX(0, 1).measure_all()
