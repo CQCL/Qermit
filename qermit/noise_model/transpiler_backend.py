@@ -7,6 +7,7 @@ from pytket.passes import BasePass, CustomPass
 from typing import Dict, List, Optional, Iterator, Sequence, Iterable
 from pytket import Circuit, Bit
 from pytket.backends.resulthandle import ResultHandle
+import multiprocessing
 
 
 class TranspilerBackend:
@@ -32,8 +33,8 @@ class TranspilerBackend:
     def __init__(
         self,
         transpiler: BasePass,
-        max_batch_size: int = 100,
         result_dict: Dict[ResultHandle, BackendResult] = {},
+        max_batch_size: int = 1000,
     ):
         """Initialisation method.
 
@@ -201,6 +202,18 @@ class TranspilerBackend:
                 for _ in range(n_shots % self.max_batch_size)
             ]
 
+    @staticmethod
+    def _get_batch_counts(circuit_list, cbits_list):
+
+        cbits = [Bit.from_list(cbit_list) for cbit_list in cbits_list]
+        backend = AerBackend()
+
+        result_list = backend.run_circuits(circuit_list, n_shots=1)
+        return sum(
+            (result.get_counts(cbits=cbits) for result in result_list), 
+            Counter()
+        )
+    
     def get_counts(
         self,
         circuit: Circuit,
@@ -221,11 +234,20 @@ class TranspilerBackend:
         :rtype: Iterator[Counter]
         """
 
-        counter: Counter = Counter()
+        # counter: Counter = Counter()
 
-        for circuit_list in self._gen_batches(circuit, n_shots):
-            result_list = self.backend.run_circuits(circuit_list, n_shots=1)
-            counter += sum((result.get_counts(cbits=cbits)
-                           for result in result_list), Counter())
+        with multiprocessing.Pool() as pool:
+            processes = [
+                pool.apply_async(self._get_batch_counts, args=(circuit_list, [cbit.to_list() for cbit in cbits]))
+                for circuit_list in self._gen_batches(circuit, n_shots)
+            ]
+            counter_list = [p.get() for p in processes]
 
-        return counter
+        # for circuit_list in self._gen_batches(circuit, n_shots):
+        #     result_list = self.backend.run_circuits(circuit_list, n_shots=1)
+        #     counter += sum((result.get_counts(cbits=cbits)
+        #                    for result in result_list), Counter())
+
+        # return counter
+        
+        return sum(counter_list, Counter())

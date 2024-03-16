@@ -361,6 +361,9 @@ def test_pauli_error_transpile() -> None:
 
 def test_noise_model() -> None:
 
+    import multiprocessing as mp
+    mp.set_start_method("spawn", force=True)
+
     error_distribution_dict = {}
     error_rate = 0.5
     error_distribution_dict[(Pauli.X, Pauli.I)] = error_rate
