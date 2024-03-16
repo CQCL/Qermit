@@ -3,9 +3,10 @@ from collections import Counter
 from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 import uuid
-from pytket.passes import BasePass
-from typing import Dict, List, Optional, Iterator
+from pytket.passes import BasePass, CustomPass
+from typing import Dict, List, Optional, Iterator, Sequence, Iterable
 from pytket import Circuit, Bit
+from pytket.backends.resulthandle import ResultHandle
 
 
 class TranspilerBackend:
@@ -25,14 +26,14 @@ class TranspilerBackend:
 
     transpiler: BasePass
     max_batch_size: int
-    result_dict: Dict[uuid.UUID, BackendResult]
+    result_dict: Dict[ResultHandle, BackendResult]
     backend = AerBackend()
 
     def __init__(
         self,
         transpiler: BasePass,
         max_batch_size: int = 100,
-        result_dict: Dict[uuid.UUID, BackendResult] = {},
+        result_dict: Dict[ResultHandle, BackendResult] = {},
     ):
         """Initialisation method.
 
@@ -43,13 +44,23 @@ class TranspilerBackend:
         :type max_batch_size: int, optional
         :param result_dict: Results dictionary, may be used to store existing
             results within backend, defaults to {}
-        :type result_dict: Dict[uuid.UUID, BackendResult], optional
+        :type result_dict: Dict[ResultHandle, BackendResult], optional
         """
 
         self.transpiler = transpiler
 
         self.max_batch_size = max_batch_size
         self.result_dict = result_dict
+
+    def default_compilation_pass(self, **kwargs) -> BasePass:
+        """Return a compiler pass which has no affect on the circuit.
+        """
+        return CustomPass(transform=lambda circuit: circuit)
+
+    def rebase_pass(self) -> BasePass:
+        """Return a compiler pass which has no affect on the circuit.
+        """
+        return CustomPass(transform=lambda circuit: circuit)
 
     def run_circuit(
         self,
@@ -70,12 +81,34 @@ class TranspilerBackend:
         handle = self.process_circuit(circuit, n_shots, **kwargs)
         return self.get_result(handle=handle)
 
+    def process_circuits(
+        self,
+        circuits: Sequence[Circuit],
+        n_shots: Sequence[int],
+    ) -> List[ResultHandle]:
+        """Processes a collection of circuits by making use multiple calls
+        to process_circuit.
+
+        :param circuits: A collection of circuit to run.
+        :type circuits: Sequence[Circuit]
+        :param n_shots: The number of shots which should be taken from
+            each circuit.
+        :type n_shots: Sequence[int]
+        :return: The result handle for each circuit.
+        :rtype: List[ResultHandle]
+        """
+
+        return [
+            self.process_circuit(circuit=circuit, n_shots=n)
+            for circuit, n in zip(circuits, n_shots)
+        ]
+
     def process_circuit(
         self,
         circuit: Circuit,
         n_shots: int,
         **kwargs,
-    ) -> uuid.UUID:
+    ) -> ResultHandle:
         """[summary]
 
         :param circuit: Submits circuit to run on noisy backend.
@@ -83,10 +116,10 @@ class TranspilerBackend:
         :param n_shots: Number of shots to take from circuit.
         :type n_shots: int
         :return: Handle identifying results in `result_dict`.
-        :rtype: uuid.UUID
+        :rtype: ResultHandle
         """
 
-        handle = uuid.uuid4()
+        handle = ResultHandle(str(uuid.uuid4()))
 
         counts = self.get_counts(
             circuit=circuit,
@@ -104,11 +137,23 @@ class TranspilerBackend:
 
         return handle
 
-    def get_result(self, handle: uuid.UUID) -> BackendResult:
+    def get_results(self, handles: Iterable[ResultHandle]) -> List[BackendResult]:
+        """Get the results corresponding to a collection of result handles.
+
+        :param handles: A collection of handles to retrieve.
+        :type handles: Iterable[ResultHandle]
+        :return: The results corresponding to the given collection of
+        :rtype: List[BackendResult]
+        """
+        return [
+            self.get_result(handle) for handle in handles
+        ]
+
+    def get_result(self, handle: ResultHandle) -> BackendResult:
         """Retrieve result from backend.
 
         :param handle: Handle identifying result.
-        :type handle: uuid.UUID
+        :type handle: ResultHandle
         :return: Result corresponding to handle.
         :rtype: BackendResult
         """

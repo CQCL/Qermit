@@ -5,6 +5,7 @@ import math
 import numpy as np
 from numpy.random import Generator
 from typing import List, Union, Tuple, Dict
+from collections.abc import Iterable
 
 
 class QermitPauli:
@@ -48,6 +49,31 @@ class QermitPauli:
         self.X_list = {qubit: X for qubit, X in zip(qubit_list, X_list)}
         self.phase = phase
         self.qubit_list = qubit_list
+
+    @staticmethod
+    def commute_coeff(pauli_one: QermitPauli, pauli_two: QermitPauli) -> int:
+        """Calculate the coefficient which result from commuting pauli_one
+        past pauli_two. That is to say P_2 P_1 = c P_1 P_2 where c is the
+        coefficient returned by this function.
+
+        :param pauli_one: First Pauli
+        :type pauli_one: QermitPauli
+        :param pauli_two: Second Pauli
+        :type pauli_two: QermitPauli
+        :raises Exception: Raised if the Paulis do not act
+            on matching qubits.
+        :return: Coefficient resulting from commuting the two Paulis.
+        :rtype: int
+        """
+        if not pauli_one.qubit_list == pauli_two.qubit_list:
+            raise Exception(
+                "The given Paulis must act on the same qubits. "
+                + f"In this case the qubits acted on by pauli_one {pauli_one.qubit_list} "
+                + f"differ from those of pauli_two {pauli_two.qubit_list}."
+            )
+        power = sum(pauli_one.X_list[qubit] * pauli_two.Z_list[qubit] for qubit in pauli_one.qubit_list)
+        power += sum(pauli_one.Z_list[qubit] * pauli_two.X_list[qubit] for qubit in pauli_one.qubit_list)
+        return (-1) ** power
 
     def is_measureable(self, qubit_list: List[Qubit]) -> bool:
         """Checks if this Pauli would be measurable on the given qubits in the
@@ -592,7 +618,7 @@ class QermitPauli:
 
     @property
     def qubit_pauli_string(self) -> Tuple[QubitPauliString, complex]:
-        """Qubit pauli string corresponding to Paulii,
+        """Qubit pauli string corresponding to Pauli,
         along with the appropriate phase.
 
         :return: Pauli string and phase corresponding to Pauli.
@@ -606,3 +632,21 @@ class QermitPauli:
         )
 
         return qubit_pauli_string, operator_phase
+
+    @classmethod
+    def from_pauli_iterable(cls, pauli_iterable: Iterable[Pauli], qubit_list: List[Qubit]) -> QermitPauli:
+        """Create a QermitPauli from a Pauli iterable.
+
+        :param pauli_iterable: The Pauli iterable to convert.
+        :type pauli_iterable: Iterable[Pauli]
+        :param qubit_list: The qubits on which the resulting pauli will act.
+        :type qubit_list: List[Qubit]
+        :return: The pauli corresponding to the given iterable.
+        :rtype: QermitPauli
+        """
+        return cls(
+            Z_list=[int(pauli in (Pauli.Z, Pauli.Y)) for pauli in pauli_iterable],
+            X_list=[int(pauli in (Pauli.X, Pauli.Y)) for pauli in pauli_iterable],
+            qubit_list=qubit_list,
+            phase=sum(int(pauli == Pauli.Y) for pauli in pauli_iterable) % 4,
+        )

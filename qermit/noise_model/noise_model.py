@@ -11,6 +11,9 @@ from pytket import Qubit, Circuit
 from pytket.pauli import QubitPauliString
 from numpy.random import Generator
 from enum import Enum
+from itertools import product
+from scipy.linalg import fractional_matrix_power  # type: ignore
+from numpy.typing import NDArray
 
 
 Direction = Enum('Direction', ['forward', 'backward'])
@@ -52,8 +55,159 @@ class ErrorDistribution:
                     + " but should be less than or equal to 1."
                 )
 
+        # If the given distribution is empty then no
+        # noise will be acted.
+        if distribution == {}:
+            pass
+        # If it it not empty then we check that the number
+        # of qubits in each of the errors match.
+        else:
+            n_qubits = len(list(distribution.keys())[0])
+            if not all(len(error) == n_qubits for error in distribution.keys()):
+                raise Exception("Errors must all act on the same number of qubits.")
+
         self.distribution = distribution
         self.rng = rng
+
+    @property
+    def identity_error_rate(self) -> float:
+        """The rate at which no error occurs.
+
+        :return: Rate at which no error occurs.
+            Calculated as 1 minus the total error rate of
+            error in this distribution.
+        :rtype: float
+        """
+        return 1 - sum(self.distribution.values())
+
+    def to_ptm(self) -> Tuple[NDArray, Dict[Tuple[Pauli, ...], int]]:
+        """Convert error distribution to Pauli Transfer Matrix (PTM) form.
+
+        :return: PTM of error distribution and Pauli index dictionary.
+            The Pauli index dictionary maps Pauli errors to their
+            index in the PTM
+        :rtype: Tuple[NDArray, Dict[Tuple[Pauli, ...], int]]
+        """
+
+        # Initialise an empty PTM and index dictionary
+        # of the appropriate size.
+        ptm = np.zeros((4**self.n_qubits, 4**self.n_qubits))
+        pauli_index = {
+            pauli: index
+            for index, pauli
+            in enumerate(product({Pauli.I, Pauli.X, Pauli.Y, Pauli.Z}, repeat=self.n_qubits))
+        }
+
+        # For each pauli, calculate the corresponding
+        # PTM entry as a sum pf error weights multiplied by +/-1
+        # Depending on commutation relations.
+        for pauli_tuple, index in pauli_index.items():
+
+            pauli = QermitPauli.from_pauli_iterable(
+                pauli_iterable=pauli_tuple,
+                qubit_list=[Qubit(i) for i in range(self.n_qubits)]
+            )
+
+            # Can add the identity error rate.
+            # This will not come up in the following for loop
+            # as the error distribution does not save
+            # the rate at which no errors occur.
+            ptm[index][index] += self.identity_error_rate
+
+            for error, error_rate in self.distribution.items():
+                error_pauli = QermitPauli.from_pauli_iterable(
+                    pauli_iterable=error,
+                    qubit_list=[Qubit(i) for i in range(self.n_qubits)]
+                )
+
+                ptm[index][index] += error_rate * QermitPauli.commute_coeff(pauli_one=pauli, pauli_two=error_pauli)
+
+        # Some checks that the form of the PTM is correct.
+        identity = tuple(Pauli.I for _ in range(self.n_qubits))
+        if not abs(ptm[pauli_index[identity]][pauli_index[identity]] - 1.0) < 10**(-6):
+            raise Exception(
+                "The identity entry of the PTM is incorrect. "
+                + "This is a fault in Qermit. "
+                + "Please report this as an issue."
+            )
+
+        if not self == ErrorDistribution.from_ptm(ptm=ptm, pauli_index=pauli_index):
+            raise Exception(
+                "From PTM does not match to PTM. "
+                + "This is a fault in Qermit. "
+                + "Please report this as an issue."
+            )
+
+        return ptm, pauli_index
+
+    @classmethod
+    def from_ptm(cls, ptm: NDArray, pauli_index: Dict[Tuple[Pauli, ...], int]) -> ErrorDistribution:
+        """Convert a Pauli Transfer Matrix (PTM) to an error distribution.
+
+        :param ptm: Pauli Transfer Matrix to convert. Should be a 4^n by 4^n matrix
+            where n is the number of qubits.
+        :type ptm: NDArray
+        :param pauli_index: A dictionary mapping Pauli errors to
+            their index in the PTM.
+        :type pauli_index: Dict[Tuple[Pauli, ...], int]
+        :return: The converted error distribution.
+        :rtype: ErrorDistribution
+        """
+
+        if ptm.ndim != 2:
+            raise Exception(
+                f"This given matrix is not has dimension {ptm.ndim} "
+                + "but should have dimension 2."
+            )
+
+        if ptm.shape[0] != ptm.shape[1]:
+            raise Exception(
+                "The dimensions of the given PTM are "
+                + f"{ptm.shape[0]} and {ptm.shape[1]} "
+                + "but they should match."
+            )
+
+        n_qubit = math.log(ptm.shape[0], 4)
+        if n_qubit % 1 != 0.0:
+            raise Exception(
+                "The given PTM should have a dimension of the form 4^n "
+                + "where n is the number of qubits."
+            )
+
+        if not np.array_equal(ptm, np.diag(np.diag(ptm))):
+            raise Exception(
+                "The given PTM is not diagonal as it should be."
+            )
+
+        # calculate the error rates by solving simultaneous
+        # linear equations. In particular the matrix to invert
+        # is the matrix of commutation values.
+        commutation_matrix = np.zeros(ptm.shape)
+        for pauli_one_tuple, index_one in pauli_index.items():
+            pauli_one = QermitPauli.from_pauli_iterable(
+                pauli_iterable=pauli_one_tuple,
+                qubit_list=[Qubit(i) for i in range(len(pauli_one_tuple))]
+            )
+            for pauli_two_tuple, index_two in pauli_index.items():
+                pauli_two = QermitPauli.from_pauli_iterable(
+                    pauli_iterable=pauli_two_tuple,
+                    qubit_list=[Qubit(i) for i in range(len(pauli_two_tuple))]
+                )
+                commutation_matrix[index_one][index_two] = QermitPauli.commute_coeff(pauli_one=pauli_one, pauli_two=pauli_two)
+
+        error_rate_list = np.matmul(ptm.diagonal(), np.linalg.inv(commutation_matrix))
+        distribution = {
+            error: error_rate_list[index]
+            for error, index in pauli_index.items()
+            if (error_rate_list[index] > 10**(-6)) and error != tuple(Pauli.I for _ in range(int(n_qubit)))
+        }
+        return cls(distribution=distribution)
+
+    @property
+    def n_qubits(self) -> int:
+        """The number of qubits this error distribution acts on.
+        """
+        return len(list(self.distribution.keys())[0])
 
     def __eq__(self, other: object) -> bool:
         """Check equality of two instances of ErrorDistribution by ensuring
@@ -208,6 +362,22 @@ class ErrorDistribution:
 
         return fig
 
+    def scale(self, scaling_factor: float) -> ErrorDistribution:
+        """Scale the error rates of this error distribution.
+        This is done by converting the error distribution to a PTM,
+        scaling that matrix appropriately, and converting back to a
+        new error distribution.
+
+        :param scaling_factor: The factor by which the noise should be scaled.
+        :type scaling_factor: float
+        :return: A new error distribution with the noise scaled.
+        :rtype: ErrorDistribution
+        """
+
+        ptm, pauli_index = self.to_ptm()
+        scaled_ptm = fractional_matrix_power(ptm, scaling_factor)
+        return ErrorDistribution.from_ptm(ptm=scaled_ptm, pauli_index=pauli_index)
+
 
 class LogicalErrorDistribution:
     """
@@ -303,6 +473,22 @@ class NoiseModel:
         """
 
         self.noise_model = noise_model
+
+    def scale(self, scaling_factor: float) -> NoiseModel:
+        """Generate new error model where all error rates have been scaled by
+        the given scaling factor.
+
+        :param scaling_factor: Factor by which to scale the error rates.
+        :type scaling_factor: float
+        :return: New noise model with scaled error rates.
+        :rtype: NoiseModel
+        """
+        return NoiseModel(
+            noise_model={
+                op_type: error_distribution.scale(scaling_factor=scaling_factor)
+                for op_type, error_distribution in self.noise_model.items()
+            }
+        )
 
     def reset_rng(self, rng: Generator):
         """Reset randomness generator.

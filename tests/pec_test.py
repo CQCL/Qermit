@@ -50,11 +50,9 @@ REASON = "IBMQ account not configured"
 def test_no_qubit_relabel():
 
     noiseless_backend = AerBackend()
-    lagos_backend = IBMQEmulatorBackend(
-        "ibm_lagos", instance='partner-cqc/internal/default'
-    )
+    mumbai_backend = IBMQEmulatorBackend("ibmq_mumbai")
     pec_mitex = gen_PEC_learning_based_MitEx(
-        device_backend=lagos_backend, simulator_backend=noiseless_backend
+        device_backend=mumbai_backend, simulator_backend=noiseless_backend
     )
 
     c = Circuit(3)
