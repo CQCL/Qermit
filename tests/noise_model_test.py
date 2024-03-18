@@ -16,6 +16,7 @@ import numpy as np
 from copy import deepcopy
 import pytest
 from qermit.noise_model.noise_model import Direction
+import multiprocessing as mp
 
 
 def test_to_ptm() -> None:
@@ -302,6 +303,8 @@ def test_to_dict(tmpdir_factory) -> None:
 @pytest.mark.high_compute
 def test_transpiler_backend() -> None:
 
+    mp.set_start_method("spawn", force=True)
+
     circuit = Circuit(3)
     for _ in range(32):
         circuit.ZZMax(0, 1).ZZMax(1, 2)
@@ -360,6 +363,8 @@ def test_pauli_error_transpile() -> None:
 
 
 def test_noise_model() -> None:
+
+    mp.set_start_method("spawn", force=True)
 
     error_distribution_dict = {}
     error_rate = 0.5

@@ -50,6 +50,7 @@ from qermit.noise_model import NoiseModel, ErrorDistribution
 from qermit.zero_noise_extrapolation.zne import gen_noise_scaled_mitex
 from qermit.noise_model import TranspilerBackend, PauliErrorTranspile
 from itertools import product
+import multiprocessing as mp
 
 n_qubits = 2
 
@@ -848,6 +849,8 @@ def test_end_to_end_noise_scaled_mitex():
 @pytest.mark.high_compute
 def test_end_to_end_noise_aware_zne_mitex_starting_from_ptm() -> None:
 
+    mp.set_start_method("spawn", force=True)
+
     # Here we are creating the PTM for a noise model acting
     # XI with rate 0.1
     ptm = np.diag([1, 1, 1, 1, 1, 1, 1, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8])
@@ -860,7 +863,10 @@ def test_end_to_end_noise_aware_zne_mitex_starting_from_ptm() -> None:
         }
     )
     transpiler = PauliErrorTranspile(noise_model=noise_model)
-    backend = TranspilerBackend(transpiler=transpiler)
+    backend = TranspilerBackend(
+        transpiler=transpiler,
+        n_cores=1,
+    )
 
     # Here we perform ZNE with some unevenly spaced
     # noise scaling values.
@@ -907,6 +913,8 @@ def test_end_to_end_noise_aware_zne_mitex_starting_from_ptm() -> None:
 @pytest.mark.high_compute
 def test_end_to_end_noise_aware_zne_mitex():
 
+    mp.set_start_method("spawn", force=True)
+
     error_rate = 0.1
     error_distribution = ErrorDistribution(
         distribution={(Pauli.X, Pauli.I): error_rate}
@@ -915,7 +923,10 @@ def test_end_to_end_noise_aware_zne_mitex():
         noise_model={OpType.CZ: error_distribution}
     )
     transpiler = PauliErrorTranspile(noise_model=noise_model)
-    backend = TranspilerBackend(transpiler=transpiler)
+    backend = TranspilerBackend(
+        transpiler=transpiler,
+        n_cores=1,
+    )
 
     zne_mitex = gen_ZNE_MitEx(
         backend=backend,
