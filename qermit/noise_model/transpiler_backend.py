@@ -44,8 +44,9 @@ class TranspilerBackend:
         :param transpiler: Compiler to use during noise simulation.
         :type transpiler: BasePass
         :param max_batch_size: Size of the largest batch of shots,
-            defaults to 100. This batches will be distributed to
-            multiple cores.
+            defaults to 1000. The total number of shots is distributed between
+            bathes of size 1000 plus a smaller batch for left over shot.
+            These batches will be distributed to multiple cores.
         :type max_batch_size: int, optional
         :param result_dict: Results dictionary, may be used to store existing
             results within backend, defaults to {}
