@@ -25,11 +25,13 @@ jobs:
       if: github.event_name == 'pull_request'
       run: |
         pip install -e . -v
+        pip list
     - name: Test qermit 
       if: github.event_name == 'pull_request'
       run: |
         cd tests
         pip install -r test_requirements.txt
+        pip list
         pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
 
   linux:
