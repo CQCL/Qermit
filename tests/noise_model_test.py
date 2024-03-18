@@ -16,6 +16,7 @@ import numpy as np
 from copy import deepcopy
 import pytest
 from qermit.noise_model.noise_model import Direction
+import multiprocessing as mp
 
 
 def test_to_ptm() -> None:
@@ -361,7 +362,6 @@ def test_pauli_error_transpile() -> None:
 
 def test_noise_model() -> None:
 
-    import multiprocessing as mp
     mp.set_start_method("spawn", force=True)
 
     error_distribution_dict = {}

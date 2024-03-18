@@ -4,7 +4,7 @@ from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 import uuid
 from pytket.passes import BasePass, CustomPass
-from typing import Dict, List, Optional, Iterator, Sequence, Iterable
+from typing import Dict, List, Optional, Iterator, Sequence, Iterable, Tuple
 from pytket import Circuit, Bit
 from pytket.backends.resulthandle import ResultHandle
 import multiprocessing
@@ -23,11 +23,13 @@ class TranspilerBackend:
             shot batch size permitted.
         result_dict: A dictionary mapping handles to results.
         backend: Backend used to simulate compiled circuits.
+        n_cores: The number of cores when simulating shots in parallel.
     """
 
     transpiler: BasePass
     max_batch_size: int
     result_dict: Dict[ResultHandle, BackendResult]
+    n_cores: Optional[int]
     backend = AerBackend()
 
     def __init__(
@@ -35,23 +37,30 @@ class TranspilerBackend:
         transpiler: BasePass,
         result_dict: Dict[ResultHandle, BackendResult] = {},
         max_batch_size: int = 1000,
+        n_cores: Optional[int] = None,
     ):
         """Initialisation method.
 
         :param transpiler: Compiler to use during noise simulation.
         :type transpiler: BasePass
         :param max_batch_size: Size of the largest batch of shots,
-            defaults to 100
+            defaults to 100. This batches will be distributed to
+            multiple cores.
         :type max_batch_size: int, optional
         :param result_dict: Results dictionary, may be used to store existing
             results within backend, defaults to {}
         :type result_dict: Dict[ResultHandle, BackendResult], optional
+        :param n_cores: Shots will be taken in parallel. This parameter
+            specifies the number of cores to use.
+        :type n_cores: Optional[int]. Defaults to None, using all available
+            cores.
         """
 
         self.transpiler = transpiler
 
         self.max_batch_size = max_batch_size
         self.result_dict = result_dict
+        self.n_cores = n_cores
 
     def default_compilation_pass(self, **kwargs) -> BasePass:
         """Return a compiler pass which has no affect on the circuit.
@@ -203,23 +212,40 @@ class TranspilerBackend:
             ]
 
     @staticmethod
-    def _get_batch_counts(circuit_list, cbits_list):
+    def _get_batch_counts(
+        circuit_list: List[Circuit],
+        cbits_list: Optional[List[List]],
+    ) -> Counter[Tuple[int, ...]]:
+        """Run each circuit in the given list for one shot,
+        collating the results into a single counter.
 
-        cbits = [Bit.from_list(cbit_list) for cbit_list in cbits_list]
+        :param circuit_list: The list of circuits to run for one shot each.
+        :type circuit_list: List[Circuit]
+        :param cbits_list: The classical bits to return the measurements of
+        :type cbits_list: Optional[List[List]]
+        :return: The collated counter object.
+        :rtype: Counter[Tuple[int, ...]]
+        """
+
+        if cbits_list is not None:
+            cbits = [Bit.from_list(cbit_list) for cbit_list in cbits_list]
+        else:
+            cbits = None
+
         backend = AerBackend()
 
         result_list = backend.run_circuits(circuit_list, n_shots=1)
         return sum(
-            (result.get_counts(cbits=cbits) for result in result_list), 
+            (result.get_counts(cbits=cbits) for result in result_list),
             Counter()
         )
-    
+
     def get_counts(
         self,
         circuit: Circuit,
         n_shots: int,
         cbits: Optional[List[Bit]] = None,
-    ) -> Counter:
+    ) -> Counter[Tuple[int, ...]]:
         """Generate shots from the given circuit.
 
         :param circuit: Circuit to take shots from.
@@ -234,20 +260,16 @@ class TranspilerBackend:
         :rtype: Iterator[Counter]
         """
 
-        # counter: Counter = Counter()
+        if cbits is not None:
+            cbits_list = [cbit.to_list() for cbit in cbits]
+        else:
+            cbits_list = None
 
-        with multiprocessing.Pool() as pool:
+        with multiprocessing.Pool(self.n_cores) as pool:
             processes = [
-                pool.apply_async(self._get_batch_counts, args=(circuit_list, [cbit.to_list() for cbit in cbits]))
+                pool.apply_async(self._get_batch_counts, args=(circuit_list, cbits_list))
                 for circuit_list in self._gen_batches(circuit, n_shots)
             ]
             counter_list = [p.get() for p in processes]
 
-        # for circuit_list in self._gen_batches(circuit, n_shots):
-        #     result_list = self.backend.run_circuits(circuit_list, n_shots=1)
-        #     counter += sum((result.get_counts(cbits=cbits)
-        #                    for result in result_list), Counter())
-
-        # return counter
-        
         return sum(counter_list, Counter())
