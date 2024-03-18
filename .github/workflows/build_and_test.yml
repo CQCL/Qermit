@@ -24,7 +24,7 @@ jobs:
     - name: Build qermit
       if: github.event_name == 'pull_request'
       run: |
-        pip install -e .[tests] -v
+        pip install .[tests]
     - name: Test qermit 
       if: github.event_name == 'pull_request'
       run: |
@@ -46,7 +46,7 @@ jobs:
     - name: Build qermit
       if: github.event_name == 'pull_request'
       run: |
-        pip install -e .[tests] -v
+        pip install .[tests]
     - name: Test qermit 
       if: github.event_name == 'pull_request'
       run: |
@@ -68,7 +68,7 @@ jobs:
     - name: Build qermit
       if: github.event_name == 'pull_request'
       run: |
-        pip install -e .[tests] -v
+        pip install .[tests]
     - name: Test qermit 
       if: github.event_name == 'pull_request'
       run: |
@@ -107,7 +107,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Build qermit
       run: |
-        pip install -e .[tests] -v
+        pip install .[tests]
         cd tests
     - name: Run mypy
       if: github.event_name == 'pull_request'
