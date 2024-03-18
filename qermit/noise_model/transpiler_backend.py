@@ -23,7 +23,7 @@ class TranspilerBackend:
             shot batch size permitted.
         result_dict: A dictionary mapping handles to results.
         backend: Backend used to simulate compiled circuits.
-        n_cores: The number of cores when simulating shots in parallel.
+        n_cores: The number of cores used when simulating shots in parallel.
     """
 
     transpiler: BasePass
