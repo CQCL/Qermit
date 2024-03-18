@@ -1,8 +1,16 @@
+[build-system]
+requires = ["poetry", "poetry-core>=1.0.8"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "qermit"
 version = "0.5.0"
-description = "Python package for quantum error mitigation"
-authors = ["Your Name <you@example.com>"]
+description = "Python package for quantum error mitigation."
+authors = [
+    "Daniel Mills <daniel.mill@quantinuum.com>",
+    "Silas Dilkes <silas.dilkes@quantinuum.com>",
+    "Cristina Cirsoiu <cristina.circsoiu@quantinuum.com>",
+]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -10,14 +18,14 @@ python = ">=3.10, <3.13"
 pytket-qiskit = "^0.50.0"
 matplotlib = "^3.8.3"
 
-pytest = {version="^8.1.1", optional=True}
-mypy = {version="^1.9.0", optional=True}
-flake8 = {version="^7.0.0", optional=True}
-sphinx = {version="^7.2.6", optional=True}
-pytest-cov = {version="^4.1.0", optional=True}
-sphinx-book-theme = {version="^1.1.2", optional=True}
-qiskit-ibm-provider = {version="^0.10.0", optional=True}
-pytket-quantinuum = {version="^0.30.0", optional=True}
+pytest = { version = "^8.1.1", optional = True }
+mypy = { version = "^1.9.0", optional = True }
+flake8 = { version = "^7.0.0", optional = True }
+sphinx = { version = "^7.2.6", optional = True }
+pytest-cov = { version = "^4.1.0", optional = True }
+sphinx-book-theme = { version = "^1.1.2", optional = True }
+qiskit-ibm-provider = { version = "^0.10.0", optional = True }
+pytket-quantinuum = { version = "^0.30.0", optional = True }
 
 [tool.poetry.extras]
 tests = ["pytest", "pytest-cov", "mypy", "flake8"]
