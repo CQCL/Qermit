@@ -1,16 +1,8 @@
-[build-system]
-requires = ["poetry", "poetry-core>=1.0.8"]
-build-backend = "poetry.core.masonry.api"
-
 [tool.poetry]
 name = "qermit"
 version = "0.5.0"
 description = "Python package for quantum error mitigation."
-authors = [
-    "Daniel Mills <daniel.mill@quantinuum.com>",
-    "Silas Dilkes <silas.dilkes@quantinuum.com>",
-    "Cristina Cirsoiu <cristina.circsoiu@quantinuum.com>",
-]
+authors = []
 readme = "README.md"
 
 [tool.poetry.dependencies]
