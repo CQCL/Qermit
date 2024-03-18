@@ -37,7 +37,7 @@ class TranspilerBackend:
         transpiler: BasePass,
         result_dict: Dict[ResultHandle, BackendResult] = {},
         max_batch_size: int = 1000,
-        n_cores: Optional[int] = None,
+        n_cores: int = 1,
     ):
         """Initialisation method.
 
@@ -52,9 +52,9 @@ class TranspilerBackend:
             results within backend, defaults to {}
         :type result_dict: Dict[ResultHandle, BackendResult], optional
         :param n_cores: Shots will be taken in parallel. This parameter
-            specifies the number of cores to use.
-        :type n_cores: Optional[int]. Defaults to None, using all available
-            cores.
+            specifies the number of cores to use. The default is to use
+            one core.
+        :type n_cores: Optional[int]. Defaults to 1.
         """
 
         self.transpiler = transpiler
@@ -261,16 +261,28 @@ class TranspilerBackend:
         :rtype: Iterator[Counter]
         """
 
-        if cbits is not None:
-            cbits_list = [cbit.to_list() for cbit in cbits]
+        if self.n_cores > 1:
+
+            if cbits is not None:
+                cbits_list = [cbit.to_list() for cbit in cbits]
+            else:
+                cbits_list = None
+
+            with multiprocessing.Pool(self.n_cores) as pool:
+                processes = [
+                    pool.apply_async(self._get_batch_counts, args=(circuit_list, cbits_list))
+                    for circuit_list in self._gen_batches(circuit, n_shots)
+                ]
+                counter_list = [p.get() for p in processes]
+
+            return sum(counter_list, Counter())
+        
         else:
-            cbits_list = None
-
-        with multiprocessing.Pool(self.n_cores) as pool:
-            processes = [
-                pool.apply_async(self._get_batch_counts, args=(circuit_list, cbits_list))
-                for circuit_list in self._gen_batches(circuit, n_shots)
-            ]
-            counter_list = [p.get() for p in processes]
-
-        return sum(counter_list, Counter())
+    
+            counter: Counter = Counter()
+            for circuit_list in self._gen_batches(circuit, n_shots):
+                result_list = self.backend.run_circuits(circuit_list, n_shots=1)
+                counter += sum((result.get_counts(cbits=cbits)
+                            for result in result_list), Counter())
+            
+            return counter

@@ -863,7 +863,10 @@ def test_end_to_end_noise_aware_zne_mitex_starting_from_ptm() -> None:
         }
     )
     transpiler = PauliErrorTranspile(noise_model=noise_model)
-    backend = TranspilerBackend(transpiler=transpiler)
+    backend = TranspilerBackend(
+        transpiler=transpiler,
+        n_cores=1,
+    )
 
     # Here we perform ZNE with some unevenly spaced
     # noise scaling values.
@@ -920,7 +923,10 @@ def test_end_to_end_noise_aware_zne_mitex():
         noise_model={OpType.CZ: error_distribution}
     )
     transpiler = PauliErrorTranspile(noise_model=noise_model)
-    backend = TranspilerBackend(transpiler=transpiler)
+    backend = TranspilerBackend(
+        transpiler=transpiler,
+        n_cores=1,
+    )
 
     zne_mitex = gen_ZNE_MitEx(
         backend=backend,
