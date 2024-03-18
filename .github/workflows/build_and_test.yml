@@ -29,7 +29,6 @@ jobs:
       if: github.event_name == 'pull_request'
       run: |
         cd tests
-        pip install -r test_requirements.txt
         pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
 
   linux:
@@ -52,7 +51,6 @@ jobs:
       if: github.event_name == 'pull_request'
       run: |
         cd tests
-        pip install -r test_requirements.txt
         pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
       
   windows:
@@ -75,7 +73,6 @@ jobs:
       if: github.event_name == 'pull_request'
       run: |
         cd tests
-        pip install -r test_requirements.txt
         pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
 
   build-docs:
@@ -89,7 +86,6 @@ jobs:
       - name: Build Docs
         run: |
           cd docs_src
-          pip install -r requirements.txt
           ./build_docs.sh
           cd ../manual
           ./build_manual.sh
@@ -113,7 +109,6 @@ jobs:
       run: |
         pip install -e . -v
         cd tests
-        pip install -r test_requirements.txt
     - name: Run mypy
       if: github.event_name == 'pull_request'
       run: mypy -p qermit
