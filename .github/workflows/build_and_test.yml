@@ -82,7 +82,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install Qermit
-        run: pip install .
+        run: pip install -e . -v
       - name: Build Docs
         run: |
           cd docs_src
