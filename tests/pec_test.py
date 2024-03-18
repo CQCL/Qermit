@@ -38,10 +38,10 @@ import math
 from pytket.predicates import GateSetPredicate, CliffordCircuitPredicate  # type: ignore
 from qermit import AnsatzCircuit, ObservableExperiment
 from pytket.extensions.qiskit import IBMQEmulatorBackend  # type: ignore
-from qiskit import IBMQ  # type: ignore
+from qiskit.providers.ibmq import IBMQFactory
 import pytest
 
-skip_remote_tests: bool = not IBMQ.stored_account()
+skip_remote_tests: bool = not IBMQFactory.stored_account()
 REASON = "IBMQ account not configured"
 
 
