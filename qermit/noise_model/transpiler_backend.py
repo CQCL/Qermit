@@ -29,7 +29,7 @@ class TranspilerBackend:
     transpiler: BasePass
     max_batch_size: int
     result_dict: Dict[ResultHandle, BackendResult]
-    n_cores: Optional[int]
+    n_cores: int
     backend = AerBackend()
 
     def __init__(
@@ -276,13 +276,15 @@ class TranspilerBackend:
                 counter_list = [p.get() for p in processes]
 
             return sum(counter_list, Counter())
-        
+
         else:
-    
+
             counter: Counter = Counter()
             for circuit_list in self._gen_batches(circuit, n_shots):
                 result_list = self.backend.run_circuits(circuit_list, n_shots=1)
-                counter += sum((result.get_counts(cbits=cbits)
-                            for result in result_list), Counter())
-            
+                counter += sum(
+                    (result.get_counts(cbits=cbits) for result in result_list),
+                    Counter()
+                )
+
             return counter
