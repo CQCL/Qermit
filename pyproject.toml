@@ -6,7 +6,11 @@ build-backend = "poetry.core.masonry.api"
 name = "qermit"
 version = "0.5.0"
 description = "Python package for quantum error mitigation."
-authors = []
+authors = [
+    "Daniel Mills <daniel.mills@quantinuum.com>",
+    "Silas Dilkes <silas.dilkes@quantinuum.com>",
+    "Cristina Circsoiu <cristina.cirstoiu@quantinuum.com>"
+]
 readme = "README.md"
 
 [tool.poetry.dependencies]
