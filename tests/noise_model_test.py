@@ -303,6 +303,8 @@ def test_to_dict(tmpdir_factory) -> None:
 @pytest.mark.high_compute
 def test_transpiler_backend() -> None:
 
+    mp.set_start_method("spawn", force=True)
+
     circuit = Circuit(3)
     for _ in range(32):
         circuit.ZZMax(0, 1).ZZMax(1, 2)
