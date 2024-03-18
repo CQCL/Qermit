@@ -26,7 +26,7 @@ from qermit.spam.full_transition_tomography import (  # type: ignore
 
 from pytket import Circuit, Bit, Qubit
 from pytket.extensions.qiskit import AerBackend  # type: ignore
-import qiskit.providers.aer.noise as noise  # type: ignore
+import qiskit_aer.noise as noise  # type: ignore
 import numpy as np  # type: ignore
 
 

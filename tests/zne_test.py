@@ -39,7 +39,7 @@ from numpy.polynomial.polynomial import polyval  # type: ignore
 import math
 import numpy as np  # type: ignore
 from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
-import qiskit.providers.aer.noise as noise  # type: ignore
+import qiskit_aer.noise as noise  # type: ignore
 from pytket.circuit import OpType  # type: ignore
 from qiskit import IBMQ  # type: ignore
 import pytest
