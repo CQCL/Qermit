@@ -24,13 +24,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install Qermit
-        run: pip install .
+        run: pip install .[docs]
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Build Docs
         run: |
           cd docs_src
-          pip install -r requirements.txt
           ./build_docs.sh
           cd ../manual
           ./build_manual.sh

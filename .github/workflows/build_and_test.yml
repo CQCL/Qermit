@@ -9,12 +9,13 @@ on:
 
 jobs:
 
-  macos:
-    name: Build and test (MacOS)
-    runs-on: macos-latest
+  run-tests:
+    name: Build and test
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.10', '3.11', '3.12']
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -24,58 +25,11 @@ jobs:
     - name: Build qermit
       if: github.event_name == 'pull_request'
       run: |
-        pip install -e . -v
+        pip install -e .[tests] -v
     - name: Test qermit 
       if: github.event_name == 'pull_request'
       run: |
         cd tests
-        pip install -r test_requirements.txt
-        pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
-
-  linux:
-    name: Build and test (Linux)
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.9', '3.10', '3.11']
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Build qermit
-      if: github.event_name == 'pull_request'
-      run: |
-        pip install -e . -v
-    - name: Test qermit 
-      if: github.event_name == 'pull_request'
-      run: |
-        cd tests
-        pip install -r test_requirements.txt
-        pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
-      
-  windows:
-    name: Build and test (Windows)
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        python-version: ['3.9', '3.10', '3.11']
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Build qermit
-      if: github.event_name == 'pull_request'
-      run: |
-        pip install -e . -v
-    - name: Test qermit 
-      if: github.event_name == 'pull_request'
-      run: |
-        cd tests
-        pip install -r test_requirements.txt
         pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
 
   build-docs:
@@ -85,11 +39,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install Qermit
-        run: pip install .
+        run: pip install -e .[docs] -v
       - name: Build Docs
         run: |
           cd docs_src
-          pip install -r requirements.txt
           ./build_docs.sh
           cd ../manual
           ./build_manual.sh
@@ -111,9 +64,8 @@ jobs:
       uses: actions/checkout@v2
     - name: Build qermit
       run: |
-        pip install -e . -v
+        pip install .[tests]
         cd tests
-        pip install -r test_requirements.txt
     - name: Run mypy
       if: github.event_name == 'pull_request'
       run: mypy -p qermit

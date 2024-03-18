@@ -39,9 +39,9 @@ from numpy.polynomial.polynomial import polyval  # type: ignore
 import math
 import numpy as np  # type: ignore
 from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
-import qiskit.providers.aer.noise as noise  # type: ignore
+import qiskit_aer.noise as noise  # type: ignore
 from pytket.circuit import OpType  # type: ignore
-from qiskit import IBMQ  # type: ignore
+from qiskit_ibm_provider import IBMProvider
 import pytest
 from pytket.circuit import Node  # type: ignore
 from qermit.noise_model import MockQuantinuumBackend  # type: ignore
@@ -71,7 +71,7 @@ for node in [i for i in range(n_qubits)]:
 noisy_backend = AerBackend(noise_model)
 
 
-skip_remote_tests: bool = not IBMQ.stored_account()
+skip_remote_tests: bool = not IBMProvider.saved_accounts()
 REASON = "IBMQ account not configured"
 
 

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["poetry", "poetry-core>=1.0.8"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "qermit"
+version = "0.5.0"
+description = "Python package for quantum error mitigation."
+authors = [
+    "Daniel Mills <daniel.mills@quantinuum.com>",
+    "Silas Dilkes <silas.dilkes@quantinuum.com>",
+    "Cristina Circsoiu <cristina.cirstoiu@quantinuum.com>"
+]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10, <3.13"
+pytket-qiskit = "^0.50.0"
+matplotlib = "^3.8.3"
+
+pytest = {version="^8.1.1", optional=true}
+mypy = {version="^1.9.0", optional=true}
+flake8 = {version="^7.0.0", optional=true}
+sphinx = {version="^7.2.6", optional=true}
+pytest-cov = {version="^4.1.0", optional=true}
+sphinx-book-theme = {version="^1.1.2", optional=true}
+qiskit-ibm-provider = {version="^0.10.0", optional=true}
+pytket-quantinuum = {version="^0.30.0", optional=true}
+
+[tool.poetry.extras]
+tests = ["pytest", "mypy", "flake8", "pytest-cov", "qiskit-ibm-provider", "pytket-quantinuum"]
+docs = ["sphinx", "sphinx-book-theme"]
