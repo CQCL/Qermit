@@ -29,4 +29,4 @@ pytket-quantinuum = "0.32"
 
 [tool.poetry.extras]
 tests = ["pytest", "mypy", "flake8", "pytest-cov", "qiskit-ibm-provider", "pytket-quantinuum"]
-docs = ["sphinx", "sphinx-book-theme"]
+docs = ["sphinx", "sphinx-book-theme", "pytket-quantinuum"]
