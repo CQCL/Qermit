@@ -1066,7 +1066,7 @@ tests = ["pytest (>=4.6)"]
 name = "msal"
 version = "1.28.0"
 description = "The Microsoft Authentication Library (MSAL) for Python library enables your app to access the Microsoft Cloud by supporting authentication of users with Microsoft Azure Active Directory accounts (AAD) and Microsoft Accounts (MSA) using industry standard OAuth2 and OpenID Connect."
-optional = true
+optional = false
 python-versions = ">=3.7"
 files = [
     {file = "msal-1.28.0-py3-none-any.whl", hash = "sha256:3064f80221a21cd535ad8c3fafbb3a3582cd9c7e9af0bb789ae14f726a0ca99b"},
@@ -1143,7 +1143,7 @@ files = [
 name = "nest-asyncio"
 version = "1.6.0"
 description = "Patch asyncio to allow nested event loops"
-optional = true
+optional = false
 python-versions = ">=3.5"
 files = [
     {file = "nest_asyncio-1.6.0-py3-none-any.whl", hash = "sha256:87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c"},
@@ -1644,7 +1644,7 @@ diagrams = ["jinja2", "railroad-diagrams"]
 name = "pyqir"
 version = "0.10.0"
 description = "PyQIR parses, generates and evaluates the Quantum Intermediate Representation."
-optional = true
+optional = false
 python-versions = ">=3.8"
 files = [
     {file = "pyqir-0.10.0-cp38-abi3-macosx_10_9_x86_64.whl", hash = "sha256:b2fd7bb4bd45fa601ac92099c4e82d8f02e092a44d413d1dad7fa555fafa40b8"},
@@ -1809,7 +1809,7 @@ tests = ["pytest"]
 name = "pytket-qir"
 version = "0.9.0"
 description = "Extension for pytket, providing functions for conversion into to qir"
-optional = true
+optional = false
 python-versions = ">=3.10"
 files = [
     {file = "pytket_qir-0.9.0-py3-none-any.whl", hash = "sha256:2ecd74db10eb6aaccd9fe7c80635b1d368d1a1f70cdcc5e4a30abf661cff8424"},
@@ -1842,7 +1842,7 @@ qiskit-ibm-runtime = ">=0.21.0,<0.22.0"
 name = "pytket-quantinuum"
 version = "0.32.0"
 description = "Extension for pytket, providing access to Quantinuum backends"
-optional = true
+optional = false
 python-versions = ">=3.10"
 files = [
     {file = "pytket_quantinuum-0.32.0-py3-none-any.whl", hash = "sha256:31f6c6482fb24a854a41b2ca8e653a43c02c2a7090c86c17d38ccacfb1409ebb"},
@@ -2580,7 +2580,7 @@ files = [
 name = "types-requests"
 version = "2.31.0.20240406"
 description = "Typing stubs for requests"
-optional = true
+optional = false
 python-versions = ">=3.8"
 files = [
     {file = "types-requests-2.31.0.20240406.tar.gz", hash = "sha256:4428df33c5503945c74b3f42e82b181e86ec7b724620419a2966e2de604ce1a1"},
@@ -2734,10 +2734,10 @@ files = [
 ]
 
 [extras]
-docs = ["pytket-quantinuum", "sphinx", "sphinx-book-theme"]
-tests = ["flake8", "mypy", "pytest", "pytest-cov", "pytket-pecos", "pytket-quantinuum", "qiskit-ibm-provider"]
+docs = ["sphinx", "sphinx-book-theme"]
+tests = ["flake8", "mypy", "pytest", "pytest-cov", "pytket-pecos", "qiskit-ibm-provider"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.13"
-content-hash = "4d036a0dc63ff867ce5345cca9f60a14aa326578a1e59d75fd4d63e97a56270c"
+content-hash = "4b3445859e208601bc5f45fa667814609b151b88a2739d3a1fbd135031ff46c6"

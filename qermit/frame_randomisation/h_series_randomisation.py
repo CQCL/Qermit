@@ -21,8 +21,7 @@ def gen_h_series_randomised_circuit(circuit):
     for q_register in circuit.q_registers:
         randomised_circuit.add_q_register(q_register)
         for qubit in q_register:
-            randomisation_reg = randomised_circuit.add_c_register(f"randomisation_{qubit.to_list()}", 4)
-            randomisation_reg_dict[qubit] = randomisation_reg
+            randomisation_reg_dict[qubit] = randomised_circuit.add_c_register(f"randomisation_{qubit.to_list()}", 4)
     for c_register in circuit.c_registers:
         randomised_circuit.add_c_register(c_register)
 
@@ -46,8 +45,10 @@ def gen_h_series_randomised_circuit(circuit):
 
     for command in circuit:
 
+        randomisation_reg = randomisation_reg_dict[command.args[0]]
+
         if command.op.type == OpType.ZZMax:
-            randomised_circuit.add_wasm_to_reg("write_randomisation", wfh, [], [randomisation_reg_dict[command.args[0]]])
+            randomised_circuit.add_wasm_to_reg("write_randomisation", wfh, [], [randomisation_reg])
             randomised_circuit.Z(command.qubits[0], condition=randomisation_reg[0])
             randomised_circuit.Z(command.qubits[1], condition=randomisation_reg[1])
             randomised_circuit.X(command.qubits[0], condition=randomisation_reg[2])

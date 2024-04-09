@@ -18,6 +18,7 @@ python = ">=3.10, <3.13"
 pytket-qiskit = "0.50"
 matplotlib = "^3.8.3"
 importlib-resources = "^6.4.0"
+pytket-quantinuum = "^0.32"
 
 pytest = {version="^8.1.1", optional=true}
 mypy = {version="^1.9.0", optional=true}
@@ -26,9 +27,8 @@ sphinx = {version="^7.2.6", optional=true}
 pytest-cov = {version="^4.1.0", optional=true}
 sphinx-book-theme = {version="^1.1.2", optional=true}
 qiskit-ibm-provider = {version="^0.10.0", optional=true}
-pytket-quantinuum = {version="0.32", optional=true}
 pytket-pecos = {version="^0.1.23", optional=true}
 
 [tool.poetry.extras]
-tests = ["pytest", "mypy", "flake8", "pytest-cov", "qiskit-ibm-provider", "pytket-quantinuum", "pytket-pecos"]
-docs = ["sphinx", "sphinx-book-theme", "pytket-quantinuum"]
+tests = ["pytest", "mypy", "flake8", "pytest-cov", "qiskit-ibm-provider", "pytket-pecos"]
+docs = ["sphinx", "sphinx-book-theme"]
