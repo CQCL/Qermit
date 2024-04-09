@@ -17,7 +17,7 @@ from pytket.architecture import FullyConnected  # type: ignore
 from pytket.passes.auto_rebase import auto_rebase_pass
 from pytket.predicates import GateSetPredicate  # type: ignore
 from pytket.extensions.quantinuum import QuantinuumBackend  # type: ignore
-from pytket.extensions.quantinuum.backends.quantinuum import _GATE_SET  # type: ignore
+from pytket.extensions.quantinuum.backends.quantinuum import _ALL_GATES  # type: ignore
 from pytket.predicates import CompilationUnit  # type: ignore
 from pytket import OpType
 from pytket import Circuit
@@ -34,7 +34,7 @@ class MockQuantinuumBackend(QuantinuumBackend):
     that on the device) is also applied.
     """
 
-    gate_set = _GATE_SET
+    gate_set = _ALL_GATES
     gate_set.add(OpType.ZZPhase)
 
     backend_info = BackendInfo(
