@@ -2,12 +2,13 @@ from pytket import Circuit, OpType, wasm
 import itertools
 from pytket.unit_id import BitRegister, QubitRegister
 from pathlib import Path
+import importlib_resources
 
 
 def get_wfh():
 
-    rus_dir = Path("/Users/daniel.mills/Qermit/qermit_rus/target/wasm32-unknown-unknown/release")
-    wasm_file = rus_dir.joinpath('qermit_rus.wasm')
+    package_path = importlib_resources.files("qermit")
+    wasm_file = f"{package_path}/frame_randomisation/qermit_rus.wasm"
     return wasm.WasmFileHandler(wasm_file)
 
 
