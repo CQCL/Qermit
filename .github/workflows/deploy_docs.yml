@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Qermit
         run: pip install .[docs]
       - name: Setup Pages
@@ -34,7 +34,7 @@ jobs:
           cd ../manual
           ./build_manual.sh
       - name: Save documentation
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: docs_html
           path: docs/
