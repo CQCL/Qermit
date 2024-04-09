@@ -33,9 +33,16 @@ from pytket.tailoring import UniversalFrameRandomisation, PauliFrameRandomisatio
 from enum import Enum
 from pytket import OpType
 from pytket.passes import auto_rebase_pass
+from .h_series_randomisation import gen_h_series_randomised_circuit
 
 
 class FrameRandomisation(Enum):
+
+    @staticmethod
+    def HSeriesRandomisation(
+        circuit: Circuit, shots: int,
+    ) -> List[CircuitShots]:
+        return [CircuitShots(Circuit=gen_h_series_randomised_circuit(circuit), Shots=shots)]
 
     @staticmethod
     def PauliFrameRandomisation(

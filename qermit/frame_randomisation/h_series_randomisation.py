@@ -11,13 +11,17 @@ def get_wfh():
     return wasm.WasmFileHandler(wasm_file)
 
 
-def gen_randomised_circuit(circuit):
+def gen_h_series_randomised_circuit(circuit):
 
     wfh = get_wfh()
     
     randomised_circuit = Circuit()
+    randomisation_reg_dict = {}
     for q_register in circuit.q_registers:
         randomised_circuit.add_q_register(q_register)
+        for qubit in q_register:
+            randomisation_reg = randomised_circuit.add_c_register(f"randomisation_{qubit.to_list()}", 4)
+            randomisation_reg_dict[qubit] = randomisation_reg
     for c_register in circuit.c_registers:
         randomised_circuit.add_c_register(c_register)
 
@@ -39,16 +43,10 @@ def gen_randomised_circuit(circuit):
         randomised_circuit.Reset(qubit)
     randomised_circuit.add_wasm_to_reg("seed_randomisation", wfh, [seed_c_reg], [])
 
-    randomisation_reg = randomised_circuit.add_c_register("randomisation", 4)
-
-    # rand_vals = [10, 7]
-    # command_count = 0
-
     for command in circuit:
 
         if command.op.type == OpType.ZZMax:
-            randomised_circuit.add_wasm_to_reg("write_randomisation", wfh, [], [randomisation_reg])
-            # randomised_circuit.add_c_setreg(rand_vals[command_count], randomisation_reg)
+            randomised_circuit.add_wasm_to_reg("write_randomisation", wfh, [], [randomisation_reg_dict[command.args[0]]])
             randomised_circuit.Z(command.qubits[0], condition=randomisation_reg[0])
             randomised_circuit.Z(command.qubits[1], condition=randomisation_reg[1])
             randomised_circuit.X(command.qubits[0], condition=randomisation_reg[2])
@@ -67,26 +65,9 @@ def gen_randomised_circuit(circuit):
             )
             randomised_circuit.X(command.qubits[0], condition=randomisation_reg[2])
             randomised_circuit.X(command.qubits[1], condition=randomisation_reg[3])
-            
-            # randomised_circuit.Z(command.qubits[0], condition=randomisation_reg[4])
-            # randomised_circuit.Z(command.qubits[1], condition=randomisation_reg[5])
-            # randomised_circuit.X(command.qubits[0], condition=randomisation_reg[6])
-            # randomised_circuit.X(command.qubits[1], condition=randomisation_reg[7])
-
-            # randomised_circuit.Z(command.qubits[0], condition=randomisation_reg[0])
-            # randomised_circuit.Z(command.qubits[0], condition=randomisation_reg[2])
-            # randomised_circuit.Z(command.qubits[0], condition=randomisation_reg[3])
-            # randomised_circuit.X(command.qubits[0], condition=randomisation_reg[2])
-
-            # randomised_circuit.Z(command.qubits[1], condition=randomisation_reg[1])
-            # randomised_circuit.Z(command.qubits[1], condition=randomisation_reg[2])
-            # randomised_circuit.Z(command.qubits[1], condition=randomisation_reg[3])
-            # randomised_circuit.X(command.qubits[1], condition=randomisation_reg[3])
 
             randomised_circuit.Phase(0.5, condition=randomisation_reg[2])
             randomised_circuit.Phase(0.5, condition=randomisation_reg[3])
             randomised_circuit.Phase(-1, condition=randomisation_reg[2] & randomisation_reg[3])
-
-            # command_count += 1
     
-    return randomised_circuit, wfh
+    return randomised_circuit
