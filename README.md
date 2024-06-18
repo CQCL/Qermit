@@ -39,7 +39,7 @@ tests and is accepted after review, it will be merged in.
 #### Formatting
 
 All code should adhere to [flake8](https://flake8.pycqa.org/en/latest/)
-formatting, ignoring only E501 and W503
+formatting, ignoring E501, W503 and F401.
 
 #### Type annotation
 

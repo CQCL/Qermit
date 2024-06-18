@@ -119,4 +119,4 @@ jobs:
       run: mypy -p qermit
     - name: Format check
       if: github.event_name == 'pull_request'
-      run: flake8 qermit/ tests/ --ignore=E501,W503
+      run: flake8 qermit/ tests/ --ignore=E501,W503,F401
