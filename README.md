@@ -8,7 +8,7 @@ This repo containts API documentation, a user manual for getting started with `q
 
 ## Getting Started
 
-`qermit` is compatible with the `pytket` 1.0 release and so is available for Python 3.9, 3.10 and 3.11 on Linux, MacOS and Windows.
+`qermit` is compatible with the `pytket` 1.0 release and is available for Python 3.10, 3.11 and 3.12 on Linux, MacOS and Windows.
 To install, run:
 
 ``pip install qermit``
