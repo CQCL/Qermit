@@ -75,7 +75,9 @@ def preparation_circuit_for_partition(
     # transform string, then append gates for preparing
     # +1 eigenstate to circuit
     # use RemoveRedundancies after to minimise gates required in cosntruction
+    Transform.RebaseToTket().apply(clifford_circuit)
     Transform.RebaseToCliffordSingles().apply(clifford_circuit)
+
     for string in partition:
         transformed_string = apply_clifford_basis_change(string, clifford_circuit)
         transformed_dict = transformed_string.map

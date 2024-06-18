@@ -335,16 +335,15 @@ def test_CRY_case():
             ansatz_circuit, ObservableTracker(QubitPauliOperator({qubit_pauli_string: 1.0}))
         )
     ]
-    results = dfsc_mitex.run(exp)
-    print(results)
+    assert dfsc_mitex.run(exp)
 
 
 if __name__ == "__main__":
-    # test_get_clifford_mcs()
-    # test_prep_circuit_for_partition()
-    # test_DFSC_circuit_task_gen()
-    # test_DFSC_collater_task_gen()
-    # test_DFSC_characterisation_task_gen()
-    # test_DFSC_correction_task_gen()
-    # test_DFSC_mitex_gen()
+    test_get_clifford_mcs()
+    test_prep_circuit_for_partition()
+    test_DFSC_circuit_task_gen()
+    test_DFSC_collater_task_gen()
+    test_DFSC_characterisation_task_gen()
+    test_DFSC_correction_task_gen()
+    test_DFSC_mitex_gen()
     test_CRY_case() 
