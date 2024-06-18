@@ -143,7 +143,7 @@ def frame_randomisation_result_task_gen(samples: int) -> MitTask:
         :rtype: Tuple[List[BackendResult]]
         """
         chunked_results = [
-            all_fr_results[i : i + samples]
+            all_fr_results[i: i + samples]
             for i in range(0, len(all_fr_results), samples)
         ]
         results = []
