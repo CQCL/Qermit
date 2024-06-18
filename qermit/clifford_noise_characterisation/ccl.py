@@ -179,9 +179,13 @@ def gen_state_circuits(
                     new_circuit.add_barrier(cast(List[UnitID], com.qubits))
                     original_angle = com.op.params[0]
                     if not isinstance(original_angle, float):
-                        raise Exception("Circuit cannot include parameters which are not floats.")
+                        raise Exception(
+                            "Circuit cannot include parameters which are not floats."
+                        )
                     angle = sample_weighted_clifford_angle(original_angle)
-                    new_circuit.add_gate(com.op.type, [angle], cast(List[UnitID], com.qubits))
+                    new_circuit.add_gate(
+                        com.op.type, [angle], cast(List[UnitID], com.qubits)
+                    )
                     new_circuit.add_barrier(cast(List[UnitID], com.qubits))
                 # Measure gate has special case, but can assume 1 qubit to 1 bit
                 elif com.op.type is OpType.Measure:
@@ -229,7 +233,9 @@ def gen_state_circuits(
                 # in clifford_pair_elements means gate has been denominated as Clifford,
                 # but is in some sampled pair so add original angle
                 if i in clifford_pair_elements:
-                    new_circuit.add_gate(com.op.type, com.op.params, cast(List[UnitID], com.qubits))
+                    new_circuit.add_gate(
+                        com.op.type, com.op.params, cast(List[UnitID], com.qubits)
+                    )
                     new_circuit.add_barrier(cast(List[UnitID], com.qubits))
                 # in non_clifford_pair_elements mean gate was denominated to be left non-Clifford,
                 # but its value has been sampled in a pair to now be Clifford
@@ -237,21 +243,31 @@ def gen_state_circuits(
                 elif i in non_clifford_pair_elements:
                     original_angle = com.op.params[0]
                     if not isinstance(original_angle, float):
-                        raise Exception("Circuit cannot include parameters which are not floats.")
+                        raise Exception(
+                            "Circuit cannot include parameters which are not floats."
+                        )
                     angle = sample_weighted_clifford_angle(original_angle)
-                    new_circuit.add_gate(com.op.type, [angle], cast(List[UnitID], com.qubits))
+                    new_circuit.add_gate(
+                        com.op.type, [angle], cast(List[UnitID], com.qubits)
+                    )
                     new_circuit.add_barrier(cast(List[UnitID], com.qubits))
                 # in cliffords mean it is denominated as Clifford, and hasn't been sampled for a pair
                 # as clifford_pair_elements has already been checked
                 # in this case, cliffords is a dict between Rz index and substitution S power
                 # get power from dict, multiply by 0.5 to get angle, add to circuit
                 elif i in cliffords:
-                    new_circuit.add_gate(com.op.type, [0.5 * cliffords[i]], cast(List[UnitID], com.qubits))
+                    new_circuit.add_gate(
+                        com.op.type,
+                        [0.5 * cliffords[i]],
+                        cast(List[UnitID], com.qubits),
+                    )
                     new_circuit.add_barrier(cast(List[UnitID], com.qubits))
                 # final case means gate was chosen to retain non-Clifford, and has not been
                 # sampled in any pair, so add original angle.
                 else:
-                    new_circuit.add_gate(com.op.type, com.op.params, cast(List[UnitID], com.qubits))
+                    new_circuit.add_gate(
+                        com.op.type, com.op.params, cast(List[UnitID], com.qubits)
+                    )
                     new_circuit.add_barrier(cast(List[UnitID], com.qubits))
             # Measure gate has special case, but can assume 1 qubit to 1 bit
             elif com.op.type is OpType.Measure:
@@ -427,7 +443,7 @@ def ccl_result_batching_task_gen(n_state_circuits: int) -> MitTask:
 
         zipped = list(zip(noisy_exp, exact_exp))
         chunked_zipped = [
-            zipped[i: i + n_state_circuits]
+            zipped[i : i + n_state_circuits]
             for i in range(0, len(zipped), n_state_circuits)
         ]
         return (chunked_zipped,)

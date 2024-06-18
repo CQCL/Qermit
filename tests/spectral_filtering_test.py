@@ -330,7 +330,7 @@ def test_gen_flatten_reshape_task():
 
     assert out_wire[1] == length_list
     assert out_wire[0][: length_list[0]] == grid_0_flattened
-    assert out_wire[0][length_list[0]: length_list[0] + length_list[1]] == [
+    assert out_wire[0][length_list[0] : length_list[0] + length_list[1]] == [
         1,
         2,
         3,

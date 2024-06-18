@@ -106,8 +106,8 @@ def test_measurement_reduction_integration():
 
     # A bell state
     circuit = Circuit()
-    qubit_0 = Qubit(name='my_qubit', index=0)
-    qubit_1 = Qubit(name='my_qubit', index=1)
+    qubit_0 = Qubit(name="my_qubit", index=0)
+    qubit_1 = Qubit(name="my_qubit", index=1)
     circuit.add_qubit(qubit_0)
     circuit.add_qubit(qubit_1)
     circuit.H(qubit_0).CX(qubit_0, qubit_1)
@@ -116,27 +116,19 @@ def test_measurement_reduction_integration():
     backend = AerBackend()
     reduction_mitex = gen_MeasurementReduction_MitEx(backend=backend)
 
-    ansatz = AnsatzCircuit(
-        Circuit=circuit,
-        Shots=1000000,
-        SymbolsDict=SymbolsDict()
-    )
+    ansatz = AnsatzCircuit(Circuit=circuit, Shots=1000000, SymbolsDict=SymbolsDict())
 
     qpo = get_string_operator(meas_qubits, [0, 0])
     obs = ObservableTracker(qubit_pauli_operator=qpo)
     obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
-    result = reduction_mitex.run(
-        mitex_wires=[obs_exp]
-    )
+    result = reduction_mitex.run(mitex_wires=[obs_exp])
     # The probability of measuring 00 is 0.5
     assert abs(sum(result[0]._dict.values()) - 0.5) < tol
 
     qpo = get_string_operator(meas_qubits, [0, 1])
     obs = ObservableTracker(qubit_pauli_operator=qpo)
     obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
-    result = reduction_mitex.run(
-        mitex_wires=[obs_exp]
-    )
+    result = reduction_mitex.run(mitex_wires=[obs_exp])
     # The probability of measuring 01 is 0
     assert abs(sum(result[0]._dict.values())) < tol
 
@@ -154,18 +146,14 @@ def test_measurement_reduction_integration():
     qpo = get_string_operator(meas_qubits, [1, 0])
     obs = ObservableTracker(qubit_pauli_operator=qpo)
     obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
-    result = zne_mitex.run(
-        mitex_wires=[obs_exp]
-    )
+    result = zne_mitex.run(mitex_wires=[obs_exp])
     # The probability of measuring 10 is 0
     assert abs(sum(result[0]._dict.values())) < tol
 
     qpo = get_string_operator(meas_qubits, [1, 1])
     obs = ObservableTracker(qubit_pauli_operator=qpo)
     obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
-    result = zne_mitex.run(
-        mitex_wires=[obs_exp]
-    )
+    result = zne_mitex.run(mitex_wires=[obs_exp])
     # The probability of measuring 11 is 0.5
     assert abs(sum(result[0]._dict.values()) - 0.5) < tol
 
@@ -175,7 +163,7 @@ def test_measurement_reduction_integration():
 def test_no_qubit_relabel():
 
     lagos_backend = IBMQEmulatorBackend(
-        "ibm_lagos", instance='partner-cqc/internal/default'
+        "ibm_lagos", instance="partner-cqc/internal/default"
     )
     zne_mitex = gen_ZNE_MitEx(backend=lagos_backend, noise_scaling_list=[3, 5, 7])
 

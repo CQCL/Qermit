@@ -1,4 +1,5 @@
 """Visualise TaskGraph using graphviz."""
+
 from typing import Iterable, Optional, Tuple, TYPE_CHECKING
 import graphviz as gv  # type: ignore
 
@@ -151,9 +152,11 @@ def _taskgraph_to_graphviz(
             node_label=node_label,
             inputs_row=_html_ports(in_ports) if in_ports else "",
             outputs_row=_html_ports(out_ports) if out_ports else "",
-            border_colour=_COLOURS["background"]
-            if fillcolor == _COLOURS["background"]
-            else _COLOURS["node_border"],
+            border_colour=(
+                _COLOURS["background"]
+                if fillcolor == _COLOURS["background"]
+                else _COLOURS["node_border"]
+            ),
         )
         gv_graph.node(
             node_identifier,

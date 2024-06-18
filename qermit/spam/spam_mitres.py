@@ -101,6 +101,7 @@ def gen_UnCorrelated_SPAM_MitRes(
     """
     if backend.backend_info is None:
         raise ValueError("Backend has no backend_info attribute.")
+    assert backend.backend_info.architecture
     if len(backend.backend_info.architecture.nodes) == 0:
         raise ValueError(
             "Backend Architecture has no specified Nodes, please use a Backend with a specified Architecture."

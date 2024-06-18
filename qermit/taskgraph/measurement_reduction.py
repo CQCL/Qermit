@@ -80,9 +80,9 @@ def measurement_reduction_task_gen(
                 full_circ.append(measurement_circuit)
                 measurement_circuits.append(MeasurementCircuit(full_circ, symbols))
             # convert MeasurementBitMap objects to MeasurementInfo for ObservableTracker
-            adder_info: Dict[
-                int, List[Tuple[QubitPauliString, List[Bit], bool]]
-            ] = dict()
+            adder_info: Dict[int, List[Tuple[QubitPauliString, List[Bit], bool]]] = (
+                dict()
+            )
             for i in range(len(measurement_circuits)):
                 adder_info[i] = list()
 

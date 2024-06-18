@@ -42,11 +42,7 @@ def test_mitex_cache():
     mitex = MitEx(backend=backend)
     mitex.decompose_TaskGraph_nodes()
 
-    ansatz = AnsatzCircuit(
-        Circuit=circuit,
-        Shots=100000,
-        SymbolsDict=SymbolsDict()
-    )
+    ansatz = AnsatzCircuit(Circuit=circuit, Shots=100000, SymbolsDict=SymbolsDict())
     qubits = circuit.qubits
     qps = QubitPauliString(
         qubits=qubits,
@@ -56,18 +52,16 @@ def test_mitex_cache():
     obs = ObservableTracker(qubit_pauli_operator=qpo)
     obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
 
-    mitex.run(
-        mitex_wires=[obs_exp], cache=True
-    )
+    mitex.run(mitex_wires=[obs_exp], cache=True)
     cache = mitex.get_cache()
     assert list(cache.keys()) == [
-        'FilterObservableTracker',
-        'CollateExperimentCircuits',
-        'MitResCompileCircuitShots',
-        'MitResCircuitsToHandles',
-        'MitResHandlesToResults',
-        'SplitResults',
-        'GenerateExpectations',
+        "FilterObservableTracker",
+        "CollateExperimentCircuits",
+        "MitResCompileCircuitShots",
+        "MitResCircuitsToHandles",
+        "MitResHandlesToResults",
+        "SplitResults",
+        "GenerateExpectations",
     ]
 
 

@@ -177,7 +177,9 @@ class MeasurementCircuit(object):
     for some Ansatz Circuit.
     """
 
-    def __init__(self, symbolic_circuit: Circuit, symbols: Optional[SymbolsDict] = None):
+    def __init__(
+        self, symbolic_circuit: Circuit, symbols: Optional[SymbolsDict] = None
+    ):
         """
         Stores information required to instantiate any MeasurementCircuit with parameterised symbols.
 
@@ -311,7 +313,7 @@ class ObservableTracker:
                         coeff[0]
                     )
                 )
-            self._qubit_pauli_operator._dict[coeff[0]] = coeff[1]
+            self._qubit_pauli_operator._dict[coeff[0]] = coeff[1]  # type: ignore
 
     def extend_operator(self, new_operator: QubitPauliOperator):
         """

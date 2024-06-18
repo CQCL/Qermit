@@ -104,7 +104,10 @@ def DFSC_circuit_task_gen() -> MitTask:
     def task(
         obj,
         measurement_wires: List[ObservableExperiment],
-    ) -> Tuple[List[ObservableExperiment], List[List[List[ObservableExperiment]]],]:
+    ) -> Tuple[
+        List[ObservableExperiment],
+        List[List[List[ObservableExperiment]]],
+    ]:
         """
         :param measurement_wires: A list of tuples, each tuple representing a different experiment
         :type measurement_wires: List[ObservableExperiment]
@@ -250,7 +253,7 @@ def DFSC_characterisation_task_gen() -> MitTask:
                 for string in qpo._dict:
                     if string not in characterisation_dict:
                         characterisation_dict[string] = list()
-                    characterisation_dict[string].append(qpo._dict[string])
+                    characterisation_dict[string].append(qpo._dict[string])  # type: ignore
             # set entry to average of values in list
             # add characterisation for DFSC to output list
             characterisation_qpos.append(
