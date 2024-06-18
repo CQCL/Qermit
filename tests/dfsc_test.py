@@ -310,14 +310,15 @@ def test_DFSC_mitex_gen():
     assert res[0][qps_12] == -1.0
     assert res[1][qps_012] == 0.7
 
+
 def test_CRY_case():
-    backend=AerBackend()
+    backend = AerBackend()
     dfsc_mitex = gen_DFSC_MitEx(backend=backend)
     sym = fresh_symbol("test")
     peb_xyz = PauliExpBox([Pauli.X, Pauli.Y, Pauli.Z], sym)
 
     c = Circuit(3, 3)
-    c.add_pauliexpbox(peb_xyz, [Qubit(0), Qubit(1), Qubit(2)]).CRy(sym, 0,1).Z(1).Z(2)
+    c.add_pauliexpbox(peb_xyz, [Qubit(0), Qubit(1), Qubit(2)]).CRy(sym, 0, 1).Z(1).Z(2)
     c.add_pauliexpbox(peb_xyz, [Qubit(0), Qubit(1), Qubit(2)]).Z(0).Z(1).Z(2)
     c.add_pauliexpbox(peb_xyz, [Qubit(0), Qubit(1), Qubit(2)]).Z(0).Z(1).Z(2)
     c.add_pauliexpbox(peb_xyz, [Qubit(0), Qubit(1), Qubit(2)])
@@ -328,11 +329,12 @@ def test_CRY_case():
     qubit_pauli_string = QubitPauliString(
         [Qubit(0), Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z, Pauli.Z]
     )
-    ansatz_circuit = AnsatzCircuit(c, 2000, symbols)
+    ansatz_circuit = AnsatzCircuit(c, 10, symbols)
 
     exp = [
         ObservableExperiment(
-            ansatz_circuit, ObservableTracker(QubitPauliOperator({qubit_pauli_string: 1.0}))
+            ansatz_circuit,
+            ObservableTracker(QubitPauliOperator({qubit_pauli_string: 1.0})),
         )
     ]
     assert dfsc_mitex.run(exp)
@@ -346,4 +348,4 @@ if __name__ == "__main__":
     test_DFSC_characterisation_task_gen()
     test_DFSC_correction_task_gen()
     test_DFSC_mitex_gen()
-    test_CRY_case() 
+    test_CRY_case()
