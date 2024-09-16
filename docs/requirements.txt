@@ -1,4 +1,4 @@
 sphinx > 4.2.0, <6.2.0
 sphinx_autodoc_annotation
-sphinx_book_theme ~= 1.0.1
+furo
 jupyter_sphinx
