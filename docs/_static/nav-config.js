@@ -14,7 +14,7 @@ const navConfig = {
         {
             "title": "Qermit Github",
             "href": "https://github.com/CQCL/qermit",
-            "iconImageURL": string(i.e. "_static/assets/github.svg"),
+            "iconImageURL": "_static/assets/github.svg",
         },
     ],
 }
