@@ -1,2 +1,2 @@
-rm -rf docs/build
+rm -rf build
 sphinx-build -b html . build
