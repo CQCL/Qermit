@@ -88,7 +88,7 @@ jobs:
         run: pip install .
       - name: Build Docs
         run: |
-          cd docs_src
+          cd docs
           pip install -r requirements.txt
           ./build_docs.sh
           cd ../manual

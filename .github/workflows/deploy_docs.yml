@@ -29,7 +29,7 @@ jobs:
         uses: actions/configure-pages@v3
       - name: Build Docs
         run: |
-          cd docs_src
+          cd docs
           pip install -r requirements.txt
           ./build_docs.sh
           cd ../manual
