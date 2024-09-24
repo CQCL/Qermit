@@ -1,4 +1,4 @@
-qermit User Manual
+Qermit User Manual
 ==================
 
 .. toctree::
