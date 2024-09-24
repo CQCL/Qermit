@@ -2,11 +2,11 @@ const navConfig = {
     "navTextLinks": [
         {
             "title": "API docs",
-            "href": "docs/build",
+            "href": "index.html",
         },
         {
             "title": "Manual",
-            "href": "https://cqcl.github.io/Qermit/manual/",
+            "href": "manual/index.html",
         },
     ],
     "navProductName": "Qermit",
