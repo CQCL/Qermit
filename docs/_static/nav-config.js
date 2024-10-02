@@ -1,4 +1,3 @@
-
 const navConfig = {
     "navTextLinks": [
         {
