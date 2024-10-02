@@ -119,7 +119,13 @@ User Support
 If you have problems with the use of Qermit or you think you have found a bug, there 
 are several ways to contact us:
 - Write an email to tket-support@cambridgequantum.com and ask for help with your problem.
-- You can write a bug report on the `CQC github <https://github.com/CQCL/Qermit/issues>`_ with details of the problem and we will pick that up. You can also have a look on that page so see if your problem has already been reported by someone else.
+- You can write a bug report on the `github repository <https://github.com/CQCL/Qermit/issues>`_ with details of the problem and we will pick that up. You can also have a look on that page so see if your problem has already been reported by someone else.
+
+
+.. toctree::
+   :hidden:
+
+   manual/index.rst
 
 .. toctree::
    :caption: API Reference:
