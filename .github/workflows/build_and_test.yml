@@ -43,7 +43,7 @@ jobs:
       - name: Build Docs
         run: |
           cd docs
-          ./build_docs.sh
+          ./build-docs.sh
           cd ../manual
           ./build_manual.sh
       - name: Save documentation
