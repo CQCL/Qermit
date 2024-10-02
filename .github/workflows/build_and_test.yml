@@ -41,8 +41,6 @@ jobs:
         run: |
           cd docs
           ./build-docs.sh
-          cd ../manual
-          ./build_manual.sh
       - name: Save documentation
         uses: actions/upload-artifact@v4
         with:
