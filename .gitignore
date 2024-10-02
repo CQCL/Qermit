@@ -6,5 +6,4 @@
 .dmypy.json
 .DS_Store
 .venv
-build
-docs/
+docs/build
