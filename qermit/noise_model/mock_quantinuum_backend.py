@@ -17,12 +17,12 @@ from pytket.architecture import FullyConnected  # type: ignore
 from pytket.passes.auto_rebase import auto_rebase_pass
 from pytket.predicates import GateSetPredicate  # type: ignore
 from pytket.extensions.quantinuum import QuantinuumBackend  # type: ignore
-from pytket.extensions.quantinuum.backends.quantinuum import _GATE_SET  # type: ignore
+from pytket.extensions.quantinuum.backends.quantinuum import _ALL_GATES  # type: ignore
 from pytket.predicates import CompilationUnit  # type: ignore
 from pytket import OpType
 from pytket import Circuit
 from pytket.backends.resulthandle import ResultHandle
-from typing import List, Union
+from typing import List, Union, Optional, Sequence
 from pytket.backends.backendresult import BackendResult
 from .noisy_aer_backend import NoisyAerBackend
 
@@ -34,7 +34,7 @@ class MockQuantinuumBackend(QuantinuumBackend):
     that on the device) is also applied.
     """
 
-    gate_set = _GATE_SET
+    gate_set = _ALL_GATES
     gate_set.add(OpType.ZZPhase)
 
     backend_info = BackendInfo(
@@ -56,7 +56,7 @@ class MockQuantinuumBackend(QuantinuumBackend):
     def process_circuit(
         self,
         circuit: Circuit,
-        n_shot: int,
+        n_shots: Optional[int] = None,
         valid_check: bool = True,
         **kwargs,
     ) -> ResultHandle:
@@ -64,8 +64,8 @@ class MockQuantinuumBackend(QuantinuumBackend):
 
         :param circuit: Circuit to process on the backend
         :type circuit: Circuit
-        :param n_shot: Number of shots to run per circuit.
-        :type n_shot: int
+        :param n_shots: Number of shots to run per circuit.
+        :type n_shots: int
         :param valid_check: Explicitly check that all circuits satisfy all
             required predicates to run on the backend, defaults to True
         :type valid_check: bool, optional
@@ -86,15 +86,15 @@ class MockQuantinuumBackend(QuantinuumBackend):
             self.noisy_backend.noisy_gate_set.union({OpType.Reset, OpType.Barrier})
         ).verify(cu.circuit)
 
-        handle = self.noisy_backend.process_circuit(cu.circuit, n_shot)
+        handle = self.noisy_backend.process_circuit(cu.circuit, n_shots)
         self.handle_cu_dict[handle] = cu
 
         return handle
 
     def process_circuits(
         self,
-        circuits: List[Circuit],
-        n_shots: Union[List[int], int],
+        circuits: Sequence[Circuit],
+        n_shots: Union[Optional[int], Sequence[Optional[int]]] = None,
         valid_check: bool = True,
         **kwargs,
     ) -> List[ResultHandle]:
@@ -111,7 +111,7 @@ class MockQuantinuumBackend(QuantinuumBackend):
         :return: Handles to results for each input circuit, as an interable in the same order as the circuits.
         :rtype: List[ResultHandle]
         """
-        if isinstance(n_shots, int):
+        if (isinstance(n_shots, int)) or (n_shots is None):
             return [
                 self.process_circuit(circuit, n_shots, valid_check=valid_check)
                 for circuit in circuits

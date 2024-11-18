@@ -36,6 +36,9 @@ from numpy.polynomial.polynomial import Polynomial  # type: ignore
 from pytket.circuit import Node  # type: ignore
 from math import isclose
 from pytket.pauli import Pauli
+from sympy import Expr  # type: ignore
+from qermit.noise_model import NoiseModel, PauliErrorTranspile
+from pytket.utils.operators import CoeffTypeAccepted
 
 
 box_types = {
@@ -59,7 +62,7 @@ class Folding(Enum):
     # TODO: circ does not appear as input in docs
     # TODO Generalise with 'partial folding' to allow for non integer noise scaling
     @staticmethod
-    def circuit(circ: Circuit, noise_scaling: int, **kwargs) -> Circuit:
+    def circuit(circ: Circuit, noise_scaling: int, **kwargs) -> List[Circuit]:
         """Noise scaling by circuit folding. In this case the folded circuit is of
         the form :math:`CC^{-1}CC^{-1}...C` where :math:`C` is the original circuit. As such noise may be scaled by
         odd integers. The Unitary implemented is unchanged by this process.
@@ -70,7 +73,7 @@ class Folding(Enum):
         :type noise_scaling: int
         :raises ValueError: Raised if the amount by which the noise should be scaled is not an odd integer.
         :return: Folded circuit implementing identical unitary to the initial circuit.
-        :rtype: Circuit
+        :rtype: List[Circuit]
         """
 
         # Raise if the amount by which the noise should be scaled is not an odd integer
@@ -105,10 +108,10 @@ class Folding(Enum):
                 else:
                     folded_circ.add_gate(gate.op, gate.args)
 
-        return folded_circ
+        return [folded_circ]
 
     @staticmethod
-    def two_qubit_gate(circ: Circuit, noise_scaling: float, **kwargs) -> Circuit:
+    def two_qubit_gate(circ: Circuit, noise_scaling: float, **kwargs) -> List[Circuit]:
         """Noise scaling by folding 2 qubit gates. It is implicitly
         assumed that the noise on the 2 qubit gates dominate. Two qubit gates
         :math:`G` are replaced by :math:`GG^{-1}G...G^{-1}G`. If
@@ -132,7 +135,7 @@ class Folding(Enum):
             approximate folding is allowed. Defaults to True.
 
         :return: Circuit with noise scaled.
-        :rtype: Circuit
+        :rtype: List[Circuit]
         """
 
         if noise_scaling < 1:
@@ -211,10 +214,10 @@ class Folding(Enum):
             else:
                 folded_circuit.add_gate(gate.op, gate.args)
 
-        return folded_circuit
+        return [folded_circuit]
 
     @staticmethod
-    def gate(circ: Circuit, noise_scaling: float, **kwargs) -> Circuit:
+    def gate(circ: Circuit, noise_scaling: float, **kwargs) -> List[Circuit]:
         """Noise scaling by gate folding. In this case gates :math:`G` are replaced at random
         with :math:`GG^{-1}G` until the number of gates is sufficiently scaled.
 
@@ -233,7 +236,7 @@ class Folding(Enum):
         :raises ValueError: Raised if the requested noise scaling cannot be exactly achieved. This can be
             avoided by appropriately setting _allow_approx_fold.
         :return: Folded circuit implementing identical unitary to the initial circuit.
-        :rtype: Circuit
+        :rtype: List[Circuit]
         """
 
         _allow_approx_fold = kwargs.get("_allow_approx_fold", 0)
@@ -322,10 +325,10 @@ class Folding(Enum):
         folded_c_dict["commands"] = folded_command_list
         folded_c = Circuit().from_dict(folded_c_dict)
 
-        return folded_c
+        return [folded_c]
 
     @staticmethod
-    def odd_gate(circ: Circuit, noise_scaling: int, **kwargs) -> Circuit:
+    def odd_gate(circ: Circuit, noise_scaling: int, **kwargs) -> List[Circuit]:
         """Noise scaling by gate folding. In this case odd gates :math:`G` are
         replaced :math:`GG^{-1}G` until the number of gates is sufficiently
         scaled.
@@ -335,7 +338,7 @@ class Folding(Enum):
         :param noise_scaling: Factor by which to increase the noise.
         :type noise_scaling: float
         :return: Folded circuit implementing identical unitary to the initial circuit.
-        :rtype: Circuit
+        :rtype: List[Circuit]
         """
 
         c_dict = circ.to_dict()
@@ -395,7 +398,41 @@ class Folding(Enum):
         c_dict.update({"commands": folded_command_list})
         folded_c = Circuit.from_dict(c_dict)
 
-        return folded_c
+        return [folded_c]
+
+    @staticmethod
+    def noise_aware(circ: Circuit, noise_scaling: int, **kwargs) -> List[Circuit]:
+        """Scale noise in a circuit by adding noisy gates as defined
+        by the given noise model.
+
+        :param circ: Circuit with noise to be scaled.
+        :type circ: Circuit
+        :param noise_scaling: Factor by which noise should be scaled.
+        :type noise_scaling: int
+        :return: List of circuits with additional noise gates added.
+        :rtype: List[Circuit]
+
+        :key noise_model: Noise model defining noise types and rates.
+            Defaults to noiseless model.
+        :type noise_model: NoiseModel
+        :key n_noisy_circuit_samples: The number of random noisy
+            circuits to generate. Defaults to 1.
+        :type n_noisy_circuit_samples: int
+        """
+
+        noise_model: NoiseModel = kwargs.get("noise_model", NoiseModel(noise_model={}))
+        n_noisy_circuit_samples: int = kwargs.get("n_noisy_circuit_samples", 1)
+
+        scaled_noise_model: NoiseModel = noise_model.scale(scaling_factor=noise_scaling - 1)
+        error_transpiler = PauliErrorTranspile(noise_model=scaled_noise_model)
+
+        scaled_circ_list = []
+        for _ in range(n_noisy_circuit_samples):
+            scaled_circ = circ.copy()
+            error_transpiler.apply(scaled_circ)
+            scaled_circ_list.append(scaled_circ)
+
+        return scaled_circ_list
 
 
 def poly_exp_func(x: float, *params) -> float:
@@ -579,7 +616,7 @@ class Fit(Enum):
             fit_x = linspace[0]
             fit_y = linspace[1]
 
-            plot_fit(x, y, fit_x, fit_y, fit_to_zero)
+            plot_fit(x, y, list(fit_x), list(fit_y), fit_to_zero)
 
         return float(fit_to_zero)
 
@@ -658,6 +695,7 @@ def digital_folding_task_gen(
     noise_scaling: float,
     _folding_type: Folding,
     _allow_approx_fold: bool,
+    **kwargs
 ) -> MitTask:
     """
     Generates task transforming a circuit in order to amplify the noise. The noise
@@ -682,45 +720,123 @@ def digital_folding_task_gen(
     def task(
         obj,
         mitex_wire: List[ObservableExperiment],
-    ) -> Tuple[List[ObservableExperiment]]:
+    ) -> Tuple[List[ObservableExperiment], List[int]]:
         """Increase the noise levels impacting the circuit by increasing the
         number of gates. This preserves the action of the circuit.
 
         :param mitex_wire: List of experiments
         :type mitex_wire: List[ObservableExperiment]
         :return: List of equivalent circuits, but with noise levels increased.
-        :rtype: Tuple[List[ObservableExperiment]]
+            Each noise scaling value may generate multiple circuits.
+            As such the return includes a lit of integers indicating to which
+            of the original circuits the new circuits belong.
+        :rtype: Tuple[List[ObservableExperiment], List[int]]
         """
 
         folded_circuits = []
+        experiment_index = []
 
         # For each circuit in the input wire, extract the circuit, apply the fold,
         # and perform the necessary compilation.
-        for experiment in mitex_wire:
+        for index, experiment in enumerate(mitex_wire):
             # Apply the necessary folding method
-            zne_circ = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold)  # type: ignore
+            zne_circ_list = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold, **kwargs)  # type: ignore
 
-            # TODO: This additional compilation pass may result in the circuit noise being
-            # increased too much, and should be removed or better accounted for.
+            for zne_circ in zne_circ_list:
 
-            # This compilation pass was added to account for the case that
-            # the inverse of a gate is not in the gateset of the backend.
-            backend.rebase_pass().apply(zne_circ)
+                # TODO: This additional compilation pass may result in the circuit noise being
+                # increased too much, and should be removed or better accounted for.
 
-            folded_circuits.append(
-                ObservableExperiment(
-                    AnsatzCircuit=AnsatzCircuit(
-                        Circuit=zne_circ,
-                        Shots=experiment.AnsatzCircuit.Shots,
-                        SymbolsDict=experiment.AnsatzCircuit.SymbolsDict,
-                    ),
-                    ObservableTracker=experiment.ObservableTracker,
+                # This compilation pass was added to account for the case that
+                # the inverse of a gate is not in the gateset of the backend.
+                backend.rebase_pass().apply(zne_circ)
+
+                folded_circuits.append(
+                    ObservableExperiment(
+                        AnsatzCircuit=AnsatzCircuit(
+                            Circuit=zne_circ,
+                            Shots=experiment.AnsatzCircuit.Shots // len(zne_circ_list),
+                            SymbolsDict=deepcopy(experiment.AnsatzCircuit.SymbolsDict),
+                        ),
+                        ObservableTracker=deepcopy(experiment.ObservableTracker),
+                    )
                 )
-            )
+                experiment_index.append(index)
 
-        return (folded_circuits,)
+        return (folded_circuits, experiment_index)
 
-    return MitTask(_label="DigitalFolding", _n_in_wires=1, _n_out_wires=1, _method=task)
+    return MitTask(_label="DigitalFolding", _n_in_wires=1, _n_out_wires=2, _method=task)
+
+
+def merge_experiments_task_gen() -> MitTask:
+    """Generates task merging qubit pauli strings when they belong to the
+    same experiment.
+
+    :return: MitTask performing the merge.
+    :rtype: MitTask
+    """
+
+    def task(
+        obj,
+        qpo_list: List[QubitPauliOperator],
+        experiment_index_list: List[int]
+    ) -> Tuple[List[QubitPauliOperator]]:
+        """Merge a list of qubit pauli operators. Qubit pauli operators will
+        merged if they belong to the same experiment. The experiment each
+        qubit pauli operator belongs to is indicated by the index list.
+        Merging here means that the mean of the pauli string coefficients
+        is taken to be the coefficient of the qubit pauli string in the
+        new qubit pauli operator.
+
+        :param qpo_list: List of qubit pauli strings, some of which may belong
+            to the same experiment.
+        :type qpo_list: List[QubitPauliOperator]
+        :param experiment_index_list: Indexes indicating to which experiment
+            the qubit pauli strings belong to.
+        :type experiment_index_list: List[int]
+        :return: A list of merged qubit pauli operators.
+        :rtype: Tuple[List[QubitPauliOperator]]
+        """
+
+        # A dictionary mapping the experiment index to the dictionary
+        # of the merged qubit pauli operator.
+        index_to_merged_qpo_dict: Dict[int, Dict[QubitPauliString, CoeffTypeAccepted]] = {}
+
+        # For each qubit pauli operator, sum the coefficients of the
+        # qubit pauli strings it contains.
+        for index, qpo in zip(experiment_index_list, qpo_list):
+
+            index_qpo_dict = index_to_merged_qpo_dict.get(index, {qps: 0 for qps in qpo._dict.keys()})
+
+            if not index_qpo_dict.keys() == qpo._dict.keys():
+                raise Exception(
+                    "The qubit pauli strings being merged do not contain "
+                    + "matching qubit pauli strings. In particular "
+                    + f"{index_qpo_dict.keys()} and {qpo._dict.keys()} differ."
+                )
+
+            # Sum qubit pauli string coefficients.
+            index_to_merged_qpo_dict[index] = {
+                qps: qpo._dict[qps] + index_qpo_dict[qps]
+                for qps in qpo._dict.keys()
+            }
+
+        # For each index, find the mean coefficient.
+        for index, merged_qpo_dict in index_to_merged_qpo_dict.items():
+            index_to_merged_qpo_dict[index] = {
+                qps: coeff / experiment_index_list.count(index)
+                for qps, coeff in merged_qpo_dict.items()
+            }
+
+        # Convert the dictionary to a list and return.
+        return (
+            [
+                QubitPauliOperator(dictionary=index_to_merged_qpo_dict.get(index, {}))
+                for index in range(max(experiment_index_list) + 1)
+            ],
+        )
+
+    return MitTask(_label="MergeExperiments", _n_in_wires=2, _n_out_wires=1, _method=task)
 
 
 def extrapolation_task_gen(
@@ -749,8 +865,6 @@ def extrapolation_task_gen(
         experiment, all with noise scaled by a fixed amount.
         :rtype: Tuple[List[QubitPauliOperator]]
         """
-        # Combine noise folding levels with the unfolded experiment
-        all_fold_vals = [1, *noise_scaling_list]
 
         # Reformats to create list, where each list has fixed noise folding. Each element of
         # the list is a list of experiments
@@ -774,7 +888,7 @@ def extrapolation_task_gen(
                 QubitPauliOperator(
                     {
                         qpo_k: _fit_type(  # type: ignore
-                            all_fold_vals, qpo_list_float[qpo_k], _show_fit, deg
+                            noise_scaling_list, qpo_list_float[qpo_k], _show_fit, deg
                         )
                         for qpo_k in qpo_list_float
                     }
@@ -785,7 +899,7 @@ def extrapolation_task_gen(
 
     return MitTask(
         _label="CollateZNEResults",
-        _n_in_wires=len(noise_scaling_list) + 1,
+        _n_in_wires=len(noise_scaling_list),
         _n_out_wires=1,
         _method=task,
     )
@@ -879,7 +993,7 @@ def qpo_node_relabel(
     """
 
     orig_qpo_dict = qpo._dict.copy()
-    new_qpo_dict = {}
+    new_qpo_dict: Dict[QubitPauliString, Union[int, float, complex, Expr]] = {}
     for orig_qps in orig_qpo_dict:
         orig_qps_dict = orig_qps.map
         new_qps_dict = {}
@@ -1003,19 +1117,34 @@ def gen_qubit_relabel_task() -> MitTask:
     )
 
 
-# TODO: Backend does not appear as input in documentation
-def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -> MitEx:
-    """Generates MitEx object which mitigates for noise using Zero Noise Extrapolation. This is the
-    process by which noise is amplified incrementally, and the zero noise case arrived at by
-    extrapolating backwards. For further explanantion see https://arxiv.org/abs/2005.10921.
+def gen_noise_scaled_mitex(
+    backend: Backend,
+    noise_scaling: float,
+    **kwargs,
+) -> MitEx:
+    """Generates MitEx with noise scaled by the Qermit Folding methods.
 
-    :param backend: Backend on which the circuits are to be run.
+    :param backend: Backend on which circuits are run.
     :type backend: Backend
-    :param noise_scaling_list: A list of the amounts by which the noise should be scaled.
-    :type noise_scaling_list: List[float]
-    :return: MitEx object performing noise mitigation by ZNE.
+    :param noise_scaling: Factor by which noise is scaled.
+    :type noise_scaling: float
+
+    :return: MitEx with scaled noise.
     :rtype: MitEx
+
+    :key experiment_mitres: MitRes on which circuits are run, defaults to
+        a MitRes wrapped around the given backend.
+    :type experiment_mitres: MitRes
+    :key experiment_mitex: MitEx on which the circuits are run, defaults
+        to a MitEx wrapped around experiment_mitres
+    :type experiment_mitex: MitEx
+    :key allow_approx_fold: Allow approximate folding which may occur as a
+        result of discreet folding due to adding gates.
+    :type allow_approx_fold: bool
+    :key folding_type: The noise scaling method to use.
+    :type folding_type: Folding
     """
+
     _experiment_mitres = deepcopy(
         kwargs.get(
             "experiment_mitres",
@@ -1029,39 +1158,75 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
             MitEx(backend, _label="ExperimentMitex", mitres=_experiment_mitres),
         )
     )
-    _experiment_taskgraph = TaskGraph().from_TaskGraph(_experiment_mitex)
 
+    _allow_approx_fold = kwargs.get("allow_approx_fold", True)
+    _folding_type = kwargs.get("folding_type", Folding.circuit)
+
+    _fold_mitex = deepcopy(_experiment_mitex)
+    _fold_mitex._label = str(noise_scaling) + "FoldMitEx" + _fold_mitex._label
+
+    digital_folding_task = digital_folding_task_gen(
+        backend, noise_scaling, _folding_type, _allow_approx_fold, **kwargs
+    )
+
+    _fold_taskgraph = TaskGraph().from_TaskGraph(_fold_mitex)
+    _fold_taskgraph.add_wire()
+    _fold_taskgraph.prepend(digital_folding_task)
+    _fold_taskgraph.append(merge_experiments_task_gen())
+
+    return MitEx(backend).from_TaskGraph(_fold_taskgraph)
+
+
+# TODO: Backend does not appear as input in documentation
+def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -> MitEx:
+    """Generates MitEx object which mitigates for noise using Zero Noise Extrapolation. This is the
+    process by which noise is amplified incrementally, and the zero noise case arrived at by
+    extrapolating backwards. For further explanantion see https://arxiv.org/abs/2005.10921.
+
+    :param backend: Backend on which the circuits are to be run.
+    :type backend: Backend
+    :param noise_scaling_list: A list of the amounts by which the noise should be scaled.
+    :type noise_scaling_list: List[float]
+    :return: MitEx object performing noise mitigation by ZNE.
+    :rtype: MitEx
+    """
     _optimisation_level = kwargs.get("optimisation_level", 0)
     _show_fit = kwargs.get("show_fit", False)
-    _folding_type = kwargs.get("folding_type", Folding.circuit)
     _fit_type = kwargs.get("fit_type", Fit.linear)
     _deg = kwargs.get("deg", len(noise_scaling_list) - 1)
     _seed = kwargs.get("seed", None)
-    _allow_approx_fold = kwargs.get("allow_approx_fold", True)
 
     np.random.seed(seed=_seed)
 
-    for fold in noise_scaling_list:
-        _label = str(fold) + "FoldMitEx"
-        _fold_mitex = deepcopy(_experiment_mitex)
-        _fold_mitex._label = _label + _fold_mitex._label
-        digital_folding_task = digital_folding_task_gen(
-            backend, fold, _folding_type, _allow_approx_fold
+    _zne_taskgraph = TaskGraph().from_TaskGraph(
+        gen_noise_scaled_mitex(
+            noise_scaling=noise_scaling_list[0],
+            backend=backend,
+            **kwargs,
         )
-        _fold_mitex.prepend(digital_folding_task)
-        _experiment_taskgraph.parallel(_fold_mitex)
-
-    extrapolation_task = extrapolation_task_gen(
-        noise_scaling_list, _fit_type, _show_fit, _deg
     )
 
-    _experiment_taskgraph.prepend(gen_duplication_task(len(noise_scaling_list) + 1))
-    _experiment_taskgraph.append(extrapolation_task)
+    for fold in noise_scaling_list[1:]:
+        _zne_taskgraph.parallel(
+            gen_noise_scaled_mitex(
+                noise_scaling=fold,
+                backend=backend,
+                **kwargs,
+            )
+        )
 
-    _experiment_taskgraph.add_wire()
+    _zne_taskgraph.prepend(gen_duplication_task(len(noise_scaling_list)))
+    _zne_taskgraph.append(
+        extrapolation_task_gen(
+            noise_scaling_list, _fit_type, _show_fit, _deg
+        )
+    )
 
-    _experiment_taskgraph.prepend(
+    _zne_taskgraph.add_wire()
+
+    _zne_taskgraph.prepend(
         gen_initial_compilation_task(backend, _optimisation_level)
     )
-    _experiment_taskgraph.append(gen_qubit_relabel_task())
-    return MitEx(backend).from_TaskGraph(_experiment_taskgraph)
+    _zne_taskgraph.append(gen_qubit_relabel_task())
+
+    return MitEx(backend).from_TaskGraph(_zne_taskgraph)

@@ -1,3 +1,0 @@
-pytket~=1.11
-matplotlib
-networkx

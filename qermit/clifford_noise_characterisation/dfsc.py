@@ -23,7 +23,7 @@ from numpy import mean  # type: ignore
 
 from typing import List, Tuple, cast, Union, Dict
 from copy import copy
-from sympy.core.expr import Expr
+from sympy.core.expr import Expr  # type: ignore
 
 from qermit import (
     MitEx,
@@ -248,7 +248,7 @@ def DFSC_characterisation_task_gen() -> MitTask:
                 for string in qpo._dict:
                     if string not in characterisation_dict:
                         characterisation_dict[string] = list()
-                    characterisation_dict[string].append(qpo._dict[string])
+                    characterisation_dict[string].append(float(qpo._dict[string]))
             # set entry to average of values in list
             # add characterisation for DFSC to output list
             characterisation_qpos.append(
