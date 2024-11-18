@@ -30,7 +30,7 @@ from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
 
-from sympy.core.expr import Expr
+from sympy.core.expr import Expr  # type: ignore
 
 from pytket.passes import RebaseTket, DecomposeBoxes  # type: ignore
 from pytket.utils import QubitPauliOperator, get_pauli_expectation_value

@@ -191,7 +191,7 @@ def test_ObservableTracker_measurement_circuits_methods() -> None:
     results = backend.get_results(handles)
     final_qpo = test_ot.get_expectations(results)
 
-    assert final_qpo[qps_1] == 1
+    assert final_qpo[qps_1] == 1.0
 
     with pytest.raises(ValueError):
         test_ot.get_expectations([results[0]])
