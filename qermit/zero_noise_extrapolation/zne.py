@@ -36,7 +36,7 @@ from numpy.polynomial.polynomial import Polynomial  # type: ignore
 from pytket.circuit import Node  # type: ignore
 from math import isclose
 from pytket.pauli import Pauli
-from sympy import Expr
+from sympy import Expr  # type: ignore
 from qermit.noise_model import NoiseModel, PauliErrorTranspile
 from pytket.utils.operators import CoeffTypeAccepted
 
@@ -616,7 +616,7 @@ class Fit(Enum):
             fit_x = linspace[0]
             fit_y = linspace[1]
 
-            plot_fit(x, y, fit_x, fit_y, fit_to_zero)
+            plot_fit(x, y, list(fit_x), list(fit_y), fit_to_zero)
 
         return float(fit_to_zero)
 

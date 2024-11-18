@@ -229,10 +229,10 @@ def test_DFSC_characterisation_task_gen():
     # each characteriastion circuit should return some result
     assert len(results) == 4
     # assert each result is correct
-    assert results[0]._dict[qps0] == -1
-    assert results[1]._dict[qps1] == 1
-    assert results[2]._dict[qps0] == -1
-    assert results[3]._dict[qps1] == 1
+    assert results[0]._dict[qps0] == -1.0
+    assert results[1]._dict[qps1] == 1.0
+    assert results[2]._dict[qps0] == -1.0
+    assert results[3]._dict[qps1] == 1.0
 
     test_task = DFSC_characterisation_task_gen()
     assert test_task.n_in_wires == 2
@@ -243,10 +243,10 @@ def test_DFSC_characterisation_task_gen():
     assert len(characterisation_results[0]) == 2
 
     # check results are suitably recollated
-    assert characterisation_results[0][0]._dict[qps0] == -1
-    assert characterisation_results[0][0]._dict[qps1] == 1
-    assert characterisation_results[0][1]._dict[qps0] == -1
-    assert characterisation_results[0][1]._dict[qps1] == 1
+    assert characterisation_results[0][0]._dict[qps0] == -1.0
+    assert characterisation_results[0][0]._dict[qps1] == 1.0
+    assert characterisation_results[0][1]._dict[qps0] == -1.0
+    assert characterisation_results[0][1]._dict[qps1] == 1.0
 
 
 def test_DFSC_correction_task_gen():
