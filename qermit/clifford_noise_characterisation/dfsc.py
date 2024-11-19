@@ -23,7 +23,7 @@ from numpy import mean
 
 from typing import List, Tuple, cast, Union, Dict
 from copy import copy
-from sympy.core.expr import Expr
+from sympy.core.expr import Expr  # type: ignore
 
 from qermit import (
     MitEx,

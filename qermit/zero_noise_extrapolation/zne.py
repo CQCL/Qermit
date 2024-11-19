@@ -36,7 +36,7 @@ from numpy.polynomial.polynomial import Polynomial
 from pytket.circuit import Node
 from math import isclose
 from pytket.pauli import Pauli
-from sympy import Expr
+from sympy import Expr  # type: ignore
 from qermit.noise_model import NoiseModel, PauliErrorTranspile
 from pytket.utils.operators import CoeffTypeAccepted
 

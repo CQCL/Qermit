@@ -23,7 +23,7 @@ from qermit import MitTask
 from copy import copy
 import math
 import warnings
-from sympy.core.expr import Expr
+from sympy.core.expr import Expr  # type: ignore
 
 
 class _BaseExCorrectModel(ABC):

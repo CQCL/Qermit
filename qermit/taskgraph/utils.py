@@ -21,7 +21,7 @@ from pytket.utils import (
 from pytket.pauli import QubitPauliString
 from pytket.backends.backendresult import BackendResult
 from copy import copy
-from sympy import Symbol
+from sympy import Symbol  # type: ignore
 from typing import Iterable, Dict, Union, Tuple, List, Optional
 from collections import OrderedDict
 from numpy import ndarray
@@ -225,7 +225,7 @@ class MeasurementCircuit(object):
         :rtype: Circuit
         """
         _circuit = self._symbolic_circuit.copy()
-        _circuit.symbol_substitution(self._symbols._symbolic_map)  # type: ignore
+        _circuit.symbol_substitution(self._symbols._symbolic_map)
         return _circuit
 
 
