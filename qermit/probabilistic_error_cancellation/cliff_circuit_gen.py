@@ -14,7 +14,7 @@
 
 
 from pytket import Circuit
-import numpy as np  # type: ignore
+import numpy as np
 from typing import List, Tuple
 
 

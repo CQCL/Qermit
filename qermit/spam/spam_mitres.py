@@ -29,7 +29,7 @@ from qermit.spam.full_spam_correction import (
 )
 from pytket.backends import Backend
 from typing import List
-from pytket.circuit import Node  # type: ignore
+from pytket.circuit import Node
 from copy import copy
 
 

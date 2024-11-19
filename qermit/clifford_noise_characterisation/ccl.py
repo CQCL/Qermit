@@ -14,7 +14,7 @@
 
 
 from pytket import OpType, Circuit
-from pytket.passes import DecomposeBoxes  # type: ignore
+from pytket.passes import DecomposeBoxes
 from pytket.backends import Backend
 from pytket.utils import QubitPauliOperator, get_operator_expectation_value
 from typing import List, Tuple
@@ -35,7 +35,7 @@ from .cdr_post import (
     _PolyCDRCorrect,
     cdr_quality_check_task_gen,
 )
-import numpy as np  # type: ignore
+import numpy as np
 import random
 from enum import Enum
 import warnings

@@ -29,12 +29,12 @@ from .mittask import (
 )
 from .utils import ObservableTracker, MeasurementCircuit, MeasurementInfo, SymbolsDict
 from pytket.utils import QubitPauliOperator
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.pauli import Pauli, QubitPauliString
 from pytket import Bit, Circuit
 from pytket.backends.backendresult import BackendResult
 from typing import Tuple, List, OrderedDict, Union, cast
 import networkx as nx  # type: ignore
-from pytket.backends import Backend  # type: ignore
+from pytket.backends import Backend
 import inspect
 from copy import deepcopy
 

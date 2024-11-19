@@ -11,7 +11,7 @@ from pytket.utils import QubitPauliOperator
 from copy import copy, deepcopy
 from .signal_filter import SmallCoefficientSignalFilter, SignalFilter
 from numpy.typing import NDArray
-from pytket.pauli import QubitPauliString  # type: ignore
+from pytket.pauli import QubitPauliString
 
 # TODO: The type annotation for NDArrays should be improved when newer
 # versions of python are supported. Reference the documentation

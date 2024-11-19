@@ -3,7 +3,7 @@ from qermit.postselection.postselect_mitres import gen_postselect_task
 from qermit import CircuitShots, MitRes, MitTask, TaskGraph
 from copy import deepcopy
 from typing import List, Tuple, cast
-from pytket.extensions.quantinuum.backends.leakage_gadget import get_detection_circuit  # type: ignore
+from pytket.extensions.quantinuum.backends.leakage_gadget import get_detection_circuit
 from pytket.backends import Backend
 from pytket.backends.backendinfo import BackendInfo
 

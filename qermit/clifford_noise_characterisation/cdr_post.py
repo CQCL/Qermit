@@ -16,14 +16,14 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple, cast, Dict, Union
 
-import numpy as np  # type: ignore
+import numpy as np
 from pytket.utils import QubitPauliOperator
-from pytket.pauli import QubitPauliString  # type: ignore
+from pytket.pauli import QubitPauliString
 from qermit import MitTask
 from copy import copy
 import math
 import warnings
-from sympy.core.expr import Expr  # type: ignore
+from sympy.core.expr import Expr
 
 
 class _BaseExCorrectModel(ABC):

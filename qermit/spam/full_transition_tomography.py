@@ -16,13 +16,13 @@
 import itertools
 from functools import lru_cache
 
-from pytket.circuit import Circuit, Qubit, Bit, Node, CircBox  # type: ignore
-import numpy as np  # type: ignore
+from pytket.circuit import Circuit, Qubit, Bit, Node, CircBox
+import numpy as np
 from collections import OrderedDict, namedtuple
 from typing import Dict, Iterable, List, Tuple, Counter, cast, Optional
 from math import ceil, log2
 from pytket.backends import Backend
-from pytket.passes import DecomposeBoxes, FlattenRegisters  # type: ignore
+from pytket.passes import DecomposeBoxes, FlattenRegisters
 from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 from enum import Enum

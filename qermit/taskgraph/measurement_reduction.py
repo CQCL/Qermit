@@ -21,14 +21,14 @@ from .utils import MeasurementCircuit
 from copy import copy
 
 from pytket.backends import Backend
-from pytket.transform import CXConfigType  # type: ignore
-from pytket.partition import (  # type: ignore
+from pytket.transform import CXConfigType
+from pytket.partition import (
     PauliPartitionStrat,
     measurement_reduction,
     GraphColourMethod,
 )
 from pytket import Bit
-from pytket.pauli import QubitPauliString  # type: ignore
+from pytket.pauli import QubitPauliString
 
 
 def measurement_reduction_task_gen(

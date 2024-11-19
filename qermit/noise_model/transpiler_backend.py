@@ -1,4 +1,4 @@
-from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.extensions.qiskit import AerBackend
 from collections import Counter
 from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray

@@ -28,7 +28,7 @@ from copy import deepcopy
 from itertools import repeat
 from pytket.utils.outcomearray import OutcomeArray
 from pytket import Bit
-import numpy as np  # type: ignore
+import numpy as np
 from pytket import Circuit
 
 

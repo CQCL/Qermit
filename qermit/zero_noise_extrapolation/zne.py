@@ -23,20 +23,20 @@ from qermit import (
 )
 from pytket.unit_id import UnitID
 from copy import copy, deepcopy
-from pytket.pauli import QubitPauliString  # type: ignore
+from pytket.pauli import QubitPauliString
 from enum import Enum
-import numpy as np  # type: ignore
+import numpy as np
 from scipy.optimize import curve_fit  # type: ignore
 from typing import List, Tuple, cast, Dict, Union
 from pytket import Circuit, OpType, Qubit
-from pytket.predicates import CompilationUnit  # type: ignore
+from pytket.predicates import CompilationUnit
 from pytket.utils import QubitPauliOperator
-import matplotlib.pyplot as plt  # type: ignore
-from numpy.polynomial.polynomial import Polynomial  # type: ignore
-from pytket.circuit import Node  # type: ignore
+import matplotlib.pyplot as plt
+from numpy.polynomial.polynomial import Polynomial
+from pytket.circuit import Node
 from math import isclose
 from pytket.pauli import Pauli
-from sympy import Expr  # type: ignore
+from sympy import Expr
 from qermit.noise_model import NoiseModel, PauliErrorTranspile
 from pytket.utils.operators import CoeffTypeAccepted
 

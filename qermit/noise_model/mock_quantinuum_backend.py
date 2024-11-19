@@ -13,12 +13,12 @@
 # limitations under the License.
 
 from pytket.backends.backendinfo import BackendInfo
-from pytket.architecture import FullyConnected  # type: ignore
+from pytket.architecture import FullyConnected
 from pytket.passes.auto_rebase import auto_rebase_pass
-from pytket.predicates import GateSetPredicate  # type: ignore
-from pytket.extensions.quantinuum import QuantinuumBackend  # type: ignore
-from pytket.extensions.quantinuum.backends.quantinuum import _ALL_GATES  # type: ignore
-from pytket.predicates import CompilationUnit  # type: ignore
+from pytket.predicates import GateSetPredicate
+from pytket.extensions.quantinuum import QuantinuumBackend
+from pytket.extensions.quantinuum.backends.quantinuum import _ALL_GATES
+from pytket.predicates import CompilationUnit
 from pytket import OpType
 from pytket import Circuit
 from pytket.backends.resulthandle import ResultHandle

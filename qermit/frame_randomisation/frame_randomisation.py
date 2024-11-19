@@ -29,7 +29,7 @@ from math import ceil
 from pytket.backends import Backend
 from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
-from pytket.tailoring import UniversalFrameRandomisation, PauliFrameRandomisation  # type: ignore
+from pytket.tailoring import UniversalFrameRandomisation, PauliFrameRandomisation
 from enum import Enum
 from pytket import OpType
 from pytket.passes import auto_rebase_pass

@@ -30,23 +30,23 @@ from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
 
-from sympy.core.expr import Expr  # type: ignore
+from sympy.core.expr import Expr
 
-from pytket.passes import RebaseTket, DecomposeBoxes  # type: ignore
+from pytket.passes import RebaseTket, DecomposeBoxes
 from pytket.utils import QubitPauliOperator, get_pauli_expectation_value
 from pytket.backends import Backend
-from pytket.transform import Transform  # type: ignore
-from pytket.circuit import Op, CircBox, OpType, Circuit, Node  # type: ignore
-from pytket.placement import place_with_map  # type: ignore
+from pytket.transform import Transform
+from pytket.circuit import Op, CircBox, OpType, Circuit, Node
+from pytket.placement import place_with_map
 
-from pytket.pauli import QubitPauliString  # type: ignore
-from pytket.predicates import CliffordCircuitPredicate  # type: ignore
+from pytket.pauli import QubitPauliString
+from pytket.predicates import CliffordCircuitPredicate
 from pytket.unit_id import Qubit
 
 import re
 from typing import List, Tuple, Dict, cast, Union, Any
 from copy import copy
-import numpy as np  # type: ignore
+import numpy as np
 
 QuasiProbabilities = List[float]
 

@@ -13,18 +13,18 @@
 # limitations under the License.
 
 
-from pytket.circuit import Circuit, Bit  # type: ignore
+from pytket.circuit import Circuit, Bit
 from pytket.utils import (
     QubitPauliOperator,
     expectation_from_counts,
 )
-from pytket.pauli import QubitPauliString  # type: ignore
+from pytket.pauli import QubitPauliString
 from pytket.backends.backendresult import BackendResult
 from copy import copy
-from sympy import Symbol  # type: ignore
+from sympy import Symbol
 from typing import Iterable, Dict, Union, Tuple, List, Optional
 from collections import OrderedDict
-from numpy import ndarray  # type: ignore
+from numpy import ndarray
 from pytket.utils.operators import _coeff_convert
 
 

@@ -3,8 +3,8 @@ import numpy as np
 from .qermit_pauli import QermitPauli
 from collections import Counter
 import math
-from pytket.circuit import OpType  # type: ignore
-from matplotlib.pyplot import subplots  # type: ignore
+from pytket.circuit import OpType
+from matplotlib.pyplot import subplots
 from typing import Dict, Tuple, List, Union, cast
 from pytket.pauli import Pauli
 from pytket import Qubit, Circuit
