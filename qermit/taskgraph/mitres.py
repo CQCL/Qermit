@@ -217,12 +217,12 @@ class MitRes(TaskGraph):
     def __str__(self) -> str:
         return f"<MitRes::{self._label}>"
 
-    def __call__(
+    def __call__(  # type: ignore[override]
         self,
         circuits_wire: List[List[CircuitShots]],
         cache: bool = False,
         characterisation: dict = {},
-    ) -> Tuple[List[BackendResult]]:  # type: ignore[override]
+    ) -> Tuple[List[BackendResult]]:
         return cast(
             Tuple[List[BackendResult]],
             super().run(
@@ -305,12 +305,12 @@ class MitRes(TaskGraph):
         """
         raise TypeError("MitRes.add_wire forbidden.")
 
-    def run(
+    def run(  # type: ignore[override]
         self,
         circuit_shots: List[CircuitShots],
         cache: bool = False,
         characterisation: dict = {},
-    ) -> List[BackendResult]:  # type: ignore[override]
+    ) -> List[BackendResult]:
         """
         Overloaded run method from TaskGraph class to add type checking.
         A single experiment is defined by a Tuple containing a circuit to be run
