@@ -1,20 +1,21 @@
 from __future__ import annotations
-import numpy as np
-from .qermit_pauli import QermitPauli
-from collections import Counter
+
 import math
-from pytket.circuit import OpType
-from matplotlib.pyplot import subplots
-from typing import Dict, Tuple, List, Union, cast
-from pytket.pauli import Pauli
-from pytket import Qubit, Circuit
-from pytket.pauli import QubitPauliString
-from numpy.random import Generator
+from collections import Counter
 from enum import Enum
 from itertools import product
-from scipy.linalg import fractional_matrix_power  # type: ignore
-from numpy.typing import NDArray
+from typing import Dict, List, Tuple, Union, cast
 
+import numpy as np
+from matplotlib.pyplot import subplots
+from numpy.random import Generator
+from numpy.typing import NDArray
+from pytket import Circuit, Qubit
+from pytket.circuit import OpType
+from pytket.pauli import Pauli, QubitPauliString
+from scipy.linalg import fractional_matrix_power  # type: ignore
+
+from .qermit_pauli import QermitPauli
 
 Direction = Enum('Direction', ['forward', 'backward'])
 

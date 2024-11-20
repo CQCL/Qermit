@@ -14,17 +14,16 @@
 
 
 import pytest  # type: ignore
+from pytket.circuit import Bit, Circuit, Qubit, fresh_symbol  # type: ignore
+from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.utils import QubitPauliOperator
 
 from qermit import (  # type: ignore
-    SymbolsDict,
     MeasurementCircuit,
     ObservableTracker,
+    SymbolsDict,
 )
-
-from pytket.circuit import Circuit, fresh_symbol, Qubit, Bit  # type: ignore
-from pytket.pauli import QubitPauliString, Pauli  # type: ignore
-from pytket.utils import QubitPauliOperator
-from pytket.extensions.qiskit import AerBackend  # type: ignore
 
 
 # tests for SymbolsDict class in utils

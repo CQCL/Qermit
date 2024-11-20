@@ -13,19 +13,20 @@
 # limitations under the License.
 
 
-from pytket.circuit import Circuit, Bit
+from collections import OrderedDict
+from copy import copy
+from typing import Dict, Iterable, List, Optional, Tuple, Union
+
+from numpy import ndarray
+from pytket.backends.backendresult import BackendResult
+from pytket.circuit import Bit, Circuit
+from pytket.pauli import QubitPauliString
 from pytket.utils import (
     QubitPauliOperator,
     expectation_from_counts,
 )
-from pytket.pauli import QubitPauliString
-from pytket.backends.backendresult import BackendResult
-from copy import copy
-from sympy import Symbol  # type: ignore
-from typing import Iterable, Dict, Union, Tuple, List, Optional
-from collections import OrderedDict
-from numpy import ndarray
 from pytket.utils.operators import _coeff_convert
+from sympy import Symbol  # type: ignore
 
 
 class SymbolsDict(object):

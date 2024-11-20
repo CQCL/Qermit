@@ -12,45 +12,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from qermit import (  # type: ignore
+import math
+import multiprocessing as mp
+from itertools import product
+
+import numpy as np  # type: ignore
+import pytest
+import qiskit_aer.noise as noise  # type: ignore
+from numpy.polynomial.polynomial import polyval  # type: ignore
+from pytket import Circuit, Qubit
+from pytket.circuit import (
+    CircBox,
+    Node,  # type: ignore
+    OpType,  # type: ignore
+)
+from pytket.extensions.qiskit import AerBackend, IBMQEmulatorBackend  # type: ignore
+from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.predicates import GateSetPredicate  # type: ignore
+from pytket.utils import QubitPauliOperator
+from qiskit_ibm_provider import IBMProvider
+
+from qermit import (  # type: ignore  # type: ignore
+    AnsatzCircuit,
+    ObservableExperiment,
     ObservableTracker,
     SymbolsDict,
 )
+from qermit.noise_model import (
+    ErrorDistribution,
+    MockQuantinuumBackend,  # type: ignore
+    NoiseModel,
+    PauliErrorTranspile,
+    TranspilerBackend,
+)
+from qermit.taskgraph import gen_MeasurementReduction_MitEx
 from qermit.zero_noise_extrapolation import (  # type: ignore
-    Folding,
     Fit,
+    Folding,
     gen_ZNE_MitEx,
 )
 from qermit.zero_noise_extrapolation.zne import (  # type: ignore
-    gen_initial_compilation_task,
-    gen_duplication_task,
-    extrapolation_task_gen,
     digital_folding_task_gen,
+    extrapolation_task_gen,
+    gen_duplication_task,
+    gen_initial_compilation_task,
+    gen_noise_scaled_mitex,
     gen_qubit_relabel_task,
     merge_experiments_task_gen,
 )
-from pytket.predicates import GateSetPredicate  # type: ignore
-from pytket.extensions.qiskit import AerBackend, IBMQEmulatorBackend  # type: ignore
-from pytket import Circuit, Qubit
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
-from pytket.utils import QubitPauliOperator
-from pytket.circuit import CircBox
-from numpy.polynomial.polynomial import polyval  # type: ignore
-import math
-import numpy as np  # type: ignore
-from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
-import qiskit_aer.noise as noise  # type: ignore
-from pytket.circuit import OpType  # type: ignore
-from qiskit_ibm_provider import IBMProvider
-import pytest
-from pytket.circuit import Node  # type: ignore
-from qermit.noise_model import MockQuantinuumBackend  # type: ignore
-from qermit.taskgraph import gen_MeasurementReduction_MitEx
-from qermit.noise_model import NoiseModel, ErrorDistribution
-from qermit.zero_noise_extrapolation.zne import gen_noise_scaled_mitex
-from qermit.noise_model import TranspilerBackend, PauliErrorTranspile
-from itertools import product
-import multiprocessing as mp
 
 n_qubits = 2
 

@@ -14,19 +14,19 @@
 
 
 import itertools
-from functools import lru_cache
-
-from pytket.circuit import Circuit, Qubit, Bit, Node, CircBox
-import numpy as np
 from collections import OrderedDict, namedtuple
-from typing import Dict, Iterable, List, Tuple, Counter, cast, Optional
-from math import ceil, log2
-from pytket.backends import Backend
-from pytket.passes import DecomposeBoxes, FlattenRegisters
-from pytket.backends.backendresult import BackendResult
-from pytket.utils.outcomearray import OutcomeArray
 from enum import Enum
+from functools import lru_cache
+from math import ceil, log2
+from typing import Counter, Dict, Iterable, List, Optional, Tuple, cast
+
+import numpy as np
+from pytket.backends import Backend
+from pytket.backends.backendresult import BackendResult
+from pytket.circuit import Bit, CircBox, Circuit, Node, Qubit
+from pytket.passes import DecomposeBoxes, FlattenRegisters
 from pytket.unit_id import UnitID
+from pytket.utils.outcomearray import OutcomeArray
 
 FullCorrelatedNoiseCharacterisation = namedtuple(
     "FullCorrelatedNoiseCharacterisation",

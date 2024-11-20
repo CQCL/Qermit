@@ -1,8 +1,10 @@
-from pytket.pauli import Pauli
-from pytket.passes import CustomPass, BasePass
-from pytket import Circuit, OpType, Qubit
-from .noise_model import NoiseModel
 from typing import cast
+
+from pytket import Circuit, OpType, Qubit
+from pytket.passes import BasePass, CustomPass
+from pytket.pauli import Pauli
+
+from .noise_model import NoiseModel
 
 
 def PauliErrorTranspile(noise_model: NoiseModel) -> BasePass:

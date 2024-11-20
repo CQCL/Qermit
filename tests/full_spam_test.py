@@ -13,18 +13,19 @@
 # limitations under the License.
 
 
-from pytket import Circuit, Qubit, Bit
-from qermit.spam.full_spam_correction import (  # type: ignore
-    gen_full_tomography_spam_circuits_task,
-    gen_full_tomography_spam_characterisation_task,
-    gen_full_tomography_spam_correction_task,
-    gen_get_bit_maps_task,
-)
+import numpy as np  # type: ignore
+from pytket import Bit, Circuit, Qubit
+from pytket.extensions.qiskit import AerBackend  # type: ignore
+
 from qermit.spam import (  # type: ignore
     CorrectionMethod,
 )
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-import numpy as np  # type: ignore
+from qermit.spam.full_spam_correction import (  # type: ignore
+    gen_full_tomography_spam_characterisation_task,
+    gen_full_tomography_spam_circuits_task,
+    gen_full_tomography_spam_correction_task,
+    gen_get_bit_maps_task,
+)
 
 
 def test_gen_full_tomography_spam_circuits_task():

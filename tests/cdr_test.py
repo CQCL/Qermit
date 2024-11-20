@@ -14,17 +14,19 @@
 
 
 from typing import cast
+
 import numpy as np  # type: ignore
+from pytket import Qubit
+from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.utils import QubitPauliOperator
+
 from qermit.clifford_noise_characterisation.cdr_post import (  # type: ignore
     _PolyCDRCorrect,
     cdr_calibration_task_gen,
     cdr_correction_task_gen,
     cdr_quality_check_task_gen,
 )
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from pytket.pauli import QubitPauliString, Pauli  # type: ignore
-from pytket.utils import QubitPauliOperator
-from pytket import Qubit
 
 
 def test_linear_cdr_calib() -> None:

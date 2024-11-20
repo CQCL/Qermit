@@ -12,16 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import networkx as nx  # type: ignore
-from typing import List, Union, OrderedDict, Tuple, cast, TYPE_CHECKING
-from .mittask import (
-    MitTask,
-    IOTask,
-    Wire,
-)
-from .graphviz import _taskgraph_to_graphviz
 from copy import copy, deepcopy
 from tempfile import NamedTemporaryFile
+from typing import TYPE_CHECKING, List, OrderedDict, Tuple, Union, cast
+
+import networkx as nx  # type: ignore
+
+from .graphviz import _taskgraph_to_graphviz
+from .mittask import (
+    IOTask,
+    MitTask,
+    Wire,
+)
 
 if TYPE_CHECKING:
     import graphviz as gv  # type: ignore

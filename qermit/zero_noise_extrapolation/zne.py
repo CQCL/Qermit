@@ -11,35 +11,35 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from copy import copy, deepcopy
+from enum import Enum
+from math import isclose
+from typing import Dict, List, Tuple, Union, cast
+
+import matplotlib.pyplot as plt
+import numpy as np
+from numpy.polynomial.polynomial import Polynomial
+from pytket import Circuit, OpType, Qubit
 from pytket.backends import Backend
+from pytket.circuit import Node
+from pytket.pauli import Pauli, QubitPauliString
+from pytket.predicates import CompilationUnit
+from pytket.unit_id import UnitID
+from pytket.utils import QubitPauliOperator
+from pytket.utils.operators import CoeffTypeAccepted
+from scipy.optimize import curve_fit  # type: ignore
+from sympy import Expr  # type: ignore
+
 from qermit import (
+    AnsatzCircuit,
     MitEx,
     MitRes,
-    ObservableTracker,
-    AnsatzCircuit,
     MitTask,
     ObservableExperiment,
+    ObservableTracker,
     TaskGraph,
 )
-from pytket.unit_id import UnitID
-from copy import copy, deepcopy
-from pytket.pauli import QubitPauliString
-from enum import Enum
-import numpy as np
-from scipy.optimize import curve_fit  # type: ignore
-from typing import List, Tuple, cast, Dict, Union
-from pytket import Circuit, OpType, Qubit
-from pytket.predicates import CompilationUnit
-from pytket.utils import QubitPauliOperator
-import matplotlib.pyplot as plt
-from numpy.polynomial.polynomial import Polynomial
-from pytket.circuit import Node
-from math import isclose
-from pytket.pauli import Pauli
-from sympy import Expr  # type: ignore
 from qermit.noise_model import NoiseModel, PauliErrorTranspile
-from pytket.utils.operators import CoeffTypeAccepted
-
 
 box_types = {
     OpType.CircBox,

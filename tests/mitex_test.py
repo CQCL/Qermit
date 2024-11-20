@@ -13,26 +13,28 @@
 # limitations under the License.
 
 
+import copy
+
+from pytket.circuit import Circuit, OpType, Qubit, fresh_symbol  # type: ignore
+from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.utils import QubitPauliOperator
+
 from qermit import (  # type: ignore
-    MitEx,
-    SymbolsDict,
-    ObservableTracker,
-    CircuitShots,
     AnsatzCircuit,
+    CircuitShots,
+    MitEx,
     ObservableExperiment,
+    ObservableTracker,
+    SymbolsDict,
 )
 from qermit.taskgraph.mitex import (  # type: ignore
-    filter_observable_tracker_task_gen,
     collate_circuit_shots_task_gen,
-    split_results_task_gen,
-    get_expectations_task_gen,
+    filter_observable_tracker_task_gen,
     gen_compiled_shot_split_MitRes,
+    get_expectations_task_gen,
+    split_results_task_gen,
 )
-import copy
-from pytket.circuit import Circuit, fresh_symbol, Qubit, OpType  # type: ignore
-from pytket.pauli import QubitPauliString, Pauli  # type: ignore
-from pytket.utils import QubitPauliOperator
-from pytket.extensions.qiskit import AerBackend  # type: ignore
 
 
 def test_mitex_cache():

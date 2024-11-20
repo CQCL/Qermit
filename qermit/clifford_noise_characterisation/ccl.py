@@ -13,36 +13,36 @@
 # limitations under the License.
 
 
-from pytket import OpType, Circuit
-from pytket.passes import DecomposeBoxes
-from pytket.backends import Backend
-from pytket.utils import QubitPauliOperator, get_operator_expectation_value
-from typing import List, Tuple
+import random
+import warnings
 from copy import copy
+from enum import Enum
+from typing import List, Tuple, cast
+
+import numpy as np
+from pytket import Circuit, OpType
+from pytket.backends import Backend
+from pytket.passes import DecomposeBoxes, auto_rebase_pass
+from pytket.unit_id import UnitID
+from pytket.utils import QubitPauliOperator, get_operator_expectation_value
+
 from qermit import (
+    AnsatzCircuit,
     MitEx,
+    MitTask,
+    ObservableExperiment,
     ObservableTracker,
     SymbolsDict,
-    MitTask,
-    AnsatzCircuit,
-    ObservableExperiment,
     TaskGraph,
 )
 from qermit.taskgraph import gen_compiled_MitRes
+
 from .cdr_post import (
+    _PolyCDRCorrect,
     cdr_calibration_task_gen,
     cdr_correction_task_gen,
-    _PolyCDRCorrect,
     cdr_quality_check_task_gen,
 )
-import numpy as np
-import random
-from enum import Enum
-import warnings
-from pytket.passes import auto_rebase_pass
-from typing import cast
-from pytket.unit_id import UnitID
-
 
 ufr_gateset = {OpType.CX, OpType.Rz, OpType.H}
 ufr_rebase = auto_rebase_pass(ufr_gateset)

@@ -1,11 +1,13 @@
 from __future__ import annotations
-from pytket.pauli import QubitPauliString, Pauli
-from pytket.circuit import Qubit, OpType, Circuit
+
 import math
+from collections.abc import Iterable
+from typing import Dict, List, Tuple, Union
+
 import numpy as np
 from numpy.random import Generator
-from typing import List, Union, Tuple, Dict
-from collections.abc import Iterable
+from pytket.circuit import Circuit, OpType, Qubit
+from pytket.pauli import Pauli, QubitPauliString
 
 
 class QermitPauli:

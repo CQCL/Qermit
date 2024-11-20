@@ -19,5 +19,5 @@ MitEx objects that automatically characterise and correct device noise via
 Spectral Filtering.
 """
 
-from .spectral_filtering import gen_spectral_filtering_MitEx
 from .signal_filter import SmallCoefficientSignalFilter
+from .spectral_filtering import gen_spectral_filtering_MitEx

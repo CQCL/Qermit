@@ -13,7 +13,22 @@
 # limitations under the License.
 
 
+import math
+
+import pytest
+from pytket import Circuit, OpType, Qubit
+from pytket.extensions.qiskit import (
+    AerBackend,  # type: ignore
+    IBMQEmulatorBackend,  # type: ignore
+)
+from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.predicates import CliffordCircuitPredicate, GateSetPredicate  # type: ignore
+from pytket.utils import QubitPauliOperator
+from qiskit_ibm_provider import IBMProvider
+
 from qermit import (  # type: ignore
+    AnsatzCircuit,
+    ObservableExperiment,
     ObservableTracker,
     SymbolsDict,
 )
@@ -21,25 +36,15 @@ from qermit.probabilistic_error_cancellation import (  # type: ignore
     gen_PEC_learning_based_MitEx,
 )
 from qermit.probabilistic_error_cancellation.pec_learning_based import (  # type: ignore
-    gen_rebase_to_frames_and_computing,
-    gen_label_gates,
-    gen_wrap_frame_gates,
-    gen_get_noisy_circuits,
-    gen_get_clifford_training_set,
     collate_results_task_gen,
+    gen_get_clifford_training_set,
+    gen_get_noisy_circuits,
+    gen_label_gates,
+    gen_rebase_to_frames_and_computing,
     gen_run_with_quasi_prob,
+    gen_wrap_frame_gates,
     learn_quasi_probs_task_gen,
 )
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
-from pytket.utils import QubitPauliOperator
-from pytket import Circuit, Qubit, OpType
-import math
-from pytket.predicates import GateSetPredicate, CliffordCircuitPredicate  # type: ignore
-from qermit import AnsatzCircuit, ObservableExperiment
-from pytket.extensions.qiskit import IBMQEmulatorBackend  # type: ignore
-from qiskit_ibm_provider import IBMProvider
-import pytest
 
 skip_remote_tests: bool = not IBMProvider.saved_accounts()
 REASON = "IBMQ account not configured"

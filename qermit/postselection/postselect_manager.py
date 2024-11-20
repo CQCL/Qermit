@@ -1,8 +1,9 @@
 from collections import Counter
+from typing import Dict, List, Tuple
+
 from pytket.backends.backendresult import BackendResult
-from pytket.utils.outcomearray import OutcomeArray
 from pytket.circuit import Bit
-from typing import List, Tuple, Dict
+from pytket.utils.outcomearray import OutcomeArray
 
 
 class PostselectMgr:

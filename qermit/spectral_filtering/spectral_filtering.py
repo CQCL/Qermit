@@ -1,17 +1,20 @@
-import numpy as np
-from scipy import fft, interpolate  # type: ignore
-from itertools import product
-from typing import Tuple, List, Dict, Any
-from qermit.taskgraph.task_graph import TaskGraph
-from qermit.taskgraph.mittask import MitTask
-from qermit import SymbolsDict, AnsatzCircuit, ObservableExperiment
-from qermit.taskgraph.mitex import MitEx, gen_compiled_MitRes
-from pytket.backends import Backend
-from pytket.utils import QubitPauliOperator
 from copy import copy, deepcopy
-from .signal_filter import SmallCoefficientSignalFilter, SignalFilter
+from itertools import product
+from typing import Any, Dict, List, Tuple
+
+import numpy as np
 from numpy.typing import NDArray
+from pytket.backends import Backend
 from pytket.pauli import QubitPauliString
+from pytket.utils import QubitPauliOperator
+from scipy import fft, interpolate  # type: ignore
+
+from qermit import AnsatzCircuit, ObservableExperiment, SymbolsDict
+from qermit.taskgraph.mitex import MitEx, gen_compiled_MitRes
+from qermit.taskgraph.mittask import MitTask
+from qermit.taskgraph.task_graph import TaskGraph
+
+from .signal_filter import SignalFilter, SmallCoefficientSignalFilter
 
 # TODO: The type annotation for NDArrays should be improved when newer
 # versions of python are supported. Reference the documentation

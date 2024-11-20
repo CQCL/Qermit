@@ -1,22 +1,24 @@
-from itertools import product
-from pytket import Circuit, OpType
-from qermit.noise_model import (
-    PauliErrorTranspile,
-    TranspilerBackend,
-    NoiseModel,
-    ErrorDistribution,
-    QermitPauli,
-    LogicalErrorDistribution,
-)
-from collections import Counter
-from pytket.circuit import Qubit
-from pytket.pauli import QubitPauliString, Pauli
 import json
-import numpy as np
-from copy import deepcopy
-import pytest
-from qermit.noise_model.noise_model import Direction
 import multiprocessing as mp
+from collections import Counter
+from copy import deepcopy
+from itertools import product
+
+import numpy as np
+import pytest
+from pytket import Circuit, OpType
+from pytket.circuit import Qubit
+from pytket.pauli import Pauli, QubitPauliString
+
+from qermit.noise_model import (
+    ErrorDistribution,
+    LogicalErrorDistribution,
+    NoiseModel,
+    PauliErrorTranspile,
+    QermitPauli,
+    TranspilerBackend,
+)
+from qermit.noise_model.noise_model import Direction
 
 
 def test_to_ptm() -> None:

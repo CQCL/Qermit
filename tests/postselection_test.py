@@ -1,11 +1,13 @@
-from qermit.postselection import PostselectMgr, gen_postselect_mitres
-from pytket.circuit import Bit
 from collections import Counter
-from pytket.backends.backendresult import BackendResult
-from pytket.utils.outcomearray import OutcomeArray
-from pytket.extensions.qiskit import AerBackend
-from qermit import CircuitShots
+
 from pytket import Circuit
+from pytket.backends.backendresult import BackendResult
+from pytket.circuit import Bit
+from pytket.extensions.qiskit import AerBackend
+from pytket.utils.outcomearray import OutcomeArray
+
+from qermit import CircuitShots
+from qermit.postselection import PostselectMgr, gen_postselect_mitres
 
 
 def test_postselect_manager() -> None:

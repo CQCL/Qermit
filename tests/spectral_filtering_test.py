@@ -12,30 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
+
+import numpy as np
+import scipy.fft
+from pytket import Circuit, Qubit
+from pytket.extensions.qiskit import AerBackend
+from pytket.pauli import Pauli, QubitPauliString
+from pytket.utils import QubitPauliOperator
+from sympy import Symbol
+
+from qermit import AnsatzCircuit, ObservableExperiment, ObservableTracker, SymbolsDict
+from qermit.spectral_filtering import SmallCoefficientSignalFilter
 from qermit.spectral_filtering.spectral_filtering import (
-    gen_result_extraction_task,
-    gen_wire_copy_task,
-    gen_inv_fft_task,
-    gen_mitigation_task,
     gen_fft_task,
     gen_flatten_task,
-    gen_reshape_task,
+    gen_inv_fft_task,
+    gen_mitigation_task,
+    gen_ndarray_to_dict_task,
     gen_obs_exp_grid_gen_task,
     gen_param_grid_gen_task,
-    gen_symbol_val_gen_task,
-    gen_ndarray_to_dict_task,
+    gen_reshape_task,
+    gen_result_extraction_task,
     gen_spectral_filtering_MitEx,
+    gen_symbol_val_gen_task,
+    gen_wire_copy_task,
 )
-from qermit.spectral_filtering import SmallCoefficientSignalFilter
-import numpy as np
-from pytket.utils import QubitPauliOperator
-import math
-from pytket import Circuit, Qubit
-from pytket.pauli import QubitPauliString, Pauli
-from qermit import AnsatzCircuit, SymbolsDict, ObservableExperiment, ObservableTracker
-from sympy import Symbol
-import scipy.fft
-from pytket.extensions.qiskit import AerBackend
 
 
 def generate_sine_wave(freq, sample_rate, duration):

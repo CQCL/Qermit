@@ -13,29 +13,29 @@
 # limitations under the License.
 
 
+from copy import copy
+from typing import Dict, List, Tuple, Union, cast
+
+from numpy import mean
 from pytket import Circuit
 from pytket.backends import Backend
-from pytket.transform import Transform
-from pytket.utils import QubitPauliOperator
 from pytket.pauli import Pauli, QubitPauliString
 from pytket.tailoring import apply_clifford_basis_change
-from numpy import mean
-
-from typing import List, Tuple, cast, Union, Dict
-from copy import copy
+from pytket.transform import Transform
+from pytket.utils import QubitPauliOperator
 from sympy.core.expr import Expr  # type: ignore
 
 from qermit import (
-    MitEx,
-    SymbolsDict,
-    MeasurementCircuit,
-    ObservableTracker,
-    MitTask,
     AnsatzCircuit,
+    MeasurementCircuit,
+    MitEx,
+    MitTask,
     ObservableExperiment,
+    ObservableTracker,
+    SymbolsDict,
     TaskGraph,
 )
-from qermit.taskgraph.mitex import get_basic_measurement_circuit, gen_compiled_MitRes
+from qermit.taskgraph.mitex import gen_compiled_MitRes, get_basic_measurement_circuit
 
 
 def get_clifford_mcs(input_circuit: Circuit) -> List[MeasurementCircuit]:

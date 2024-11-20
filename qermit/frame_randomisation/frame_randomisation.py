@@ -13,26 +13,26 @@
 # limitations under the License.
 
 
-from typing import List, Tuple, Counter, cast, Sequence
-from functools import reduce
 import operator
-
-from qermit import (
-    MitRes,
-    MitTask,
-    CircuitShots,
-)
-from qermit.taskgraph.mitex import backend_compile_circuit_shots_task_gen
-from pytket import Circuit, Bit
 from copy import copy
+from enum import Enum
+from functools import reduce
 from math import ceil
+from typing import Counter, List, Sequence, Tuple, cast
+
+from pytket import Bit, Circuit, OpType
 from pytket.backends import Backend
 from pytket.backends.backendresult import BackendResult
-from pytket.utils.outcomearray import OutcomeArray
-from pytket.tailoring import UniversalFrameRandomisation, PauliFrameRandomisation
-from enum import Enum
-from pytket import OpType
 from pytket.passes import auto_rebase_pass
+from pytket.tailoring import PauliFrameRandomisation, UniversalFrameRandomisation
+from pytket.utils.outcomearray import OutcomeArray
+
+from qermit import (
+    CircuitShots,
+    MitRes,
+    MitTask,
+)
+from qermit.taskgraph.mitex import backend_compile_circuit_shots_task_gen
 
 
 class FrameRandomisation(Enum):

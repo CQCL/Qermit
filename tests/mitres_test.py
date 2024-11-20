@@ -13,19 +13,20 @@
 # limitations under the License.
 
 
+from pytket import Circuit
+from pytket.extensions.qiskit import AerBackend  # type: ignore
+
 from qermit import (  # type: ignore
-    MitRes,
     CircuitShots,
+    MitRes,
 )
 from qermit.taskgraph.mitres import (  # type: ignore
     backend_handle_task_gen,
     backend_res_task_gen,
-    split_shots_task_gen,
-    group_shots_task_gen,
     gen_shot_split_MitRes,
+    group_shots_task_gen,
+    split_shots_task_gen,
 )
-from pytket import Circuit
-from pytket.extensions.qiskit import AerBackend  # type: ignore
 
 
 def test_backend_handle_result_task_gen():

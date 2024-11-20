@@ -12,24 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .mittask import (
-    MitTask,
-    IOTask,
-    CircuitShots,
-    Wire,
-)
-from typing import List, Tuple, Union, OrderedDict, cast, Sequence
-from .task_graph import TaskGraph
-from pytket.backends import Backend, ResultHandle
-from pytket.backends.backendresult import BackendResult
-import networkx as nx  # type: ignore
 import inspect
 from copy import deepcopy
 from itertools import repeat
-from pytket.utils.outcomearray import OutcomeArray
-from pytket import Bit
+from typing import List, OrderedDict, Sequence, Tuple, Union, cast
+
+import networkx as nx  # type: ignore
 import numpy as np
-from pytket import Circuit
+from pytket import Bit, Circuit
+from pytket.backends import Backend, ResultHandle
+from pytket.backends.backendresult import BackendResult
+from pytket.utils.outcomearray import OutcomeArray
+
+from .mittask import (
+    CircuitShots,
+    IOTask,
+    MitTask,
+    Wire,
+)
+from .task_graph import TaskGraph
 
 
 def backend_compile_circuit_shots_task_gen(

@@ -14,16 +14,17 @@
 
 
 from pytket import Circuit, Qubit
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from pytket.circuit import Node  # type: ignore
 from pytket.architecture import Architecture  # type: ignore
-from qermit.spam import (  # type: ignore
-    gen_FullyCorrelated_SPAM_MitRes,
-    gen_UnCorrelated_SPAM_MitRes,
-    CorrectionMethod,
-)
+from pytket.circuit import Node  # type: ignore
+from pytket.extensions.qiskit import AerBackend  # type: ignore
+
 from qermit import CircuitShots
 from qermit.noise_model import MockQuantinuumBackend  # type: ignore
+from qermit.spam import (  # type: ignore
+    CorrectionMethod,
+    gen_FullyCorrelated_SPAM_MitRes,
+    gen_UnCorrelated_SPAM_MitRes,
+)
 
 
 def test_mock_quantinuum_all_qubits() -> None:

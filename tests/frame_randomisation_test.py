@@ -13,6 +13,9 @@
 # limitations under the License.
 
 
+from pytket import Circuit
+from pytket.extensions.qiskit import AerBackend  # type: ignore
+
 from qermit.frame_randomisation import (  # type: ignore
     FrameRandomisation,
     gen_Frame_Randomisation_MitRes,
@@ -20,8 +23,6 @@ from qermit.frame_randomisation import (  # type: ignore
 from qermit.frame_randomisation.frame_randomisation import (  # type: ignore
     frame_randomisation_circuits_task_gen,
 )
-from pytket import Circuit
-from pytket.extensions.qiskit import AerBackend  # type: ignore
 
 
 def test_frame_randomisation_circuits_task_gen():

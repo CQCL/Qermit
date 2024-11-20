@@ -12,41 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
+from copy import copy
+from typing import Any, Dict, List, Tuple, Union, cast
+
+import numpy as np
+from pytket.backends import Backend
+from pytket.circuit import CircBox, Circuit, Node, Op, OpType
+from pytket.passes import DecomposeBoxes, RebaseTket
+from pytket.pauli import QubitPauliString
+from pytket.placement import place_with_map
+from pytket.predicates import CliffordCircuitPredicate
+from pytket.transform import Transform
+from pytket.unit_id import Qubit
+from pytket.utils import QubitPauliOperator, get_pauli_expectation_value
+from sympy.core.expr import Expr  # type: ignore
+
 from qermit import (
+    AnsatzCircuit,
     MitEx,
     MitRes,
-    AnsatzCircuit,
     MitTask,
-    ObservableTracker,
     ObservableExperiment,
+    ObservableTracker,
     TaskGraph,
+)
+from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
+    random_clifford_circ,
 )
 from qermit.zero_noise_extrapolation.zne import (
     gen_duplication_task,
     gen_initial_compilation_task,
     gen_qubit_relabel_task,
 )
-from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
-    random_clifford_circ,
-)
-
-from sympy.core.expr import Expr  # type: ignore
-
-from pytket.passes import RebaseTket, DecomposeBoxes
-from pytket.utils import QubitPauliOperator, get_pauli_expectation_value
-from pytket.backends import Backend
-from pytket.transform import Transform
-from pytket.circuit import Op, CircBox, OpType, Circuit, Node
-from pytket.placement import place_with_map
-
-from pytket.pauli import QubitPauliString
-from pytket.predicates import CliffordCircuitPredicate
-from pytket.unit_id import Qubit
-
-import re
-from typing import List, Tuple, Dict, cast, Union, Any
-from copy import copy
-import numpy as np
 
 QuasiProbabilities = List[float]
 

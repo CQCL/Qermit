@@ -13,22 +13,22 @@
 # limitations under the License.
 
 
-from typing import List, Tuple, Dict
+from copy import copy
+from typing import Dict, List, Tuple
+
+from pytket import Bit
+from pytket.backends import Backend
+from pytket.partition import (
+    GraphColourMethod,
+    PauliPartitionStrat,
+    measurement_reduction,
+)
+from pytket.pauli import QubitPauliString
+from pytket.transform import CXConfigType
+
 from .mitex import MitEx
 from .mittask import MitTask, ObservableExperiment
 from .utils import MeasurementCircuit
-
-from copy import copy
-
-from pytket.backends import Backend
-from pytket.transform import CXConfigType
-from pytket.partition import (
-    PauliPartitionStrat,
-    measurement_reduction,
-    GraphColourMethod,
-)
-from pytket import Bit
-from pytket.pauli import QubitPauliString
 
 
 def measurement_reduction_task_gen(
