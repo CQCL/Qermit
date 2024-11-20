@@ -18,9 +18,9 @@ The spam module defines tasks for completing SPAM Mitigation methods, and genera
 functions for producing MitRes objects that automatically characterise and apply SPAM
 Mitigation methods to experiment results.
 """
-from .spam_mitres import (  # noqa:F401
+from .spam_mitres import (
     gen_FullyCorrelated_SPAM_MitRes,
     gen_UnCorrelated_SPAM_MitRes,
     CorrectionMethod,
 )
-from .full_transition_tomography import FullCorrelatedNoiseCharacterisation  # noqa:F401
+from .full_transition_tomography import FullCorrelatedNoiseCharacterisation

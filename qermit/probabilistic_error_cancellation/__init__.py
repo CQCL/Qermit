@@ -19,6 +19,6 @@ MitEx objects that automatically characterise and correct device noise via
 Probabilistic Error Cancellation.
 """
 
-from .pec_learning_based import (  # noqa:F401
+from .pec_learning_based import (
     gen_PEC_learning_based_MitEx,
 )
