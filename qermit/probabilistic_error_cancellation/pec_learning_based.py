@@ -234,7 +234,7 @@ def substitute_pauli_but_one(
         i["opgroup"] for i in circ.to_dict()["commands"] if "Frame" in i["opgroup"]
     ]
     # Raise error if there is no circuits in the opgroup given as input.
-    if not (to_replace_opgroup in frame_opgroup_list):
+    if to_replace_opgroup not in frame_opgroup_list:
         raise RuntimeError(
             "No Frame Gate with given name %s in circuit" % to_replace_opgroup
         )

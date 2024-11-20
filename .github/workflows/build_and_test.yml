@@ -69,6 +69,8 @@ jobs:
     - name: Run mypy
       if: github.event_name == 'pull_request'
       run: mypy -p qermit --warn-unused-ignores
+    - name: Linting check
+      run: ruff check
     - name: Format check
       if: github.event_name == 'pull_request'
       run: flake8 qermit/ tests/ --ignore=E501,W503

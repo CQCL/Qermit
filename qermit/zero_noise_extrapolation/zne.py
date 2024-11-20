@@ -151,7 +151,7 @@ class Folding(Enum):
             for i, cmd in enumerate(circ.get_commands())
             if (
                 not (cmd.op.type == OpType.Barrier)
-                and not (cmd.op.type in box_types)
+                and (cmd.op.type not in box_types)
                 and (len(cmd.qubits) == 2)
             )
         }
