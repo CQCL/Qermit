@@ -20,7 +20,6 @@ matplotlib = "^3.8.3"
 
 pytest = {version="^8.1.1", optional=true}
 mypy = {version="^1.9.0", optional=true}
-flake8 = {version="^7.0.0", optional=true}
 sphinx = {version="^7.2.6", optional=true}
 pytest-cov = {version="^4.1.0", optional=true}
 sphinx-book-theme = {version="^1.1.2", optional=true}
