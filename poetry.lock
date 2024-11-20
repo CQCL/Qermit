@@ -618,6 +618,23 @@ unicode = ["unicodedata2 (>=15.1.0)"]
 woff = ["brotli (>=1.0.1)", "brotlicffi (>=0.8.0)", "zopfli (>=0.1.4)"]
 
 [[package]]
+name = "furo"
+version = "2024.8.6"
+description = "A clean customisable Sphinx documentation theme."
+optional = true
+python-versions = ">=3.8"
+files = [
+    {file = "furo-2024.8.6-py3-none-any.whl", hash = "sha256:6cd97c58b47813d3619e63e9081169880fbe331f0ca883c871ff1f3f11814f5c"},
+    {file = "furo-2024.8.6.tar.gz", hash = "sha256:b63e4cee8abfc3136d3bc03a3d45a76a850bada4d6374d24c1716b0e01394a01"},
+]
+
+[package.dependencies]
+beautifulsoup4 = "*"
+pygments = ">=2.7"
+sphinx = ">=6.0,<9.0"
+sphinx-basic-ng = ">=1.0.0.beta2"
+
+[[package]]
 name = "graphviz"
 version = "0.20.3"
 description = "Simple Python interface for Graphviz"
@@ -1019,7 +1036,7 @@ tests = ["pytest (>=4.6)"]
 name = "msal"
 version = "1.31.1"
 description = "The Microsoft Authentication Library (MSAL) for Python library enables your app to access the Microsoft Cloud by supporting authentication of users with Microsoft Azure Active Directory accounts (AAD) and Microsoft Accounts (MSA) using industry standard OAuth2 and OpenID Connect."
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "msal-1.31.1-py3-none-any.whl", hash = "sha256:29d9882de247e96db01386496d59f29035e5e841bcac892e6d7bf4390bf6bd17"},
@@ -1102,7 +1119,7 @@ files = [
 name = "nest-asyncio"
 version = "1.6.0"
 description = "Patch asyncio to allow nested event loops"
-optional = false
+optional = true
 python-versions = ">=3.5"
 files = [
     {file = "nest_asyncio-1.6.0-py3-none-any.whl", hash = "sha256:87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c"},
@@ -1573,7 +1590,7 @@ diagrams = ["jinja2", "railroad-diagrams"]
 name = "pyqir"
 version = "0.10.6"
 description = "PyQIR parses, generates and evaluates the Quantum Intermediate Representation."
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "pyqir-0.10.6-cp38-abi3-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:6a0221de2f0134fc4c4a3b55e957d48225221f582fd05a640bd9cebd4c70d5e0"},
@@ -1704,7 +1721,7 @@ zx = ["autoray (>=0.6.12)", "numba (>=0.60.0)", "quimb (>=1.8.2)"]
 name = "pytket-qir"
 version = "0.17.0"
 description = "Extension for pytket, providing functions for conversion into to qir"
-optional = false
+optional = true
 python-versions = ">=3.10"
 files = [
     {file = "pytket_qir-0.17.0-py3-none-any.whl", hash = "sha256:f17338ad61dbf360caca108767463b926d2af1aefe97820a1cab51e0e1273fcd"},
@@ -1737,7 +1754,7 @@ qiskit-ibm-runtime = ">=0.21.0,<0.22.0"
 name = "pytket-quantinuum"
 version = "0.40.0"
 description = "Extension for pytket, providing access to Quantinuum backends"
-optional = false
+optional = true
 python-versions = ">=3.10"
 files = [
     {file = "pytket_quantinuum-0.40.0-py3-none-any.whl", hash = "sha256:367e01bcb265e139979c4ec3a02a0a734bab5a1a5398eae9e42398a8ca6db1f1"},
@@ -1978,7 +1995,7 @@ requests = ">=2.0.0"
 name = "ruff"
 version = "0.7.4"
 description = "An extremely fast Python linter and code formatter, written in Rust."
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "ruff-0.7.4-py3-none-linux_armv6l.whl", hash = "sha256:a4919925e7684a3f18e18243cd6bea7cfb8e968a6eaa8437971f681b7ec51478"},
@@ -2167,6 +2184,23 @@ tomli = {version = ">=2", markers = "python_version < \"3.11\""}
 docs = ["sphinxcontrib-websupport"]
 lint = ["flake8 (>=6.0)", "importlib-metadata (>=6.0)", "mypy (==1.10.1)", "pytest (>=6.0)", "ruff (==0.5.2)", "sphinx-lint (>=0.9)", "tomli (>=2)", "types-docutils (==0.21.0.20240711)", "types-requests (>=2.30.0)"]
 test = ["cython (>=3.0)", "defusedxml (>=0.7.1)", "pytest (>=8.0)", "setuptools (>=70.0)", "typing_extensions (>=4.9)"]
+
+[[package]]
+name = "sphinx-basic-ng"
+version = "1.0.0b2"
+description = "A modern skeleton for Sphinx themes."
+optional = true
+python-versions = ">=3.7"
+files = [
+    {file = "sphinx_basic_ng-1.0.0b2-py3-none-any.whl", hash = "sha256:eb09aedbabfb650607e9b4b68c9d240b90b1e1be221d6ad71d61c52e29f7932b"},
+    {file = "sphinx_basic_ng-1.0.0b2.tar.gz", hash = "sha256:9ec55a47c90c8c002b5960c57492ec3021f5193cb26cebc2dc4ea226848651c9"},
+]
+
+[package.dependencies]
+sphinx = ">=4.0"
+
+[package.extras]
+docs = ["furo", "ipython", "myst-parser", "sphinx-copybutton", "sphinx-inline-tabs"]
 
 [[package]]
 name = "sphinx-book-theme"
@@ -2424,7 +2458,7 @@ files = [
 name = "types-requests"
 version = "2.32.0.20241016"
 description = "Typing stubs for requests"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "types-requests-2.32.0.20241016.tar.gz", hash = "sha256:0d9cad2f27515d0e3e3da7134a1b6f28fb97129d86b867f24d9c726452634d95"},
@@ -2558,9 +2592,9 @@ files = [
 
 [extras]
 docs = ["pytket-quantinuum", "sphinx", "sphinx-book-theme"]
-tests = ["mypy", "pytest", "pytest-cov", "pytket-quantinuum", "qiskit-ibm-provider"]
+tests = ["mypy", "pytest", "pytest-cov", "pytket-quantinuum", "qiskit-ibm-provider", "ruff"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.13"
-content-hash = "27ba41d71405c48ca2aac7d19891003bb538549d89e48ef758c65c82bc5a860d"
+content-hash = "81cd3a52c4869a0ac505ab70f1bc1cc7a9436f0920fb6c52cbd80d088651b563"
