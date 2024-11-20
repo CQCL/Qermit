@@ -1,7 +1,18 @@
 version: 2
 updates:
-    - package-ecosystem: pip
-      directory: "/" # Location of package manifests
-      schedule:
-        interval: "daily"
-      target-branch: "develop"
+  - package-ecosystem: pip
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "daily"
+    target-branch: "main"
+    commit-message:
+      # Use a conventional commit tag
+      prefix: "ci(py-deps)"
+  - package-ecosystem: github-actions
+    directory: ".github/workflows"
+    schedule:
+      interval: "daily"
+    target-branch: "main"
+    commit-message:
+      # Use a conventional commit tag
+      prefix: "ci(workflow-deps)"
