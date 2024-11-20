@@ -87,6 +87,7 @@ def get_full_transition_tomography_circuits(
         should be processed without compilation.
     :rtype: List[Circuit]
     """
+
     def to_tuple(correlation_list: List[Node]) -> Tuple[Node, ...]:
         return tuple(correlation_list)
 
@@ -119,7 +120,9 @@ def get_full_transition_tomography_circuits(
 
     n_qubits_pre_compile = process_circuit.n_qubits
     # This needs to be optimisation level 0 to avoid using simplify initial
-    process_circuit = backend.get_compiled_circuit(process_circuit, optimisation_level=0)
+    process_circuit = backend.get_compiled_circuit(
+        process_circuit, optimisation_level=0
+    )
 
     while process_circuit.n_qubits < n_qubits_pre_compile:
         process_circuit.add_qubit(Qubit("temp_q", process_circuit.n_qubits))

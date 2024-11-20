@@ -1,4 +1,5 @@
 """Visualise TaskGraph using graphviz."""
+
 from typing import TYPE_CHECKING, Iterable, Optional, Tuple
 
 import graphviz as gv  # type: ignore

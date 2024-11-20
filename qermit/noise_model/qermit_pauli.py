@@ -29,7 +29,7 @@ class QermitPauli:
         Z_list: List[int],
         X_list: List[int],
         qubit_list: List[Qubit],
-        phase: int = 0
+        phase: int = 0,
     ):
         """Initialisation is by a list of qubits, and lists of 0, 1
         values indicating that a Z or X operator acts there.
@@ -73,8 +73,14 @@ class QermitPauli:
                 + f"In this case the qubits acted on by pauli_one {pauli_one.qubit_list} "
                 + f"differ from those of pauli_two {pauli_two.qubit_list}."
             )
-        power = sum(pauli_one.X_list[qubit] * pauli_two.Z_list[qubit] for qubit in pauli_one.qubit_list)
-        power += sum(pauli_one.Z_list[qubit] * pauli_two.X_list[qubit] for qubit in pauli_one.qubit_list)
+        power = sum(
+            pauli_one.X_list[qubit] * pauli_two.Z_list[qubit]
+            for qubit in pauli_one.qubit_list
+        )
+        power += sum(
+            pauli_one.Z_list[qubit] * pauli_two.X_list[qubit]
+            for qubit in pauli_one.qubit_list
+        )
         return (-1) ** power
 
     def is_measureable(self, qubit_list: List[Qubit]) -> bool:
@@ -91,8 +97,7 @@ class QermitPauli:
         :rtype: bool
         """
         if not all(qubit in self.qubit_list for qubit in qubit_list):
-            raise Exception(
-                f"{qubit_list} is not a subset of {self.qubit_list}.")
+            raise Exception(f"{qubit_list} is not a subset of {self.qubit_list}.")
         return any(self.X_list[qubit] == 1 for qubit in qubit_list)
 
     def reduce_qubits(self, qubit_list: List[Qubit]) -> QermitPauli:
@@ -109,7 +114,7 @@ class QermitPauli:
             Z_list=[Z for qubit, Z in self.Z_list.items() if qubit not in qubit_list],
             X_list=[X for qubit, X in self.X_list.items() if qubit not in qubit_list],
             qubit_list=[qubit for qubit in self.qubit_list if qubit not in qubit_list],
-            phase=self.phase
+            phase=self.phase,
         )
 
     @property
@@ -119,9 +124,7 @@ class QermitPauli:
         :return: True is the pauli represents the all I string.
         :rtype: bool
         """
-        return all(
-            Z == 0 for Z in self.Z_list.values()
-        ) and all(
+        return all(Z == 0 for Z in self.Z_list.values()) and all(
             X == 0 for X in self.X_list.values()
         )
 
@@ -189,21 +192,20 @@ class QermitPauli:
         qubit_list = []
 
         for pauli in qps.to_list():
-
             qubit = Qubit(name=pauli[0][0], index=pauli[0][1])
             qubit_list.append(qubit)
 
-            if pauli[1] in ['Z', 'Y']:
+            if pauli[1] in ["Z", "Y"]:
                 Z_list.append(1)
             else:
                 Z_list.append(0)
 
-            if pauli[1] in ['X', 'Y']:
+            if pauli[1] in ["X", "Y"]:
                 X_list.append(1)
             else:
                 X_list.append(0)
 
-            if pauli[1] == 'Y':
+            if pauli[1] == "Y":
                 phase += 1
                 phase %= 4
 
@@ -240,24 +242,16 @@ class QermitPauli:
         if not isinstance(other, QermitPauli):
             return False
 
-        if (
-            sorted(list(self.X_list.keys()))
-            != sorted(list(other.X_list.keys()))
-        ):
+        if sorted(list(self.X_list.keys())) != sorted(list(other.X_list.keys())):
             return False
         if not all(
-            self.X_list[quibt] == other.X_list[quibt]
-            for quibt in self.X_list.keys()
+            self.X_list[quibt] == other.X_list[quibt] for quibt in self.X_list.keys()
         ):
             return False
-        if (
-            sorted(list(self.Z_list.keys()))
-            != sorted(list(other.Z_list.keys()))
-        ):
+        if sorted(list(self.Z_list.keys())) != sorted(list(other.Z_list.keys())):
             return False
         if not all(
-            self.Z_list[quibt] == other.Z_list[quibt]
-            for quibt in self.X_list.keys()
+            self.Z_list[quibt] == other.Z_list[quibt] for quibt in self.X_list.keys()
         ):
             return False
         if self.phase != other.phase:
@@ -332,10 +326,7 @@ class QermitPauli:
                 self.apply_gate(OpType.Rx, qubits=qubits, params=[params[0]])
                 self.apply_gate(OpType.Rz, qubits=qubits, params=[params[1]])
             else:
-                raise Exception(
-                    f"{params} are not clifford angles for "
-                    + "PhasedX."
-                )
+                raise Exception(f"{params} are not clifford angles for " + "PhasedX.")
         elif op_type == OpType.Rz:
             params = kwargs.get("params", None)
             angle = params[0]
@@ -344,9 +335,7 @@ class QermitPauli:
                 for _ in range(int((angle % 2) // 0.5)):
                     self.S(qubit=qubits[0])
             else:
-                raise Exception(
-                    f"{angle} is not a clifford angle."
-                )
+                raise Exception(f"{angle} is not a clifford angle.")
         elif op_type == OpType.Rx:
             params = kwargs.get("params", None)
             angle = params[0]
@@ -357,9 +346,7 @@ class QermitPauli:
                     self.S(qubit=qubits[0])
                 self.H(qubit=qubits[0])
             else:
-                raise Exception(
-                    f"{angle} is not a clifford angle."
-                )
+                raise Exception(f"{angle} is not a clifford angle.")
         elif op_type == OpType.ZZMax:
             self.CX(control_qubit=qubits[0], target_qubit=qubits[1])
             self.S(qubit=qubits[1])
@@ -372,9 +359,7 @@ class QermitPauli:
                 for _ in range(int((angle % 2) // 0.5)):
                     self.apply_gate(op_type=OpType.ZZMax, qubits=qubits)
             else:
-                raise Exception(
-                    f"{angle} is not a clifford angle."
-                )
+                raise Exception(f"{angle} is not a clifford angle.")
         elif op_type == OpType.Barrier:
             pass
         else:
@@ -466,9 +451,7 @@ class QermitPauli:
         elif pauli == Pauli.I:
             pass
         else:
-            raise Exception(
-                f"{pauli} is not a Pauli."
-            )
+            raise Exception(f"{pauli} is not a Pauli.")
 
     def pre_apply_X(self, qubit: Qubit):
         """Pre-apply X Pauli ito qubit.
@@ -514,9 +497,7 @@ class QermitPauli:
         elif pauli == Pauli.I:
             pass
         else:
-            raise Exception(
-                f"{pauli} is not a Pauli."
-            )
+            raise Exception(f"{pauli} is not a Pauli.")
 
     def post_apply_X(self, qubit: Qubit):
         """Post-apply X Pauli ito qubit.
@@ -558,19 +539,19 @@ class QermitPauli:
                 circ.CZ(
                     control_qubit=control_qubit,
                     target_qubit=qubit,
-                    opgroup='pauli check',
+                    opgroup="pauli check",
                 )
             if self.X_list[qubit] == 1:
                 circ.CX(
                     control_qubit=control_qubit,
                     target_qubit=qubit,
-                    opgroup='pauli check',
+                    opgroup="pauli check",
                 )
 
         for _ in range(self.phase):
             circ.S(
                 control_qubit,
-                opgroup='phase correction',
+                opgroup="phase correction",
             )
 
         return circ
@@ -629,14 +610,14 @@ class QermitPauli:
 
         paulis, operator_phase = self.pauli_string
 
-        qubit_pauli_string = QubitPauliString(
-            qubits=self.qubit_list, paulis=paulis
-        )
+        qubit_pauli_string = QubitPauliString(qubits=self.qubit_list, paulis=paulis)
 
         return qubit_pauli_string, operator_phase
 
     @classmethod
-    def from_pauli_iterable(cls, pauli_iterable: Iterable[Pauli], qubit_list: List[Qubit]) -> QermitPauli:
+    def from_pauli_iterable(
+        cls, pauli_iterable: Iterable[Pauli], qubit_list: List[Qubit]
+    ) -> QermitPauli:
         """Create a QermitPauli from a Pauli iterable.
 
         :param pauli_iterable: The Pauli iterable to convert.

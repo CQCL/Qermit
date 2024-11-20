@@ -18,6 +18,7 @@ The clifford_noise_characterisation module provides generator methods for produc
 objects that automatically characterise and correct some device noise using
 characterisation via Clifford circuits.
 """
+
 from .ccl import (
     gen_CDR_MitEx,
 )

@@ -179,7 +179,9 @@ class MeasurementCircuit(object):
     for some Ansatz Circuit.
     """
 
-    def __init__(self, symbolic_circuit: Circuit, symbols: Optional[SymbolsDict] = None):
+    def __init__(
+        self, symbolic_circuit: Circuit, symbols: Optional[SymbolsDict] = None
+    ):
         """
         Stores information required to instantiate any MeasurementCircuit with parameterised symbols.
 

@@ -253,7 +253,8 @@ class TaskGraph:
                             set(task_input_out_edges).intersection(
                                 set(task_output_in_edges)
                             )
-                        ) > 0
+                        )
+                        > 0
                     ):
                         raise ValueError(
                             "Decomposition of TaskGraph node {}, not permitted: TaskGraph to be decomposed has edge between input and output vertices.".format(

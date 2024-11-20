@@ -108,9 +108,9 @@ def gen_full_tomography_spam_characterisation_task(
                 "SPAM Characterisation requires the same number of prepared states and results."
             )
         if len(results) > 0:
-            obj.characterisation[
-                "FullCorrelatedSpamCorrection"
-            ] = calculate_correlation_matrices(results, state_infos, qubit_subsets)
+            obj.characterisation["FullCorrelatedSpamCorrection"] = (
+                calculate_correlation_matrices(results, state_infos, qubit_subsets)
+            )
 
         return (True,)
 

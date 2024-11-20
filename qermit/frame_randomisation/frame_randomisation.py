@@ -36,7 +36,6 @@ from qermit.taskgraph.mitex import backend_compile_circuit_shots_task_gen
 
 
 class FrameRandomisation(Enum):
-
     @staticmethod
     def PauliFrameRandomisation(
         circuit: Circuit, shots: int, samples: int
@@ -143,7 +142,7 @@ def frame_randomisation_result_task_gen(samples: int) -> MitTask:
         :rtype: Tuple[List[BackendResult]]
         """
         chunked_results = [
-            all_fr_results[i: i + samples]
+            all_fr_results[i : i + samples]
             for i in range(0, len(all_fr_results), samples)
         ]
         results = []

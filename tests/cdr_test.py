@@ -56,7 +56,6 @@ def test_linear_cdr_calib() -> None:
 
 
 def test_cdr_quality_check_task_gen():
-
     qual_task = cdr_quality_check_task_gen(
         distance_tolerance=0.1, calibration_fraction=0.5
     )

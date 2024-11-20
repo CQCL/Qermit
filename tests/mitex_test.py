@@ -38,17 +38,12 @@ from qermit.taskgraph.mitex import (  # type: ignore
 
 
 def test_mitex_cache():
-
     circuit = Circuit(1).X(0)
     backend = AerBackend()
     mitex = MitEx(backend=backend)
     mitex.decompose_TaskGraph_nodes()
 
-    ansatz = AnsatzCircuit(
-        Circuit=circuit,
-        Shots=100000,
-        SymbolsDict=SymbolsDict()
-    )
+    ansatz = AnsatzCircuit(Circuit=circuit, Shots=100000, SymbolsDict=SymbolsDict())
     qubits = circuit.qubits
     qps = QubitPauliString(
         qubits=qubits,
@@ -58,18 +53,16 @@ def test_mitex_cache():
     obs = ObservableTracker(qubit_pauli_operator=qpo)
     obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
 
-    mitex.run(
-        mitex_wires=[obs_exp], cache=True
-    )
+    mitex.run(mitex_wires=[obs_exp], cache=True)
     cache = mitex.get_cache()
     assert list(cache.keys()) == [
-        'FilterObservableTracker',
-        'CollateExperimentCircuits',
-        'MitResCompileCircuitShots',
-        'MitResCircuitsToHandles',
-        'MitResHandlesToResults',
-        'SplitResults',
-        'GenerateExpectations',
+        "FilterObservableTracker",
+        "CollateExperimentCircuits",
+        "MitResCompileCircuitShots",
+        "MitResCircuitsToHandles",
+        "MitResHandlesToResults",
+        "SplitResults",
+        "GenerateExpectations",
     ]
 
 
@@ -309,7 +302,6 @@ def test_mitex_run_basic():
 
 
 def test_gen_compiled_shot_split_MitRes():
-
     backend = AerBackend()
 
     mitres = gen_compiled_shot_split_MitRes(backend, 5, optimisation_level=2)
@@ -329,7 +321,6 @@ def test_gen_compiled_shot_split_MitRes():
 
 
 if __name__ == "__main__":
-
     # calling test methods
     test_filter_observable_tracker_task_gen()
     test_collate_and_split_circuit_shots_task_gen()

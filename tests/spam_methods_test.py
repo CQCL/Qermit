@@ -28,7 +28,6 @@ from qermit.spam import (  # type: ignore
 
 
 def test_mock_quantinuum_all_qubits() -> None:
-
     circuit = Circuit(2).X(0).X(1).measure_all()
     circ_shots = CircuitShots(circuit, 1000)
     noisy_backend = MockQuantinuumBackend()

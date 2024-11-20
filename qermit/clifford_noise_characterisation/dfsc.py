@@ -102,7 +102,10 @@ def DFSC_circuit_task_gen() -> MitTask:
     def task(
         obj,
         measurement_wires: List[ObservableExperiment],
-    ) -> Tuple[List[ObservableExperiment], List[List[List[ObservableExperiment]]],]:
+    ) -> Tuple[
+        List[ObservableExperiment],
+        List[List[List[ObservableExperiment]]],
+    ]:
         """
         :param measurement_wires: A list of tuples, each tuple representing a different experiment
         :type measurement_wires: List[ObservableExperiment]

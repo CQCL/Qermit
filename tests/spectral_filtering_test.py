@@ -47,7 +47,6 @@ def generate_sine_wave(freq, sample_rate, duration):
 
 
 def gen_experiment_symbols():
-
     a = Symbol("alpha")
     b = Symbol("beta")
     c = Symbol("gamma")
@@ -60,7 +59,6 @@ def gen_experiment_symbols():
 
 
 def gen_experiment_qps():
-
     qps_one = QubitPauliString([Qubit(0), Qubit(1)], [Pauli.Z, Pauli.Z])
     qps_two = QubitPauliString([Qubit(0), Qubit(2)], [Pauli.Z, Pauli.X])
 
@@ -68,7 +66,6 @@ def gen_experiment_qps():
 
 
 def gen_experiment_one():
-
     _, a, b, _, sym_vals = gen_experiment_symbols()
     n_shots = 16
 
@@ -93,7 +90,6 @@ def gen_experiment_one():
 
 
 def gen_experiment_two():
-
     _, a, b, c, sym_vals = gen_experiment_symbols()
     n_shots = 16
 
@@ -117,7 +113,6 @@ def gen_experiment_two():
 
 
 def test_gen_symbol_val_gen_task():
-
     n_sym_vals, _, _, _, sym_vals = gen_experiment_symbols()
     exp_one, _, _ = gen_experiment_one()
     exp_two, _, _ = gen_experiment_two()
@@ -148,7 +143,6 @@ def test_gen_symbol_val_gen_task():
 
 
 def test_gen_wire_copy_task():
-
     # A couple of tests that the task works with unfamiliar inputs.
     wire_copy_task = gen_wire_copy_task(n_in_wires=2, n_wire_copies=2)
 
@@ -191,7 +185,6 @@ def test_gen_wire_copy_task():
 
 
 def test_gen_param_grid_gen_task():
-
     _, _, sym_vals_one = gen_experiment_one()
     _, _, sym_vals_two = gen_experiment_two()
     n_sym_vals, _, _, _, _ = gen_experiment_symbols()
@@ -219,7 +212,6 @@ def test_gen_param_grid_gen_task():
 
 
 def test_gen_obs_exp_grid_gen_task():
-
     _, a, b, c, _ = gen_experiment_symbols()
     exp_one, _, _ = gen_experiment_one()
     exp_two, _, _ = gen_experiment_two()
@@ -251,7 +243,6 @@ def test_gen_obs_exp_grid_gen_task():
 
 
 def test_gen_flatten_reshape_task():
-
     flatten_task = gen_flatten_task()
     reshape_task = gen_reshape_task()
 
@@ -332,7 +323,7 @@ def test_gen_flatten_reshape_task():
 
     assert out_wire[1] == length_list
     assert out_wire[0][: length_list[0]] == grid_0_flattened
-    assert out_wire[0][length_list[0]: length_list[0] + length_list[1]] == [
+    assert out_wire[0][length_list[0] : length_list[0] + length_list[1]] == [
         1,
         2,
         3,
@@ -377,7 +368,6 @@ def test_gen_flatten_reshape_task():
 
 
 def test_gen_ndarray_to_dict_task():
-
     sample_rate = 20
     duration = 2
     frequency = 2
@@ -423,7 +413,6 @@ def test_gen_ndarray_to_dict_task():
 
 
 def test_gen_fft_task():
-
     sample_rate = 20
     duration = 2
     frequency = 2
@@ -469,7 +458,6 @@ def test_gen_fft_task():
 
 
 def test_gen_fft_task_with_sine():
-
     sample_rate = 20
     duration = 2
     frequency = 2
@@ -497,7 +485,6 @@ def test_gen_fft_task_with_sine():
 
 
 def test_gen_inv_fft_task():
-
     inv_fft_task = gen_inv_fft_task()
 
     sample_rate = 20
@@ -542,7 +529,6 @@ def test_gen_inv_fft_task():
 
 
 def test_gen_mitigation_task():
-
     tol = 5
     signal_filter = SmallCoefficientSignalFilter(tol=tol)
     mitigation_task = gen_mitigation_task(signal_filter=signal_filter)
@@ -572,7 +558,6 @@ def test_gen_mitigation_task():
 
 
 def test_gen_result_extraction_task():
-
     exp_one, _, sym_vals_one = gen_experiment_one()
     exp_two, _, sym_vals_two = gen_experiment_two()
 
@@ -600,7 +585,6 @@ def test_gen_result_extraction_task():
 
 
 def test_gen_spectral_filtering_MitEx():
-
     signal_filter = SmallCoefficientSignalFilter(tol=20)
     noisy_backend = AerBackend()
     n_vals = 16
@@ -648,7 +632,6 @@ def test_gen_spectral_filtering_MitEx():
 
 
 def test_small_coefficient_signal_filter():
-
     tol = 5
     signal_filter = SmallCoefficientSignalFilter(tol=tol)
 

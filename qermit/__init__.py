@@ -19,6 +19,7 @@ mitigation methods are split into two types, those which in some manner modify t
 of shots returned when running quantum circuits on quantum devices (MitRes), and those which
 modify the expectation value of some observable (MitEx).
 """
+
 from qermit.taskgraph.mitex import MitEx
 from qermit.taskgraph.mitres import MitRes
 from qermit.taskgraph.mittask import (

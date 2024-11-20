@@ -85,7 +85,9 @@ class Folding(Enum):
         folded_circ = circ.copy()
         for _ in range(noise_scaling // 2):
             # Add barrier between circuit and its inverse
-            folded_circ.add_barrier(cast(List[UnitID], folded_circ.qubits + folded_circ.bits))
+            folded_circ.add_barrier(
+                cast(List[UnitID], folded_circ.qubits + folded_circ.bits)
+            )
 
             # Add inverse circuit by iterating though commands and inverting them
             for gate in reversed(circ.get_commands()):
@@ -97,7 +99,9 @@ class Folding(Enum):
                     folded_circ.add_gate(gate.op.dagger, gate.args)
 
             # Add barrier between circuit and its inverse
-            folded_circ.add_barrier(cast(List[UnitID], folded_circ.qubits + folded_circ.bits))
+            folded_circ.add_barrier(
+                cast(List[UnitID], folded_circ.qubits + folded_circ.bits)
+            )
 
             # Add original circuit
             for gate in circ.get_commands():
@@ -423,7 +427,9 @@ class Folding(Enum):
         noise_model: NoiseModel = kwargs.get("noise_model", NoiseModel(noise_model={}))
         n_noisy_circuit_samples: int = kwargs.get("n_noisy_circuit_samples", 1)
 
-        scaled_noise_model: NoiseModel = noise_model.scale(scaling_factor=noise_scaling - 1)
+        scaled_noise_model: NoiseModel = noise_model.scale(
+            scaling_factor=noise_scaling - 1
+        )
         error_transpiler = PauliErrorTranspile(noise_model=scaled_noise_model)
 
         scaled_circ_list = []
@@ -695,7 +701,7 @@ def digital_folding_task_gen(
     noise_scaling: float,
     _folding_type: Folding,
     _allow_approx_fold: bool,
-    **kwargs
+    **kwargs,
 ) -> MitTask:
     """
     Generates task transforming a circuit in order to amplify the noise. The noise
@@ -740,10 +746,14 @@ def digital_folding_task_gen(
         # and perform the necessary compilation.
         for index, experiment in enumerate(mitex_wire):
             # Apply the necessary folding method
-            zne_circ_list = _folding_type(experiment.AnsatzCircuit.Circuit, noise_scaling, _allow_approx_fold=_allow_approx_fold, **kwargs)  # type: ignore
+            zne_circ_list = _folding_type(
+                experiment.AnsatzCircuit.Circuit,
+                noise_scaling,
+                _allow_approx_fold=_allow_approx_fold,
+                **kwargs,
+            )  # type: ignore
 
             for zne_circ in zne_circ_list:
-
                 # TODO: This additional compilation pass may result in the circuit noise being
                 # increased too much, and should be removed or better accounted for.
 
@@ -777,9 +787,7 @@ def merge_experiments_task_gen() -> MitTask:
     """
 
     def task(
-        obj,
-        qpo_list: List[QubitPauliOperator],
-        experiment_index_list: List[int]
+        obj, qpo_list: List[QubitPauliOperator], experiment_index_list: List[int]
     ) -> Tuple[List[QubitPauliOperator]]:
         """Merge a list of qubit pauli operators. Qubit pauli operators will
         merged if they belong to the same experiment. The experiment each
@@ -800,13 +808,16 @@ def merge_experiments_task_gen() -> MitTask:
 
         # A dictionary mapping the experiment index to the dictionary
         # of the merged qubit pauli operator.
-        index_to_merged_qpo_dict: Dict[int, Dict[QubitPauliString, CoeffTypeAccepted]] = {}
+        index_to_merged_qpo_dict: Dict[
+            int, Dict[QubitPauliString, CoeffTypeAccepted]
+        ] = {}
 
         # For each qubit pauli operator, sum the coefficients of the
         # qubit pauli strings it contains.
         for index, qpo in zip(experiment_index_list, qpo_list):
-
-            index_qpo_dict = index_to_merged_qpo_dict.get(index, {qps: 0 for qps in qpo._dict.keys()})
+            index_qpo_dict = index_to_merged_qpo_dict.get(
+                index, {qps: 0 for qps in qpo._dict.keys()}
+            )
 
             if not index_qpo_dict.keys() == qpo._dict.keys():
                 raise Exception(
@@ -817,8 +828,7 @@ def merge_experiments_task_gen() -> MitTask:
 
             # Sum qubit pauli string coefficients.
             index_to_merged_qpo_dict[index] = {
-                qps: qpo._dict[qps] + index_qpo_dict[qps]
-                for qps in qpo._dict.keys()
+                qps: qpo._dict[qps] + index_qpo_dict[qps] for qps in qpo._dict.keys()
             }
 
         # For each index, find the mean coefficient.
@@ -836,7 +846,9 @@ def merge_experiments_task_gen() -> MitTask:
             ],
         )
 
-    return MitTask(_label="MergeExperiments", _n_in_wires=2, _n_out_wires=1, _method=task)
+    return MitTask(
+        _label="MergeExperiments", _n_in_wires=2, _n_out_wires=1, _method=task
+    )
 
 
 def extrapolation_task_gen(
@@ -980,7 +992,7 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
 
 def qpo_node_relabel(
     qpo: QubitPauliOperator,
-    node_map: Dict[Union[UnitID, Qubit, Node], Union[UnitID, Qubit, Node]]
+    node_map: Dict[Union[UnitID, Qubit, Node], Union[UnitID, Qubit, Node]],
 ):
     """Relabel the nodes of qpo according to node_map
 
@@ -1105,7 +1117,15 @@ def gen_qubit_relabel_task() -> MitTask:
 
         for compilation_map, qpo in zip(compilation_map_list, qpo_list):
             node_map = {value: key for key, value in compilation_map.items()}
-            new_qpo_list.append(qpo_node_relabel(qpo, cast(Dict[Union[UnitID, Qubit, Node], Union[UnitID, Qubit, Node]], node_map)))
+            new_qpo_list.append(
+                qpo_node_relabel(
+                    qpo,
+                    cast(
+                        Dict[Union[UnitID, Qubit, Node], Union[UnitID, Qubit, Node]],
+                        node_map,
+                    ),
+                )
+            )
 
         return (new_qpo_list,)
 
@@ -1217,16 +1237,12 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
 
     _zne_taskgraph.prepend(gen_duplication_task(len(noise_scaling_list)))
     _zne_taskgraph.append(
-        extrapolation_task_gen(
-            noise_scaling_list, _fit_type, _show_fit, _deg
-        )
+        extrapolation_task_gen(noise_scaling_list, _fit_type, _show_fit, _deg)
     )
 
     _zne_taskgraph.add_wire()
 
-    _zne_taskgraph.prepend(
-        gen_initial_compilation_task(backend, _optimisation_level)
-    )
+    _zne_taskgraph.prepend(gen_initial_compilation_task(backend, _optimisation_level))
     _zne_taskgraph.append(gen_qubit_relabel_task())
 
     return MitEx(backend).from_TaskGraph(_zne_taskgraph)

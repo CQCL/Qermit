@@ -37,7 +37,6 @@ def PauliErrorTranspile(noise_model: NoiseModel) -> BasePass:
         # Add each command in the original circuit,
         # and a pauli error if appropriate.
         for command in circuit.get_commands():
-
             if command.op.type == OpType.Barrier:
                 noisy_circuit.add_barrier(command.args)
             else:
@@ -46,26 +45,20 @@ def PauliErrorTranspile(noise_model: NoiseModel) -> BasePass:
             # If command has noise model defined, add a random error
             if command.op.type in noise_model.noisy_gates:
                 # Sample a random error, which may be None
-                error = noise_model.get_error_distribution(
-                    command.op.type
-                ).sample()
+                error = noise_model.get_error_distribution(command.op.type).sample()
                 if error is not None:
-                    for qubit, pauli in zip(
-                        command.args,
-                        error
-                    ):
+                    for qubit, pauli in zip(command.args, error):
                         if pauli in [Pauli.X, OpType.X]:
-                            noisy_circuit.X(cast(Qubit, qubit), opgroup='noisy')
+                            noisy_circuit.X(cast(Qubit, qubit), opgroup="noisy")
                         elif pauli in [Pauli.Z, OpType.Z]:
-                            noisy_circuit.Z(cast(Qubit, qubit), opgroup='noisy')
+                            noisy_circuit.Z(cast(Qubit, qubit), opgroup="noisy")
                         elif pauli in [Pauli.Y, OpType.Y]:
-                            noisy_circuit.Y(cast(Qubit, qubit), opgroup='noisy')
+                            noisy_circuit.Y(cast(Qubit, qubit), opgroup="noisy")
                         elif pauli in [Pauli.I]:
                             pass
                         else:
                             raise Exception(
-                                "Not a Pauli noise model."
-                                + f" Contains {pauli} error"
+                                "Not a Pauli noise model." + f" Contains {pauli} error"
                             )
 
         return noisy_circuit

@@ -53,7 +53,6 @@ REASON = "IBMQ account not configured"
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
 @pytest.mark.high_compute
 def test_no_qubit_relabel():
-
     noiseless_backend = AerBackend()
     mumbai_backend = IBMQEmulatorBackend("ibmq_mumbai")
     pec_mitex = gen_PEC_learning_based_MitEx(
@@ -79,7 +78,6 @@ def test_no_qubit_relabel():
 
 
 def test_gen_run_with_quasi_prob():
-
     noisy_prob = 0.8
     ideal_prob = 1
 
@@ -113,20 +111,17 @@ def test_gen_run_with_quasi_prob():
 
     output_wire = output[0]
     for output_qpo, input_experiment in zip(output_wire, wire):
-
         input_qpo = input_experiment[1]
 
         output_qpo_dict = output_qpo._dict
         input_qpo_dict = input_qpo.qubit_pauli_operator._dict
 
         for output_qps, input_qps in zip(output_qpo_dict, input_qpo_dict):
-
             assert output_qps == input_qps
             assert math.isclose(output_qpo_dict[output_qps], ideal_prob, rel_tol=0.001)
 
 
 def example_obs_exp_wire():
-
     circ_0 = (
         Circuit(2)
         .add_gate(OpType.noop, [1], opgroup="pre Pauli 1 0")
@@ -173,7 +168,6 @@ def example_obs_exp_wire():
 
 
 def test_collate_results_task_gen():
-
     noisy_prob = 0.8
     ideal_prob = 1
 
@@ -228,7 +222,6 @@ def test_collate_results_task_gen():
 
 
 def test_learn_quasi_probs_task_gen():
-
     noisy_prob = 0.8
     ideal_prob = 1
 
@@ -277,7 +270,6 @@ def test_learn_quasi_probs_task_gen():
 
 
 def test_gen_get_clifford_training_set():
-
     be = AerBackend()
 
     num_rand_cliff = 4
@@ -311,7 +303,6 @@ def test_gen_get_clifford_training_set():
     ]
 
     for input_experiment, output_experiment in zip(input_wire_expanded, output_wire):
-
         input_circuit = input_experiment[0][0]
         output_circuit = output_experiment[0][0]
 
@@ -327,7 +318,6 @@ def test_gen_get_clifford_training_set():
 
 
 def test_gen_get_noisy_circuits():
-
     be = AerBackend()
 
     task = gen_get_noisy_circuits(backend=be)
@@ -380,19 +370,16 @@ def test_gen_get_noisy_circuits():
     input_wire_expanded = [experiment for experiment in wire for _ in range(16)]
 
     for input_experiment, output_experiment in zip(input_wire_expanded, output_wire):
-
         input_command_list = input_experiment[0][0].get_commands()
         output_command_list = output_experiment[0][0].get_commands()
 
         for input_command, output_command in zip(
             input_command_list, output_command_list
         ):
-
             # Check that all gates that are not Pauli gates are the same
             if ("Frame" in input_command.opgroup) or (
                 "Computing" in input_command.opgroup
             ):
-
                 assert input_command.opgroup == output_command.opgroup
 
     # Check the correctness of an instances
@@ -401,7 +388,6 @@ def test_gen_get_noisy_circuits():
     output_circ_commands = output_circ.get_commands()
 
     for command in output_circ_commands:
-
         if command.opgroup == "pre Pauli 1 0":
             assert command.op.get_name() == "Y"
         elif command.opgroup == "pre Pauli 1 1":
@@ -413,7 +399,6 @@ def test_gen_get_noisy_circuits():
 
 
 def test_gen_wrap_frame_gates():
-
     task = gen_wrap_frame_gates()
     assert task.n_in_wires == 1
     assert task.n_out_wires == 1
@@ -471,7 +456,6 @@ def test_gen_wrap_frame_gates():
 
 
 def test_gen_label_gates():
-
     task = gen_label_gates()
 
     circ_0 = (
@@ -536,7 +520,6 @@ def test_gen_label_gates():
 
 
 def test_gen_rebase_to_frames_and_computing():
-
     task = gen_rebase_to_frames_and_computing()
 
     circ_0 = Circuit(2).CX(1, 0).X(0).Rx(0.25, 1)
@@ -566,7 +549,6 @@ def test_gen_rebase_to_frames_and_computing():
 
 @pytest.mark.high_compute
 def test_gen_PEC_learning_based_MitEx():
-
     be = AerBackend()
 
     me = gen_PEC_learning_based_MitEx(
