@@ -28,4 +28,4 @@ bash ./build-docs.sh
 npx serve build
 ```
 
-alternatively, just look at the built html pages in `docs/build`. Serving the html locally allows you to see the navbar.
+Alternatively, just look at the built html pages in `docs/build`. Serving the html locally allows you to see the navbar.
