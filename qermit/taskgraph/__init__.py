@@ -17,33 +17,34 @@
 The taskgraph module defines the TaskGraph, MitRes and MitTask objects, through which
 mitigated experiments are run.
 """
-from .task_graph import TaskGraph  # noqa:F401
-from .mittask import (  # noqa:F401
-    MitTask,
-    IOTask,
-    CircuitShots,
-    Wire,
-    duplicate_wire_task_gen,
-    AnsatzCircuit,
-    ObservableExperiment,
+
+from .measurement_reduction import gen_MeasurementReduction_MitEx
+from .mitex import (
+    MitEx,
+    collate_circuit_shots_task_gen,
+    filter_observable_tracker_task_gen,
+    gen_compiled_MitRes,
+    gen_compiled_shot_split_MitRes,
+    get_expectations_task_gen,
+    split_results_task_gen,
 )
-from .mitres import (  # noqa:F401
+from .mitres import (
     MitRes,
     backend_compile_circuit_shots_task_gen,
     backend_handle_task_gen,
     backend_res_task_gen,
-    split_shots_task_gen,
-    group_shots_task_gen,
     gen_shot_split_MitRes,
+    group_shots_task_gen,
+    split_shots_task_gen,
 )
-from .mitex import (  # noqa:F401
-    MitEx,
-    gen_compiled_MitRes,
-    filter_observable_tracker_task_gen,
-    collate_circuit_shots_task_gen,
-    split_results_task_gen,
-    get_expectations_task_gen,
-    gen_compiled_shot_split_MitRes,
+from .mittask import (
+    AnsatzCircuit,
+    CircuitShots,
+    IOTask,
+    MitTask,
+    ObservableExperiment,
+    Wire,
+    duplicate_wire_task_gen,
 )
-from .utils import SymbolsDict, MeasurementCircuit, ObservableTracker  # noqa:F401
-from .measurement_reduction import gen_MeasurementReduction_MitEx  # noqa:F401
+from .task_graph import TaskGraph
+from .utils import MeasurementCircuit, ObservableTracker, SymbolsDict

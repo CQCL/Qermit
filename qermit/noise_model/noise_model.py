@@ -1,22 +1,23 @@
 from __future__ import annotations
-import numpy as np
-from .qermit_pauli import QermitPauli
-from collections import Counter
+
 import math
-from pytket.circuit import OpType  # type: ignore
-from matplotlib.pyplot import subplots  # type: ignore
-from typing import Dict, Tuple, List, Union, cast
-from pytket.pauli import Pauli
-from pytket import Qubit, Circuit
-from pytket.pauli import QubitPauliString
-from numpy.random import Generator
+from collections import Counter
 from enum import Enum
 from itertools import product
-from scipy.linalg import fractional_matrix_power  # type: ignore
+from typing import Dict, List, Tuple, Union, cast
+
+import numpy as np
+from matplotlib.pyplot import subplots
+from numpy.random import Generator
 from numpy.typing import NDArray
+from pytket import Circuit, Qubit
+from pytket.circuit import OpType
+from pytket.pauli import Pauli, QubitPauliString
+from scipy.linalg import fractional_matrix_power  # type: ignore
 
+from .qermit_pauli import QermitPauli
 
-Direction = Enum('Direction', ['forward', 'backward'])
+Direction = Enum("Direction", ["forward", "backward"])
 
 
 class ErrorDistribution:
@@ -94,18 +95,18 @@ class ErrorDistribution:
         ptm = np.zeros((4**self.n_qubits, 4**self.n_qubits))
         pauli_index = {
             pauli: index
-            for index, pauli
-            in enumerate(product({Pauli.I, Pauli.X, Pauli.Y, Pauli.Z}, repeat=self.n_qubits))
+            for index, pauli in enumerate(
+                product({Pauli.I, Pauli.X, Pauli.Y, Pauli.Z}, repeat=self.n_qubits)
+            )
         }
 
         # For each pauli, calculate the corresponding
         # PTM entry as a sum pf error weights multiplied by +/-1
         # Depending on commutation relations.
         for pauli_tuple, index in pauli_index.items():
-
             pauli = QermitPauli.from_pauli_iterable(
                 pauli_iterable=pauli_tuple,
-                qubit_list=[Qubit(i) for i in range(self.n_qubits)]
+                qubit_list=[Qubit(i) for i in range(self.n_qubits)],
             )
 
             # Can add the identity error rate.
@@ -117,14 +118,18 @@ class ErrorDistribution:
             for error, error_rate in self.distribution.items():
                 error_pauli = QermitPauli.from_pauli_iterable(
                     pauli_iterable=error,
-                    qubit_list=[Qubit(i) for i in range(self.n_qubits)]
+                    qubit_list=[Qubit(i) for i in range(self.n_qubits)],
                 )
 
-                ptm[index][index] += error_rate * QermitPauli.commute_coeff(pauli_one=pauli, pauli_two=error_pauli)
+                ptm[index][index] += error_rate * QermitPauli.commute_coeff(
+                    pauli_one=pauli, pauli_two=error_pauli
+                )
 
         # Some checks that the form of the PTM is correct.
         identity = tuple(Pauli.I for _ in range(self.n_qubits))
-        if not abs(ptm[pauli_index[identity]][pauli_index[identity]] - 1.0) < 10**(-6):
+        if not abs(ptm[pauli_index[identity]][pauli_index[identity]] - 1.0) < 10 ** (
+            -6
+        ):
             raise Exception(
                 "The identity entry of the PTM is incorrect. "
                 + "This is a fault in Qermit. "
@@ -141,7 +146,9 @@ class ErrorDistribution:
         return ptm, pauli_index
 
     @classmethod
-    def from_ptm(cls, ptm: NDArray, pauli_index: Dict[Tuple[Pauli, ...], int]) -> ErrorDistribution:
+    def from_ptm(
+        cls, ptm: NDArray, pauli_index: Dict[Tuple[Pauli, ...], int]
+    ) -> ErrorDistribution:
         """Convert a Pauli Transfer Matrix (PTM) to an error distribution.
 
         :param ptm: Pauli Transfer Matrix to convert. Should be a 4^n by 4^n matrix
@@ -175,9 +182,7 @@ class ErrorDistribution:
             )
 
         if not np.array_equal(ptm, np.diag(np.diag(ptm))):
-            raise Exception(
-                "The given PTM is not diagonal as it should be."
-            )
+            raise Exception("The given PTM is not diagonal as it should be.")
 
         # calculate the error rates by solving simultaneous
         # linear equations. In particular the matrix to invert
@@ -186,27 +191,29 @@ class ErrorDistribution:
         for pauli_one_tuple, index_one in pauli_index.items():
             pauli_one = QermitPauli.from_pauli_iterable(
                 pauli_iterable=pauli_one_tuple,
-                qubit_list=[Qubit(i) for i in range(len(pauli_one_tuple))]
+                qubit_list=[Qubit(i) for i in range(len(pauli_one_tuple))],
             )
             for pauli_two_tuple, index_two in pauli_index.items():
                 pauli_two = QermitPauli.from_pauli_iterable(
                     pauli_iterable=pauli_two_tuple,
-                    qubit_list=[Qubit(i) for i in range(len(pauli_two_tuple))]
+                    qubit_list=[Qubit(i) for i in range(len(pauli_two_tuple))],
                 )
-                commutation_matrix[index_one][index_two] = QermitPauli.commute_coeff(pauli_one=pauli_one, pauli_two=pauli_two)
+                commutation_matrix[index_one][index_two] = QermitPauli.commute_coeff(
+                    pauli_one=pauli_one, pauli_two=pauli_two
+                )
 
         error_rate_list = np.matmul(ptm.diagonal(), np.linalg.inv(commutation_matrix))
         distribution = {
             error: error_rate_list[index]
             for error, index in pauli_index.items()
-            if (error_rate_list[index] > 10**(-6)) and error != tuple(Pauli.I for _ in range(int(n_qubit)))
+            if (error_rate_list[index] > 10 ** (-6))
+            and error != tuple(Pauli.I for _ in range(int(n_qubit)))
         }
         return cls(distribution=distribution)
 
     @property
     def n_qubits(self) -> int:
-        """The number of qubits this error distribution acts on.
-        """
+        """The number of qubits this error distribution acts on."""
         return len(list(self.distribution.keys())[0])
 
     def __eq__(self, other: object) -> bool:
@@ -230,9 +237,7 @@ class ErrorDistribution:
         # Check all probabilities are close.
         if not all(
             math.isclose(
-                self.distribution[error],
-                other.distribution[error],
-                abs_tol=0.01
+                self.distribution[error], other.distribution[error], abs_tol=0.01
             )
             for error in self.distribution.keys()
         ):
@@ -247,9 +252,7 @@ class ErrorDistribution:
         :return: String representation of error distribution.
         :rtype: str
         """
-        return ''.join(
-            f"{key}:{value} \n" for key, value in self.distribution.items()
-        )
+        return "".join(f"{key}:{value} \n" for key, value in self.distribution.items())
 
     @classmethod
     def mixture(cls, distribution_list: List[ErrorDistribution]) -> ErrorDistribution:
@@ -262,10 +265,20 @@ class ErrorDistribution:
         :rtype: ErrorDistribution
         """
 
-        return cls(distribution={
-            error: sum(distribution.distribution.get(error, 0) for distribution in distribution_list) / len(distribution_list)
-            for error in set(error for distribution in distribution_list for error in distribution.distribution)
-        })
+        return cls(
+            distribution={
+                error: sum(
+                    distribution.distribution.get(error, 0)
+                    for distribution in distribution_list
+                )
+                / len(distribution_list)
+                for error in set(
+                    error
+                    for distribution in distribution_list
+                    for error in distribution.distribution
+                )
+            }
+        )
 
     def order(self, reverse: bool = True):
         """Reorders the distribution dictionary based on probabilities.
@@ -275,8 +288,9 @@ class ErrorDistribution:
         """
         self.distribution = {
             error: probability
-            for error, probability
-            in sorted(self.distribution.items(), key=lambda x: x[1], reverse=reverse)
+            for error, probability in sorted(
+                self.distribution.items(), key=lambda x: x[1], reverse=reverse
+            )
         }
 
     def reset_rng(self, rng: Generator):
@@ -303,8 +317,7 @@ class ErrorDistribution:
 
     @classmethod
     def from_dict(
-        cls,
-        distribution_dict: List[Dict[str, Union[List[int], float]]]
+        cls, distribution_dict: List[Dict[str, Union[List[int], float]]]
     ) -> ErrorDistribution:
         """Generates ErrorDistribution from json serialisable representation.
 
@@ -317,7 +330,9 @@ class ErrorDistribution:
 
         return cls(
             distribution={
-                tuple(Pauli(op) for op in cast(List[int], noise_op['op_list'])): cast(float, noise_op['noise_level'])
+                tuple(Pauli(op) for op in cast(List[int], noise_op["op_list"])): cast(
+                    float, noise_op["noise_level"]
+                )
                 for noise_op in distribution_dict
             }
         )
@@ -348,16 +363,15 @@ class ErrorDistribution:
 
         fig, ax = subplots()
 
-        to_plot = {
-            key: value
-            for key, value in self.distribution.items()
-        }
+        to_plot = {key: value for key, value in self.distribution.items()}
 
-        ax.bar(range(len(to_plot)), list(to_plot.values()), align='center')
+        ax.bar(range(len(to_plot)), list(to_plot.values()), align="center")
         ax.set_xticks(
             ticks=range(len(to_plot)),
-            labels=list(''.join(tuple(op.name for op in op_tuple))
-                        for op_tuple in to_plot.keys())
+            labels=list(
+                "".join(tuple(op.name for op in op_tuple))
+                for op_tuple in to_plot.keys()
+            ),
         )
 
         return fig
@@ -404,7 +418,7 @@ class LogicalErrorDistribution:
         """
 
         self.pauli_error_counter = pauli_error_counter
-        self.total = kwargs.get('total', sum(self.pauli_error_counter.values()))
+        self.total = kwargs.get("total", sum(self.pauli_error_counter.values()))
 
     @property
     def distribution(self) -> Dict[QubitPauliString, float]:
@@ -419,9 +433,9 @@ class LogicalErrorDistribution:
         for stab, count in dict(self.pauli_error_counter).items():
             # Note that the phase is ignored here
             pauli_string, _ = stab.qubit_pauli_string
-            distribution[
-                pauli_string
-            ] = distribution.get(pauli_string, 0) + count / self.total
+            distribution[pauli_string] = (
+                distribution.get(pauli_string, 0) + count / self.total
+            )
 
         return distribution
 
@@ -500,8 +514,7 @@ class NoiseModel:
             distribution.reset_rng(rng=rng)
 
     def plot(self):
-        """Generates plot of noise model.
-        """
+        """Generates plot of noise model."""
 
         fig_list = []
         for noisy_gate, distribution in self.noise_model.items():
@@ -525,10 +538,7 @@ class NoiseModel:
         if not isinstance(other, NoiseModel):
             return False
 
-        if not (
-            sorted(self.noise_model.keys())
-            == sorted(other.noise_model.keys())
-        ):
+        if not (sorted(self.noise_model.keys()) == sorted(other.noise_model.keys())):
             return False
         if not all(
             self.noise_model[op] == other.noise_model[op]
@@ -550,7 +560,9 @@ class NoiseModel:
         }
 
     @classmethod
-    def from_dict(cls, noise_model_dict: Dict[str, List[Dict[str, Union[List[int], float]]]]) -> NoiseModel:
+    def from_dict(
+        cls, noise_model_dict: Dict[str, List[Dict[str, Union[List[int], float]]]]
+    ) -> NoiseModel:
         """Convert JSON serialised version of noise model back to an instance
         of NoiseModel.
 
@@ -562,9 +574,7 @@ class NoiseModel:
         """
         return cls(
             noise_model={
-                OpType.from_name(op): ErrorDistribution.from_dict(
-                    error_distribution
-                )
+                OpType.from_name(op): ErrorDistribution.from_dict(error_distribution)
                 for op, error_distribution in noise_model_dict.items()
             }
         )
@@ -617,10 +627,7 @@ class NoiseModel:
         return LogicalErrorDistribution(error_counter, total=n_rand)
 
     def counter_propagate(
-        self,
-        cliff_circ: Circuit,
-        n_counts: int,
-        **kwargs
+        self, cliff_circ: Circuit, n_counts: int, **kwargs
     ) -> Counter[QermitPauli]:
         """Generate random noisy instances of the given circuit and propagate
         the noise to create a counter of logical errors. Note that
@@ -690,12 +697,10 @@ class NoiseModel:
         # For each command in the circuit, add an error as appropriate, and
         # push the total error through the command.
         for command in command_list:
-
             if command.op.type in [OpType.Measure, OpType.Barrier]:
                 continue
 
             if direction == Direction.forward:
-
                 # Apply gate to total error.
                 pauli_error.apply_gate(
                     op_type=command.op.type,
@@ -704,10 +709,7 @@ class NoiseModel:
                 )
             # Add noise operation if appropriate.
             if command.op.type in self.noisy_gates:
-
-                error_distribution = self.get_error_distribution(
-                    optype=command.op.type
-                )
+                error_distribution = self.get_error_distribution(optype=command.op.type)
                 error = error_distribution.sample()
 
                 if error is not None:
@@ -726,7 +728,6 @@ class NoiseModel:
                             )
 
             if direction == Direction.backward:
-
                 # Note that here we wish to pull the pauli back through the gate,
                 # which has the same effect on the pauli as pushing through the
                 # dagger.

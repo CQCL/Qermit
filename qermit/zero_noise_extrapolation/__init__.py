@@ -17,8 +17,9 @@
 The zero_noise_extrapolation module provides generator methods for producing MitEx
 objects that automatically run digital zero noise extrapolation protocols.
 """
-from .zne import (  # noqa:F401
-    gen_ZNE_MitEx,
-    Folding,
+
+from .zne import (
     Fit,
+    Folding,
+    gen_ZNE_MitEx,
 )

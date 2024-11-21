@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - main
-      - develop
   workflow_dispatch:
 
 jobs:
@@ -23,11 +22,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Build qermit
-      if: github.event_name == 'pull_request'
       run: |
         pip install -e .[tests] -v
     - name: Test qermit 
-      if: github.event_name == 'pull_request'
       run: |
         cd tests
         pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
@@ -67,8 +64,8 @@ jobs:
         pip install .[tests]
         cd tests
     - name: Run mypy
-      if: github.event_name == 'pull_request'
-      run: mypy -p qermit
+      run: mypy -p qermit --warn-unused-ignores
+    - name: Linting check
+      run: ruff check
     - name: Format check
-      if: github.event_name == 'pull_request'
-      run: flake8 qermit/ tests/ --ignore=E501,W503
+      run: ruff format --check

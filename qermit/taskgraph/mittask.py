@@ -13,12 +13,12 @@
 # limitations under the License.
 
 
-from typing import List, Union, Callable, Dict, Optional
 from collections import namedtuple
-from types import MethodType
 from enum import Enum
+from types import MethodType
+from typing import Callable, Dict, List, Optional, Union
 
-from pytket import Circuit, Qubit, Bit
+from pytket import Bit, Circuit, Qubit
 from pytket.backends import ResultHandle
 from pytket.backends.backendresult import BackendResult
 from pytket.utils import QubitPauliOperator

@@ -13,34 +13,34 @@
 # limitations under the License.
 
 
+import copy
+
 from pytket import Circuit, Qubit
 from pytket.circuit import fresh_symbol  # type: ignore
+from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.transform import Transform  # type: ignore
+from pytket.utils import QubitPauliOperator
 
 from qermit import (  # type: ignore
-    SymbolsDict,
-    ObservableTracker,
     MeasurementCircuit,
     MitEx,
     ObservableExperiment,
+    ObservableTracker,
+    SymbolsDict,
 )
-from qermit.taskgraph.mitex import get_basic_measurement_circuit  # type: ignore
 from qermit.clifford_noise_characterisation import (  # type: ignore
     gen_DFSC_MitEx,
 )
 from qermit.clifford_noise_characterisation.dfsc import (  # type: ignore
-    get_clifford_mcs,
-    preparation_circuit_for_partition,
+    DFSC_characterisation_task_gen,
     DFSC_circuit_task_gen,
     DFSC_collater_task_gen,
-    DFSC_characterisation_task_gen,
     DFSC_correction_task_gen,
+    get_clifford_mcs,
+    preparation_circuit_for_partition,
 )
-import copy
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
-from pytket.utils import QubitPauliOperator
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-
+from qermit.taskgraph.mitex import get_basic_measurement_circuit  # type: ignore
 
 sym_0 = fresh_symbol("alpha")
 sym_1 = fresh_symbol("beta")

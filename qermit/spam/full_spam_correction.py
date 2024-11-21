@@ -13,22 +13,24 @@
 # limitations under the License.
 
 
+from typing import Dict, List, Set, Tuple
+
+from pytket import Bit, Circuit, OpType, Qubit
 from pytket.backends import Backend
 from pytket.backends.backendresult import BackendResult
-from typing import List, Tuple, Dict, Set
-from pytket import Qubit, Circuit, Bit, OpType
+from pytket.unit_id import Node
+
 from qermit import (
-    MitTask,
     CircuitShots,
+    MitTask,
 )
 from qermit.spam.full_transition_tomography import (
-    get_full_transition_tomography_circuits,
+    CorrectionMethod,
+    StateInfo,
     calculate_correlation_matrices,
     correct_transition_noise,
-    StateInfo,
-    CorrectionMethod,
+    get_full_transition_tomography_circuits,
 )
-from pytket.unit_id import Node
 
 
 def gen_full_tomography_spam_circuits_task(
@@ -106,9 +108,9 @@ def gen_full_tomography_spam_characterisation_task(
                 "SPAM Characterisation requires the same number of prepared states and results."
             )
         if len(results) > 0:
-            obj.characterisation[
-                "FullCorrelatedSpamCorrection"
-            ] = calculate_correlation_matrices(results, state_infos, qubit_subsets)
+            obj.characterisation["FullCorrelatedSpamCorrection"] = (
+                calculate_correlation_matrices(results, state_infos, qubit_subsets)
+            )
 
         return (True,)
 

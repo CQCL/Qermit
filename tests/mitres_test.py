@@ -13,19 +13,20 @@
 # limitations under the License.
 
 
+from pytket import Circuit
+from pytket.extensions.qiskit import AerBackend  # type: ignore
+
 from qermit import (  # type: ignore
-    MitRes,
     CircuitShots,
+    MitRes,
 )
 from qermit.taskgraph.mitres import (  # type: ignore
     backend_handle_task_gen,
     backend_res_task_gen,
-    split_shots_task_gen,
-    group_shots_task_gen,
     gen_shot_split_MitRes,
+    group_shots_task_gen,
+    split_shots_task_gen,
 )
-from pytket import Circuit
-from pytket.extensions.qiskit import AerBackend  # type: ignore
 
 
 def test_backend_handle_result_task_gen():
@@ -63,7 +64,6 @@ def test_mitres_run():
 
 
 def test_split_shots_task_gen():
-
     n_shots_1 = 20
     circ_1 = Circuit(1).X(0)
     circ_shots_1 = CircuitShots(circ_1, n_shots_1)
@@ -106,7 +106,6 @@ def test_split_shots_task_gen():
 
 
 def test_group_shots_task_gen():
-
     backend = AerBackend()
 
     circ_1 = Circuit(1).X(0).measure_all()
@@ -143,7 +142,6 @@ def test_group_shots_task_gen():
 
 
 def test_gen_shot_split_MitRes():
-
     backend = AerBackend()
 
     mitres = gen_shot_split_MitRes(backend, 5)

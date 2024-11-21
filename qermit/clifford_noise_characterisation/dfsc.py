@@ -13,29 +13,29 @@
 # limitations under the License.
 
 
+from copy import copy
+from typing import Dict, List, Tuple, Union, cast
+
+from numpy import mean
 from pytket import Circuit
 from pytket.backends import Backend
-from pytket.transform import Transform  # type: ignore
+from pytket.pauli import Pauli, QubitPauliString
+from pytket.tailoring import apply_clifford_basis_change
+from pytket.transform import Transform
 from pytket.utils import QubitPauliOperator
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
-from pytket.tailoring import apply_clifford_basis_change  # type: ignore
-from numpy import mean  # type: ignore
-
-from typing import List, Tuple, cast, Union, Dict
-from copy import copy
 from sympy.core.expr import Expr  # type: ignore
 
 from qermit import (
-    MitEx,
-    SymbolsDict,
-    MeasurementCircuit,
-    ObservableTracker,
-    MitTask,
     AnsatzCircuit,
+    MeasurementCircuit,
+    MitEx,
+    MitTask,
     ObservableExperiment,
+    ObservableTracker,
+    SymbolsDict,
     TaskGraph,
 )
-from qermit.taskgraph.mitex import get_basic_measurement_circuit, gen_compiled_MitRes
+from qermit.taskgraph.mitex import gen_compiled_MitRes, get_basic_measurement_circuit
 
 
 def get_clifford_mcs(input_circuit: Circuit) -> List[MeasurementCircuit]:
@@ -102,7 +102,10 @@ def DFSC_circuit_task_gen() -> MitTask:
     def task(
         obj,
         measurement_wires: List[ObservableExperiment],
-    ) -> Tuple[List[ObservableExperiment], List[List[List[ObservableExperiment]]],]:
+    ) -> Tuple[
+        List[ObservableExperiment],
+        List[List[List[ObservableExperiment]]],
+    ]:
         """
         :param measurement_wires: A list of tuples, each tuple representing a different experiment
         :type measurement_wires: List[ObservableExperiment]

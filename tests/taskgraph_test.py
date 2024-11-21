@@ -13,16 +13,17 @@
 # limitations under the License.
 
 
+import networkx as nx  # type: ignore
+import pytest
+
 from qermit import (  # type: ignore
-    TaskGraph,
     MitTask,
+    TaskGraph,
 )
 from qermit.taskgraph import (  # type: ignore
     IOTask,
     duplicate_wire_task_gen,
 )
-import networkx as nx  # type: ignore
-import pytest
 
 
 def test_task_graph_constructor():

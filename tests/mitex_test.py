@@ -13,40 +13,37 @@
 # limitations under the License.
 
 
+import copy
+
+from pytket.circuit import Circuit, OpType, Qubit, fresh_symbol  # type: ignore
+from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.utils import QubitPauliOperator
+
 from qermit import (  # type: ignore
-    MitEx,
-    SymbolsDict,
-    ObservableTracker,
-    CircuitShots,
     AnsatzCircuit,
+    CircuitShots,
+    MitEx,
     ObservableExperiment,
+    ObservableTracker,
+    SymbolsDict,
 )
 from qermit.taskgraph.mitex import (  # type: ignore
-    filter_observable_tracker_task_gen,
     collate_circuit_shots_task_gen,
-    split_results_task_gen,
-    get_expectations_task_gen,
+    filter_observable_tracker_task_gen,
     gen_compiled_shot_split_MitRes,
+    get_expectations_task_gen,
+    split_results_task_gen,
 )
-import copy
-from pytket.circuit import Circuit, fresh_symbol, Qubit, OpType  # type: ignore
-from pytket.pauli import QubitPauliString, Pauli  # type: ignore
-from pytket.utils import QubitPauliOperator
-from pytket.extensions.qiskit import AerBackend  # type: ignore
 
 
 def test_mitex_cache():
-
     circuit = Circuit(1).X(0)
     backend = AerBackend()
     mitex = MitEx(backend=backend)
     mitex.decompose_TaskGraph_nodes()
 
-    ansatz = AnsatzCircuit(
-        Circuit=circuit,
-        Shots=100000,
-        SymbolsDict=SymbolsDict()
-    )
+    ansatz = AnsatzCircuit(Circuit=circuit, Shots=100000, SymbolsDict=SymbolsDict())
     qubits = circuit.qubits
     qps = QubitPauliString(
         qubits=qubits,
@@ -56,18 +53,16 @@ def test_mitex_cache():
     obs = ObservableTracker(qubit_pauli_operator=qpo)
     obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
 
-    mitex.run(
-        mitex_wires=[obs_exp], cache=True
-    )
+    mitex.run(mitex_wires=[obs_exp], cache=True)
     cache = mitex.get_cache()
     assert list(cache.keys()) == [
-        'FilterObservableTracker',
-        'CollateExperimentCircuits',
-        'MitResCompileCircuitShots',
-        'MitResCircuitsToHandles',
-        'MitResHandlesToResults',
-        'SplitResults',
-        'GenerateExpectations',
+        "FilterObservableTracker",
+        "CollateExperimentCircuits",
+        "MitResCompileCircuitShots",
+        "MitResCircuitsToHandles",
+        "MitResHandlesToResults",
+        "SplitResults",
+        "GenerateExpectations",
     ]
 
 
@@ -307,7 +302,6 @@ def test_mitex_run_basic():
 
 
 def test_gen_compiled_shot_split_MitRes():
-
     backend = AerBackend()
 
     mitres = gen_compiled_shot_split_MitRes(backend, 5, optimisation_level=2)
@@ -327,7 +321,6 @@ def test_gen_compiled_shot_split_MitRes():
 
 
 if __name__ == "__main__":
-
     # calling test methods
     test_filter_observable_tracker_task_gen()
     test_collate_and_split_circuit_shots_task_gen()

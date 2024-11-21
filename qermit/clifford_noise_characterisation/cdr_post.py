@@ -13,17 +13,18 @@
 # limitations under the License.
 
 
-from abc import ABC, abstractmethod
-from typing import List, Tuple, cast, Dict, Union
-
-import numpy as np  # type: ignore
-from pytket.utils import QubitPauliOperator
-from pytket.pauli import QubitPauliString  # type: ignore
-from qermit import MitTask
-from copy import copy
 import math
 import warnings
+from abc import ABC, abstractmethod
+from copy import copy
+from typing import Dict, List, Tuple, Union, cast
+
+import numpy as np
+from pytket.pauli import QubitPauliString
+from pytket.utils import QubitPauliOperator
 from sympy.core.expr import Expr  # type: ignore
+
+from qermit import MitTask
 
 
 class _BaseExCorrectModel(ABC):

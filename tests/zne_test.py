@@ -12,45 +12,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from qermit import (  # type: ignore
+import math
+import multiprocessing as mp
+from itertools import product
+
+import numpy as np  # type: ignore
+import pytest
+import qiskit_aer.noise as noise  # type: ignore
+from numpy.polynomial.polynomial import polyval  # type: ignore
+from pytket import Circuit, Qubit
+from pytket.circuit import (
+    CircBox,
+    Node,  # type: ignore
+    OpType,  # type: ignore
+)
+from pytket.extensions.qiskit import AerBackend, IBMQEmulatorBackend  # type: ignore
+from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.predicates import GateSetPredicate  # type: ignore
+from pytket.utils import QubitPauliOperator
+from qiskit_ibm_provider import IBMProvider
+
+from qermit import (  # type: ignore  # type: ignore
+    AnsatzCircuit,
+    ObservableExperiment,
     ObservableTracker,
     SymbolsDict,
 )
+from qermit.noise_model import (
+    ErrorDistribution,
+    MockQuantinuumBackend,  # type: ignore
+    NoiseModel,
+    PauliErrorTranspile,
+    TranspilerBackend,
+)
+from qermit.taskgraph import gen_MeasurementReduction_MitEx
 from qermit.zero_noise_extrapolation import (  # type: ignore
-    Folding,
     Fit,
+    Folding,
     gen_ZNE_MitEx,
 )
 from qermit.zero_noise_extrapolation.zne import (  # type: ignore
-    gen_initial_compilation_task,
-    gen_duplication_task,
-    extrapolation_task_gen,
     digital_folding_task_gen,
+    extrapolation_task_gen,
+    gen_duplication_task,
+    gen_initial_compilation_task,
+    gen_noise_scaled_mitex,
     gen_qubit_relabel_task,
     merge_experiments_task_gen,
 )
-from pytket.predicates import GateSetPredicate  # type: ignore
-from pytket.extensions.qiskit import AerBackend, IBMQEmulatorBackend  # type: ignore
-from pytket import Circuit, Qubit
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
-from pytket.utils import QubitPauliOperator
-from pytket.circuit import CircBox
-from numpy.polynomial.polynomial import polyval  # type: ignore
-import math
-import numpy as np  # type: ignore
-from qermit import AnsatzCircuit, ObservableExperiment  # type: ignore
-import qiskit_aer.noise as noise  # type: ignore
-from pytket.circuit import OpType  # type: ignore
-from qiskit_ibm_provider import IBMProvider
-import pytest
-from pytket.circuit import Node  # type: ignore
-from qermit.noise_model import MockQuantinuumBackend  # type: ignore
-from qermit.taskgraph import gen_MeasurementReduction_MitEx
-from qermit.noise_model import NoiseModel, ErrorDistribution
-from qermit.zero_noise_extrapolation.zne import gen_noise_scaled_mitex
-from qermit.noise_model import TranspilerBackend, PauliErrorTranspile
-from itertools import product
-import multiprocessing as mp
 
 n_qubits = 2
 
@@ -107,13 +116,12 @@ def get_string_operator(meas_qubits, string):
 
 @pytest.mark.high_compute
 def test_measurement_reduction_integration():
-
     tol = 0.01
 
     # A bell state
     circuit = Circuit()
-    qubit_0 = Qubit(name='my_qubit', index=0)
-    qubit_1 = Qubit(name='my_qubit', index=1)
+    qubit_0 = Qubit(name="my_qubit", index=0)
+    qubit_1 = Qubit(name="my_qubit", index=1)
     circuit.add_qubit(qubit_0)
     circuit.add_qubit(qubit_1)
     circuit.H(qubit_0).CX(qubit_0, qubit_1)
@@ -122,27 +130,19 @@ def test_measurement_reduction_integration():
     backend = AerBackend()
     reduction_mitex = gen_MeasurementReduction_MitEx(backend=backend)
 
-    ansatz = AnsatzCircuit(
-        Circuit=circuit,
-        Shots=1000000,
-        SymbolsDict=SymbolsDict()
-    )
+    ansatz = AnsatzCircuit(Circuit=circuit, Shots=1000000, SymbolsDict=SymbolsDict())
 
     qpo = get_string_operator(meas_qubits, [0, 0])
     obs = ObservableTracker(qubit_pauli_operator=qpo)
     obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
-    result = reduction_mitex.run(
-        mitex_wires=[obs_exp]
-    )
+    result = reduction_mitex.run(mitex_wires=[obs_exp])
     # The probability of measuring 00 is 0.5
     assert abs(sum(result[0]._dict.values()) - 0.5) < tol
 
     qpo = get_string_operator(meas_qubits, [0, 1])
     obs = ObservableTracker(qubit_pauli_operator=qpo)
     obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
-    result = reduction_mitex.run(
-        mitex_wires=[obs_exp]
-    )
+    result = reduction_mitex.run(mitex_wires=[obs_exp])
     # The probability of measuring 01 is 0
     assert abs(sum(result[0]._dict.values())) < tol
 
@@ -160,18 +160,14 @@ def test_measurement_reduction_integration():
     qpo = get_string_operator(meas_qubits, [1, 0])
     obs = ObservableTracker(qubit_pauli_operator=qpo)
     obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
-    result = zne_mitex.run(
-        mitex_wires=[obs_exp]
-    )
+    result = zne_mitex.run(mitex_wires=[obs_exp])
     # The probability of measuring 10 is 0
     assert abs(sum(result[0]._dict.values())) < tol
 
     qpo = get_string_operator(meas_qubits, [1, 1])
     obs = ObservableTracker(qubit_pauli_operator=qpo)
     obs_exp = ObservableExperiment(AnsatzCircuit=ansatz, ObservableTracker=obs)
-    result = zne_mitex.run(
-        mitex_wires=[obs_exp]
-    )
+    result = zne_mitex.run(mitex_wires=[obs_exp])
     # The probability of measuring 11 is 0.5
     assert abs(sum(result[0]._dict.values()) - 0.5) < tol
 
@@ -179,7 +175,6 @@ def test_measurement_reduction_integration():
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
 @pytest.mark.high_compute
 def test_no_qubit_relabel():
-
     lagos_backend = IBMQEmulatorBackend("ibmq_mumbai")
     zne_mitex = gen_ZNE_MitEx(backend=lagos_backend, noise_scaling_list=[3, 5, 7])
 
@@ -202,7 +197,6 @@ def test_no_qubit_relabel():
 
 
 def test_gen_qubit_relabel_task():
-
     task = gen_qubit_relabel_task()
 
     assert task.n_in_wires == 2
@@ -227,7 +221,6 @@ def test_gen_qubit_relabel_task():
 
 
 def test_gen_initial_compilation_task():
-
     be = AerBackend()
 
     task = gen_initial_compilation_task(be, optimisation_level=1)
@@ -284,7 +277,6 @@ def test_gen_initial_compilation_task_quantinuum_qubit_names():
 
 
 def test_gen_duplication_task():
-
     n_dups = 2
 
     task = gen_duplication_task(n_dups)
@@ -310,7 +302,6 @@ def test_gen_duplication_task():
     duplicate_2 = result[1]
 
     for duplicate_1_experiment, duplicate_2_experiment in zip(duplicate_1, duplicate_2):
-
         duplicate_1_ac = duplicate_1_experiment[0]
         duplicate_1_qpo = duplicate_1_experiment[1]
 
@@ -325,7 +316,6 @@ def test_gen_duplication_task():
 
 
 def test_extrapolation_task_gen():
-
     n_folds = [1, 2, 3, 4, 5]
 
     task = extrapolation_task_gen(n_folds, Fit.polynomial, False, 2)
@@ -371,7 +361,6 @@ def test_extrapolation_task_gen():
 @pytest.mark.skipif(skip_remote_tests, reason=REASON)
 @pytest.mark.high_compute
 def test_folding_compiled_circuit():
-
     emulator_backend = IBMQEmulatorBackend("ibmq_mumbai")
 
     n_folds_1 = 3
@@ -402,7 +391,6 @@ def test_folding_compiled_circuit():
 
 
 def test_digital_folding_task_gen():
-
     be = AerBackend()
 
     n_folds_1 = 5
@@ -500,9 +488,7 @@ def test_digital_folding_task_gen():
         c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)
     ) * n_folds_2 + (c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)) * (
         n_folds_2 - 1
-    ) + c_5.n_gates_of_type(
-        OpType.Barrier
-    )
+    ) + c_5.n_gates_of_type(OpType.Barrier)
     assert folded_c_7.n_gates == c_5.n_gates + n_folds_4 * 2 * (
         ((c_5.n_gates - c_5.n_gates_of_type(OpType.Barrier)) + 1) // 2
     )
@@ -530,7 +516,6 @@ def test_digital_folding_task_gen():
 
 
 def test_zne_identity():
-
     backend = AerBackend()
 
     me = gen_ZNE_MitEx(
@@ -555,7 +540,6 @@ def test_zne_identity():
 
 
 def test_simple_run_end_to_end():
-
     be = AerBackend()
 
     me = gen_ZNE_MitEx(
@@ -601,7 +585,6 @@ def test_simple_run_end_to_end():
 
 
 def test_circuit_folding_TK1():
-
     circ = Circuit(2)
     circ.add_gate(OpType.TK1, (0, 0.1, 0), [0])
     circ.CX(0, 1)
@@ -614,7 +597,6 @@ def test_circuit_folding_TK1():
 
 
 def test_odd_gate_folding():
-
     circ = Circuit(2).CX(0, 1).X(0).CX(1, 0).X(1)
     folded_circ = Folding.odd_gate(circ, 2)[0]
     correct_folded_circ = (
@@ -653,7 +635,6 @@ def test_odd_gate_folding():
 
 
 def test_two_qubit_gate_folding():
-
     be = AerBackend()
 
     n_folds_1 = 3
@@ -761,18 +742,13 @@ def test_two_qubit_gate_folding():
 
 @pytest.mark.high_compute
 def test_end_to_end_noise_scaled_mitex():
-
     error_rate = 0.1
     error_distribution = ErrorDistribution(
         distribution={
             (Pauli.X, Pauli.I): error_rate,
         }
     )
-    noise_model = NoiseModel(
-        noise_model={
-            OpType.CZ: error_distribution
-        }
-    )
+    noise_model = NoiseModel(noise_model={OpType.CZ: error_distribution})
 
     noise_scaling = 5
     noise_scaled_mitex = gen_noise_scaled_mitex(
@@ -815,14 +791,10 @@ def test_end_to_end_noise_scaled_mitex():
 
     shots = 1000000
     ansatz_circuit_noisy = AnsatzCircuit(
-        Circuit=circuit_noisy,
-        Shots=shots,
-        SymbolsDict={}
+        Circuit=circuit_noisy, Shots=shots, SymbolsDict={}
     )
     ansatz_circuit_noisless = AnsatzCircuit(
-        Circuit=circuit_noisless,
-        Shots=shots,
-        SymbolsDict={}
+        Circuit=circuit_noisless, Shots=shots, SymbolsDict={}
     )
 
     observable_experiment_noisy = ObservableExperiment(
@@ -837,8 +809,14 @@ def test_end_to_end_noise_scaled_mitex():
     qubit_pauli_operator_list = noise_scaled_mitex.run(
         mitex_wires=[observable_experiment_noisy, observable_experiment_noisless]
     )
-    assert qubit_pauli_operator_list[0]._dict.keys() == qubit_pauli_operator_noisy._dict.keys()
-    assert qubit_pauli_operator_list[1]._dict.keys() == qubit_pauli_operator_noisless._dict.keys()
+    assert (
+        qubit_pauli_operator_list[0]._dict.keys()
+        == qubit_pauli_operator_noisy._dict.keys()
+    )
+    assert (
+        qubit_pauli_operator_list[1]._dict.keys()
+        == qubit_pauli_operator_noisless._dict.keys()
+    )
 
     assert abs(qubit_pauli_operator_list[0]._dict[qps_noisy_noisy] - 0.3439) < 0.1
     assert abs(qubit_pauli_operator_list[0]._dict[qps_noisy_noisless]) < 0.1
@@ -848,20 +826,20 @@ def test_end_to_end_noise_scaled_mitex():
 
 @pytest.mark.high_compute
 def test_end_to_end_noise_aware_zne_mitex_starting_from_ptm() -> None:
-
     mp.set_start_method("spawn", force=True)
 
     # Here we are creating the PTM for a noise model acting
     # XI with rate 0.1
     ptm = np.diag([1, 1, 1, 1, 1, 1, 1, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8])
-    pauli_index = {pauli: index for index, pauli in enumerate(product([Pauli.I, Pauli.X, Pauli.Y, Pauli.Z], repeat=2))}
+    pauli_index = {
+        pauli: index
+        for index, pauli in enumerate(
+            product([Pauli.I, Pauli.X, Pauli.Y, Pauli.Z], repeat=2)
+        )
+    }
     error_distribution = ErrorDistribution.from_ptm(ptm, pauli_index)
 
-    noise_model = NoiseModel(
-        noise_model={
-            OpType.CZ: error_distribution
-        }
-    )
+    noise_model = NoiseModel(noise_model={OpType.CZ: error_distribution})
     transpiler = PauliErrorTranspile(noise_model=noise_model)
     backend = TranspilerBackend(
         transpiler=transpiler,
@@ -883,9 +861,7 @@ def test_end_to_end_noise_aware_zne_mitex_starting_from_ptm() -> None:
 
     qps_noisy_noisy = QubitPauliString(map={Qubit(0): Pauli.Z, Qubit(1): Pauli.Z})
 
-    qubit_pauli_operator_noisy = QubitPauliOperator(
-        dictionary={qps_noisy_noisy: 1}
-    )
+    qubit_pauli_operator_noisy = QubitPauliOperator(dictionary={qps_noisy_noisy: 1})
 
     observable_tracker_noisy = ObservableTracker(
         qubit_pauli_operator=qubit_pauli_operator_noisy
@@ -893,9 +869,7 @@ def test_end_to_end_noise_aware_zne_mitex_starting_from_ptm() -> None:
 
     shots = 10000
     ansatz_circuit_noisy = AnsatzCircuit(
-        Circuit=circuit_noisy,
-        Shots=shots,
-        SymbolsDict={}
+        Circuit=circuit_noisy, Shots=shots, SymbolsDict={}
     )
 
     observable_experiment_noisy = ObservableExperiment(
@@ -903,9 +877,7 @@ def test_end_to_end_noise_aware_zne_mitex_starting_from_ptm() -> None:
         ObservableTracker=observable_tracker_noisy,
     )
 
-    qubit_pauli_operator_list = zne_mitex.run(
-        mitex_wires=[observable_experiment_noisy]
-    )
+    qubit_pauli_operator_list = zne_mitex.run(mitex_wires=[observable_experiment_noisy])
 
     # 0.15 is picked arbitrarily. Ideally this test would be seeded so that
     # a correct outcome is known.
@@ -914,16 +886,13 @@ def test_end_to_end_noise_aware_zne_mitex_starting_from_ptm() -> None:
 
 @pytest.mark.high_compute
 def test_end_to_end_noise_aware_zne_mitex():
-
     mp.set_start_method("spawn", force=True)
 
     error_rate = 0.1
     error_distribution = ErrorDistribution(
         distribution={(Pauli.X, Pauli.I): error_rate}
     )
-    noise_model = NoiseModel(
-        noise_model={OpType.CZ: error_distribution}
-    )
+    noise_model = NoiseModel(noise_model={OpType.CZ: error_distribution})
     transpiler = PauliErrorTranspile(noise_model=noise_model)
     backend = TranspilerBackend(
         transpiler=transpiler,
@@ -943,9 +912,7 @@ def test_end_to_end_noise_aware_zne_mitex():
 
     qps_noisy_noisy = QubitPauliString(map={Qubit(0): Pauli.Z, Qubit(1): Pauli.Z})
 
-    qubit_pauli_operator_noisy = QubitPauliOperator(
-        dictionary={qps_noisy_noisy: 1}
-    )
+    qubit_pauli_operator_noisy = QubitPauliOperator(dictionary={qps_noisy_noisy: 1})
 
     observable_tracker_noisy = ObservableTracker(
         qubit_pauli_operator=qubit_pauli_operator_noisy
@@ -953,9 +920,7 @@ def test_end_to_end_noise_aware_zne_mitex():
 
     shots = 10000
     ansatz_circuit_noisy = AnsatzCircuit(
-        Circuit=circuit_noisy,
-        Shots=shots,
-        SymbolsDict={}
+        Circuit=circuit_noisy, Shots=shots, SymbolsDict={}
     )
 
     observable_experiment_noisy = ObservableExperiment(
@@ -963,9 +928,7 @@ def test_end_to_end_noise_aware_zne_mitex():
         ObservableTracker=observable_tracker_noisy,
     )
 
-    qubit_pauli_operator_list = zne_mitex.run(
-        mitex_wires=[observable_experiment_noisy]
-    )
+    qubit_pauli_operator_list = zne_mitex.run(mitex_wires=[observable_experiment_noisy])
 
     # 0.15 is picked arbitrarily. Ideally this test would be seeded so that
     # a correct outcome is known.
@@ -973,13 +936,8 @@ def test_end_to_end_noise_aware_zne_mitex():
 
 
 def test_noise_aware_folding():
-
-    error_distribution = ErrorDistribution(
-        distribution={(Pauli.X, Pauli.I): 1}
-    )
-    noise_model = NoiseModel(
-        noise_model={OpType.CZ: error_distribution}
-    )
+    error_distribution = ErrorDistribution(distribution={(Pauli.X, Pauli.I): 1})
+    noise_model = NoiseModel(noise_model={OpType.CZ: error_distribution})
     circ = Circuit(2).CZ(0, 1)
     scaled_circ = Folding.noise_aware(
         circ=circ,
@@ -987,28 +945,19 @@ def test_noise_aware_folding():
         noise_model=noise_model,
         n_noisy_circuit_samples=1,
     )
-    assert scaled_circ[0] == Circuit(2).CZ(0, 1).X(0, opgroup='noisy')
+    assert scaled_circ[0] == Circuit(2).CZ(0, 1).X(0, opgroup="noisy")
 
 
 def test_merge_experiments_task_gen():
-
     task = merge_experiments_task_gen()
 
     qps_one = QubitPauliString(map={Qubit(0): Pauli.Z})
     qps_two = QubitPauliString(map={Qubit(1): Pauli.X})
 
-    qpo_one = QubitPauliOperator(
-        dictionary={qps_one: 1, qps_two: 1}
-    )
-    qpo_two = QubitPauliOperator(
-        dictionary={qps_one: 1, qps_two: -1}
-    )
-    qpo_three = QubitPauliOperator(
-        dictionary={qps_one: 1, qps_two: -1}
-    )
-    merged_qpo_list = task(
-        ([qpo_one, qpo_two, qpo_three], [0, 0, 1])
-    )
+    qpo_one = QubitPauliOperator(dictionary={qps_one: 1, qps_two: 1})
+    qpo_two = QubitPauliOperator(dictionary={qps_one: 1, qps_two: -1})
+    qpo_three = QubitPauliOperator(dictionary={qps_one: 1, qps_two: -1})
+    merged_qpo_list = task(([qpo_one, qpo_two, qpo_three], [0, 0, 1]))
     assert merged_qpo_list[0][0]._dict[qps_one] == 1
     assert merged_qpo_list[0][0]._dict[qps_two] == 0
     assert merged_qpo_list[0][1]._dict[qps_one] == 1

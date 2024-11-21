@@ -13,30 +13,32 @@
 # limitations under the License.
 
 
+import inspect
+from copy import deepcopy
+from typing import List, OrderedDict, Tuple, Union, cast
+
+import networkx as nx  # type: ignore
+from pytket import Bit, Circuit
+from pytket.backends import Backend
+from pytket.backends.backendresult import BackendResult
+from pytket.pauli import Pauli, QubitPauliString
+from pytket.utils import QubitPauliOperator
+
 from .mitres import (
     MitRes,
     backend_compile_circuit_shots_task_gen,
     gen_shot_split_MitRes,
 )
-from .task_graph import TaskGraph
 from .mittask import (
-    MitTask,
-    IOTask,
-    CircuitShots,
-    Wire,
     AnsatzCircuit,
+    CircuitShots,
+    IOTask,
+    MitTask,
     ObservableExperiment,
+    Wire,
 )
-from .utils import ObservableTracker, MeasurementCircuit, MeasurementInfo, SymbolsDict
-from pytket.utils import QubitPauliOperator
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
-from pytket import Bit, Circuit
-from pytket.backends.backendresult import BackendResult
-from typing import Tuple, List, OrderedDict, Union, cast
-import networkx as nx  # type: ignore
-from pytket.backends import Backend  # type: ignore
-import inspect
-from copy import deepcopy
+from .task_graph import TaskGraph
+from .utils import MeasurementCircuit, MeasurementInfo, ObservableTracker, SymbolsDict
 
 
 def gen_compiled_shot_split_MitRes(

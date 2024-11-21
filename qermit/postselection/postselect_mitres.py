@@ -1,9 +1,12 @@
-from .postselect_manager import PostselectMgr
-from qermit import CircuitShots, MitRes, MitTask, TaskGraph
 from copy import deepcopy
 from typing import List, Tuple
-from pytket.backends.backendresult import BackendResult
+
 from pytket.backends import Backend
+from pytket.backends.backendresult import BackendResult
+
+from qermit import CircuitShots, MitRes, MitTask, TaskGraph
+
+from .postselect_manager import PostselectMgr
 
 
 def gen_postselect_task() -> MitTask:

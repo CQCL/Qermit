@@ -1,12 +1,15 @@
 """Visualise TaskGraph using graphviz."""
-from typing import Iterable, Optional, Tuple, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Iterable, Optional, Tuple
+
 import graphviz as gv  # type: ignore
 
 from qermit.taskgraph.mittask import IOTask
 
 if TYPE_CHECKING:
-    from qermit.taskgraph.mittask import MitTask
     import networkx as nx  # type: ignore
+
+    from qermit.taskgraph.mittask import MitTask
 
 # qermit colours
 _COLOURS = {

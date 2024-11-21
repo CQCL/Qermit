@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List, Optional, Sequence, Union
+
+from pytket import Circuit, OpType
+from pytket.architecture import FullyConnected
 from pytket.backends.backendinfo import BackendInfo
-from pytket.architecture import FullyConnected  # type: ignore
-from pytket.passes.auto_rebase import auto_rebase_pass
-from pytket.predicates import GateSetPredicate  # type: ignore
-from pytket.extensions.quantinuum import QuantinuumBackend  # type: ignore
-from pytket.extensions.quantinuum.backends.quantinuum import _ALL_GATES  # type: ignore
-from pytket.predicates import CompilationUnit  # type: ignore
-from pytket import OpType
-from pytket import Circuit
-from pytket.backends.resulthandle import ResultHandle
-from typing import List, Union, Optional, Sequence
 from pytket.backends.backendresult import BackendResult
+from pytket.backends.resulthandle import ResultHandle
+from pytket.extensions.quantinuum import QuantinuumBackend
+from pytket.extensions.quantinuum.backends.quantinuum import _ALL_GATES
+from pytket.passes.auto_rebase import auto_rebase_pass
+from pytket.predicates import CompilationUnit, GateSetPredicate
+
 from .noisy_aer_backend import NoisyAerBackend
 
 

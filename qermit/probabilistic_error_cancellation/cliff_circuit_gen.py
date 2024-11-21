@@ -13,9 +13,10 @@
 # limitations under the License.
 
 
-from pytket import Circuit
-import numpy as np  # type: ignore
 from typing import List, Tuple
+
+import numpy as np
+from pytket import Circuit
 
 
 def sample_q_mallows(n_qubits: int) -> Tuple[List[int], List[int]]:

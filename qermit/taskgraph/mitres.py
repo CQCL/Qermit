@@ -12,24 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .mittask import (
-    MitTask,
-    IOTask,
-    CircuitShots,
-    Wire,
-)
-from typing import List, Tuple, Union, OrderedDict, cast, Sequence
-from .task_graph import TaskGraph
-from pytket.backends import Backend, ResultHandle
-from pytket.backends.backendresult import BackendResult
-import networkx as nx  # type: ignore
 import inspect
 from copy import deepcopy
 from itertools import repeat
+from typing import List, OrderedDict, Sequence, Tuple, Union, cast
+
+import networkx as nx  # type: ignore
+import numpy as np
+from pytket import Bit, Circuit
+from pytket.backends import Backend, ResultHandle
+from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
-from pytket import Bit
-import numpy as np  # type: ignore
-from pytket import Circuit
+
+from .mittask import (
+    CircuitShots,
+    IOTask,
+    MitTask,
+    Wire,
+)
+from .task_graph import TaskGraph
 
 
 def backend_compile_circuit_shots_task_gen(
@@ -216,7 +217,12 @@ class MitRes(TaskGraph):
     def __str__(self) -> str:
         return f"<MitRes::{self._label}>"
 
-    def __call__(self, circuits_wire: List[List[CircuitShots]], cache: bool = False, characterisation: dict = {}) -> Tuple[List[BackendResult]]:  # type: ignore[override]
+    def __call__(  # type: ignore[override]
+        self,
+        circuits_wire: List[List[CircuitShots]],
+        cache: bool = False,
+        characterisation: dict = {},
+    ) -> Tuple[List[BackendResult]]:
         return cast(
             Tuple[List[BackendResult]],
             super().run(
@@ -299,7 +305,12 @@ class MitRes(TaskGraph):
         """
         raise TypeError("MitRes.add_wire forbidden.")
 
-    def run(self, circuit_shots: List[CircuitShots], cache: bool = False, characterisation: dict = {}) -> List[BackendResult]:  # type: ignore[override]
+    def run(  # type: ignore[override]
+        self,
+        circuit_shots: List[CircuitShots],
+        cache: bool = False,
+        characterisation: dict = {},
+    ) -> List[BackendResult]:
         """
         Overloaded run method from TaskGraph class to add type checking.
         A single experiment is defined by a Tuple containing a circuit to be run

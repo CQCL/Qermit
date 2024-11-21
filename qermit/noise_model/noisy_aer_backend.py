@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from pytket import OpType
 import qiskit_aer.noise as noise  # type: ignore
+from pytket import OpType
+from pytket.extensions.qiskit import AerBackend
 
 
 class NoisyAerBackend(AerBackend):

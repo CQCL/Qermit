@@ -1,11 +1,13 @@
-from qermit.postselection import PostselectMgr
-from qermit.postselection.postselect_mitres import gen_postselect_task
-from qermit import CircuitShots, MitRes, MitTask, TaskGraph
 from copy import deepcopy
 from typing import List, Tuple, cast
-from pytket.extensions.quantinuum.backends.leakage_gadget import get_detection_circuit  # type: ignore
+
 from pytket.backends import Backend
 from pytket.backends.backendinfo import BackendInfo
+from pytket.extensions.quantinuum.backends.leakage_gadget import get_detection_circuit
+
+from qermit import CircuitShots, MitRes, MitTask, TaskGraph
+from qermit.postselection import PostselectMgr
+from qermit.postselection.postselect_mitres import gen_postselect_task
 
 
 def gen_add_leakage_gadget_circuit_task(backend: Backend) -> MitTask:

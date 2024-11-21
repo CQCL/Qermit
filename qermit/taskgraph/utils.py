@@ -13,19 +13,20 @@
 # limitations under the License.
 
 
-from pytket.circuit import Circuit, Bit  # type: ignore
+from collections import OrderedDict
+from copy import copy
+from typing import Dict, Iterable, List, Optional, Tuple, Union
+
+from numpy import ndarray
+from pytket.backends.backendresult import BackendResult
+from pytket.circuit import Bit, Circuit
+from pytket.pauli import QubitPauliString
 from pytket.utils import (
     QubitPauliOperator,
     expectation_from_counts,
 )
-from pytket.pauli import QubitPauliString  # type: ignore
-from pytket.backends.backendresult import BackendResult
-from copy import copy
-from sympy import Symbol  # type: ignore
-from typing import Iterable, Dict, Union, Tuple, List, Optional
-from collections import OrderedDict
-from numpy import ndarray  # type: ignore
 from pytket.utils.operators import _coeff_convert
+from sympy import Symbol  # type: ignore
 
 
 class SymbolsDict(object):
@@ -178,7 +179,9 @@ class MeasurementCircuit(object):
     for some Ansatz Circuit.
     """
 
-    def __init__(self, symbolic_circuit: Circuit, symbols: Optional[SymbolsDict] = None):
+    def __init__(
+        self, symbolic_circuit: Circuit, symbols: Optional[SymbolsDict] = None
+    ):
         """
         Stores information required to instantiate any MeasurementCircuit with parameterised symbols.
 
@@ -225,7 +228,7 @@ class MeasurementCircuit(object):
         :rtype: Circuit
         """
         _circuit = self._symbolic_circuit.copy()
-        _circuit.symbol_substitution(self._symbols._symbolic_map)  # type: ignore
+        _circuit.symbol_substitution(self._symbols._symbolic_map)
         return _circuit
 
 

@@ -13,23 +13,24 @@
 # limitations under the License.
 
 
+from pytket import Bit, Circuit, Qubit
+from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.partition import (  # type: ignore
+    GraphColourMethod,
+    PauliPartitionStrat,
+)
+from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.transform import CXConfigType  # type: ignore
+from pytket.utils import QubitPauliOperator
+
 from qermit import (  # type: ignore
-    SymbolsDict,
     ObservableTracker,
+    SymbolsDict,
 )
 from qermit.taskgraph.measurement_reduction import (  # type: ignore
     gen_MeasurementReduction_MitEx,
     measurement_reduction_task_gen,
 )
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from pytket.pauli import QubitPauliString, Pauli  # type: ignore
-from pytket.utils import QubitPauliOperator
-from pytket import Circuit, Qubit, Bit
-from pytket.partition import (  # type: ignore
-    PauliPartitionStrat,
-    GraphColourMethod,
-)
-from pytket.transform import CXConfigType  # type: ignore
 
 
 def test_measurement_reduction_task_gen():

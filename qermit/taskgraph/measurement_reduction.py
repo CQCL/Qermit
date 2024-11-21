@@ -13,22 +13,22 @@
 # limitations under the License.
 
 
-from typing import List, Tuple, Dict
+from copy import copy
+from typing import Dict, List, Tuple
+
+from pytket import Bit
+from pytket.backends import Backend
+from pytket.partition import (
+    GraphColourMethod,
+    PauliPartitionStrat,
+    measurement_reduction,
+)
+from pytket.pauli import QubitPauliString
+from pytket.transform import CXConfigType
+
 from .mitex import MitEx
 from .mittask import MitTask, ObservableExperiment
 from .utils import MeasurementCircuit
-
-from copy import copy
-
-from pytket.backends import Backend
-from pytket.transform import CXConfigType  # type: ignore
-from pytket.partition import (  # type: ignore
-    PauliPartitionStrat,
-    measurement_reduction,
-    GraphColourMethod,
-)
-from pytket import Bit
-from pytket.pauli import QubitPauliString  # type: ignore
 
 
 def measurement_reduction_task_gen(
@@ -80,9 +80,9 @@ def measurement_reduction_task_gen(
                 full_circ.append(measurement_circuit)
                 measurement_circuits.append(MeasurementCircuit(full_circ, symbols))
             # convert MeasurementBitMap objects to MeasurementInfo for ObservableTracker
-            adder_info: Dict[
-                int, List[Tuple[QubitPauliString, List[Bit], bool]]
-            ] = dict()
+            adder_info: Dict[int, List[Tuple[QubitPauliString, List[Bit], bool]]] = (
+                dict()
+            )
             for i in range(len(measurement_circuits)):
                 adder_info[i] = list()
 

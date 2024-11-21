@@ -1,13 +1,14 @@
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from collections import Counter
-from pytket.backends.backendresult import BackendResult
-from pytket.utils.outcomearray import OutcomeArray
-import uuid
-from pytket.passes import BasePass, CustomPass
-from typing import Dict, List, Optional, Iterator, Sequence, Iterable, Tuple
-from pytket import Circuit, Bit
-from pytket.backends.resulthandle import ResultHandle
 import multiprocessing
+import uuid
+from collections import Counter
+from typing import Dict, Iterable, Iterator, List, Optional, Sequence, Tuple
+
+from pytket import Bit, Circuit
+from pytket.backends.backendresult import BackendResult
+from pytket.backends.resulthandle import ResultHandle
+from pytket.extensions.qiskit import AerBackend
+from pytket.passes import BasePass, CustomPass
+from pytket.utils.outcomearray import OutcomeArray
 
 
 class TranspilerBackend:
@@ -64,13 +65,11 @@ class TranspilerBackend:
         self.n_cores = n_cores
 
     def default_compilation_pass(self, **kwargs) -> BasePass:
-        """Return a compiler pass which has no affect on the circuit.
-        """
+        """Return a compiler pass which has no affect on the circuit."""
         return CustomPass(transform=lambda circuit: circuit)
 
     def rebase_pass(self) -> BasePass:
-        """Return a compiler pass which has no affect on the circuit.
-        """
+        """Return a compiler pass which has no affect on the circuit."""
         return CustomPass(transform=lambda circuit: circuit)
 
     def run_circuit(
@@ -139,10 +138,9 @@ class TranspilerBackend:
         )
 
         self.result_dict[handle] = BackendResult(
-            counts=Counter({
-                OutcomeArray.from_readouts([key]): val
-                for key, val in counts.items()
-            }),
+            counts=Counter(
+                {OutcomeArray.from_readouts([key]): val for key, val in counts.items()}
+            ),
             c_bits=circuit.bits,
         )
 
@@ -156,9 +154,7 @@ class TranspilerBackend:
         :return: The results corresponding to the given collection of
         :rtype: List[BackendResult]
         """
-        return [
-            self.get_result(handle) for handle in handles
-        ]
+        return [self.get_result(handle) for handle in handles]
 
     def get_result(self, handle: ResultHandle) -> BackendResult:
         """Retrieve result from backend.
@@ -237,8 +233,7 @@ class TranspilerBackend:
 
         result_list = backend.run_circuits(circuit_list, n_shots=1)
         return sum(
-            (result.get_counts(cbits=cbits) for result in result_list),
-            Counter()
+            (result.get_counts(cbits=cbits) for result in result_list), Counter()
         )
 
     def get_counts(
@@ -262,7 +257,6 @@ class TranspilerBackend:
         """
 
         if self.n_cores > 1:
-
             if cbits is not None:
                 cbits_list = [cbit.to_list() for cbit in cbits]
             else:
@@ -270,7 +264,9 @@ class TranspilerBackend:
 
             with multiprocessing.Pool(self.n_cores) as pool:
                 processes = [
-                    pool.apply_async(self._get_batch_counts, args=(circuit_list, cbits_list))
+                    pool.apply_async(
+                        self._get_batch_counts, args=(circuit_list, cbits_list)
+                    )
                     for circuit_list in self._gen_batches(circuit, n_shots)
                 ]
                 counter_list = [p.get() for p in processes]
@@ -278,13 +274,12 @@ class TranspilerBackend:
             return sum(counter_list, Counter())
 
         else:
-
             counter: Counter = Counter()
             for circuit_list in self._gen_batches(circuit, n_shots):
                 result_list = self.backend.run_circuits(circuit_list, n_shots=1)
                 counter += sum(
                     (result.get_counts(cbits=cbits) for result in result_list),
-                    Counter()
+                    Counter(),
                 )
 
             return counter

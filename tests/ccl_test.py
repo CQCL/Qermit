@@ -12,29 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pytket.predicates import CliffordCircuitPredicate  # type: ignore
+import numpy as np  # type: ignore
 from pytket import Circuit, OpType, Qubit
+from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.predicates import CliffordCircuitPredicate  # type: ignore
+from pytket.utils import QubitPauliOperator
+
 from qermit import (  # type: ignore
-    ObservableTracker,
-    SymbolsDict,
+    AnsatzCircuit,
     MitEx,
     ObservableExperiment,
-    AnsatzCircuit,
+    ObservableTracker,
+    SymbolsDict,
 )
 from qermit.clifford_noise_characterisation import (  # type: ignore
     gen_CDR_MitEx,
 )
 from qermit.clifford_noise_characterisation.ccl import (  # type: ignore
-    sample_weighted_clifford_angle,
-    gen_state_circuits,
-    ccl_state_task_gen,
-    ccl_result_batching_task_gen,
     ccl_likelihood_filtering_task_gen,
+    ccl_result_batching_task_gen,
+    ccl_state_task_gen,
+    gen_state_circuits,
+    sample_weighted_clifford_angle,
 )
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from pytket.pauli import QubitPauliString, Pauli  # type: ignore
-from pytket.utils import QubitPauliOperator
-import numpy as np  # type: ignore
 
 
 def test_sample_weighted_clifford_angle():

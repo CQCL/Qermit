@@ -13,24 +13,26 @@
 # limitations under the License.
 
 
+from copy import copy
+from typing import List
+
+from pytket.backends import Backend
+from pytket.circuit import Node
+
 from qermit import (
     MitRes,
     TaskGraph,
 )
-from qermit.taskgraph import (
-    backend_compile_circuit_shots_task_gen,
-)
 from qermit.spam.full_spam_correction import (
+    CorrectionMethod,
     gen_full_tomography_spam_characterisation_task,
     gen_full_tomography_spam_circuits_task,
     gen_full_tomography_spam_correction_task,
-    CorrectionMethod,
     gen_get_bit_maps_task,
 )
-from pytket.backends import Backend
-from typing import List
-from pytket.circuit import Node  # type: ignore
-from copy import copy
+from qermit.taskgraph import (
+    backend_compile_circuit_shots_task_gen,
+)
 
 
 def gen_FullyCorrelated_SPAM_MitRes(
