@@ -9,7 +9,7 @@ description = "Python package for quantum error mitigation."
 authors = [
     "Daniel Mills <daniel.mills@quantinuum.com>",
     "Silas Dilkes <silas.dilkes@quantinuum.com>",
-    "Cristina Circsoiu <cristina.cirstoiu@quantinuum.com>",
+    "Cristina Cirstoiu <cristina.cirstoiu@quantinuum.com>",
 ]
 readme = "README.md"
 
