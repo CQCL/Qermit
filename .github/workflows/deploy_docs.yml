@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
       - name: Install Qermit
         run: pip install .[docs]
       - name: Setup Pages
