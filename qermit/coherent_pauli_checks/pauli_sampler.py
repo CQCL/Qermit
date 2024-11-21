@@ -6,6 +6,7 @@ from typing import List, cast
 import numpy.random
 from numpy.random import Generator
 from pytket import Circuit
+from pytket._tket.unit_id import UnitID
 from pytket.circuit import Bit, CircBox, Command, OpType, Qubit
 from pytket.pauli import Pauli, QubitPauliString
 
@@ -271,7 +272,7 @@ class CircuitPauliChecker:
     def decompose_clifford_subcircuit_box(clifford_subcircuit_box: Command) -> Circuit:
         clifford_subcircuit = cast(CircBox, clifford_subcircuit_box.op).get_circuit()
         qubit_map = {
-            q_subcirc: q_orig
+            cast(UnitID, q_subcirc): q_orig
             for q_subcirc, q_orig in zip(
                 clifford_subcircuit.qubits, clifford_subcircuit_box.args
             )

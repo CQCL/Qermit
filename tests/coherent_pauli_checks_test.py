@@ -585,7 +585,8 @@ def test_error_sampler():
     )
 
     noise_model = NoiseModel(
-        noise_model={OpType.ZZMax: error_distribution}, n_rand=n_shots
+        noise_model={OpType.ZZMax: error_distribution},
+        # n_rand=n_shots,
     )
 
     cliff_circ = Circuit(2, name="Clifford Subcircuit").H(0)
