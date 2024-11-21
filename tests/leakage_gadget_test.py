@@ -12,14 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from qermit.noise_model import MockQuantinuumBackend
 from pytket import Circuit
-from qermit.taskgraph import gen_compiled_MitRes
+from pytket.extensions.quantinuum.backends.leakage_gadget import (
+    prune_shots_detected_as_leaky,
+)
+
 from qermit import CircuitShots
 from qermit.leakage_detection import get_leakage_detection_mitres
-from qermit.leakage_detection.leakage_detection import gen_add_leakage_gadget_circuit_task
-from pytket.extensions.quantinuum.backends.leakage_gadget import prune_shots_detected_as_leaky
+from qermit.leakage_detection.leakage_detection import (
+    gen_add_leakage_gadget_circuit_task,
+)
+from qermit.noise_model import MockQuantinuumBackend
 from qermit.postselection.postselect_mitres import gen_postselect_task
+from qermit.taskgraph import gen_compiled_MitRes
 
 
 def test_leakage_gadget() -> None:
