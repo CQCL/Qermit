@@ -1,4 +1,0 @@
-sphinx
-sphinx_autodoc_annotation
-pytket-quantinuum
-furo
