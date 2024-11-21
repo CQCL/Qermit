@@ -125,7 +125,8 @@ are several ways to contact us:
 .. toctree::
    :hidden:
 
-   manual/index.rst
+   manual/manual_index.rst
+
 
 .. toctree::
    :caption: API Reference:
