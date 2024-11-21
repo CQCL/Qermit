@@ -1,0 +1,16 @@
+{
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "bump-minor-pre-major": true,
+    "bump-patch-for-minor-pre-major": true,
+    "initial-version": "0.1.0",
+    "packages": {
+        ".": {
+            "release-type": "python",
+            "changelog-path": "CHANGELOG.md",
+            "bump-minor-pre-major": true,
+            "bump-patch-for-minor-pre-major": false,
+            "draft": false,
+            "prerelease": false
+        }
+    }
+}
