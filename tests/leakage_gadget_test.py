@@ -28,7 +28,6 @@ from qermit.taskgraph import gen_compiled_MitRes
 
 
 def test_leakage_gadget() -> None:
-
     backend = MockQuantinuumBackend()
     circuit = Circuit(2).H(0).measure_all()
     compiled_mitres = gen_compiled_MitRes(
@@ -36,8 +35,7 @@ def test_leakage_gadget() -> None:
         optimisation_level=0,
     )
     leakage_gadget_mitres = get_leakage_detection_mitres(
-        backend=backend,
-        mitres=compiled_mitres
+        backend=backend, mitres=compiled_mitres
     )
     n_shots = 50
     result_list = leakage_gadget_mitres.run(
@@ -62,20 +60,23 @@ def test_compare_with_prune() -> None:
     postselection_task = gen_postselect_task()
 
     detection_circuit_shots_list, postselect_mgr_list = generation_task(
-        ([circuit_shot_0, circuit_shot_1], )
+        ([circuit_shot_0, circuit_shot_1],)
     )
     result_list = [
         backend.run_circuit(
             circuit=backend.get_compiled_circuit(
-                circuit=detection_circuit_shots.Circuit,
-                optimisation_level=0
+                circuit=detection_circuit_shots.Circuit, optimisation_level=0
             ),
             n_shots=detection_circuit_shots.Shots,
-        ) for detection_circuit_shots in detection_circuit_shots_list
+        )
+        for detection_circuit_shots in detection_circuit_shots_list
     ]
 
     qermit_result_list = postselection_task(
-        (result_list, postselect_mgr_list, )
+        (
+            result_list,
+            postselect_mgr_list,
+        )
     )
     pytket_result_list = [
         prune_shots_detected_as_leaky(result) for result in result_list
