@@ -4,7 +4,7 @@
 
 `qermit` is a python module for running error-mitigation protocols on quantum processors using the [pytket](https://docs.quantinuum.com/tket) quantum computing toolkit.
 
-This repo constraints API documentation, a user manual for getting started with `qermit` and source code.
+This repo contains API documentation, a user manual for getting started with `qermit` and source code.
 
 ## Getting Started
 
