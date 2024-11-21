@@ -6,7 +6,7 @@ const navConfig = {
         },
         {
             "title": "Manual",
-            "href": "manual/index.html",
+            "href": "manual/manual_index.html",
         },
     ],
     "navProductName": "Qermit",
