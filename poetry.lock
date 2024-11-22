@@ -3668,4 +3668,4 @@ tests = ["mypy", "pytest", "pytest-cov", "pytket-quantinuum", "qiskit-ibm-provid
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.13"
-content-hash = "0feefac600b86d42524d2de3723396217b5d0729021077b70a4f56812ac4b600"
+content-hash = "6e4afaa04f0fece9a301b97c7182eea0b29db2d9561a39b9610e2c34b63362e6"
