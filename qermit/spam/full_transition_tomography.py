@@ -27,6 +27,9 @@ from pytket.backends.backendresult import BackendResult
 from pytket.utils.outcomearray import OutcomeArray
 from enum import Enum
 from pytket.unit_id import UnitID
+from pytket.passes import NaivePlacementPass
+from pytket.placement import place_fully_connected
+from pytket.architecture import FullyConnected
 
 FullCorrelatedNoiseCharacterisation = namedtuple(
     "FullCorrelatedNoiseCharacterisation",
@@ -105,21 +108,46 @@ def get_full_transition_tomography_circuits(
                 len(process_circuit.qubits), len(all_qubits)
             )
         )
+    
+    print("all_qubits: ", all_qubits)
 
     # output
     prepared_circuits = []
     state_infos = []
 
+    architecture = backend.backend_info.architecture
+
     # set up CircBox of X gate for preparing basis states
     xcirc = Circuit(1).X(0)
-    xcirc = backend.get_compiled_circuit(xcirc, optimisation_level=0)
+    # xcirc = backend.get_compiled_circuit(xcirc, optimisation_level=0)
+    if isinstance(architecture, FullyConnected):
+        place_fully_connected(
+            circuit=xcirc,
+            fully_connected=architecture
+        )
+    else:
+        NaivePlacementPass(architecture=architecture).apply(xcirc)
+    backend.rebase_pass().apply(xcirc)
     FlattenRegisters().apply(xcirc)
     xbox = CircBox(xcirc)
+    print("xbox: ", xbox.get_circuit().qubits, xbox.get_circuit().get_commands())
     # need to be default register to add as box suitably
+
+    # print("initial process_circuit: ", process_circuit)
 
     n_qubits_pre_compile = process_circuit.n_qubits
     # This needs to be optimisation level 0 to avoid using simplify initial
-    process_circuit = backend.get_compiled_circuit(process_circuit, optimisation_level=0)
+    # process_circuit = backend.get_compiled_circuit(process_circuit, optimisation_level=0)
+    if isinstance(architecture, FullyConnected):
+        place_fully_connected(
+            circuit=process_circuit,
+            fully_connected=architecture
+        )
+    else:
+        NaivePlacementPass(architecture=architecture).apply(process_circuit)
+    backend.rebase_pass().apply(process_circuit)
+
+    # print("compiled process_circuit: ", process_circuit)
 
     while process_circuit.n_qubits < n_qubits_pre_compile:
         process_circuit.add_qubit(Qubit("temp_q", process_circuit.n_qubits))
@@ -130,6 +158,7 @@ def get_full_transition_tomography_circuits(
     process_circuit.rename_units(cast(Dict[UnitID, UnitID], rename_map_pc))
 
     pbox = CircBox(process_circuit)
+    print("pbox: ", pbox.get_circuit().qubits, pbox.get_circuit().get_commands())
 
     # set up base circuit for appending xbox to
     base_circuit = Circuit()
@@ -141,6 +170,8 @@ def get_full_transition_tomography_circuits(
         base_circuit.add_bit(c_bit)
         index += 1
         measures[qb] = c_bit
+
+    print("base_circuit: ", base_circuit)
 
     # generate state circuits for given correlations
     for major_state_index in range(n_circuits):
@@ -159,13 +190,24 @@ def get_full_transition_tomography_circuits(
         state_circuit.add_barrier(cast(List[UnitID], all_qubits))
 
         # add process circuit to measure
+        print(pbox.get_circuit(), state_circuit.qubits)
         state_circuit.add_circbox(pbox, cast(List[UnitID], state_circuit.qubits))
         DecomposeBoxes().apply(state_circuit)
         state_circuit.add_barrier(cast(List[UnitID], all_qubits))
         for q in measures:
             state_circuit.Measure(q, measures[q])
         # add to returned types
-        state_circuit = backend.get_compiled_circuit(state_circuit)
+        print("original state_circuit: ", state_circuit.qubits, state_circuit.get_commands())
+        # state_circuit = backend.get_compiled_circuit(state_circuit, optimisation_level=0)
+        if isinstance(architecture, FullyConnected):
+            place_fully_connected(
+                circuit=state_circuit,
+                fully_connected=architecture
+            )
+        else:
+            NaivePlacementPass(architecture=architecture).apply(state_circuit)
+        backend.rebase_pass().apply(state_circuit)
+        print("compiled state_circuit: ", state_circuit.qubits, state_circuit.get_commands(), backend.valid_circuit(state_circuit))
         prepared_circuits.append(state_circuit)
         state_infos.append(StateInfo(new_state_dicts, measures))
     return (prepared_circuits, state_infos)
