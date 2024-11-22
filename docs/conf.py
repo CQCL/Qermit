@@ -42,7 +42,18 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
+    "jupyter_sphinx",
+    "sphinxcontrib.email",
 ]
+
+intersphinx_mapping = {
+    "pytket": ("https://tket.quantinuum.com/api-docs/", None),
+    "python": ("https://docs.python.org/3", None),
+    # "numpy": ("https://numpy.org/doc/stable/", None),
+    # "pandas": ("https://pandas.pydata.org/docs/", None),
+    # "matplotlib": ("https://matplotlib.org/stable/", None),
+    # "networkx": ("https://networkx.org/documentation/stable/", None),
+}
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -87,3 +98,6 @@ html_theme_options = {}
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "Qermitdoc"
+
+# For sphinxcontrib
+email_automode = True
