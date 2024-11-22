@@ -19,7 +19,12 @@ tools for local testing.
 """
 
 from .mock_quantinuum_backend import MockQuantinuumBackend
-from .noise_model import ErrorDistribution, LogicalErrorDistribution, NoiseModel
+from .noise_model import (
+    Direction,
+    ErrorDistribution,
+    LogicalErrorDistribution,
+    NoiseModel,
+)
 from .pauli_error_transpile import PauliErrorTranspile
 from .qermit_pauli import QermitPauli
 from .transpiler_backend import TranspilerBackend
