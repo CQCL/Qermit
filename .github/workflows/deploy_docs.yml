@@ -25,7 +25,9 @@ jobs:
         with:
           submodules: true
       - name: Install Qermit
-        run: pip install .[docs]
+        run: |
+          sudo apt-get install graphviz
+          pip install .[docs]
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build Docs
