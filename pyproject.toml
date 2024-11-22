@@ -26,6 +26,8 @@ qiskit-ibm-provider = { version = "^0.10.0", optional = true }
 pytket-quantinuum = { version = "0.41.0", optional = true }
 ruff = { version = "^0.8.0", optional = true }
 furo = { version = "^2024.8.6", optional = true }
+jupyter-sphinx = "^0.5.3"
+sphinxcontrib-email = "^0.3.6"
 
 [tool.poetry.extras]
 tests = [

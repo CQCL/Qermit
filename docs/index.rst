@@ -1,126 +1,173 @@
 Qermit
 ======
 
-``qermit`` is a python module for running error-mitigation protocols on quantum computers using the ``pytket`` 
-python module for interfacing with tket, a set of quantum programming tools developed by `Quantinuum <https://www.quantinuum.com/>`_. 
-``qermit`` functions using the ``pytket`` :py:class:`Backend` class, meaning ``qermit`` supports any of the 
-`numerous providers <https://cqcl.github.io/pytket-extensions/api/index.html>`_ ``pytket`` does.
-``qermit`` also provides easy composability of error-mitigation methods, meaning 
-it is practically straightforward to run an experiment with multiple forms of error-mitigation 
-where appropriate.
+Qermit is a python module for running error-mitigation protocols.
+It contains an assortment of ready to use error-mitigation schemes.
+Qermit supports straightforward composition of these existing
+error-mitigation methods, and the development of new error-mitigaiton
+schemes.
 
-``qermit`` is compatible with ``pytket`` 1~.
+Qermit is an extension to the pytket quantum software development kit. 
+Qermit uses the pytket :py:class:`~pytket.backends.Backend` class,
+and so supports an array of backends.
 
-To install, run
+Getting Started
+~~~~~~~~~~~~~~~
 
-``pip install qermit``
+To install, simply run
 
-To use ``qermit``, simply import the appropriate modules into your python code or into an interactive Python notebook.
+.. code-block:: console
 
-Error-mitigation methods in ``qermit`` fit in to two distinctions, ``MitRes`` methods 
-that result in a modification of a distribution of counts  retrieved from some 
-quantum computer, and ``MitEx`` methods that result in the modification of the 
-expectation value of some observable.
+   pip install qermit
 
-In their basic capacity, ``MitRes`` and ``MitEx`` objects will run experiments without error-mitigation.
+Please visit the
+`github repository <https://github.com/CQCL/Qermit/issues>`_ if you would
+like to install from source. We also welcome contributions to Qermit there!
 
-::
+If you notice any bugs while using Qermit we would much appreciate you
+raising them as issues at that repository. If you would like an further
+support with Qermit please contact :email:`tket-support@quantinuum.com`.
+
+Key Notions
+~~~~~~~~~~~
+
+Error-mitigation methods in Qermit are either one of two types:
+
+- :py:class:`~qermit.taskgraph.mitres.MitRes` methods which modify a distribution of counts.
+- :py:class:`~qermit.taskgraph.mitex.MitEx` methods which modify the expectation value of some observable.
+
+While Qermit includes many advanced error-mitigation schemes,
+in their basic capacity, :py:class:`~qermit.taskgraph.mitres.MitRes` and
+:py:class:`~qermit.taskgraph.mitex.MitEx` objects will run
+experiments without error-mitigation, as in the following example.
+
+.. jupyter-execute::
 
    from qermit import MitRes, CircuitShots
    from pytket import Circuit
    from pytket.extensions.qiskit import AerBackend
 
+   # Define the experiment to be run.
+   # In this case, a Bell pair is prepared and measured 1000 times.
+   circ = Circuit(2,2).H(0).CX(0,1).measure_all()
+   circ_shots = CircuitShots(Circuit=circ, Shots=1000)
+
+   # Define the way the experiemnt will be run.
+   # In this case the default MitRes, without error-mitigation,
+   # will be performed.
    mitres = MitRes(backend = AerBackend())
-   c = Circuit(2,2).H(0).Rz(0.25,0).CX(1,0).measure_all()
-   results = mitres.run([CircuitShots(Circuit = c, Shots = 50)])
-   print(results[0].get_counts())
-
-::
    
-   Counter({(0, 0): 25, (1, 0): 25})
+   # Finally, run the experiemnt.
+   results = mitres.run([circ_shots])
+   results[0].get_counts()
 
+Here we have introduced the :py:obj:`~qermit.taskgraph.mittask.CircuitShots`.
+This can be throught of a defining experiment to run to generated a
+distribution of shots. In this case the Bell state preparation circuit will
+be run 1000 times to generate the desired distribution. The
+:py:class:`~qermit.taskgraph.mitres.MitRes` definition can then be throught
+of as specifying how the experiment will run, in this case without
+error-mitigaiton,
+and by using :py:class:`~pytket.extensions.qiskit.AerBackend`.
+The input to the :py:meth:`~qermit.taskgraph.mitres.MitRes.run` method
+is then a list :py:obj:`~qermit.taskgraph.mittask.CircuitShots`,
+with the output being a list of
+:py:class:`~pytket.backends.backendresult.BackendResult`.
 
-The ``MitRes.run`` method takes a list of ``CircuitShots`` as an argument
-and returns a ``pytket`` ``BackendResult`` object for each list element.
+:py:class:`~qermit.taskgraph.mitres.MitRes` and
+:py:class:`~qermit.taskgraph.mitex.MitEx` are built from a graph of
+:py:class:`~qermit.taskgraph.mittask.MitTask` objects.
+A :py:class:`~qermit.taskgraph.mittask.MitTask` object is a pure function
+which computes some basic step in an experiment. These
+:py:class:`~qermit.taskgraph.mittask.MitTask` are composed into a
+:py:class:`~qermit.taskgraph.task_graph.TaskGraph` which defined how
+inputs and outputs pass between the tasks.
+Indeed, :py:class:`~qermit.taskgraph.mitres.MitRes` and
+:py:class:`~qermit.taskgraph.mitex.MitEx` are instances of a
+:py:class:`~qermit.taskgraph.task_graph.TaskGraph`.
 
-The ``MitRes`` and ``MitEx`` objects hold a graph of ``MitTask`` objects (a ``TaskGraph``). A ``MitTask``
-object is a pure function that computes some basic step in a typical experiment. When the run function
-is called, a topological sort is applied to the graph to order these tasks and then each is run sequentially.
+In its default construction, a :py:class:`~qermit.taskgraph.mitres.MitRes`
+object will simply run each circuit through the backend it is defined by.
+In the following we see one task, `CircuitsToHandles`, submitting the circuits
+and generating handles for those experiments, and a second, `HandlesToResults`,
+retrieving the results using those handles.
+The information passed along the centeral wire is simply
+those handles.
 
-In its default construction, a ``MitRes`` object will simply run each Circuit through the backend it is defined by.
-
-::
+.. jupyter-execute::
 
    mitres.get_task_graph()
 
-.. image:: mitresgraph.png
-
-Similarly, in its default construction a ``MitEx`` object will simply estimate the expectation of each observable 
+Similarly, in its default construction a
+:py:class:`~qermit.taskgraph.mitex.MitEx` object will simply estimate
+the expectation of each observable 
 desired without applying any mitigation method.
 
-::
+.. jupyter-execute::
 
-   from qermit import MitEx, AnsatzCircuit, ObservableExperiment, ObservableTracker
+   from qermit import (
+      MitEx,
+      AnsatzCircuit,
+      ObservableExperiment,
+      ObservableTracker,
+      SymbolsDict,
+   )
+   from pytket import Qubit
    from pytket.pauli import Pauli, QubitPauliString
    from pytket.utils import QubitPauliOperator
 
-   mitex = MitEx(backend = AerBackend())
-   qubit_pauli_string = QubitPauliString([Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z])
-   qubit_pauli_operator = QubitPauliOperator({qubit_pauli_String: 1.0})
+   # Define the experiment to be conudcted. In this case that consists
+   # of two parts.
+   # 1.  The circuit to run. In the case of MitEx we use AnsatzCircuit
+   #     which allows parametrised circuit. In this case we do not use
+   #     this capability however.
    ansatz_circuit = AnsatzCircuit(
-      Circuit = Circuit(3,3).X(0).X(1), 
-      Shots = 50, 
-      SymbolsDict = SymbolsDict()
+      Circuit=Circuit(3,3).X(0).X(1), 
+      Shots=50, 
+      SymbolsDict=SymbolsDict(),
    )
+
+   # 2.  The observable to be measured. In this case the observable
+   #     is only the ZZ observable on qubits 1 and 2.
+   qubit_pauli_string = QubitPauliString([Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z])
+   qubit_pauli_operator = QubitPauliOperator({qubit_pauli_string: 1.0})
+
+   # These are combined to define the experiment.
    experiment = ObservableExperiment(
       AnsatzCircuit = ansatz_circuit, 
       ObservableTracker = ObservableTracker(qubit_pauli_operator)
    )
-   mitex_results = mitex.run([experiment])
-   print(mitex_results)
 
-::
+   # Now we can define how the experiment is run.
+   # In this case the default MitEx, without error-mitigation, is performed.
+   mitex = MitEx(backend = AerBackend())
+   mitex.run([experiment])
 
-   [{(Zq[1], Zq[2]): -1.00000000000000}]
+The :py:meth:`~qermit.taskgraph.mitex.MitEx.run` method takes a list of
+:py:class:`~qermit.taskgraph.mittask.ObservableExperiment`
+as an argument. Each
+:py:class:`~qermit.taskgraph.mittask.ObservableExperiment`
+contains the basic information required to estimate the expectation value
+of an observable; a state preparation circuit, a dictionary between symbols
+and parameter values (where appropriate),
+a :py:class:`~pytket.utils.QubitPauliOperator` detailing the 
+operator being measured and used for preparing measurement circuits,
+and the number of shots to run for each measurement circuit.
 
-The ``MitEx.run`` method takes a list of ``ObservableExperiment`` objects as an argument. Each ``ObservableExperiment`` objects
-contains the basic information required to estimate the expectation value of an observable; a state preparation circuit,
-a dictionary between symbols and parameter values (where appropriate), a ``pytket`` ``QubitPauliOperator`` detailing the 
-operator being measured and used for preparing measurement circuits, and the number of shots to run for each measurement circuit.
+Each experiment returns a :py:class:`~pytket.utils.QubitPauliOperator`
+containing an expectation value for each internal
+:py:class:`~pytket._tket.pauli.QubitPauliString`. In its default
+version, this is achieved by appending a measurement circuit for each
+:py:class:`~pytket._tket.pauli.QubitPauliString` to the ansatz circuit and
+executing through the :py:class:`~pytket.backends.Backend`
+the :py:class:`~qermit.taskgraph.mitex.MitEx` object is defined by.
 
-Each experiment returns a ``QubitPauliOperator`` object containing an expectation value for each internal ``QubitPauliString``. In its default
-version, this is achieved by appending a measurement circuit for each ``QubitPauliString`` to the ansatz circuit and executing through
-the ``pytket`` ``Backend`` the ``MitEx`` object is defined by.
-
-::
+.. jupyter-execute::
 
    mitex.get_task_graph()
 
-.. image:: mitex_taskgraph.png
-
-
-
-See the Qermit `user manual <https://cqcl.github.io/Qermit/manual/>`_ for an extended tutorial on using ``qermit``, including
-pre-defined error-mitigation methods and composing error-mitigation methods.
-
-``qermit`` currently provides the following error-mitigation schemes (under their commonly known names):
-
-* SPAM Correction
-* Frame Randomisation
-* Zero-Noise Extrapolation
-* Probabilistic-Error-Cancellation
-* Clifford Data Regression
-* Depolarisation-Factor-Supression-For-Nearest-Clifford 
-
-
-User Support
-~~~~~~~~~~~~
-
-If you have problems with the use of Qermit or you think you have found a bug, there 
-are several ways to contact us:
-- Write an email to tket-support@cambridgequantum.com and ask for help with your problem.
-- You can write a bug report on the `github repository <https://github.com/CQCL/Qermit/issues>`_ with details of the problem and we will pick that up. You can also have a look on that page so see if your problem has already been reported by someone else.
-
+Contents
+~~~~~~~~
 
 .. toctree::
    :hidden:
