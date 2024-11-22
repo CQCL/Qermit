@@ -17,6 +17,7 @@ readme = "README.md"
 python = ">=3.10, <3.13"
 pytket-qiskit = "^0.50.0"
 matplotlib = "^3.8.3"
+graphviz = "^0.20.3"
 
 pytest = { version = "^8.1.1", optional = true }
 mypy = { version = "^1.9.0", optional = true }
