@@ -23,7 +23,6 @@ bash ./build-docs.sh
 
 4. Serve html locally (optional)
 
-
 ```shell
 npx serve build
 ```
