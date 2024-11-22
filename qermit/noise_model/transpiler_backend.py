@@ -120,7 +120,7 @@ class TranspilerBackend:
         n_shots: int,
         **kwargs,
     ) -> ResultHandle:
-        """[summary]
+        """Run a single circuit.
 
         :param circuit: Submits circuit to run on noisy backend.
         :type circuit: Circuit

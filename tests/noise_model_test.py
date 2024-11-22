@@ -114,6 +114,31 @@ def test_qermit_pauli_commute_coeff() -> None:
         assert QermitPauli.commute_coeff(pauli_one=pauli_one, pauli_two=pauli_two) == verified[1]
 
 
+# Since QermitPauli with ZZMax in the H-series
+# WASM randomisation method all input and output Paulis
+# are tested here, having been calculated by hand.
+def test_qermit_pauli_zzmax():
+
+    for x_and_z in product([0, 1], repeat=4):
+
+        Z_list = x_and_z[:2]
+        X_list = x_and_z[2:]
+        qubit_list = [Qubit(0), Qubit(1)]
+
+        qermit_pauli = QermitPauli(
+            Z_list=Z_list,
+            X_list=X_list,
+            qubit_list=qubit_list,
+        )
+        qermit_pauli.apply_gate(
+            op_type=OpType.ZZMax,
+            qubits=qubit_list,
+        )
+        assert list(qermit_pauli.Z_list.values()) == [(Z_list[0] + X_list[0] + X_list[1]) % 2, (Z_list[1] + X_list[0] + X_list[1]) % 2]
+        assert list(qermit_pauli.X_list.values()) == [X_list[0], X_list[1]]
+        assert qermit_pauli.phase == (X_list[0] + X_list[1] + 2 * X_list[1] * X_list[0]) % 4
+
+
 def test_noise_model_logical_error_propagation() -> None:
 
     pytket_ciruit = Circuit(2).H(0).CX(0, 1).measure_all()

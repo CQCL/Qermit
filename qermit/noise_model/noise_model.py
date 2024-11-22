@@ -141,7 +141,7 @@ class ErrorDistribution:
         return ptm, pauli_index
 
     @classmethod
-    def from_ptm(cls, ptm: NDArray, pauli_index: Dict[Tuple[Pauli, ...], int]) -> ErrorDistribution:
+    def from_ptm(cls, ptm: NDArray, pauli_index: Dict[Tuple[Pauli, ...], int], rng: Generator = np.random.default_rng()) -> ErrorDistribution:
         """Convert a Pauli Transfer Matrix (PTM) to an error distribution.
 
         :param ptm: Pauli Transfer Matrix to convert. Should be a 4^n by 4^n matrix
@@ -201,7 +201,7 @@ class ErrorDistribution:
             for error, index in pauli_index.items()
             if (error_rate_list[index] > 10**(-6)) and error != tuple(Pauli.I for _ in range(int(n_qubit)))
         }
-        return cls(distribution=distribution)
+        return cls(distribution=distribution, rng=rng)
 
     @property
     def n_qubits(self) -> int:
@@ -376,7 +376,7 @@ class ErrorDistribution:
 
         ptm, pauli_index = self.to_ptm()
         scaled_ptm = fractional_matrix_power(ptm, scaling_factor)
-        return ErrorDistribution.from_ptm(ptm=scaled_ptm, pauli_index=pauli_index)
+        return ErrorDistribution.from_ptm(ptm=scaled_ptm, pauli_index=pauli_index, rng=self.rng)
 
 
 class LogicalErrorDistribution:
