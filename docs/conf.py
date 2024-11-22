@@ -47,7 +47,7 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    "pytket": ("https://tket.quantinuum.com/api-docs/", None),
+    "pytket": ("https://docs.quantinuum.com/tket/api-docs/", None),
     "python": ("https://docs.python.org/3", None),
 }
 
