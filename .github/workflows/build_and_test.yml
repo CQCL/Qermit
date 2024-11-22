@@ -45,11 +45,12 @@ jobs:
       - name: Save documentation
         uses: actions/upload-artifact@v4
         with:
-          path: docs/
+          name: docs_html
+          path: docs/build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'docs/'
+          path: 'docs/build'
 
   formatting-checks:
     name: Check typing and formatting
