@@ -44,9 +44,6 @@ extensions = [
     "sphinx.ext.viewcode",
 ]
 
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
-
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
@@ -73,20 +70,12 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_book_theme"
+html_theme = "furo"
+templates_path = ["quantinuum-sphinx/_templates"]
+html_static_path = ["quantinuum-sphinx/_static", "_static"]
+html_favicon = "quantinuum-sphinx/_static/assets/quantinuum_favicon.svg"
 
-html_theme_options = {
-    "repository_url": "https://github.com/CQCL/qermit",
-    "use_repository_button": True,
-    "use_issues_button": True,
-    "logo": {
-        "image_light": "_static/Quantinuum_logo_black.png",
-        "image_dark": "_static/Quantinuum_logo_white.png",
-    },
-}
-
-html_static_path = ["_static"]
-html_css_files = ["custom.css"]
+html_theme_options = {}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

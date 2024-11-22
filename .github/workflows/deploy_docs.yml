@@ -21,27 +21,26 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Install Qermit
         run: pip install .[docs]
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Build Docs
         run: |
-          cd docs_src
-          ./build_docs.sh
-          cd ../manual
-          ./build_manual.sh
+          cd docs
+          ./build-docs.sh
       - name: Save documentation
         uses: actions/upload-artifact@v4
         with:
           name: docs_html
-          path: docs/
+          path: docs/build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'docs/'
+          path: 'docs/build'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
