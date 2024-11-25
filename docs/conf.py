@@ -43,7 +43,6 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "myst_nb",
-    "sphinxcontrib.email",
 ]
 
 intersphinx_mapping = {
@@ -94,8 +93,5 @@ html_theme_options = {}
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "Qermitdoc"
-
-# For sphinxcontrib
-email_automode = True
 
 exclude_patterns = ['README.md', 'jupyter_execute/*']
