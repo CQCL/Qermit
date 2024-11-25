@@ -37,7 +37,9 @@ jobs:
         with:
           submodules: true
       - name: Install Qermit
-        run: pip install -e .[docs] -v
+        run: | 
+          sudo apt-get install graphviz
+          pip install -e .[docs] -v
       - name: Build Docs
         run: |
           cd docs
