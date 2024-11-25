@@ -42,7 +42,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
-    "jupyter_sphinx",
+    "myst_nb",
     "sphinxcontrib.email",
 ]
 
@@ -97,3 +97,5 @@ htmlhelp_basename = "Qermitdoc"
 
 # For sphinxcontrib
 email_automode = True
+
+exclude_patterns = ['README.md', 'jupyter_execute/*']
