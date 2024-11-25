@@ -94,4 +94,4 @@ html_theme_options = {}
 # Output file base name for HTML help builder.
 htmlhelp_basename = "Qermitdoc"
 
-exclude_patterns = ['README.md', 'jupyter_execute/*']
+exclude_patterns = ["README.md", "jupyter_execute/*"]
