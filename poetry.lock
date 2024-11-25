@@ -1707,20 +1707,20 @@ qiskit-ibm-runtime = ">=0.21.0,<0.22.0"
 
 [[package]]
 name = "pytket-quantinuum"
-version = "0.40.0"
+version = "0.41.0"
 description = "Extension for pytket, providing access to Quantinuum backends"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "pytket_quantinuum-0.40.0-py3-none-any.whl", hash = "sha256:367e01bcb265e139979c4ec3a02a0a734bab5a1a5398eae9e42398a8ca6db1f1"},
+    {file = "pytket_quantinuum-0.41.0-py3-none-any.whl", hash = "sha256:632fb515a7a5ce197a521a72d2a6553151b9c2cf42611af2b5c3ab3a245393ea"},
 ]
 
 [package.dependencies]
 msal = ">=1.18,<2.0"
-nest-asyncio = ">=1.2"
+nest_asyncio = ">=1.2"
 numpy = ">=1.26.4"
 pyjwt = ">=2.4,<3.0"
-pytket = ">=1.34.0"
+pytket = ">=1.35.0"
 pytket-qir = ">=0.17,<0.18"
 requests = ">=2.32.2"
 types-requests = "*"
@@ -2532,4 +2532,4 @@ tests = ["mypy", "pytest", "pytest-cov", "pytket-quantinuum", "qiskit-ibm-provid
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.13"
-content-hash = "990d8c461be5854fd829a2ef7cc19d1e4e415520863aef379bdfa1eee6843b73"
+content-hash = "bace61ef12801b30655e7ba4bcbec647595fa1f1bc182276f8bf778485e1cda2"
