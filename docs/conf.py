@@ -48,6 +48,10 @@ extensions = [
 
 intersphinx_mapping = {
     "pytket": ("https://docs.quantinuum.com/tket/api-docs/", None),
+    "pytket.extensions.qiskit": (
+        "https://docs.quantinuum.com/tket/extensions/pytket-qiskit/",
+        None,
+    ),
     "python": ("https://docs.python.org/3", None),
 }
 
