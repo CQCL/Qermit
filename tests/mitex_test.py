@@ -15,7 +15,7 @@
 
 import copy
 
-from pytket.circuit import Circuit, OpType, Qubit, fresh_symbol  # type: ignore
+from pytket.circuit import Bit, Circuit, OpType, Qubit, fresh_symbol  # type: ignore
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.utils import QubitPauliOperator
@@ -32,9 +32,61 @@ from qermit.taskgraph.mitex import (  # type: ignore
     collate_circuit_shots_task_gen,
     filter_observable_tracker_task_gen,
     gen_compiled_shot_split_MitRes,
+    get_basic_measurement_circuit,
     get_expectations_task_gen,
     split_results_task_gen,
 )
+
+
+def test_get_basic_measurement_circuit() -> None:
+
+    q_0 = Qubit(name="test qubits a", index=0)
+    q_1 = Qubit(name="test qubits a", index=1)
+    q_2 = Qubit(name="test qubits b", index=0)
+    q_3 = Qubit(name="test qubits b", index=1)
+
+    qps_0 = QubitPauliString([q_1, q_2, q_3], [Pauli.Z, Pauli.X, Pauli.I])
+
+    circuit = Circuit()
+
+    circuit.add_qubit(q_1)
+    circuit.add_bit(Bit(0))
+    circuit.Measure(q_1, Bit(0))
+
+    circuit.add_qubit(q_2)
+    circuit.H(q_2)
+    circuit.add_bit(Bit(1))
+    circuit.Measure(q_2, Bit(1))
+
+    measurement_circuit, (string, bits, meas_bool) = get_basic_measurement_circuit(qps_0)
+    assert measurement_circuit == circuit
+    assert bits == [Bit(0), Bit(1)]
+    assert not meas_bool
+    assert string == qps_0
+
+    qps_1 = QubitPauliString([q_0, q_2, q_1], [Pauli.Z, Pauli.Y, Pauli.X])
+
+    circuit = Circuit()
+
+    circuit.add_qubit(q_0)
+    circuit.add_bit(Bit(0))
+    circuit.Measure(q_0, Bit(0))
+
+    circuit.add_qubit(q_1)
+    circuit.add_bit(Bit(1))
+    circuit.H(q_1)
+    circuit.Measure(q_1, Bit(1))
+
+    circuit.add_qubit(q_2)
+    circuit.add_bit(Bit(2))
+    circuit.Rx(0.5, q_2)
+    circuit.Measure(q_2, Bit(2))
+
+    measurement_circuit, (string, bits, meas_bool) = get_basic_measurement_circuit(qps_1)
+    assert measurement_circuit == circuit
+    assert bits == [Bit(0), Bit(1), Bit(2)]
+    assert not meas_bool
+    assert string == qps_1
 
 
 def test_mitex_cache():

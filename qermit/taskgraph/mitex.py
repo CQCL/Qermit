@@ -93,8 +93,12 @@ def get_basic_measurement_circuit(
     :param string: Qubit Pauli String to be measured
     :type string: QubitPauliString
 
-    :return: Measurement circuit for appending on some ansatz
-    :rtype: Circuit
+    :return: Tuple of measurement circuit for appending on some ansatz
+        and MeasurementInfo. Each entry of th measurement information
+        contains a QubitPauliString, the bits required to take expectation
+        over in resulting result and a bool signifying whether expectation
+        should be inverted when taking result.
+    :rtype: Tuple[Circuit, MeasurementInfo]
     """
     measurement_circuit = Circuit()
     measured_qbs = []
@@ -152,11 +156,11 @@ def filter_observable_tracker_task_gen() -> MitTask:
                 circ = circuit.copy()
                 # tuple, first entry is measurement circuit for appending
                 # second entry is MeasurementInfo for deriving expectation
-                measurement_circuit = get_basic_measurement_circuit(string)
-                circ.append(measurement_circuit[0])
+                measurement_circuit, measurement_info = get_basic_measurement_circuit(string)
+                circ.append(measurement_circuit)
                 # add new circuit to observable tracker
                 observable_tracker.add_measurement_circuit(
-                    MeasurementCircuit(circ, symbols), [measurement_circuit[1]]
+                    MeasurementCircuit(circ, symbols), [measurement_info]
                 )
 
             # retrieve all measurement circuits, substitute symbols
