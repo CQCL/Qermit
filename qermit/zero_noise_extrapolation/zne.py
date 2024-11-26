@@ -68,12 +68,9 @@ class Folding(Enum):
         odd integers. The Unitary implemented is unchanged by this process.
 
         :param circ: Original circuit to be folded.
-        :type circ: Circuit
         :param noise_scaling: Factor by which to scale the noise. This must be an odd integer.
-        :type noise_scaling: int
         :raises ValueError: Raised if the amount by which the noise should be scaled is not an odd integer.
         :return: Folded circuit implementing identical unitary to the initial circuit.
-        :rtype: List[Circuit]
         """
 
         # Raise if the amount by which the noise should be scaled is not an odd integer
@@ -125,9 +122,7 @@ class Folding(Enum):
         as close as possible to but smaller then noise_scaling.
 
         :param circ: Original circuit to be folded.
-        :type circ: Circuit
         :param noise_scaling: Factor by which the noise should be scaled.
-        :type noise_scaling: int
 
         :raises ValueError: Raised if noise_scaling is less than 1.
         :raises ValueError: Raised if the noise cannot be scaled by
@@ -139,7 +134,6 @@ class Folding(Enum):
             approximate folding is allowed. Defaults to True.
 
         :return: Circuit with noise scaled.
-        :rtype: List[Circuit]
         """
 
         if noise_scaling < 1:
@@ -226,21 +220,17 @@ class Folding(Enum):
         with :math:`GG^{-1}G` until the number of gates is sufficiently scaled.
 
         :param circ: Original circuit to be folded.
-        :type circ: Circuit
         :param noise_scaling: Factor by which to increase the noise.
-        :type noise_scaling: float
 
         :key _allow_approx_fold: Allows for the noise to be increased by an amount close to that requested, as
             opposed to by exactly the amount requested.
             This is necessary as there are cases where the exact noise scaling cannot be achieved.
             This occurs due to the discrete
             amounts by which the noise can be increased (i.e. the discrete amount by which one gate increases the noise).
-        :type _allow_approx_fold: bool
 
         :raises ValueError: Raised if the requested noise scaling cannot be exactly achieved. This can be
             avoided by appropriately setting _allow_approx_fold.
         :return: Folded circuit implementing identical unitary to the initial circuit.
-        :rtype: List[Circuit]
         """
 
         _allow_approx_fold = kwargs.get("_allow_approx_fold", 0)
@@ -338,11 +328,8 @@ class Folding(Enum):
         scaled.
 
         :param circ: Original circuit to be folded.
-        :type circ: Circuit
         :param noise_scaling: Factor by which to increase the noise.
-        :type noise_scaling: float
         :return: Folded circuit implementing identical unitary to the initial circuit.
-        :rtype: List[Circuit]
         """
 
         c_dict = circ.to_dict()
@@ -410,18 +397,14 @@ class Folding(Enum):
         by the given noise model.
 
         :param circ: Circuit with noise to be scaled.
-        :type circ: Circuit
         :param noise_scaling: Factor by which noise should be scaled.
-        :type noise_scaling: int
         :return: List of circuits with additional noise gates added.
         :rtype: List[Circuit]
 
         :key noise_model: Noise model defining noise types and rates.
             Defaults to noiseless model.
-        :type noise_model: NoiseModel
         :key n_noisy_circuit_samples: The number of random noisy
             circuits to generate. Defaults to 1.
-        :type n_noisy_circuit_samples: int
         """
 
         noise_model: NoiseModel = kwargs.get("noise_model", NoiseModel(noise_model={}))
@@ -445,9 +428,7 @@ def poly_exp_func(x: float, *params) -> float:
     """Definition of poly-exponential function for the purposes of fitting to data
 
     :param x: Value at which to evaluate function
-    :type x: float
     :return: Evaluation of poly-exponential function
-    :rtype: float
     """
     # Note that we use a list ending in 0 so that the constant in the polynomial is 0.
     # The constant can then be absorbed into the coefficient of the exponential.
@@ -458,9 +439,7 @@ def cube_root_func(x: float, *params) -> float:
     """Definition of cube root function for the purposes of fitting to data.
 
     :param x: Value at which to evaluate cube root function
-    :type x: float
     :return: Evaluation of cube root function
-    :rtype: float
     """
     y = x + params[2]
     return params[0] + params[1] * np.sign(y) * (np.abs(y)) ** (1 / 3)
@@ -470,7 +449,6 @@ class Fit(Enum):
     """Functions to fit to expectation values as they change with noise.
 
     :return: Extrapolation of expectation values to the zero noise limit.
-    :rtype: float
     """
 
     # TODO Consider adding adaptive exponential extrapolation
@@ -479,13 +457,9 @@ class Fit(Enum):
         """Fit data to a cube root function. This is to say a function of the form :math:`a + b(x+c)^{1/3}`.
 
         :param x: Noise scaling values.
-        :type x: List[float]
         :param y: Expectation values.
-        :type y: List[float]
         :param _show_fit: Plot data and resulting fitted function.
-        :type _show_fit: bool
         :return: Extrapolation of data to zero noise limit using the best fitting cube root function.
-        :rtype: float
         """
 
         # Fit data to cube root function
@@ -511,18 +485,13 @@ class Fit(Enum):
         form :math:`a+e^{z}`, where :math:`z` is a polynomial.
 
         :param x: Noise scaling values.
-        :type x: List[float]
         :param y: Expectation values.
-        :type y: List[float]
         :param _show_fit: Plot data and resulting fitted function.
-        :type _show_fit: bool
         :param deg: The degree of the polynomial in the exponential.
-        :type deg: int
         :raises ValueError: Raised if the degree of the polynomial
             inputted is negative, or too high to fit to the data.
         :return: Extrapolation of data to the zero noise limit using the best fitting
             poly-exponential function of the specified degree.
-        :rtype: float
         """
 
         # check that the degree of the polynomial is positive, and small enough to fit
@@ -572,13 +541,9 @@ class Fit(Enum):
         Note that this is a special case of the poly-exponential function.
 
         :param x: Noise scaling values.
-        :type x: List[float]
         :param y: Expectation values.
-        :type y: List[float]
         :param _show_fit: Plot data and resulting fitting function.
-        :type _show_fit: bool
         :return: Extrapolation to zero noise limit using the best fitting exponential function.
-        :rtype: float
         """
 
         # As the exponential function is a special case of the
@@ -590,18 +555,13 @@ class Fit(Enum):
         """Fit data to a polynomial function.
 
         :param x: Noise scaling values.
-        :type x: List[float]
         :param y: Expectation values.
-        :type y: List[float]
         :param _show_fit: Plot data and resulting fitting function.
-        :type _show_fit: bool
         :param deg: The degree of the function to fit to.
-        :type deg: int
         :raises ValueError: Raised if the degree of the polynomial is negative,
             or too high to fit the data to.
         :return: Extrapolation to zero noise limit using the best fitting polynomial
             function of the specified degree.
-        :rtype: float
         """
 
         # Raised if the degree of the polynomial requested is negative, or too high to fit the data to
@@ -632,13 +592,9 @@ class Fit(Enum):
         Note that this is a special case of the polynomial fitting function.
 
         :param x: Noise scaling values.
-        :type x: List[float]
         :param y: Expectation values.
-        :type y: List[float]
         :param _show_fit: Plot data and resulting fitted function.
-        :type _show_fit: bool
         :return: Extrapolation to zero noise limit using the best fitting linear function.
-        :rtype: float
         """
         # As this is a special case of a fit to a polynomial, the polynomial
         # fitting function is called here with a degree 1
@@ -650,13 +606,9 @@ class Fit(Enum):
         degree one less than the number of data points.
 
         :param x: Noise scaling values.
-        :type x: List[float]
         :param y: Expectation values.
-        :type y: List[float]
         :param _show_fit: Plot data and resulting fitted function.
-        :type _show_fit: bool
         :return: Extrapolation to zero noise limit using Richardson extrapolation.
-        :rtype: float
         """
         # As this is a special case of the polynomial fitting function, the polynomial fitting
         # function is called here with degree one less than the number of data points.
@@ -673,15 +625,10 @@ def plot_fit(
     """Plot expectation values at each noise level, and the fit to the data derived.
 
     :param x: Amounts by which the noise has been scaled
-    :type x: List[float]
     :param y: Expectation values at each noise level
-    :type y: List[float]
     :param fit_x: x coordinates at which to plot value of fitted function
-    :type fit_x: List[float]
     :param fit_y: Value of fitted function at each noise scaling
-    :type fit_y: List[float]
     :param fit_to_zero: The extrapolation of the fitted function to the zero noise limit
-    :type fit_to_zero: float
     """
 
     fig = plt.figure()
@@ -709,18 +656,13 @@ def digital_folding_task_gen(
 
     :param backend: This will be used to compile the circuit after folding to ensure
         that the gate set matches those available on the backend.
-    :type backend: Backend
     :param noise_scaling: The factor by which the noise is increased.
-    :type noise_scaling: float
     :param _folding_type: The means by which the noise should be increased.
-    :type _folding_type: Folding
     :param _allow_approx_fold:  Allows for the noise to be increased by an amount close to that requested, as
         opposed to by exactly the amount requested.
         This is necessary as there are cases where the exact noise scaling cannot be achieved.
         This occurs due to the discrete
         amounts by which the noise can be increased (i.e. the discrete amount by which one gate increases the noise).
-    :type _allow_approx_fold: bool
-
     """
 
     def task(
@@ -731,12 +673,10 @@ def digital_folding_task_gen(
         number of gates. This preserves the action of the circuit.
 
         :param mitex_wire: List of experiments
-        :type mitex_wire: List[ObservableExperiment]
         :return: List of equivalent circuits, but with noise levels increased.
             Each noise scaling value may generate multiple circuits.
             As such the return includes a lit of integers indicating to which
             of the original circuits the new circuits belong.
-        :rtype: Tuple[List[ObservableExperiment], List[int]]
         """
 
         folded_circuits = []
@@ -783,7 +723,6 @@ def merge_experiments_task_gen() -> MitTask:
     same experiment.
 
     :return: MitTask performing the merge.
-    :rtype: MitTask
     """
 
     def task(
@@ -798,12 +737,9 @@ def merge_experiments_task_gen() -> MitTask:
 
         :param qpo_list: List of qubit pauli strings, some of which may belong
             to the same experiment.
-        :type qpo_list: List[QubitPauliOperator]
         :param experiment_index_list: Indexes indicating to which experiment
             the qubit pauli strings belong to.
-        :type experiment_index_list: List[int]
         :return: A list of merged qubit pauli operators.
-        :rtype: Tuple[List[QubitPauliOperator]]
         """
 
         # A dictionary mapping the experiment index to the dictionary
@@ -857,13 +793,9 @@ def extrapolation_task_gen(
     """Generates task extrapolating to the zero noise limit using results from many folded circuits.
 
     :param noise_scaling_list: A list of the values by which the noise has been folded.
-    :type noise_scaling_list: List[float]
     :param _fit_type: The function used to fit to the resulting data.
-    :type _fit_type: Fit
     :param _show_fit: Plot data and resulting fitted function.
-    :type _show_fit: bool
     :param deg: The degree of polynomials used.
-    :type deg: int
     """
 
     def task(
@@ -872,10 +804,8 @@ def extrapolation_task_gen(
         """Returns expectation values corrected by extrapolation
 
         :param base_exp_list: List of expectation values corresponding to each experiment
-        :type base_exp_list: List[QubitPauliOperator]
         :return: Each element of this tuple is a list of expectations for each
         experiment, all with noise scaled by a fixed amount.
-        :rtype: Tuple[List[QubitPauliOperator]]
         """
 
         # Reformats to create list, where each list has fixed noise folding. Each element of
@@ -921,9 +851,7 @@ def copy_mitex_wire(wire: ObservableExperiment) -> ObservableExperiment:
     """Returns a single copy of the inputted wire
 
     :param wire: Pair of ansatz circuit and ObservableTracker
-    :type wire: ObservableExperiment
     :return: single copy of inputted wire
-    :rtype: ObservableExperiment
     """
 
     # Copy ansatz circuit
@@ -947,7 +875,6 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
     """Duplicate the inputted experiment wire
 
     :param duplicates: The number of times to duplicate the input wire.
-    :type duplicates: int
     """
 
     def task(
@@ -957,10 +884,8 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
         """Duplicate the inputted experiment wire
 
         :param mitex_wire: List of experiments
-        :type mitex_wire: List[ObservableExperiment]
         :raises ValueError: Raised if the number of duplications is less than 1
         :return: Many copies of the inputted wire
-        :rtype: Tuple[List[ObservableExperiment]]
         """
 
         # Raise error if the number of duplications requested is less than 1
@@ -997,11 +922,8 @@ def qpo_node_relabel(
     """Relabel the nodes of qpo according to node_map
 
     :param qpo: Original qubit pauli operator
-    :type qpo: QubitPauliOperator
     :param node_map: Map between nodes
-    :type node_map: Dict[Node,Node]
     :return: Relabeled qubit pauli operator
-    :rtype: QubitPauliOperator
     """
 
     orig_qpo_dict = qpo._dict.copy()
@@ -1025,9 +947,7 @@ def gen_initial_compilation_task(
     in the task graph.
 
     :param backend: Backend to compile to
-    :type backend: Backend
     :param optimisation_level: level of default compiler, defaults to 1
-    :type optimisation_level: int, optional
     """
 
     def task(
@@ -1037,11 +957,9 @@ def gen_initial_compilation_task(
         after folding, as this could disrupt by how much the noise is increased.
 
         :param wire: List of experiments
-        :type wire: List[ObservableExperiment]
         :return: List of experiments compiled to run on the inputted backend.
             Additionally a list of dictionaries describing how the nodes have
             been mapped by compilation.
-        :rtype: Tuple[List[ObservableExperiment], List[Dict[Node, Node]]]
         """
 
         mapped_wire = []
@@ -1093,7 +1011,6 @@ def gen_qubit_relabel_task() -> MitTask:
     This should follow gen_initial_compilation_task
 
     :return: Task performing relabelling.
-    :rtype: MitTask
     """
 
     def task(
@@ -1105,12 +1022,9 @@ def gen_qubit_relabel_task() -> MitTask:
         performed by gen_initial_compilation_task
 
         :param qpo_list: List of QubitPauliOperator
-        :type qpo_list: List[QubitPauliOperator]
         :param compilation_map_list: List of Dictionaries mapping nodes as
             returned by gen_initial_compilation_task task
-        :type compilation_map_list: List[Dict[Node, Node]]
         :return: List of QubitPauliOperator with relabeled nodes.
-        :rtype: Tuple[List[QubitPauliOperator]]
         """
 
         new_qpo_list = []
@@ -1145,24 +1059,17 @@ def gen_noise_scaled_mitex(
     """Generates MitEx with noise scaled by the Qermit Folding methods.
 
     :param backend: Backend on which circuits are run.
-    :type backend: Backend
     :param noise_scaling: Factor by which noise is scaled.
-    :type noise_scaling: float
 
     :return: MitEx with scaled noise.
-    :rtype: MitEx
 
     :key experiment_mitres: MitRes on which circuits are run, defaults to
         a MitRes wrapped around the given backend.
-    :type experiment_mitres: MitRes
     :key experiment_mitex: MitEx on which the circuits are run, defaults
         to a MitEx wrapped around experiment_mitres
-    :type experiment_mitex: MitEx
     :key allow_approx_fold: Allow approximate folding which may occur as a
         result of discreet folding due to adding gates.
-    :type allow_approx_fold: bool
     :key folding_type: The noise scaling method to use.
-    :type folding_type: Folding
     """
 
     _experiment_mitres = deepcopy(
@@ -1204,11 +1111,8 @@ def gen_ZNE_MitEx(backend: Backend, noise_scaling_list: List[float], **kwargs) -
     extrapolating backwards. For further explanantion see https://arxiv.org/abs/2005.10921.
 
     :param backend: Backend on which the circuits are to be run.
-    :type backend: Backend
     :param noise_scaling_list: A list of the amounts by which the noise should be scaled.
-    :type noise_scaling_list: List[float]
     :return: MitEx object performing noise mitigation by ZNE.
-    :rtype: MitEx
     """
     _optimisation_level = kwargs.get("optimisation_level", 0)
     _show_fit = kwargs.get("show_fit", False)

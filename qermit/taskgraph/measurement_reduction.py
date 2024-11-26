@@ -39,15 +39,11 @@ def measurement_reduction_task_gen(
     the number of measurement circuits required to measure all expectations for an observable.
 
     :param strategy: Measurement reduction strategy used in measurement_reduction method
-    :type strategy: PauliPartitionStrat
     :param method: Graph colouring method used in measurement_reduction method
-    :type method:  GraphColourMethod
     :param cx_config: Configuration of CX gates for diagonlisation methods.
-    :type cx_config: CXConfigType
 
     :return: MitTask object, taking and return same write type, but with added
         measurement circuits to ObservableTracker.
-    :rtype: MitTask
     """
 
     def task(
@@ -116,11 +112,9 @@ def gen_MeasurementReduction_MitEx(backend: Backend, **kwargs) -> MitEx:
     methods.
 
     :param backend: Backend experiment is built around.
-    :type backend: Backend
     :key mitex: MitEx object measurement reduction task is prepended to.
 
     :return: MitEx object performing Measurement reduction
-    :rtype: MitEx
     """
     # mitex object to built measurement reduction
     _mitex = copy(

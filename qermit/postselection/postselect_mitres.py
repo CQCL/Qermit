@@ -25,12 +25,9 @@ def gen_postselect_task() -> MitTask:
 
         :param result_list: List od results to which postselection should
             be applied.
-        :type result_list: List[BackendResult]
         :param postselect_mgr_list: List of postselection managers to apply
             to results.
-        :type postselect_mgr_list: List[PostselectMgr]
         :return: List of results after postselection has been applied.
-        :rtype: Tuple[List[BackendResult]]
         """
 
         return (
@@ -53,9 +50,7 @@ def gen_postselect_mgr_gen_task(postselect_mgr: PostselectMgr) -> MitTask:
     circuits.
 
     :param postselect_mgr: Postselection manager to apply.
-    :type postselect_mgr: PostselectMgr
     :return: Task applying the same post selection manager to all circuits.
-    :rtype: MitTask
     """
 
     def task(
@@ -65,9 +60,7 @@ def gen_postselect_mgr_gen_task(postselect_mgr: PostselectMgr) -> MitTask:
 
         :param circ_shots_list: List of circuits to which post selection is
             applied.
-        :type circ_shots_list: List[CircuitShots]
         :return: List od circuits and corresponding postselection managers.
-        :rtype: Tuple[List[CircuitShots], List[PostselectMgr]]
         """
 
         return (circ_shots_list, [postselect_mgr for _ in circ_shots_list])
@@ -86,11 +79,8 @@ def gen_postselect_mitres(
     """Generates MitRes running given circuit and applying postselection.
 
     :param backend: Backend on this circuits are run.
-    :type backend: Backend
     :param postselect_mgr: Postselection manager.
-    :type postselect_mgr: PostselectMgr
     :return: MitRes running given circuit and applying postselection.
-    :rtype: MitRes
     """
 
     _mitres = deepcopy(

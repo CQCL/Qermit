@@ -20,9 +20,7 @@ class PostselectMgr:
 
         :param compute_cbits: Bits in the circuit which are not affected
             by post selection.
-        :type compute_cbits: List[Bit]
         :param postselect_cbits: Bits on which the post selection is based.
-        :type postselect_cbits: List[Bit]
         :raises Exception: Raised if a bit is in both compute_cbits
             and postselect_cbits.
         """
@@ -64,9 +62,7 @@ class PostselectMgr:
         """Convert dictionary to BackendResult.
 
         :param result_dict: Dictionary to convert.
-        :type result_dict: Dict[Tuple[int, ...], int]
         :return: Corresponding BackendResult.
-        :rtype: BackendResult
         """
 
         # Special case where the dictionary is empty. Presently having
@@ -89,9 +85,7 @@ class PostselectMgr:
         post selected.
 
         :param result: Result to be modified.
-        :type result: BackendResult
         :return: Postselected shots.
-        :rtype: BackendResult
         """
 
         return self.dict_to_result(
@@ -107,9 +101,7 @@ class PostselectMgr:
         removed, but no shots are removed by postselection.
 
         :param result: Result to be transformed.
-        :type result: BackendResult
         :return: Result with postselection bits removed.
-        :rtype: BackendResult
         """
 
         merge_dict: Dict[Tuple[int, ...], int] = {}

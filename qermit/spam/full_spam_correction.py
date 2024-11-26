@@ -39,17 +39,14 @@ def gen_full_tomography_spam_circuits_task(
     """Generate MitTask for calibration circuits according to the specified correlation and given backend.
 
     :param backend: Backend on which the experiments are run.
-    :type backend: Backend
     :param qubit_subsets: A list of lists of correlated Nodes of a `Device`.
         Qubits within the same list are assumed to only have SPAM errors correlated
         with each other. Thus to allow SPAM errors between all qubits you should
         provide a single list.  The qubits in `qubit_subsets` must be nodes in the
         backend's associated `Device`.
-    :type qubit_subsets: List[List[Qubit]]
     :param shots: An int corresponding to the number of shots of each calibration circuit required.
     :return: A MitTask object, requiring 1 List[CircuitShots] wire and returning (List[CircuitShots], List[StateInfo])
         corresponding to Calibration Circuits and corresponding states.
-    :rtype: MitTask
     """
 
     def task(
@@ -88,7 +85,6 @@ def gen_full_tomography_spam_characterisation_task(
     for different qubit subsets and stores them in backend.
 
     :param qubit_subsets: Subsets of qubits in backend corresponding to different correlated subsets.
-    :type qubit_subsets: List[List[Qubit]]
     """
 
     def task(
@@ -96,12 +92,9 @@ def gen_full_tomography_spam_characterisation_task(
     ) -> Tuple[bool]:
         """
         :param results: Results from characterisation circuits run on backend.
-        :type results: List[BackendResult]
         :param state_infos: Corresponding state prepared in the circuit run for each result and qubit to bit map.
-        :type state_infos: List[StateInfo]
 
         :return: bool confirming characterisation complete.
-        :rtype: bool
         """
         if len(results) != len(state_infos):
             raise ValueError(
@@ -129,7 +122,6 @@ def gen_full_tomography_spam_correction_task(corr_method: CorrectionMethod) -> M
     and correct results given by CorrectionMethod enum.
 
     :param corr_method: Method used to invert matrices and correct results.
-    :type corr_method: CorrectionMethod
     """
 
     def task(
@@ -140,13 +132,10 @@ def gen_full_tomography_spam_correction_task(corr_method: CorrectionMethod) -> M
     ) -> Tuple[List[BackendResult]]:
         """
         :param results: Results from experiment circuits run on backend.
-        :type results: List[BackendResult]
         :param bit_qb_maps: Map between Bits measurement outcomes are assigned to and Qubits in each experiment Circuit. Separate dicts for
         results end of and mid-circuit measurements.
-        :type bit_qb_maps: List[Tuple[Dict[Qubit, Bit], Dict[Bit, Qubit]]]
 
         :return: Corrected Results
-        :rtype: Tuple[List[BackendResult]]
         """
         if "FullCorrelatedSpamCorrection" in obj.characterisation:
             char = obj.characterisation["FullCorrelatedSpamCorrection"]
@@ -177,10 +166,8 @@ def get_mid_circuit_measure_map(
     between Bit and Qubit.
 
     :param circuit: Circuit to get dict between Bit measured and Qubit measured on.
-    :type circuit: Circuit
 
     :return: A dict between Bit measured and Qubit measured on.
-    :rtype: Dict[Bit, Qubit]
     """
     bit_to_qubit_map = dict()
     for mc in circuit.commands_of_type(OpType.Measure):
@@ -201,10 +188,8 @@ def gen_get_bit_maps_task() -> MitTask:
     ) -> Tuple[List[CircuitShots], List[Tuple[Dict[Qubit, Bit], Dict[Bit, Qubit]]]]:
         """
         :param circuits: Circuits to retrieve bit maps from.
-        :type circuits: List[CircuitShots]
 
         :return: A tuple comprising the original circuits, and each circuits bit map.
-        :rtype: Tuple[List[CircuitShots], List[Tuple[Dict[Qubit, Bit], Dict[Bit, Qubit]]]
         """
         bq_maps = []
         for c in circuit_shots:

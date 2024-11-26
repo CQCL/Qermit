@@ -26,12 +26,10 @@ def sample_q_mallows(n_qubits: int) -> Tuple[List[int], List[int]]:
     https://arxiv.org/abs/2003.09412.
 
     :param n_qubits: Number of qubits on which the layers should act
-    :type n_qubits: int
     :return: A description of the gate layers. The hadamard layer
     is defined by a vector {0,1}^n describing on which qubits a Hadamard gate acts. The
     permutation layer is defined by a permutation of the vector (0,1,...,n_qubits)
     describing where each qubit should be permuted to.
-    :rtype: Tuple[List[int], List[int]]
     """
 
     # Hadamard layer
@@ -74,16 +72,12 @@ def clifford_canonical_F(
 
     :param pauli_layer: Description of which Pauli gate should act on each qubits. This is an element of {0,1,2,3}^n
     with 0 -> I, 1->X, 2->Y, 3->Z.
-    :type pauli_layer: List[int]
     :param gamma: Describes on which qubits CX acts. In particular the circuit contains CX_{i,j} if
     gamma[i][j]=1. The gates are ordered such the control qubit index increases with time.
-    :type gamma: List[List[int]]
     :param delta: Describes on which qubits CZ acts. In particular the circuit contains CX_{i,j} if
     delta[i][j]=1. The gates are ordered such the control qubit index increases with time. The circuit include S_i
     if delta[i][i]=1.
-    :type delta: List[List[int]]
     :return: A Hadamard free Clifford circuit.
-    :rtype: Circuit
     """
 
     circ = Circuit(len(pauli_layer))
@@ -128,15 +122,11 @@ def find_random_gamma_delta(
     This assumes the generation Clifford gates uniformly at random.
 
     :param n_qubits: Number of qubits on which the Clifford circuit acts
-    :type n_qubits: int
     :param hadamard_layer: vector in {0,1}^n_qubits describing the qubits on
     which hadamard gates act. Forms part of the canonical representation of a Clifford gate.
-    :type hadamard_layer: List[int]
     :param permute_layer: Permutation of (0,1,...,n_qubits) describing the permutation
     layer of the canonical representation.
-    :type permute_layer: List[int]
     :return: gamma and delta matrices for 2 Hadamard free Clifford circuits.
-    :rtype: Tuple[List[List[int]], List[List[int]], List[List[int]], List[List[int]]]
     """
 
     # Identity matrix
@@ -209,9 +199,7 @@ def random_clifford_circ(n_qubits: int, **kwargs) -> Circuit:
     Hadamard gates acting on a subset of the qubits, and S is a permutation layer.
 
     :param n_qubits: The number of qubits on which the returned random Clifford circuit should act
-    :type n_qubits: int
     :return: A random Clifford circuit acting on n_qubits qubits
-    :rtype: Circuit
     """
 
     np.random.seed(kwargs.get("seed", None))

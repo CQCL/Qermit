@@ -81,11 +81,9 @@ def cdr_quality_check_task_gen(
 
     :param distance_tolerance: The absolute tolerance on the distance between
     expectation values of the calibration and original circuit.
-    :type distance_tolerance: float
     :param calibration_fraction: The upper bound on the fraction of calibration
         circuits which have noisy expectation values far from that of the
         original circuit.
-    :type calibration_fraction: float
     """
 
     def cdr_quality_check_task(
@@ -104,10 +102,8 @@ def cdr_quality_check_task_gen(
 
         :param noisy_expectation: List of noisy expectation values from
         original circuits.
-        :type noisy_expectation: List[QubitPauliOperator]
         :param state_circuit_exp: A list of noisy and noiseless expectation
         values for each calibration experiment.
-        :type state_circuit_exp: List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]
         :return: The original inputs are returned unaltered.
         :rtype: Tuple[List[QubitPauliOperator], List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]
         """
@@ -157,9 +153,7 @@ def cdr_calibration_task_gen(
     and a noiseless simulator to characterise some model for correcting noisy expectation values.
 
     :param backend: Backend for storing characterisation model in.
-    :type backend: Backend
     :param model: Model type to be calibrated and stored in backend.
-    :type model: _BaseExCorrectModel
     """
 
     def cdr_calibration_task(
@@ -171,7 +165,6 @@ def cdr_calibration_task_gen(
 
         :param calibration_results: A list of noisy and noiseless expectation values for each
         experiment.
-        :type calibration_results: List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]
 
         :return: A bool confirming characteriastion is complete
         :rtype: Tuple[bool]
@@ -224,7 +217,6 @@ def cdr_correction_task_gen() -> MitTask:
     internal QubitPauliString via some pre-characterised mode.
 
     :param backend: Backend object where characterisation is stored.
-    :type backend: Backend
     """
 
     def cdr_correction_task(
@@ -235,9 +227,7 @@ def cdr_correction_task_gen() -> MitTask:
         """
         :param noisy_expectation: QubitPauliOperator objects from some experiment
         which are to be corrected from some predefined characteriastion.
-        :type noisy_expectation: List[QubitPauliOperator]
         :param calibration_complete: bool passed to method once calibration task has completed.
-        :type calibration_complete: bool
 
         """
         corrected_expectations = []

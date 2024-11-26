@@ -43,19 +43,15 @@ class TranspilerBackend:
         """Initialisation method.
 
         :param transpiler: Compiler to use during noise simulation.
-        :type transpiler: BasePass
         :param max_batch_size: Size of the largest batch of shots,
             defaults to 1000. The total number of shots is distributed between
             bathes of size 1000 plus a smaller batch for left over shot.
             These batches will be distributed to multiple cores.
-        :type max_batch_size: int, optional
         :param result_dict: Results dictionary, may be used to store existing
             results within backend, defaults to {}
-        :type result_dict: Dict[ResultHandle, BackendResult], optional
         :param n_cores: Shots will be taken in parallel. This parameter
             specifies the number of cores to use. The default is to use
             one core.
-        :type n_cores: Optional[int]. Defaults to 1.
         """
 
         self.transpiler = transpiler
@@ -81,11 +77,8 @@ class TranspilerBackend:
         """Return results of running one circuit.
 
         :param circuit: Circuit to run
-        :type circuit: Circuit
         :param n_shots: Number of shots to be taken from circuit.
-        :type n_shots: int
         :return: Result of running circuit.
-        :rtype: BackendResult
         """
 
         handle = self.process_circuit(circuit, n_shots, **kwargs)
@@ -100,12 +93,9 @@ class TranspilerBackend:
         to process_circuit.
 
         :param circuits: A collection of circuit to run.
-        :type circuits: Sequence[Circuit]
         :param n_shots: The number of shots which should be taken from
             each circuit.
-        :type n_shots: Sequence[int]
         :return: The result handle for each circuit.
-        :rtype: List[ResultHandle]
         """
 
         return [
@@ -122,11 +112,8 @@ class TranspilerBackend:
         """[summary]
 
         :param circuit: Submits circuit to run on noisy backend.
-        :type circuit: Circuit
         :param n_shots: Number of shots to take from circuit.
-        :type n_shots: int
         :return: Handle identifying results in `result_dict`.
-        :rtype: ResultHandle
         """
 
         handle = ResultHandle(str(uuid.uuid4()))
@@ -150,9 +137,7 @@ class TranspilerBackend:
         """Get the results corresponding to a collection of result handles.
 
         :param handles: A collection of handles to retrieve.
-        :type handles: Iterable[ResultHandle]
         :return: The results corresponding to the given collection of
-        :rtype: List[BackendResult]
         """
         return [self.get_result(handle) for handle in handles]
 
@@ -160,9 +145,7 @@ class TranspilerBackend:
         """Retrieve result from backend.
 
         :param handle: Handle identifying result.
-        :type handle: ResultHandle
         :return: Result corresponding to handle.
-        :rtype: BackendResult
         """
         return self.result_dict[handle]
 
@@ -170,9 +153,7 @@ class TranspilerBackend:
         """Generate compiled circuit by copying and compiling it.
 
         :param circuit: Circuit to be compiled.
-        :type circuit: Circuit
         :return: Compiled circuit.
-        :rtype: Circuit
         """
 
         transpiled_circuit = circuit.copy()
@@ -185,11 +166,8 @@ class TranspilerBackend:
             until all shots have been accounted for.
 
         :param circuit: Circuit to batch into shots.
-        :type circuit: Circuit
         :param n_shots: Number of shots to take from circuit.
-        :type n_shots: int
         :return: List of compiled circuits, which is to say noisy circuits.
-        :rtype: Iterator[List[Circuit]]
         """
 
         # Return lists of size max_batch_size containing unique
@@ -217,11 +195,8 @@ class TranspilerBackend:
         collating the results into a single counter.
 
         :param circuit_list: The list of circuits to run for one shot each.
-        :type circuit_list: List[Circuit]
         :param cbits_list: The classical bits to return the measurements of
-        :type cbits_list: Optional[List[List]]
         :return: The collated counter object.
-        :rtype: Counter[Tuple[int, ...]]
         """
 
         if cbits_list is not None:
@@ -245,15 +220,10 @@ class TranspilerBackend:
         """Generate shots from the given circuit.
 
         :param circuit: Circuit to take shots from.
-        :type circuit: Circuit
         :param n_shots: Number of shots to take from circuit.
-        :type n_shots: int
         :param cbits: Classical bits to return shots from,
             defaults to returning all.
-        :type cbits: List[Bit], optional
         :return: Counter detailing shots from circuit.
-        :rtype: Counter
-        :rtype: Iterator[Counter]
         """
 
         if self.n_cores > 1:

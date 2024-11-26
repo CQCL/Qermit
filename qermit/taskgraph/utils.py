@@ -51,8 +51,6 @@ class SymbolsDict(object):
         given circuits free symbols.
 
         :param circuit: Pytket circuit with potential symbols.
-        :type circuit: Circuit
-
         """
         mit_symbols = cls()
         for sym in circuit.free_symbols():
@@ -68,8 +66,6 @@ class SymbolsDict(object):
         of Symbol to None/float.
 
         :param symbol_dict: Dictionary from Circuit symbolics to values.
-        :type symbol_dict: Dict[Symbol, Union[None, float]
-
         """
         mit_symbols = cls()
         mit_symbols._symbolic_map = symbol_dict
@@ -83,8 +79,6 @@ class SymbolsDict(object):
         Adds all symbols (or string representing Symbol) as dict entries with no value.
 
         :param symbols_list: A list of strings representing Symbols or Symbols.
-        :type symbols_list: Iterable[Union[Symbol, str]
-
         """
         mit_symbols = cls()
         for sym in symbols_list:
@@ -97,7 +91,6 @@ class SymbolsDict(object):
         Returns all symbols held in dictionary of symbols in SymbolsDict object.
 
         :return: Iterable containing all keys from _symbolic_map, i.e. all Symbols
-        :rtype: Iterable[Symbol]
         """
         for s in self._symbolic_map.keys():
             yield s
@@ -107,7 +100,6 @@ class SymbolsDict(object):
         Adds any passed Symbol (in string form or sympy Symbol type) as a key to dictionary with None value assigned.
 
         :param symbol: Symbol to be added to self._symbolic_map
-        :type symbol: Union[str, Symbol]
         """
         if isinstance(symbol, str):
             sym = Symbol(symbol)
@@ -126,10 +118,8 @@ class SymbolsDict(object):
         dictionary object. Returns just this dictionary type.
 
         :param symbol_values: Ordered values to match to ordered keys for new dict object.
-        :type symbol_values: ndarray
 
         :return: New dict object mapping symbol to value.
-        :rtype: Dict[Symbol, float]
         """
         _map = {}
         for symbol, value in zip(self._symbolic_map.keys(), symbol_values):
@@ -142,10 +132,8 @@ class SymbolsDict(object):
         dictionary object.
 
         :param symbol_values: Orderd values to match to ordered keys for new dict object.
-        :type symbol_values: ndarray
 
         :return: New dict object mapping symbol to value.
-        :rtype: Dict[Symbol, float]
         """
         _map = {}
         for symbol, value in zip(self._symbolic_map.keys(), symbol_values):
@@ -157,9 +145,7 @@ class SymbolsDict(object):
         Assigns value to self._symbolic_map[symbol]. If symbol not in object then throws an error.
 
         :param symbol: Symbol to have value assigned.
-        :type symbol: Symbol
         :param value: Value to assign to symbol.
-        :type value: float
         """
         if symbol in self._symbolic_map:
             self._symbolic_map[symbol] = value
@@ -186,9 +172,7 @@ class MeasurementCircuit(object):
         Stores information required to instantiate any MeasurementCircuit with parameterised symbols.
 
         :param symbolic_circuit: Measurement circuit, may or may not have symbolics.
-        :type symbolic_circuit: Circuit
         :param symbols: SymbolsDict object holding symbols and values for all symbols in Circuit. Default none if circuit not symbolic.
-        :type symbols: SymbolsDict
         """
         self._symbolic_circuit: Circuit = symbolic_circuit
         if not symbols:
@@ -216,7 +200,6 @@ class MeasurementCircuit(object):
         Converts symbols_list property held in SymbolsDict to a tuple and returns it.
 
         :return: All Symbols in object
-        :rtype: Tuple[List[Symbol]]
         """
         return tuple(self._symbols.symbols_list)
 
@@ -225,7 +208,6 @@ class MeasurementCircuit(object):
         Substitutes parameters held in SymbolDict into copy of circuit and returns.
 
         :return: Substituted circuit
-        :rtype: Circuit
         """
         _circuit = self._symbolic_circuit.copy()
         _circuit.symbol_substitution(self._symbols._symbolic_map)
@@ -249,7 +231,6 @@ class ObservableTracker:
 
         :param qubit_pauli_operator: QubitPauliOperator for which given ObservableTracker is expected
             to retain measurement circuits all QubitPauliString keys for before any Backend execution.
-        :type qubit_pauli_strings: List[QubitPauliString]
         """
         self._qubit_pauli_operator = qubit_pauli_operator
         # indices being index in measurement circuits
@@ -266,7 +247,6 @@ class ObservableTracker:
         Copies each class attribute from to_copy to self. Returns self.
 
         :param to_copy: An alternative ObservableTracker for making a copy of.
-        :type to_copy: 'ObservableTracker'
 
         :return: New ObservableTracker object
         """
@@ -306,7 +286,6 @@ class ObservableTracker:
         must already be in self._qubit_pauli_operator
 
         :param new_coefficients: Each Tuple contains a QubitPauliString a new coefficient.
-        :type new_coefficients: List[Tuple[QubitPauliString, float]]
         """
         for coeff in new_coefficients:
             if coeff[0] not in self._qubit_pauli_operator._dict:
@@ -322,7 +301,6 @@ class ObservableTracker:
         Extends self._qubit_pauli_operator to include tuples in passed operator.
 
         :param new_operator: Each QubitPauliString and coefficient added to held operator.
-        :type new_operator: QubitPauliOperator
         """
         self._qubit_pauli_operator += new_operator
 
@@ -331,7 +309,6 @@ class ObservableTracker:
         Removes passed qubit pauli strings from held QubitPauliOperator and dict from string to index.
 
         :param strings: Qubit Pauli Strings no longer required to be measured by ObservableTracker
-        :type strings: List[QubitPauliString]
         """
         for qps in strings:
             self._qps_to_indices.pop(qps, None)
@@ -343,7 +320,6 @@ class ObservableTracker:
         Returns stored qubit pauli operator
 
         :return: QubitPauliOperator object stored in class
-        :rtype: QubitPauliOperator
         """
         return self._qubit_pauli_operator
 
@@ -355,10 +331,8 @@ class ObservableTracker:
         strings, updates dictionary between string and its measurement circuit + bit to measure and whether result should be inverted.
 
         :param circuit: Measurement circuit to run to get results.
-        :type circuit: MeasurementCircuit
         :param measurement_info: Each entry contains a QubitPauliString, the bits required to take expectation over in resulting result
             and a bool signifying whether expectation should be inverted when taking result.
-        :type measurement_info: List[MeasurementInfo] i.e. List[Tuple[QubitPauliString, List[Bit], bool]]
         """
         self._measurement_circuits.append(circuit)
         index = len(self._measurement_circuits) - 1
@@ -382,10 +356,8 @@ class ObservableTracker:
         Returns the measurements required to be run for a single QubitPauliString's expectation.
 
         :param string: QubitPauliString of interest.
-        :type string: QubitPauliString
 
         :return: Measurement Circuit run to find expection of QubitPauliString for some undefined ansatz circuit.
-        :rtype: MeasurementCircuit
         """
         indices = [t[0] for t in self._qps_to_indices[string]]
         circuits = [self._measurement_circuits[i] for i in indices]
@@ -396,10 +368,8 @@ class ObservableTracker:
         Returns true if given QubitPauliString has a measurement circuit stored in self._measurement_circuits.
 
         :param string: Operator measurement circuit existence being checked for.
-        :type string: QubitPauliString
 
         :return: True if string has measurement circuit, false if not.
-        :rtype: bool
         """
         if string not in self._qps_to_indices:
             return False
@@ -413,7 +383,6 @@ class ObservableTracker:
         Returns all strings in operator that don't have some assigned MeasurementCircuit.
 
         :return: Strings that require some MeasurementCircuit to be set
-        :rtype: List[QubitPauliString]
         """
         output = []
         for string in self._qubit_pauli_operator._dict:
@@ -427,7 +396,6 @@ class ObservableTracker:
         Returns all measurement circuits aded to ObservableTracker via get_measurement_circuit.
 
         :return: All measurement circuits held in ObservableTracker self._measurement_circuits attirbute.
-        :rtype: List[MeasurementCircuit]
         """
         return self._measurement_circuits
 
@@ -437,10 +405,8 @@ class ObservableTracker:
         held in self._qps_to_indices. Expectation derived by taking parity of counts.
 
         :param results: Result objects to derive counts and then an expectation from.
-        :type result: BackendResult
 
         :return: Expectation for each QubitPauliString in self._qps_to_indices
-        :type: QubitPauliOperator
         """
         max_index = len(results) - 1
         results_dict = dict()

@@ -43,9 +43,7 @@ def binary_to_int(bintuple: Tuple[int]) -> int:
     first element of tuple.
 
     :param bintuple: Binary tuple
-    :type bintuple: Tuple[int]
     :return: Integer
-    :rtype: int
     """
     integer = 0
     for index, bitset in enumerate(reversed(bintuple)):
@@ -60,11 +58,8 @@ def int_to_binary(val: int, dim: int) -> Tuple[int, ...]:
     the first element of tuple.
 
     :param val: input integer
-    :type val: int
     :param dim: Bit width
-    :type dim: int
     :return: Binary tuple of width dim
-    :rtype: Tuple[int, ...]
     """
     return tuple(map(int, format(val, "0{}b".format(dim))))
 
@@ -76,16 +71,13 @@ def get_full_transition_tomography_circuits(
 
     :param circuit: Circuit surmising correlated noise process being characterised
     :param backend: Backend on which the experiments are run.
-    :type backend: Backend
     :param correlations: A list of lists of correlated Nodes of a `Device`.
         Qubits within the same list are assumed to only have errors correlated
         with each other. Thus to allow errors between all qubits you should
         provide a single list.  The qubits in `correlations` must be nodes in the
         backend's associated `Device`.
-    :type correlations: List[List[Node]]
     :return: A list of calibration circuits to be run on the machine. The circuits
         should be processed without compilation.
-    :rtype: List[Circuit]
     """
 
     def to_tuple(correlation_list: List[Node]) -> Tuple[Node, ...]:
@@ -184,15 +176,11 @@ def calculate_correlation_matrices(
 
     :param results_list: List of result via BackendResult. Must be in the same order as the
         corresponding circuits given by prepared_states.
-    :type results_list: List[BackendResult]
-    :param states_info: Each StateInfo object containts the state prepared via a binary
+    :param states_info: Each StateInfo object contains the state prepared via a binary
         representation and the qubit_to_bit_map for the corresponding state circuit.
-    :type states_info: List[StateInfo]
     :param correlations: List of dict corresponding to each prepared basis state
-    :type correlations: List[List[Node]]
 
     :return: Characterisation for pure noise given by process circuit
-    :rtype: FullCorrelatedNoiseCharacterisation
     """
 
     def to_tuple(correlation_list: List[Node]) -> Tuple[Node, ...]:
@@ -250,14 +238,10 @@ def _unfold(tens: np.ndarray, mode: int, dims: List[int]) -> np.ndarray:
     Unfolds tensor into matrix.
 
     :param tens: Tensor with shape equivalent to dimensions
-    :type tens: np.ndarray
     :param mode: Specifies axis move to front of matrix in unfolding of tensor
-    :type mode: int
     :param dims: Gives shape of tensor passed
-    :type dims: List[int]
 
     :return: Matrix with shape (dims[mode], prod(dims[/mode]))
-    :rtype: np.ndarray
     """
     if mode == 0:
         return tens.reshape(dims[0], -1)
@@ -270,14 +254,10 @@ def _refold(vec: np.ndarray, mode: int, dims: List[int]) -> np.ndarray:
     Refolds vector into tensor.
 
     :param vec: Tensor with length equivalent to the product of dimensions given in dims
-    :type vec: np.ndarray
     :param mode: Axis tensor was unfolded along
-    :type mode: int
     :param dims: Shape of tensor
-    :type dims: List[int]
 
     :return: Tensor folded from vector with shape equivalent to dimensions given in dims
-    :rtype: np.ndarray
     """
     if mode == 0:
         return vec.reshape(dims)
@@ -293,13 +273,9 @@ def _compute_dot(submatrices: Iterable[np.ndarray], vector: np.ndarray) -> np.nd
     Multiplies the kronecker product of the given submatrices with given vector.
 
     :param submatrices: Submatrices multiplied
-    :type submatrices: Iterable[np.ndarray]
     :param vector: Vector multplied
-    :type vector: np.ndarray
 
     :return: Kronecker product of arguments
-    :rtype: np.ndarray
-
     """
     dims = [A.shape[0] for A in submatrices]
     vt = vector.reshape(dims)
@@ -318,17 +294,12 @@ def _bayesian_iteration(
     Transforms T corresponds to a Bayesian iteration, used to modfiy measurements.
 
     :param submatrices: submatrices to be inverted and applied to measurements.
-    :type submatrices: Iterable[np.ndarray]
     :param measurements: Probability distribution over some set of states to be amended.
-    :type measurements: np.ndarray
     :param t: Some transform to act on measurements.
-    :type t: np.ndarray
     :param epsilon: A stabilization parameter  to define an affine transformation for applicatoin
     to submatrices, eliminating zero probabilities.
-    :type epsilon: float
 
     :return: Transformed distribution vector.
-    :rtype: np.ndarray
     """
     # Transform t according to the Bayesian iteration
     # The parameter epsilon is a stabilization parameter which defines an affine
@@ -361,13 +332,9 @@ def _bayesian_iterative_correct(
     Converges when update states within tol range of previously tested states.
 
     :param submatrices: Matrices comprising the pure noise characterisation.
-    :type submatrices: Iterable[np.ndarray]
     :param input_vector: Vector corresponding to some counts distribution.
-    :type input_vector: np.ndarray
     :param tol: tolerance of closeness of found results
-    :type tol: float
     :param max_it: Maximum number of inversions attempted to correct results.
-    :type max_it: int
     """
     # based on method found in https://arxiv.org/abs/1910.00129
 
@@ -407,10 +374,7 @@ class CorrectionMethod(Enum):
         distribution from circuit and device.
 
         :param submatrices: Matrices comprising the pure noise characterisation.
-        :type submatrices: Iterable[np.ndarray]
         :param input_vector: Vector corresponding to some counts distribution.
-        :type input_vector: np.ndarray
-
         """
         try:
             subinverts = [np.linalg.inv(submatrix) for submatrix in submatrices]
@@ -436,13 +400,9 @@ class CorrectionMethod(Enum):
         Bayesian correction method.
 
         :param submatrices: Matrices comprising the pure noise characterisation.
-        :type submatrices: Iterable[np.ndarray]
         :param input_vector: Vector corresponding to some counts distribution.
-        :type input_vector: np.ndarray
         :param tol: tolerance of closeness of found results
-        :type tol: float
         :param max_it: Maximum number of inversions attempted to correct results.
-        :type max_it: int
         """
         return _bayesian_iterative_correct(
             submatrices, input_vector, tol=1e-5, max_it=500
@@ -458,13 +418,10 @@ def reduce_matrix(indices_to_remove: List[int], matrix: np.ndarray) -> np.ndarra
     because it is likely that unmeasured qubits will be in that state.
 
     :param indices_to_remove: Binary index of state matrix is mapping to be removed.
-    :type indices_to_remove: List[int]
     :param matrix: Transition matrix where indices correspond to some binary state, to have some
     dimension removed.
-    :type matrix: np.ndarray
 
     :return: Transition matrix with removed entries.
-    :rtype: np.ndarray
     """
 
     new_n_qubits = int(log2(matrix.shape[0])) - len(indices_to_remove)
@@ -496,12 +453,9 @@ def reduce_matrices(
     """
     Removes some dimensions from some matrices.
     :param entries_to_remove: Via indexing, says which dimensions to remove from which indices.
-    :type entries_to_remove: List[Tuple[int, int]]
     :param matrices: All matrices to have dimensions removed.
-    :type matrices: List[np.ndarray]
 
     :return: Matrices with some dimensions removed.
-    :rtype: List[np.ndarray]
     """
     organise: Dict[int, List[int]] = {k: [] for k in range(len(matrices))}
     for unused in entries_to_remove:
@@ -521,12 +475,9 @@ def get_single_matrix(
     """
     Returns a correction matrix just for the index given.
     :param entry_to_keep: Which matrix and indexing to return a correction matrix for.
-    :type entries_to_keep: Tuple[int, int]
     :param matrices: All matrices to find returned matrix from.
-    :type matrices: List[np.ndarray]
 
     :return: Matrix for correcting given entry.
-    :rtype: List[np.ndarray]
     """
     mat = matrices[entry_to_keep[0]]
     all_indices = list(range(int(log2(mat.shape[0]))))
@@ -545,11 +496,8 @@ def correct_transition_noise(
     matrices in noise_characterisation is applied to it
 
     :param result: BackendResult object to be negated by pure noise object.
-    :type result: BackendResult
     :param bit_qb_info: Used to permute corresponding BackendResult object so counts order matches noise characterisation.
-    :type bit_qb_info: Tuple[Dict[Qubit, Bit], Dict[Bit, Qubit]]
     :param noise_characterisation: Object holding all required information for some full noise characterisation of correlated subsets.
-    :type noise_characterisation: FullCorrelatedNoiseCharacterisation
     """
 
     final_measures_qb_map = bit_qb_info[0]

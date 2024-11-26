@@ -24,7 +24,6 @@ class SmallCoefficientSignalFilter(SignalFilter):
         """Initialisation method.
 
         :param tol: Value below which coefficients should be reduced to 0
-        :type tol: float
         """
         self.tol = tol
 
@@ -33,9 +32,7 @@ class SmallCoefficientSignalFilter(SignalFilter):
         they are less than `tol`.
 
         :param fft_result_val_grid: Grid of values.
-        :type fft_result_val_grid: NDArray[float]
         :return: Grid of values with values less than `tol` reduced to 0.
-        :rtype: NDArray[float]
         """
 
         mitigated_fft_result_val_grid = deepcopy(fft_result_val_grid)

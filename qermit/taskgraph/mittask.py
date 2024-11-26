@@ -65,16 +65,11 @@ class MitTask:
     _method attribute.
 
     :param _label: String to identify MitTask object by.
-    :type _label: str
     :param _n_in_wires: Number of input arguments to _method attribute function.
-    :type _n_in_wires: int
     :param _n_out_wires: number of results in Tuple returned by _method attribute function.
-    :type _n_out_wires: int
     :param _method: Pure function executed when object called.
-    :type _method: Callable
 
     :return: MitTask object for adding to TaskGraph.
-    :rtype: MitTask
     """
 
     def __init__(
@@ -120,9 +115,7 @@ def duplicate_wire_task_gen(in_wires: int, duplicates: int) -> MitTask:
     (and later added to out edges of MitTask on TaskGraph).
 
     :param in_wires: Number of in edges to Task on TaskGraph.
-    :type in_wires: int
     :param duplicates: Number of copies to take of each argument.
-    :type duplicates: int
     """
 
     def task(obj, *args):

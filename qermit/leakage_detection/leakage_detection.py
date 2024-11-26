@@ -14,9 +14,7 @@ def gen_add_leakage_gadget_circuit_task(backend: Backend) -> MitTask:
     """Generates task adding leakage gadget circuits to given circuts.
 
     :param backend: Backend on which the circuit will be run.
-    :type backend: Backend
     :return: Task adding leakage gadget circuits to given circuts.
-    :rtype: MitTask
     """
 
     if backend.backend_info is None:
@@ -33,10 +31,8 @@ def gen_add_leakage_gadget_circuit_task(backend: Backend) -> MitTask:
 
         :param circuit_shots_list: List of circuits to which leakage gadget
             circuit should be added.
-        :type circuit_shots_list: List[CircuitShots]
         :return: Circuits with gadget added, and list of corresponding
             post selection managers.
-        :rtype: Tuple[List[CircuitShots], List[PostselectMgr]]
         """
 
         # Add leakage detection gadget to each inputted circuit.
@@ -85,9 +81,7 @@ def get_leakage_detection_mitres(backend: Backend, **kwargs) -> MitRes:
     """Generate MitRes making use of leakage detection and postselection.
 
     :param backend: Backend on which the circuits are run.
-    :type backend: Backend
     :return: MitRes making use of leakage detection and postselection.
-    :rtype: MitRes
     """
 
     _mitres = deepcopy(
