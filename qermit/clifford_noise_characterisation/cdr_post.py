@@ -105,7 +105,6 @@ def cdr_quality_check_task_gen(
         :param state_circuit_exp: A list of noisy and noiseless expectation
         values for each calibration experiment.
         :return: The original inputs are returned unaltered.
-        :rtype: Tuple[List[QubitPauliOperator], List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]
         """
 
         for calibration, original in zip(state_circuit_exp, noisy_expectation):
@@ -166,8 +165,7 @@ def cdr_calibration_task_gen(
         :param calibration_results: A list of noisy and noiseless expectation values for each
         experiment.
 
-        :return: A bool confirming characteriastion is complete
-        :rtype: Tuple[bool]
+        :return: A bool confirming characterisation is complete
         """
         counter = 0
         for calibration in calibration_results:

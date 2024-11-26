@@ -190,7 +190,6 @@ class MeasurementCircuit(object):
         Returns measurement circuit stored in oracle.
 
         :return: Circuit in oracle
-        :rtype: Circuit
         """
         return self._symbolic_circuit
 

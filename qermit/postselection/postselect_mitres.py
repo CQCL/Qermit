@@ -13,7 +13,6 @@ def gen_postselect_task() -> MitTask:
     """Generates task applying postselection to given results.
 
     :return: Task applying postselection to given results.
-    :rtype: MitTask
     """
 
     def task(

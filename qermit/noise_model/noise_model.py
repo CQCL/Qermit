@@ -291,7 +291,6 @@ class ErrorDistribution:
         """Produces json serialisable representation of ErrorDistribution.
 
         :return: Json serialisable representation of ErrorDistribution.
-        :rtype: List[Dict[str, Union[List[int], float]]]
         """
         return [
             {

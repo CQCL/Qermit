@@ -113,7 +113,6 @@ def filter_observable_tracker_task_gen() -> MitTask:
     for every QubitPauliString passed that has no Measurementcircuit in ObservableTracker object passed on wire.
 
     :return: Pure function that adds MeasurementCircuit objects to ObservableTracker.
-    :rtype: MitTask
     """
 
     def task(

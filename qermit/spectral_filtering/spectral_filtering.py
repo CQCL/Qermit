@@ -26,7 +26,6 @@ def gen_result_extraction_task() -> MitTask:
     by symbol values from grid of results.
 
     :return: Task interpolating results.
-    :rtype: MitTask
     """
 
     def task(

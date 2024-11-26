@@ -56,7 +56,6 @@ class Folding(Enum):
 
     :return: Circuit with gate count increased to scale noise. The unitary implemented by the
         circuit has not changed.
-    :rtype: Circuit
     """
 
     # TODO: circ does not appear as input in docs
@@ -399,7 +398,6 @@ class Folding(Enum):
         :param circ: Circuit with noise to be scaled.
         :param noise_scaling: Factor by which noise should be scaled.
         :return: List of circuits with additional noise gates added.
-        :rtype: List[Circuit]
 
         :key noise_model: Noise model defining noise types and rates.
             Defaults to noiseless model.

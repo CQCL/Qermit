@@ -261,12 +261,11 @@ def DFSC_characterisation_task_gen() -> MitTask:
 def DFSC_correction_task_gen(zero_threshold: float) -> MitTask:
     """
     For each experiment expectation, if characterisation value greater than threshold, divide experiment expectation
-    by characteriastion value to correct for depolaring noise.
+    by characterisation value to correct for depolarising noise.
 
-    :param zero_threshold: Method does not correct for zero characteriastion expectation values, threshold for this zero limit.
+    :param zero_threshold: Method does not correct for zero characterisation expectation values, threshold for this zero limit.
 
-    :return: Function for DFSC correctoin.
-    :rtype: MitTask
+    :return: Function for DFSC correction.
     """
 
     def task(

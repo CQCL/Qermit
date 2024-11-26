@@ -126,7 +126,6 @@ def gen_state_circuits(
     :key: seed for random methods
 
     :return: All generated state circuits
-    :rtype: List[Circuit]
     """
     # set seed if given
     if "seed" in kwargs:
@@ -412,7 +411,6 @@ def ccl_result_batching_task_gen(n_state_circuits: int) -> MitTask:
         :param exact_exp: All QubitPauliOperators returned from running state circuit calibrations for all experiments through noiseless simulator.
 
         :return: State circuit results split into separate lists for each experiment, with noisy and noiseless expectations paired together.
-        :rtype: Tuple[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]
         """
         if len(noisy_exp) != len(exact_exp):
             raise RuntimeError(
