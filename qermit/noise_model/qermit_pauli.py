@@ -35,13 +35,9 @@ class QermitPauli:
         values indicating that a Z or X operator acts there.
 
         :param Z_list: 0 indicates no Z, 1 indicates Z.
-        :type Z_list: List[int]
         :param X_list: 0 indicates no X, 1 indicates X.
-        :type X_list: List[int]
         :param qubit_list: List of qubits on which the Pauli acts.
-        :type qubit_list: List[Qubit]
         :param phase: Phase as a power of i
-        :type phase: int
         """
 
         assert all([Z in {0, 1} for Z in Z_list])
@@ -59,13 +55,10 @@ class QermitPauli:
         coefficient returned by this function.
 
         :param pauli_one: First Pauli
-        :type pauli_one: QermitPauli
         :param pauli_two: Second Pauli
-        :type pauli_two: QermitPauli
         :raises Exception: Raised if the Paulis do not act
             on matching qubits.
         :return: Coefficient resulting from commuting the two Paulis.
-        :rtype: int
         """
         if not pauli_one.qubit_list == pauli_two.qubit_list:
             raise Exception(
@@ -89,12 +82,10 @@ class QermitPauli:
         qubits anticommutes with Z.
 
         :param qubit_list: Qubits on which if measurable should be checked.
-        :type qubit_list: List[Qubit]
         :raises Exception: Raised if the given qubits are not contained
             in this Pauli.
         :return: True if at least one Pauli on the given
             qubits anticommutes with Z. False otherwise.
-        :rtype: bool
         """
         if not all(qubit in self.qubit_list for qubit in qubit_list):
             raise Exception(f"{qubit_list} is not a subset of {self.qubit_list}.")
@@ -105,9 +96,7 @@ class QermitPauli:
         Pauli is created.
 
         :param qubit_list: Qubits onto which pauli should be reduced.
-        :type qubit_list: List[Qubit]
         :return: Reduced Pauli.
-        :rtype: QermitPauli
         """
 
         return QermitPauli(
@@ -122,7 +111,6 @@ class QermitPauli:
         """True is the pauli represents the all I string.
 
         :return: True is the pauli represents the all I string.
-        :rtype: bool
         """
         return all(Z == 0 for Z in self.Z_list.values()) and all(
             X == 0 for X in self.X_list.values()
@@ -137,11 +125,8 @@ class QermitPauli:
         """Generates a uniformly random Pauli.
 
         :param qubit_list: Qubits on which the Pauli acts.
-        :type qubit_list: List[Qubit]
         :param rng: Randomness generator, defaults to np.random.default_rng()
-        :type rng: Generator, optional
         :return: Random pauli.
-        :rtype: QermitPauli
         """
 
         return cls(
@@ -154,7 +139,6 @@ class QermitPauli:
         """Generates the inverse of the Pauli.
 
         :return: Conjugate transpose of the Pauli.
-        :rtype: QermitPauli
         """
 
         # the phase is the conjugate of the original
@@ -181,9 +165,7 @@ class QermitPauli:
         """Create a Pauli from a qubit pauli string.
 
         :param qps: Qubit pauli string to be converted to a Pauli.
-        :type qps: QubitPauliString
         :return: Pauli created from qubit pauli string.
-        :rtype: QermitPauli
         """
 
         Z_list = []
@@ -234,9 +216,7 @@ class QermitPauli:
         Paulis on those qubits match.
 
         :param other: Pauli to compare against.
-        :type other: QermitPauli
         :return: True is equivalent.
-        :rtype: bool
         """
 
         if not isinstance(other, QermitPauli):
@@ -264,7 +244,6 @@ class QermitPauli:
         through the circuit. The circuit should be a Clifford circuit.
 
         :param circuit: Circuit to be applied.
-        :type circuit: Circuit
         """
 
         for command in circuit.get_commands():
@@ -282,9 +261,7 @@ class QermitPauli:
         X, Y, CZ, SWAP, and Barrier.
 
         :param op_type: Type of operator to be applied.
-        :type op_type: OpType
         :param qubits: Qubits to which operator is applied.
-        :type qubits: List[Qubit]
         :raises Exception: Raised if operator is not recognised.
         """
 
@@ -374,7 +351,6 @@ class QermitPauli:
         (i)^{phase}SX^{X_liist}Z^{Z_list}S^{dagger}.
 
         :param qubit: Qubit in Pauli onto which S is acted.
-        :type qubit: Qubit
         """
 
         self.Z_list[qubit] += self.X_list[qubit]
@@ -388,7 +364,6 @@ class QermitPauli:
         H(i)^{phase}X^{X_liist}Z^{Z_list}H^{dagger}.
 
         :param qubit: Qubit in Pauli on which H is acted.
-        :type qubit: Qubit
         """
 
         self.phase += 2 * self.X_list[qubit] * self.Z_list[qubit]
@@ -404,9 +379,7 @@ class QermitPauli:
         CX(i)^{phase}X^{X_liist}Z^{Z_list}CX^{dagger}.
 
         :param control_qubit: Control qubit of CX gate.
-        :type control_qubit: Qubit
         :param target_qubit: Target qubit of CX gate.
-        :type target_qubit: Qubit
         """
 
         self.Z_list[control_qubit] += self.Z_list[target_qubit]
@@ -418,7 +391,6 @@ class QermitPauli:
         """Pre-multiply by a Pauli.
 
         :param pauli: Pauli to pre multiply by.
-        :type pauli: QermitPauli
         """
 
         for qubit in self.qubit_list:
@@ -433,9 +405,7 @@ class QermitPauli:
         """Pre apply by a pauli on a particular qubit.
 
         :param pauli: Pauli to pre-apply.
-        :type pauli: Union[Pauli, OpType]
         :param qubit: Qubit to apply Pauli to.
-        :type qubit: Qubit
         :raises Exception: Raised if pauli is not a pauli operation.
         """
 
@@ -457,7 +427,6 @@ class QermitPauli:
         """Pre-apply X Pauli ito qubit.
 
         :param qubit: Qubit to which X is pre-applied.
-        :type qubit: Qubit
         """
 
         self.X_list[qubit] += 1
@@ -469,7 +438,6 @@ class QermitPauli:
         """Pre-apply Z Pauli ito qubit.
 
         :param qubit: Qubit to which Z is pre-applied.
-        :type qubit: Qubit
         """
 
         self.Z_list[qubit] += 1
@@ -479,9 +447,7 @@ class QermitPauli:
         """Post apply a Pauli operation.
 
         :param pauli: Pauli to post-apply.
-        :type pauli: Union[Pauli, OpType]
         :param qubit: Qubit to post-apply pauli to.
-        :type qubit: Qubit
         :raises Exception: Raised if pauli is not a Pauli operation.
         """
 
@@ -503,7 +469,6 @@ class QermitPauli:
         """Post-apply X Pauli ito qubit.
 
         :param qubit: Qubit to which X is post-applied.
-        :type qubit: Qubit
         """
 
         self.X_list[qubit] += 1
@@ -513,7 +478,6 @@ class QermitPauli:
         """Post-apply Z Pauli ito qubit.
 
         :param qubit: Qubit to which Z is post-applied.
-        :type qubit: Qubit
         """
 
         self.Z_list[qubit] += 1
@@ -525,7 +489,6 @@ class QermitPauli:
         """Controlled circuit which acts Pauli.
 
         :return: Controlled circuit acting Paulii.
-        :rtype: Circuit
         """
 
         circ = Circuit()
@@ -561,7 +524,6 @@ class QermitPauli:
         """Circuit which acts Pauli.
 
         :return: Circuit acting Pauli.
-        :rtype: Circuit
         """
 
         circ = Circuit()
@@ -580,7 +542,6 @@ class QermitPauli:
         """List of Paulis which correspond to Pauli, and the phase.
 
         :return: [description]
-        :rtype: Tuple[List[Pauli], complex]
         """
 
         operator_phase = self.phase
@@ -605,7 +566,6 @@ class QermitPauli:
         along with the appropriate phase.
 
         :return: Pauli string and phase corresponding to Pauli.
-        :rtype: Tuple[QubitPauliString, complex]
         """
 
         paulis, operator_phase = self.pauli_string
@@ -621,11 +581,8 @@ class QermitPauli:
         """Create a QermitPauli from a Pauli iterable.
 
         :param pauli_iterable: The Pauli iterable to convert.
-        :type pauli_iterable: Iterable[Pauli]
         :param qubit_list: The qubits on which the resulting pauli will act.
-        :type qubit_list: List[Qubit]
         :return: The pauli corresponding to the given iterable.
-        :rtype: QermitPauli
         """
         return cls(
             Z_list=[int(pauli in (Pauli.Z, Pauli.Y)) for pauli in pauli_iterable],

@@ -38,7 +38,6 @@ class TaskGraph:
     types of ports edges are attached to must match.
 
     :param _label: Name for identification of TaskGraph object.
-    :type _label: str
     """
 
     def __init__(
@@ -63,10 +62,8 @@ class TaskGraph:
         Returns a new TaskGraph object from another TaskGraph object.
 
         :param task_graph: TaskGraph object to copy tasks from.
-        :type task_graph: TaskGraph
 
         :return: Copied TaskGraph
-        :rtype: TaskGraph
         """
         self._task_graph = deepcopy(task_graph._task_graph)
         self._label = task_graph._label
@@ -123,10 +120,8 @@ class TaskGraph:
         internal task_graph attribute matches the number of in wires to the graph.
 
         :param task: Wrapped pure function to prepend to graph
-        :type task: Union[MitTask, "TaskGraph"]
 
         :return: True if prepend permitted
-        :rtype: bool
         """
         return task.n_out_wires == self.n_in_wires
 
@@ -136,10 +131,8 @@ class TaskGraph:
         internal task_graph attribute matches the number of out wires to the graph.
 
         :param task: Wrapped pure function to append to graph
-        :type task: Union[MitTask, "TaskGraph"]
 
         :return: True if append permitted
-        :rtype: bool
         """
         return task.n_in_wires == self.n_out_wires
 
@@ -155,7 +148,6 @@ class TaskGraph:
         and output vertex, with no type restrictions.
 
         :param num_wires: Number of edges to add between input and output vertices.
-        :type num_wires: int
         """
         for _ in range(num_wires):
             in_port = len(self._task_graph.out_edges(self._i, data=True))
@@ -178,7 +170,6 @@ class TaskGraph:
         New edges also added from the Input vertex to the task (any type permitted), ports ordered in arguments order.
 
         :param task: New task to be prepended.
-        :type task: MitTask
         """
         assert self.check_prepend_wires(task)
         # It's possible a single generated MitTask object could be used in different TaskGraph objects
@@ -203,7 +194,6 @@ class TaskGraph:
         New edges added from task to Output vertex (any type permitted), ports ordered in arguments order.
 
         :param task: New task to be appended.
-        :type task: MitTask
         """
         assert self.check_append_wires(task)
         # It's possible a single generated MitTask object could be used in different TaskGraph objects
@@ -318,7 +308,6 @@ class TaskGraph:
         Adds new MitTask/TaskGraph to TaskGraph object in parallel. All task in edges wired as out edges from Input vertex. All task out_Edges wired as in edges to Output Vertex.
 
         :param task: New task to be added in parallel.
-        :type task: MitTask
         """
         task = copy(task)
         base_n_input_outs = len(self._task_graph.out_edges(self._i))
@@ -358,15 +347,11 @@ class TaskGraph:
 
         :param input_wires: Each Wire holds information assigned as data to an output edge
             from the input vertex of the _task_graph.
-        :type input_wires: List[Wire]
         :param cache: If True each Tasks output data is stored in an OrderedDict with the
             Task._label attribute as its key.
-        :type cache: bool
 
 
         :return: Data from input edges to output vertex, assigned as wires.
-        :rtype: Tuple[List[Wire]]
-
         """
         for edge, wire in zip(
             self._task_graph.out_edges(self._i, data=True), input_wires
@@ -425,7 +410,6 @@ class TaskGraph:
         :returns: Dictionary holding all output data from all MitTask.
             This is only full after run is called with the cache argument set
             to True. Keys are stored in graph topological order.
-        :rtype: Dict[str, Tuple[MitTask, List[Wire]]]
         """
         return self._cache
 
@@ -434,7 +418,6 @@ class TaskGraph:
         Return a visual representation of the DAG as a graphviz object.
 
         :returns:   Representation of the DAG
-        :rtype:     graphviz.DiGraph
         """
         return _taskgraph_to_graphviz(self._task_graph, None, self._label)
 

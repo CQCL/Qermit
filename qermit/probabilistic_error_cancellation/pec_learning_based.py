@@ -54,9 +54,7 @@ def str_to_pauli_op(pauli_str: str) -> Op:
     Returns Pauli operator corresponding to given string
 
     :param pauli_str: one of 'X','Y','Z','I'
-    :type pauli_str: str
     :return: Pauli operator
-    :rtype: Op
     """
     assert pauli_str in ["X", "Z", "Y", "I"]
     switcher = {
@@ -79,20 +77,15 @@ def random_commuting_clifford(
     of the given Pauli string on the final Clifford circuit is non-zero.
 
     :param circ: Initial circuit. Should include gates labelled as Computing using opgroups.
-    :type circ: Circuit
     :param qps: Pauli string which should have non-zero expectation on the outputted circuit.
-    :type qps: QubitPauliString
     :param max_count: Maximum number of attempts at finding a Clifford circuit with non-zero expectation value.
-    :type max_count: int
     :param simulator_backend: Backend for deriving Pauli Expectation values
-    :type simulator_backend: Backend
     :raises ValueError: Raised if the circuit does not include any gates labelled as Computing.
     :raises RuntimeError: Raised if no replacement of Computing gates with Clifford gates could be found such
         that the expectation of the inputted Pauli string is non-zero.
     :raises RuntimeError: Raised if the resulting circuit is not Clifford. This could be because
         not all Computing gates in the original circuit were labelled as such.
     :return: Clifford circuit, build by replacing Computing gates with random Clifford gates.
-    :rtype: Circuit
     """
 
     # Build list of all opgroup names corresponding to Computing gates.
@@ -181,13 +174,9 @@ def substitute_pauli(circ: Circuit, frame_name: str, pauli_pair: List[Op]) -> Ci
     Replace 2 qubit Pauli gate pair which surrounds Frame gate with a 2 qubit pauli gate and its inverse.
 
     :param circ: Initial circuit. This should include a gate in the opgroup frame_name.
-    :type circ: Circuit
     :param frame_name: The opgroup of the Frame gate that the pauli gates will act either side of
-    :type frame_name: str
     :param pauli_pair: Two Ops describing the 2 qubit Pauli gate
-    :type pauli_pair: List[Op]
     :return: A circuit, with the Pauli gates inserted either side of the given frame gate.
-    :rtype: Circuit
     """
 
     match_return = re.match(r"Frame (.*)", frame_name)
@@ -216,15 +205,11 @@ def substitute_pauli_but_one(
     inputted Frame gate, described by its opgroup.
 
     :param circ: Initial Circuit
-    :type circ: Circuit
     :param to_replace_opgroup: The opgroup of the frame gate who's corresponding
         Pauli gates should be replaced with the inputted gate.
-    :type to_replace_opgroup: str
     :param pauli_pair: Two Ops describing the Pauli gate to be substituted in
-    :type pauli_pair: List[Op]
     :raises RuntimeError: Raised if the inputted circuit does not have a gate in the opgroup inputted.
     :return: The final circuit with the Pauli gates substituted in.
-    :rtype: Circuit
     """
 
     # Gather list of all of the opgroup of Frame gates in the circuit.
@@ -257,9 +242,7 @@ def PECRebase(circ: Circuit) -> Circuit:
     All consecutive single qubit gates should be compressed to one single qubit gate.
 
     :param circ: Initial circuit in any gate set.
-    :type circ: Circuit
     :return: Rebased circuit
-    :rtype: Circuit
     """
     rebased_circ = circ.copy()
     RebaseTket().apply(rebased_circ)
@@ -274,7 +257,6 @@ def gen_rebase_to_frames_and_computing() -> MitTask:
     and all single qubit gates (called Computing gates) are merged where possible.
 
     :return: MitTask object which rebases circuits into the Frame and Computing gate set.
-    :rtype: MitTask
     """
 
     def task(
@@ -286,9 +268,7 @@ def gen_rebase_to_frames_and_computing() -> MitTask:
         and all single qubit gates (called Computing gates) should be merged where possible
 
         :param wire: Circuits
-        :type wire: List[ObservableExperiment]
         :return: Rebased Circuits
-        :rtype: Tuple[List[ObservableExperiment]]
         """
 
         framed_circ_list = []
@@ -323,7 +303,6 @@ def gen_run_with_quasi_prob() -> MitTask:
     into error mitigated results.
 
     :return: MitTask performing mitigation given noisy results and quasi-probabilities.
-    :rtype: MitTask
     """
 
     def task(
@@ -337,16 +316,11 @@ def gen_run_with_quasi_prob() -> MitTask:
         :param prob_list: List of quasi probabilities for error-mitigation. Note that the outer
             most list corresponds to circuits, the second level list corresponds to qubit pauli strings,
             and the inner most list contains the quasi probabilities.
-        :type prob_list: List[List[QuasiProbabilities]], OuterList all experiments, second level list
-            for MeasurementCircuits, third level list is for QuasiProbabilities
         :param noisy_circ_results: List of MitEx results from noisy backend.
-        :type noisy_circ_results: Tuple[List[QubitPauliOperator]]
         :param noisy_list_structure: Information on the structure of the noisy results.
             This takes the form {'experiment':int, 'error':int}, where 'experiment' indexes the
             initial circuit and 'error' indexes the Pauli error applied.
-        :type noisy_list_structure: List[Dict[str, int]]
         :return: Error mitigated results.
-        :rtype: Tuple[List[QubitPauliOperator]]
         """
 
         circ_results_list = []
@@ -392,7 +366,6 @@ def collate_results_task_gen() -> MitTask:
     not changed by this task.
 
     :return: MitTask object collating results.
-    :rtype: MitTask
     """
 
     def task(
@@ -407,22 +380,17 @@ def collate_results_task_gen() -> MitTask:
         the quasiprobabilities required for correction. The data itself is not changed by this task.
 
         :param noisy_results: List of expectations values of noisy Clifford circuits.
-        :type noisy_results: List[QubitPauliOperator]
         :param noisy_list_structure: Information on the structure of the noisy results.
             This takes the form {'experiment':int, 'error':int}, where 'experiment' indexes the
             initial circuit and 'error' indexes the Pauli error applied.
-        :type noisy_list_structure: List[Dict[str, int]]
         :param ideal_results: List of expectations values of ideal Clifford circuits
-        :type ideal_results: List[QubitPauliOperator]
         :param ideal_list_structure: Information on the structure of the ideal results.
             This takes the form {'experiment':int, 'qps':int, 'training circuit':int},
             where 'experiment' indexes the initial circuit, 'qps' indexes the QubitPauliString,
             and 'training circuit' indexes the random Clifford derived from the initial circuit.
-        :type ideal_list_structure: List[Dict[str,int]]
         :return: Collated results. The inner most Tuple corresponds to expectation results for a
             fixed ObservableExperiment, QubitPauliString, clifford circuit, and Pauli noise.
             Each list level fixes consecutively an ObservableExperiment, QubitPauliString, and Clifford circuit.
-        :rtype: Tuple[List[List[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]]]
         """
 
         if not len(ideal_list_structure) == len(ideal_results):
@@ -513,10 +481,8 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
     them to deduce quasi-probabilities for later correction of real experiment results.
 
     :param num_cliff_circ: The number of Clifford circuits generated for each inputted circuit.
-    :type num_cliff_circ: int
 
     :return: MitTask object for producing quasi probabilities.
-    :rtype: MitTask
     """
 
     def task(
@@ -530,11 +496,9 @@ def learn_quasi_probs_task_gen(num_cliff_circ: int) -> MitTask:
             expectation results for a fixed ObservableExperiment, QubitPauliString,
             clifford circuit, and Pauli noise. Each list level fixes consecutively
             an ObservableExperiment, QubitPauliString, and clifford circuit.
-        :type results: List[List[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]]
         :return: List of quasi probabilities. The outer list corresponds to circuits,
             the second level list corresponds to Pauli strings, and the inner most
             list corresponds to quasi probabilities.
-        :rtype: Tuple[List[List[QuasiProbabilities]]]
         """
 
         prob_list = []
@@ -612,12 +576,9 @@ def gen_get_clifford_training_set(
     constructed from an initial circuit by replacing all Computing gates with random Clifford gates.
 
     :param simulator_backend: Ideal simulator backend on which Clifford circuits are to be run.
-    :type simulator_backend: Backend
     :param num_rand_cliff: Number of random Clifford circuits for each fixed ObservableExperiment.
-    :type num_rand_cliff: int
 
     :return: MitTask object for producing random Clifford circuits.
-    :rtype: MitTask
     """
 
     def task(
@@ -627,9 +588,7 @@ def gen_get_clifford_training_set(
         randomly replacing each Computing gate with a Clifford gate.
 
         :param wire: Initial circuits
-        :type wire: List[Tuple[AnsatzCircuit,ObservableTracker]]
         :return: Clifford circuits
-        :rtype: Tuple[List[ObservableExperiment]]
         """
 
         training_circ_list = []
@@ -689,10 +648,8 @@ def label_gates(circ: Circuit) -> Circuit:
     The label includes an index to describe the ordering of the gates
 
     :param circ: Circuit which should be in the TK1, CX basis
-    :type circ: Circuit
     :raises RuntimeError: Raised if the circuit is not in the required basis.
     :return: Identical circuit, but with gates assigned opgroups.
-    :rtype: Circuit
     """
 
     # Recover list of commands describing initial circuit.
@@ -731,7 +688,6 @@ def gen_label_gates() -> MitTask:
     Circuits should be rebased to Frame and Computing before this task.
 
     :return: MitTask performing labelling of gates.
-    :rtype: MitTask
     """
 
     def task(
@@ -740,9 +696,7 @@ def gen_label_gates() -> MitTask:
         """Returns identical circuits but with each gate labelled as Computing or Frame.
 
         :param wire: Circuits
-        :type wire: List[ObservableExperiment]
         :return: Identical circuits with Computing and Frame gates labelled as such.
-        :rtype: Tuple[List[ObservableExperiment]]
         """
 
         labelled_circ_list = []
@@ -776,12 +730,10 @@ def wrap_frame_gates(circ: Circuit) -> Circuit:
 
     :param circ: Initial circuit. Each gate should be labelled as either
         a Frame gate, or a Computing gates.
-    :type circ: Circuit
     :raises RuntimeError: Raised if the gates in the circuit are not labelled as
         either a Frame or Computing gate.
     :return: Circuit identical to the original, but with identity gates,
         labelled as Pauli gates, added on either side of every Frame gate.
-    :rtype: Circuit
     """
 
     # Recover list of commands from circuit
@@ -848,7 +800,6 @@ def gen_wrap_frame_gates() -> MitTask:
     gates, initially set to the identity. Pauli gates are labelled as such.
 
     :return: MitTask which performs wrapping.
-    :rtype: MitTask
     """
 
     def task(
@@ -858,9 +809,7 @@ def gen_wrap_frame_gates() -> MitTask:
         gates, initially set to the identity.
 
         :param wire: Initial circuits
-        :type wire: List[ObservableExperiment]
         :return: Circuits with each Frame gate wrapped in identity gates, labelled as Pauli gates.
-        :rtype: Tuple[List[ObservableExperiment]]
         """
 
         framed_circ_list = []
@@ -892,12 +841,10 @@ def list_pauli_gates(circ: Circuit) -> List[Dict]:
     error occurs on at mores Frame gate.
 
     :param circ: Circuit with every gate labelled as a Frame of Computing gate
-    :type circ: Circuit
     :raises RuntimeError: Raised if there are no Frame gates in the circuit
     :return: A list of dictionaries describing the errors. Note that as we are assuming at most
         one error in the circuit, it is enough to specify the 2-qubit Pauli error and the gate
         (specified by its opgroup) on which it acts.
-    :rtype: List[Dict]
     """
 
     # Create list of all Frame gate opgroups
@@ -939,9 +886,7 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
     possible Pauli error.
 
     :param backend: Backend on which circuits will be run. Required for compilation.
-    :type backend: Backend
     :return: MitTask produsing noisy gates.
-    :rtype: MitTask
     """
 
     def task(
@@ -952,9 +897,7 @@ def gen_get_noisy_circuits(backend: Backend, **kwargs) -> MitTask:
          possible Pauli error.
 
         :param wire: Initial Circuits
-        :type wire: List[ObservableExperiment]
         :return: Circuits with pauli gates added around Frame gates to simulate noise.
-        :rtype: Tuple[List[ObservableExperiment]]
         """
 
         list_structure = []
@@ -1013,9 +956,7 @@ def gen_PEC_learning_based_MitEx(
     Error Cancellation (PEC), as introduced in https://arxiv.org/abs/2005.07601.
 
     :param device_backend: Noisy backend on which circuits are to be run.
-    :type device_backend: Backend
     :param simulator_backend: Ideal state vector simulator used for simulating Clifford Circuits.
-    :type simulator_backend: Backend
 
     :key simulator_mitex: MitEx object ideal state simulations are run on, default simulator_backend.
     :key device_mitex: MitEx object observable experiments are run on, default device_backend.
@@ -1025,7 +966,6 @@ def gen_PEC_learning_based_MitEx(
 
     :raises RuntimeError: Raised if the backend gate set does not include CX or CZ gates.
     :return: MitEx object implementing error-mitigation via learning based PEC.
-    :rtype: MitEx
     """
 
     # Disallow backends that do not have 2 qubit clifford gates

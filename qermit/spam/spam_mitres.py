@@ -44,11 +44,8 @@ def gen_FullyCorrelated_SPAM_MitRes(
     to fully characterise, where n is the size of the largest sublist of correlated nodes.
 
     :param backend: Default Backend characterisation and experiment are executed on.
-    :type backend: Backend
     :param calibration_shots: Number of shots required for each characterisation circuit
-    :type calibration_shots: int
     :param correlations: Each sublist of Node corresponds to some set of fully correlated nodes.
-    :type correlations: List[List[Node]]
     """
     _mitres_spam_calib = copy(
         kwargs.get("calibration_mitres", MitRes(backend, _label="SPAMCalibration"))
@@ -97,9 +94,7 @@ def gen_UnCorrelated_SPAM_MitRes(
     Requires 2 circuits to characterise device.
 
     :param backend: Default Backend characterisation and experiment are executed on.
-    :type backend: Backend
     :param calibration_shots: Number of shots required for each characterisation circuit
-    :type calibration_shots: int
     """
     if backend.backend_info is None:
         raise ValueError("Backend has no backend_info attribute.")

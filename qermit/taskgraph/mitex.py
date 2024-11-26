@@ -50,14 +50,10 @@ def gen_compiled_shot_split_MitRes(
     set as defined by backend.compile_circuit.
 
     :param backend: Backend with circuits are compiled for.
-    :type backend: Backend
     :param max_shots: The maximum number of shots that each job should request.
-    :type max_shots: int
     :param optimisation_level: Sets options in compile_circuit method
-    :type optimisation_level: int
 
     :return: shot splitting MitRes object with compilation task prepended.
-    :rtype: MitRes
     """
     mr = gen_shot_split_MitRes(backend, max_shots)
     mr.prepend(backend_compile_circuit_shots_task_gen(backend, optimisation_level))
@@ -71,12 +67,9 @@ def gen_compiled_MitRes(backend: Backend, optimisation_level: int = 1) -> MitRes
     set as defined by backend.compile_circuit.
 
     :param backend: Backend with circuits are compiled for.
-    :type backend: Backend
     :param optimisation_level: Sets options in compile_circuit method
-    :type optimisation_level: int
 
     :return: MitRes object with compilation task prepended.
-    :rtype: MitRes
     """
     mr = MitRes(backend)
     mr.prepend(backend_compile_circuit_shots_task_gen(backend, optimisation_level))
@@ -91,10 +84,8 @@ def get_basic_measurement_circuit(
     via changing of basis through quantum gates.
 
     :param string: Qubit Pauli String to be measured
-    :type string: QubitPauliString
 
     :return: Measurement circuit for appending on some ansatz
-    :rtype: Circuit
     """
     measurement_circuit = Circuit()
     measured_qbs = []
@@ -122,7 +113,6 @@ def filter_observable_tracker_task_gen() -> MitTask:
     for every QubitPauliString passed that has no Measurementcircuit in ObservableTracker object passed on wire.
 
     :return: Pure function that adds MeasurementCircuit objects to ObservableTracker.
-    :rtype: MitTask
     """
 
     def task(
@@ -131,9 +121,7 @@ def filter_observable_tracker_task_gen() -> MitTask:
     ) -> Tuple[List[List[CircuitShots]], List[ObservableTracker]]:
         """
         :param measurement_wires: Wires containing Circuit information and Observable information
-        :type measurement_wires: List[ObservableExperiment]
         :returns: A modified ObservableTracker object, and a List of CircuitShots for each Observable measured
-        :rtype: Tuple[List[List[CircuitShots]], List[ObservableTracker]]
         """
 
         output_circuits = []
@@ -186,11 +174,9 @@ def collate_circuit_shots_task_gen() -> MitTask:
     ) -> Tuple[List[CircuitShots], List[int]]:
         """
         :param circuit_wires: Different lists of Circuit + Shots for different experiments
-        :type circuit_wires: List[List[CircuitShots]]
 
         :return: Different experiment circuits collated on one wire, and the sequential number of
         results for each experiment on a second wire.
-        :rtype: Tuple[List[CircuitShots], List[int]]
         """
         collated_circuitshots = []
         lengths = []
@@ -216,12 +202,9 @@ def split_results_task_gen() -> MitTask:
     ) -> Tuple[List[List[BackendResult]]]:
         """
         :param results: All results returned from MitRes object
-        :type results: List[BackendResult]
         :param experiment_sizes: The ordered number of results required for each experiment
-        :type experiment_sizes: List[int]
 
         :return: All results split up into sublists for each MitEx experiment
-        :rtype: Tuple(List[List[BackendResult]])
         """
         lower_bound = 0
         split_results = []
@@ -245,12 +228,9 @@ def get_expectations_task_gen() -> MitTask:
     ) -> Tuple[List[QubitPauliOperator]]:
         """
         :param all_results: All Results from MitRes split into sublists, one for each Observable experiment.
-        :type all_results: List[List[BackendResult]]
         :param trackers: All ObservableTrackers defining experiments passed to MitEx.
-        :type trackers: List[ObservableTracker]
 
         :return: Each experiments expectation results in a QubitPauliOperator
-        :rtype: Tuple[List[QubitPauliOperator]]
         """
         if len(all_results) != len(trackers):
             raise ValueError(
@@ -284,9 +264,7 @@ class MitEx(TaskGraph):
         can be used to run through any mitres of choice.
 
         :param backend: Pytket backend default constructor which tasks are generated from.
-        :type backend: Backend
         :param label: Name for identification of MitEx object.
-        :type label: str
         :key mitres: MitEx object experiments are run through
         """
         # set member variables
@@ -346,10 +324,8 @@ class MitEx(TaskGraph):
         return type is Tuple[List[ObservableExperiment]].
 
         :param task: MitTask or TaskGraph object for checking wire numbers of.
-        :type task: Union[MitTask, Taskgraph]
 
         :return: True if task is suitably for prepending, False if not.
-        :rtype: bool
         """
         sig = inspect.signature(task.run)
         params = list(sig.parameters.values())
@@ -370,10 +346,8 @@ class MitEx(TaskGraph):
         return type is Tuple[List[QubitPauliOperator]].
 
         :param task: MitTask or TaskGraph object for checking wire numbers of.
-        :type task: Union[MitTask, Taskgraph]
 
         :return: True if task is suitably for appending, False if not.
-        :rtype: bool
         """
         sig = inspect.signature(task.run)
         params = list(sig.parameters.values())
@@ -408,10 +382,8 @@ class MitEx(TaskGraph):
         Returns a MitEx object from a TaskGraph object.
 
         :param task_graph: TaskGraph object to copy tasks from.
-        :type task_graph: TaskGraph
 
         :return: Copied TaskGraph as MitEx
-        :rtype: MitEx
         """
         if task_graph.n_in_wires != 1 or task_graph.n_out_wires != 1:
             raise TypeError(
@@ -454,7 +426,6 @@ class MitEx(TaskGraph):
         Not permitted for MitEx, raises TypeError.
 
         :param task: New task to be added in parallel.
-        :type task: MitTask
         """
         raise TypeError("MitEx.parallel forbidden.")
 
@@ -465,7 +436,6 @@ class MitEx(TaskGraph):
         raises TypeError.
 
         :param num_wires: Number of edges to add between input and output vertices.
-        :type num_wires: int
         """
         raise TypeError("MitEx.add_n_wires forbidden.")
 
@@ -498,10 +468,8 @@ class MitEx(TaskGraph):
 
         :param mitex_wires: Each Tuple pertains to a different Observable measuring experiment, and contains
             the minimum amount of information to run an Mitigated Experiment for calculating observables.
-        :type mitex_wires: List[ObservableExperiment]
 
         :return: Observable experiment results as QubitPauliOperator, where values are expectations.
-        :rtype: List[QubitPauliOperator]
         """
         return self([mitex_wires], cache, characterisation)[0]
 
@@ -515,10 +483,8 @@ class MitEx(TaskGraph):
         desired operator.
 
         :param mitex_wires: Each tuple pertains to a different basic observable measuring experiment.
-        :type mitex_wires: List[Tuple[CircuitShots, QubitPauliOperator]]
 
         :return: Observable experiment results as QubitPauliOperator, where values are expectations.
-        :rtype: List[QubitPauliOperator]
         """
         run_wires = [
             ObservableExperiment(

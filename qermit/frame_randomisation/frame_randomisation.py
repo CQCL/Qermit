@@ -45,11 +45,8 @@ class FrameRandomisation(Enum):
         circuits corresponding to instances of frame randomisation for the input circuit.
 
         :param circuit: Circuit to have frame randomisation applied.
-        :type circuit: Circuit
         :param shots: Number of shots of each frame randomisation circuit to take.
-        :type shots: int
         :param samples: Number of frame randomisation instances to sample.
-        :type samples: int
         """
         pfr = PauliFrameRandomisation()
         pfr_shots = ceil(shots / samples)
@@ -70,11 +67,8 @@ class FrameRandomisation(Enum):
         that Rz(-x) and Rz(x) incur similar noise for any angle x.
 
         :param circuit: Circuit to have frame randomisation applied.
-        :type circuit: Circuit
         :param shots: Number of shots of each frame randomisation circuit to take.
-        :type shots: int
         :param samples: Number of frame randomisation instances to sample.
-        :type samples: int
         """
         ufr = UniversalFrameRandomisation()
         ufr_shots = ceil(shots / samples)
@@ -91,17 +85,14 @@ def frame_randomisation_circuits_task_gen(
     Returns a MitTask object that produces Frame Randomisation circuits for some wire of experiment circuits.
 
     :param samples: Number of samples of frame randomisation circuits to take for each circuit in wire.
-    :type samples: int
     """
 
     def task(obj, circs_shots: List[CircuitShots]) -> Tuple[List[CircuitShots]]:
         """
         :param circ_shots: A list of tuple of circuits and shots. Each circuit has frame randomisation applied.
         The number of shots of each frame randomisation circuit is ceil(shots/samples)
-        :type circ_shots: List[CircuiShots]
 
         :return: Frame Randomisation circutis
-        :rtype: Tuple[List[CircuitShots]]
         """
 
         all_fr_circs_shots = []
@@ -127,7 +118,6 @@ def frame_randomisation_result_task_gen(samples: int) -> MitTask:
 
     :param samples: Number of frame randomisation instances created in the first place, used to suitably
         collate results.
-    :type samples: int
     """
 
     def task(
@@ -136,10 +126,8 @@ def frame_randomisation_result_task_gen(samples: int) -> MitTask:
     ) -> Tuple[List[BackendResult]]:
         """
         :param all_fr_results: A list of BackendResult objects for all frame randomisations for all experiment circuits.
-        :type: all_fr_results: List[BackendResult]
 
         :return: Collated BackendResult objects, reflecting frame randomisation procedure
-        :rtype: Tuple[List[BackendResult]]
         """
         chunked_results = [
             all_fr_results[i : i + samples]
@@ -174,9 +162,7 @@ def gen_Frame_Randomisation_MitRes(backend: Backend, samples: int, **kwargs) -> 
     Produces a MitRes object that applies FrameRandomisation techniques to experiment circuits.
 
     :param backend: Backend which experiments are default run through.
-    :type backend: Backend
     :param samples: Number of Frame Randomisation instances sampled in Frame Randomisation.
-    :type samples: int
 
     :key mitres: MitRes object FrameRandomisation MitRes built around if given.
     :key frame_randomisation: FrameRandomisation Enum passed to specify method used.

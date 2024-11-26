@@ -42,9 +42,7 @@ def backend_compile_circuit_shots_task_gen(
     Returns new wire wherein each circuit has been compiled.
 
     :param backend: Backend object from which compile circuit method is called
-    :type backend: Backend
     :param optimisation_level: Optimisation level of backend called.
-    :type optimmisation_level: int
     """
 
     def task(obj, circ_shots: List[CircuitShots]) -> Tuple[List[CircuitShots]]:
@@ -72,18 +70,14 @@ def backend_handle_task_gen(backend: Backend) -> MitTask:
     If different numbers of shots are passed, each circuit is run with the maximum number of shots.
 
     :param backend: Backend circuits are run through.
-    :type backend: Backend
     :return: Pure function that adds passes circuits to backend and gets handles.
-    :rtype: MitTask
     """
 
     def task(obj, circuit_wires: List[CircuitShots]) -> Tuple[List[ResultHandle]]:
         """
         :param circuit_wires: Circuits to be run on backend, number of shots to run of each.
-        :type circuit_wires: List[CircuitShots]
 
         :return: ResultHandles from process_circuits method.
-        :rtype: Tuple[List[ResultHandle]]
         """
 
         if len(circuit_wires) != 0:
@@ -108,20 +102,17 @@ def backend_res_task_gen(backend: Backend) -> MitTask:
     the backend the task is defined by.
 
     :param backend: backend holding results for handles.
-    :type backend: Backend
     """
 
     def task(obj, handles: List[ResultHandle]) -> Tuple[List[BackendResult]]:
+        """
+        :param handles: ResultHandle objects previously produced from backend.
+
+        :return: For each ResultHandle in handles, a BackendResult object retrieved from backend.
+        """
         results = backend.get_results(handles)
 
         return (results,)
-        """
-        :param handles: ResultHandle objects previously produced from backend.
-        :type handles: List[ResultHandle]
-
-        :return: For each ResultHandle in handles, a BackendResult object retrieved from backend.
-        :rtype: Tuple[List[BackendResult]]
-        """
 
     return MitTask(
         _label="HandlesToResults", _n_in_wires=1, _n_out_wires=1, _method=task
@@ -143,9 +134,7 @@ class MitRes(TaskGraph):
 
 
         :param backend: Pytket backend default constructor which tasks are generated from.
-        :type backend: Backend
         :param label: Name for identification of MitRes object.
-        :type label: str
         """
         # set member variables
         self._label = _label
@@ -175,10 +164,8 @@ class MitRes(TaskGraph):
         return type is Tuple[List[CircuitShots]].
 
         :param task: MitTask or TaskGraph object for checking wire numbers of.
-        :type task: Union[MitTask, Taskgraph]
 
         :return: True if task is suitable for prepending, False if not.
-        :rtype: bool
         """
         sig = inspect.signature(task.run)
         params = list(sig.parameters.values())
@@ -199,10 +186,8 @@ class MitRes(TaskGraph):
         return type is Tuple[List[BackendResult]].
 
         :param task: MitTask or TaskGraph object for checking wire numbers of.
-        :type task: Union[MitTask, Taskgraph]
 
         :return: True if task is suitable for apppending, False if not.
-        :rtype: bool
         """
         sig = inspect.signature(task.run)
         params = list(sig.parameters.values())
@@ -237,9 +222,7 @@ class MitRes(TaskGraph):
         Returns a MitRes object from a TaskGraph object.
 
         :param task_graph: TaskGraph object to copy tasks from.
-        :type task_graph: TaskGraph
         :return: Copied TaskGraph as MitRes
-        :rtype: MitRes
         """
         if task_graph.n_in_wires != 1 or task_graph.n_out_wires != 1:
             raise TypeError(
@@ -282,7 +265,6 @@ class MitRes(TaskGraph):
         Not permitted for MitRes, raises TypeError.
 
         :param task: New task to be added in parallel.
-        :type task: MitTask
         """
         raise TypeError("MitRes.parallel forbidden.")
 
@@ -294,7 +276,6 @@ class MitRes(TaskGraph):
 
 
         :param num_wires: Number of edges to add between input and output vertices.
-        :type num_wires: int
         """
         raise TypeError("MitRes.add_n_wires forbidden.")
 
@@ -320,10 +301,8 @@ class MitRes(TaskGraph):
 
         :param circuit_shotss: Each tuple in circuit_wires contains a Circuit to run on
             internal backends and the number of shots to take of said circuit.
-        :type circuit_shots: List[CircuitShots]
 
         :return: A BackendResult object for each combination of circuit and shots.
-        :rtype: List[BackendResult]
         """
         return self([circuit_shots], cache, characterisation)[0]
 
@@ -335,9 +314,7 @@ def split_shots_task_gen(max_shots: int) -> MitTask:
     shots matches that initially requested.
 
     :param max_shots: The maximum number of shots per job.
-    :type max_shots: int
     :return: A task dividing the job into several smaller ones.
-    :rtype: MitTask
     """
 
     def task(
@@ -349,10 +326,8 @@ def split_shots_task_gen(max_shots: int) -> MitTask:
 
         :param circuit_wires: A list of the circuits to be run, and the number
         of shots to be taken.
-        :type circuit_wires: List[CircuitShots]
         :return: A new list of circuits, some of which repeat with a smaller
         number of shots.
-        :rtype: Tuple[List[CircuitShots], List[int]]
         """
 
         # A new list of circuits and shots
@@ -398,7 +373,6 @@ def group_shots_task_gen() -> MitTask:
     by split_shots_task_gen.
 
     :return: Task merging jobs which correspond to the same circuit.
-    :rtype: MitTask
     """
 
     def task(
@@ -409,14 +383,11 @@ def group_shots_task_gen() -> MitTask:
 
         :param results_wires: A list of results, some of which correspond to
         the same circuit.
-        :type results_wires: List[BackendResult]
         :param split_index: A list of indexes identifying which results
         correspond to which circuit. Those results with index i correspond to
         the circuit i.
-        :type split_index: List[int]
         :return: A new list of results, where results which correspond to the
         same circuit have been grouped together.
-        :rtype: Tuple[List[BackendResult]]
         """
 
         # A new list of results where some results have been merged.
@@ -452,11 +423,8 @@ def gen_shot_split_MitRes(backend: Backend, max_shots: int) -> MitRes:
     jobs if necessary.
 
     :param backend: The backend on which to run the jobs.
-    :type backend: Backend
     :param max_shots: The maximum number of shots that each job should request.
-    :type max_shots: int
     :return: A MitRes object.
-    :rtype: MitRes
     """
 
     _experiment_mitres = MitRes(backend=backend)

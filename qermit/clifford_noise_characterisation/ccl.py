@@ -56,12 +56,9 @@ class LikelihoodFunction(Enum):
         Returns probability 1 of accepting returned results.
 
         :param qpo_noisy: Results calculated from device of choice.
-        :type qpo_noisy: QubitPauliOperators
         :param qpo_exact: Results calculated from noiseless simulator of choice.
-        :type qpo_exact: QubitPauliOperator
 
         :return: Always 1, meaning any result is accepted.
-        :rtype: float
         """
         return 1
 
@@ -74,11 +71,9 @@ def sample_weighted_clifford_angle(rz_angle: float, **kwargs) -> float:
     Distribution calculation as in B1, page 6 arXiv:2005.10189.
 
     :param rz_angle: Angle of rotation in rz axis.
-    :type rz_angle: float
     :key: seed
 
     :return: An angle corresponding to Clifford rotation of some Rz gate
-    :rtype: float
     """
     if "seed" in kwargs:
         random.seed(kwargs.get("seed"))
@@ -125,17 +120,12 @@ def gen_state_circuits(
 
 
     :param c: Circuit for producing state circuits from.
-    :type c: Circuit
     :param n_non_cliffords: Number of non-Clifford gates in resulting characterisation state circuits
-    :type n_non_cliffords: int
     :param n_pairs: Pairs of Clifford, Non-Clifford gates in state circuit generated.
-    :type n_pairs: int
     :param total_state_circuits: Total number of state circuits to be produced for characterisation
-    :type total_state_circuits: int
     :key: seed for random methods
 
     :return: All generated state circuits
-    :rtype: List[Circuit]
     """
     # set seed if given
     if "seed" in kwargs:
@@ -300,26 +290,19 @@ def ccl_state_task_gen(
     and state circuits for noiseless simulation on the third wire.
 
     :param n_non_cliffords: Number of remaining non-Clifford gates in generated State Circuits.
-    :type n_non_cliffords: int
     :param n_pairs: Parameter used for guiding properties of State Circuits generated.
-    :type n_pairs:
     :param total_state_circuits: Number of state circuits prepared for characterisation.
-    :type total_state_circuits: int
     :param tolerance: Model can be perturbed when calibration circuits have by
         exact expectation values too close to each other. This parameter
         sets a distance between exact expectation values which at least some
         calibration circuits should have.
-    :type tolerance: float
     :param simulator_backend: Backend object simulated characterisation experiments are
         default run through.
-    :type simulator_backend: Backend
     :param max_state_circuits_attempts: The maximum number of times to attempt to generate a
         list of calibrations circuit with significantly different expectation
         values, before resorting to a list with similar expectation values.
-    :type max_state_circuits_attempts: int
 
     :return: MitTask object for preparing and returning state circuits for characterisation.
-    :rtype: MitTask
     """
 
     def task(
@@ -332,11 +315,9 @@ def ccl_state_task_gen(
     ]:
         """
         :param experiment_wires: Information used to define generic experiments in MitEx objects.
-        :type experiment_wires: List[ObservableExperiment]
 
         :return: Original experiment for running on experiment backend, state circuits for running on characterisation backend,
         state circuits for running on noiseless backend.
-        :rtype: Tuple[List[ObservableExperiment], List[ObservableExperiment], List[ObservableExperiment],]
         """
         simulator_wires = []
         device_wires = []
@@ -417,11 +398,9 @@ def ccl_result_batching_task_gen(n_state_circuits: int) -> MitTask:
 
     :param n_state_circuits: Number of state circuits initially prepared for each
         experiment characterisation.
-    :type n_state_circuits: int
 
     :return: MitTask object that organises QubitPauliOperator objects required for
         characterisation.
-    :rtype: MitTask.
     """
 
     def task(
@@ -429,12 +408,9 @@ def ccl_result_batching_task_gen(n_state_circuits: int) -> MitTask:
     ) -> Tuple[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]:
         """
         :param noisy_exp: All QubitPauliOperators returned from running state circuit calibrations for all experiments through device.
-        :type noisy_exp: List[QubitPauliOperator]
         :param exact_exp: All QubitPauliOperators returned from running state circuit calibrations for all experiments through noiseless simulator.
-        :type exact_exp: List[QubitPauliOperator]
 
         :return: State circuit results split into separate lists for each experiment, with noisy and noiseless expectations paired together.
-        :rtype: Tuple[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]
         """
         if len(noisy_exp) != len(exact_exp):
             raise RuntimeError(
@@ -459,12 +435,10 @@ def ccl_likelihood_filtering_task_gen(
     """
     :param likelihood_function: LikelihoodFunction enum used to accept or reject some pair of noisy and noiseless expectation.
         Function must take two QubitPauliOperator as parameter, and return a single float between 0 and 1 as answer.
-    :type likelihood_function: LikelihoodFunction
     :key seed: Seed value for sampling probability for likelihood function
 
     :return: MitTask object that removes some characterisation results under some
         condition set by the likelihood_function option.
-    :rtype: MitTask
     """
 
     def task(
@@ -479,10 +453,8 @@ def ccl_likelihood_filtering_task_gen(
         accepted expectations for calibrating from.
 
         :param state_circuit_exp: Noisy and Noiseless Expectation results for calibration.
-        :type state_circuit_exp: List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]
 
         :return: Filtered calibration results.
-        :rtype: Tuple[List[List[Tuple[QubitPauliOperator, QubitPauliOperator]]]]
         """
         if likelihood_function == LikelihoodFunction.none:
             return (state_circuit_exp,)
@@ -518,18 +490,13 @@ def gen_CDR_MitEx(
     in arXiv:2005.10189.
 
     :param device_backend: Backend object device experiments are default run through.
-    :type device_backend: Backend
     :param simulator_backend: Backend object simulated characterisation experiments are
         default run through.
-    :type simulator_backend: Backend
     :param n_non_cliffords: Number of gates in Ansatz Circuit left as non-Clifford gates when
         producing characterisation circuits.
-    :type n_non_cliffords: int
     :param n_pairs: Number of non-Clifford gates sampled to become Clifford and vice versa
         each time a new state circuit is generated.
-    :type n_pairs: int
     :param total_state_circuits: Total number of state circuits produced for characterisation.
-    :type total_state_circuits: int
     :key states_simulator_mitex: MitEx object noiseless characterisation simulations are executed on, default
         simulator_backend with basic compilation of circuit.
     :key states_device_mitex: MitEx object noisy characterisation circuit are executed on, default

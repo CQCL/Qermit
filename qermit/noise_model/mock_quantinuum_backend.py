@@ -63,15 +63,11 @@ class MockQuantinuumBackend(QuantinuumBackend):
         """Submit circuit to the backend for running.
 
         :param circuit: Circuit to process on the backend
-        :type circuit: Circuit
         :param n_shots: Number of shots to run per circuit.
-        :type n_shots: int
         :param valid_check: Explicitly check that all circuits satisfy all
             required predicates to run on the backend, defaults to True
-        :type valid_check: bool, optional
         :return: Handles to results for each input circuit, as an interable
             in the same order as the circuits.
-        :rtype: ResultHandle
         """
 
         if valid_check:
@@ -101,15 +97,11 @@ class MockQuantinuumBackend(QuantinuumBackend):
         """Submit list of circuits to the backend for running.
 
         :param circuits: Circuits to process on the backend
-        :type circuits: List[Circuit]
         :param n_shot: Number of shots to run per circuit. May be a list of
             the same length as circuits.
-        :type n_shot: int
         :param valid_check: Explicitly check that all circuits satisfy all
             required predicates to run on the backend, defaults to True
-        :type valid_check: bool, optional
         :return: Handles to results for each input circuit, as an interable in the same order as the circuits.
-        :rtype: List[ResultHandle]
         """
         if (isinstance(n_shots, int)) or (n_shots is None):
             return [
@@ -125,8 +117,6 @@ class MockQuantinuumBackend(QuantinuumBackend):
         """Return a BackendResult corresponding to the handle.
 
         :param handle: handle to results
-        :type handle: ResultHandle
         :return: Results corresponding to handle.
-        :rtype: BackendResult
         """
         return self.noisy_backend.get_result(handle, *kwargs)

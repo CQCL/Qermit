@@ -45,10 +45,8 @@ def get_clifford_mcs(input_circuit: Circuit) -> List[MeasurementCircuit]:
     object varies with some different set of Clifford angles.
 
     :param input_circuit: Circuit to make all-non Clifford gates paramterised.
-    :type input_circuit: Circuit
 
     :return: New MeasurementCircuits with Clifford parameters
-    :rtype: List[MeasurementCircuit]
     """
     copy_circ = input_circuit.copy()
     symbols = copy_circ.free_symbols()
@@ -96,7 +94,6 @@ def DFSC_circuit_task_gen() -> MitTask:
     added for each Qubit Pauli String in the operator.
 
     :return: MitTask object that produces characterisation circuits for DFSC on a new wire as new experiments
-    :rtype: MitTask
     """
 
     def task(
@@ -108,11 +105,9 @@ def DFSC_circuit_task_gen() -> MitTask:
     ]:
         """
         :param measurement_wires: A list of tuples, each tuple representing a different experiment
-        :type measurement_wires: List[ObservableExperiment]
 
         :return: Original experiment wires and another list of characterisation experiments for each original experiment.
         These are organised in later task.
-        :rtype: Tuple[List[ObservableExperiment], List[List[List[ObservableExperiment]]]]
         """
         characterisation_wires = []
         for measurement_wire in measurement_wires:
@@ -181,7 +176,6 @@ def DFSC_collater_task_gen() -> MitTask:
     :return: MitTask object that collates many BackendResult objects for a single
         frame randomisation instance and converts them into a single
         BackendResult object.
-    :rtype: MitTask
     """
 
     def task(
@@ -191,11 +185,9 @@ def DFSC_collater_task_gen() -> MitTask:
         """
         :param all_characterisation_trackers: Experiment wires; outer list is experiments, second outer list
         is Cliffords, inner list is qubit pauli strings.
-        :type all_characterisation_trackers: List[List[List[ObservableExperiment]]]
 
         :return: Wire 1; All individual experiments collated into a single wire.
         Wire 2; Indexing to produce characterisation later.
-        :rtype: Tuple[List[ObservableExperiment], List[Tuple[int, List[int]]]]
         """
         organisation_indices = []
         collated_experiments = []
@@ -219,7 +211,6 @@ def DFSC_characterisation_task_gen() -> MitTask:
     a characterisation result for each Experiment.
 
     :return: MitTask object for organising and calculating characterisation.
-    :rtype: MitTask
     """
 
     def task(
@@ -229,12 +220,9 @@ def DFSC_characterisation_task_gen() -> MitTask:
     ) -> Tuple[List[QubitPauliOperator]]:
         """
         :param characterisation_results: All QubitPauliOperators returned from running experiment through some MitEx object
-        :type characteriastion_results: List[QubitPauliOperator]
         :param experiment_indexing: Number of characteriastion results for each experiment, used to split results up.
-        :type experiment_indexing: List[int]
 
         :return: Collated characterisation results, one QubitPauliOperator characterisation for each experiment
-        :rtype: Tuple[List[QubitPauliOperator]]
         """
         split_results = []
         lower_bound = 0
@@ -273,13 +261,11 @@ def DFSC_characterisation_task_gen() -> MitTask:
 def DFSC_correction_task_gen(zero_threshold: float) -> MitTask:
     """
     For each experiment expectation, if characterisation value greater than threshold, divide experiment expectation
-    by characteriastion value to correct for depolaring noise.
+    by characterisation value to correct for depolarising noise.
 
-    :param zero_threshold: Method does not correct for zero characteriastion expectation values, threshold for this zero limit.
-    :type zero_threshold: float
+    :param zero_threshold: Method does not correct for zero characterisation expectation values, threshold for this zero limit.
 
-    :return: Function for DFSC correctoin.
-    :rtype: MitTask
+    :return: Function for DFSC correction.
     """
 
     def task(
@@ -289,12 +275,9 @@ def DFSC_correction_task_gen(zero_threshold: float) -> MitTask:
     ) -> Tuple[List[QubitPauliOperator]]:
         """
         :param experiment_results: QubitPauliOperators corresponding to expectations for all observable experiments.
-        :type experiment_results: List[QubitPauliOperator]
         :param characteriastion_results: QubitPauliOperators corresponding to expectations for all characterisation experiments.
-        :type characterisation_results: List[QubitPauliOperator]
 
         :return: Corrected expectations as QubitPauliOperator objects.
-        :rtype: Tuple[List[QubitPauliOperator]]
         """
         if len(experiment_results) != len(characterisation_results):
             raise ValueError(
@@ -324,13 +307,10 @@ def gen_DFSC_MitEx(backend: Backend, **kwargs) -> MitEx:
     Produces a MitEx object that applies DFSC characterisation to all experiment results.
 
     :param backend: Backend experiments are run through.
-    :type backend: Backend
     :key experiment_mitex: MitEx object observable experiments are run through
     :key characterisation_mitex: MitEX object characteriastion experiments are run through.
 
     :return: MitEx object for automatic DFSC correction of circuits.
-    :rtype: MitEx
-
     """
 
     _experiment_mitex = copy(

@@ -12,19 +12,15 @@ def PauliErrorTranspile(noise_model: NoiseModel) -> BasePass:
 
     :param noise_model: Model describing the noise to be added. Should be
         a Pauli noise model.
-    :type noise_model: NoiseModel
     :return: Compiler pass adding random coherent Pauli noise.
-    :rtype: BasePass
     """
 
     def add_gates(circuit: Circuit) -> Circuit:
         """Function adding random coherent Pauli errors to a circuit.
 
         :param circuit: Circuit to which errors are added.
-        :type circuit: Circuit
         :raises Exception: Raised if the noise model is not a Pauli one.
         :return: Circuit with additional noise operations.
-        :rtype: Circuit
         """
 
         # Initialise circuit with the same registers as input.

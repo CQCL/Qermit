@@ -30,13 +30,9 @@ class NoisyAerBackend(AerBackend):
         """AerBacked with simple depolarising and SPAM noise model.
 
         :param n_qubits: The number of qubits available on the backend.
-        :type n_qubits: int
         :param prob_1: The depolarising noise error rates on single qubit gates.
-        :type prob_1: float
         :param prob_2: The depolarising noise error rates on two qubit gates.
-        :type prob_2: float
         :param prob_ro: Error rates of symmetric uncorrelated SPAM errors.
-        :type prob_ro: float
         """
 
         super().__init__(
@@ -54,15 +50,10 @@ class NoisyAerBackend(AerBackend):
         AerBacked.
 
         :param n_qubits: Number of qubits noise model applies to.
-        :type n_qubits: int
         :param prob_1: The depolarising noise error rates on single qubit gates.
-        :type prob_1: float
         :param prob_2: The depolarising noise error rates on two qubit gates.
-        :type prob_2: float
         :param prob_ro: Error rates of symmetric uncorrelated SPAM errors.
-        :type prob_ro: float
         :return: Noise model
-        :rtype: noise.NoiseModel
         """
 
         noise_model = noise.NoiseModel()

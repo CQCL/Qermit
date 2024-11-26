@@ -43,9 +43,7 @@ class ErrorDistribution:
 
         :param distribution: Dictionary mapping a string of Pauli errors
             to the probability that they occur.
-        :type distribution: Dict[Tuple[Pauli, ...], float]
         :param rng: Randomness generator, defaults to np.random.default_rng()
-        :type rng: Generator, optional
         :raises Exception: Raised if error probabilities sum to greater than 1.
         """
 
@@ -77,7 +75,6 @@ class ErrorDistribution:
         :return: Rate at which no error occurs.
             Calculated as 1 minus the total error rate of
             error in this distribution.
-        :rtype: float
         """
         return 1 - sum(self.distribution.values())
 
@@ -87,7 +84,6 @@ class ErrorDistribution:
         :return: PTM of error distribution and Pauli index dictionary.
             The Pauli index dictionary maps Pauli errors to their
             index in the PTM
-        :rtype: Tuple[NDArray, Dict[Tuple[Pauli, ...], int]]
         """
 
         # Initialise an empty PTM and index dictionary
@@ -153,12 +149,9 @@ class ErrorDistribution:
 
         :param ptm: Pauli Transfer Matrix to convert. Should be a 4^n by 4^n matrix
             where n is the number of qubits.
-        :type ptm: NDArray
         :param pauli_index: A dictionary mapping Pauli errors to
             their index in the PTM.
-        :type pauli_index: Dict[Tuple[Pauli, ...], int]
         :return: The converted error distribution.
-        :rtype: ErrorDistribution
         """
 
         if ptm.ndim != 2:
@@ -222,9 +215,7 @@ class ErrorDistribution:
         close for each value.
 
         :param other: Instance of ErrorDistribution to be compared against.
-        :type other: object
         :return: True if two instances are equal, false otherwise.
-        :rtype: bool
         """
 
         if not isinstance(other, ErrorDistribution):
@@ -250,7 +241,6 @@ class ErrorDistribution:
         """Generates string representation of error distribution.
 
         :return: String representation of error distribution.
-        :rtype: str
         """
         return "".join(f"{key}:{value} \n" for key, value in self.distribution.items())
 
@@ -260,9 +250,7 @@ class ErrorDistribution:
         list of distributions.
 
         :param distribution_list: List of instances of ErrorDistribution.
-        :type distribution_list: List[ErrorDistribution]
         :return: Mixture distribution.
-        :rtype: ErrorDistribution
         """
 
         return cls(
@@ -284,7 +272,6 @@ class ErrorDistribution:
         """Reorders the distribution dictionary based on probabilities.
 
         :param reverse: Order from high to low, defaults to True
-        :type reverse: bool, optional
         """
         self.distribution = {
             error: probability
@@ -297,7 +284,6 @@ class ErrorDistribution:
         """Reset randomness generator.
 
         :param rng: Randomness generator.
-        :type rng: Generator
         """
         self.rng = rng
 
@@ -305,7 +291,6 @@ class ErrorDistribution:
         """Produces json serialisable representation of ErrorDistribution.
 
         :return: Json serialisable representation of ErrorDistribution.
-        :rtype: List[Dict[str, Union[List[int], float]]]
         """
         return [
             {
@@ -323,9 +308,7 @@ class ErrorDistribution:
 
         :param distribution_dict: List of dictionaries, each of which map
             a property of the distribution to its value.
-        :type distribution_dict: List[Dict[str, Union[List[int], float]]]
         :return: ErrorDistribution created from serialised representation.
-        :rtype: ErrorDistribution
         """
 
         return cls(
@@ -344,7 +327,6 @@ class ErrorDistribution:
             distribution, or None. None can be returned if the total proability
             of the distribution not 1, and should be interpreted as the
             the unspecified support.
-        :rtype: Union[Tuple[Pauli, ...], None]
         """
 
         return_val = self.rng.uniform(0, 1)
@@ -383,9 +365,7 @@ class ErrorDistribution:
         new error distribution.
 
         :param scaling_factor: The factor by which the noise should be scaled.
-        :type scaling_factor: float
         :return: A new error distribution with the noise scaled.
-        :rtype: ErrorDistribution
         """
 
         ptm, pauli_index = self.to_ptm()
@@ -410,7 +390,6 @@ class LogicalErrorDistribution:
         """Initialisation method. Stores pauli error counter.
 
         :param pauli_error_counter: Counter of pauli errors.
-        :type pauli_error_counter: Counter[QermitPauli]
 
         :key total: The total number of shots taken when measuring the
             errors. By default this will be taken to be the total
@@ -426,7 +405,6 @@ class LogicalErrorDistribution:
 
         :return: Dictionary mapping QubitPauliString to probability that
             that error occurs.
-        :rtype: Dict[QubitPauliString, float]
         """
 
         distribution: Dict[QubitPauliString, float] = {}
@@ -444,11 +422,9 @@ class LogicalErrorDistribution:
         the given qubits, and the shots with measurable errors on those qubits.
 
         :param qubit_list: List of qubits to be post selected on.
-        :type qubit_list: List[Qubit]
         :return: New LogicalErrorDistribution with given qubits removed,
             and those shots where there are measurable errors on those
             qubits removed.
-        :rtype: LogicalErrorDistribution
         """
 
         # the number of error free shots.
@@ -483,7 +459,6 @@ class NoiseModel:
         """Initialisation method.
 
         :param noise_model: Map from gates to their error models.
-        :type noise_model: Dict[OpType, ErrorDistribution]
         """
 
         self.noise_model = noise_model
@@ -493,9 +468,7 @@ class NoiseModel:
         the given scaling factor.
 
         :param scaling_factor: Factor by which to scale the error rates.
-        :type scaling_factor: float
         :return: New noise model with scaled error rates.
-        :rtype: NoiseModel
         """
         return NoiseModel(
             noise_model={
@@ -508,7 +481,6 @@ class NoiseModel:
         """Reset randomness generator.
 
         :param rng: Randomness generator to be reset to.
-        :type rng: Generator
         """
         for distribution in self.noise_model.values():
             distribution.reset_rng(rng=rng)
@@ -530,9 +502,7 @@ class NoiseModel:
         and that the noise models of each gate match.
 
         :param other: Noise model to be compared against.
-        :type other: object
         :return: True if equivalent, false otherwise.
-        :rtype: bool
         """
 
         if not isinstance(other, NoiseModel):
@@ -552,7 +522,6 @@ class NoiseModel:
         """Json serialisable object representing noise model.
 
         :return: Json serialisable object representing noise model.
-        :rtype: Dict[str, List[Dict[str, Union[List[int], float]]]]
         """
         return {
             op.name: distribution.to_dict()
@@ -567,10 +536,8 @@ class NoiseModel:
         of NoiseModel.
 
         :param noise_model_dict: JSON serialised version of NoiseModel
-        :type noise_model_dict: Dict[str, List[Dict[str, Union[List[int], float]]]]
         :return: Instance of noise model corresponding to JSON serialised
             version.
-        :rtype: NoiseModel
         """
         return cls(
             noise_model={
@@ -584,7 +551,6 @@ class NoiseModel:
         """List of OpTypes with noise.
 
         :return: List of OpTypes with noise.
-        :rtype: List[OpType]
         """
         return list(self.noise_model.keys())
 
@@ -592,9 +558,7 @@ class NoiseModel:
         """Recovers error model corresponding to particular OpType.
 
         :param optype: OpType for which noise model should be retrieved.
-        :type optype: OpType
         :return: Error model corresponding to particular OpType.
-        :rtype: ErrorDistribution
         """
         return self.noise_model[optype]
 
@@ -611,11 +575,8 @@ class NoiseModel:
 
         :param cliff_circ: Circuit to be simulated. This should be a Clifford
             circuit.
-        :type cliff_circ: Circuit
         :param n_rand: Number of random circuit instances, defaults to 1000
-        :type n_rand: int, optional
         :return: Resulting distribution of errors.
-        :rtype: LogicalErrorDistribution
         """
 
         error_counter = self.counter_propagate(
@@ -635,11 +596,8 @@ class NoiseModel:
 
         :param cliff_circ: Circuit to be simulated. This should be a Clifford
             circuit.
-        :type cliff_circ: Circuit
         :param n_counts: Number of random instances.
-        :type n_counts: int
         :return: Counter of logical errors.
-        :rtype: Counter[QermitPauli]
         """
 
         error_counter: Counter[QermitPauli] = Counter()
@@ -666,13 +624,10 @@ class NoiseModel:
 
         :param cliff_circ: Circuit to be simulated. This should be a Clifford
             circuit.
-        :type cliff_circ: Circuit
         :param direction: Direction in which noise should be propagated,
             defaults to 'backward'
-        :type direction: Direction, optional
         :raises Exception: Raised if direction is invalid.
         :return: Resulting logical error.
-        :rtype: QermitPauli
         """
 
         # Create identity error.
