@@ -403,10 +403,11 @@ class ObservableTracker:
         """
         if string not in self._qps_to_indices:
             return False
+        
         if len(self._qps_to_indices[string]) > 0:
             return True
-        else:
-            return False
+        
+        return False
 
     def get_empty_strings(self) -> List[QubitPauliString]:
         """
