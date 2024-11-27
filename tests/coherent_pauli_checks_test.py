@@ -265,10 +265,7 @@ def test_decompose_clifford_subcircuit_box():
     zzmax_circ.ZZMax(qubits[0], qubits[1]).ZZMax(qubits[2], qubits[3])
     zzmax_circ.add_circbox(cx_circbox, [qubits[1], qubits[0], qubits[3]])
 
-    # dag_circ = CircuitPauliChecker.decompose_clifford_subcircuit_box(
-    #     zzmax_circ.get_commands()[2]
-    # )
-    dag_circ = PauliSampler.decompose_clifford_subcircuit_box(
+    dag_circ = PauliSampler._decompose_clifford_subcircuit_box(
         zzmax_circ.get_commands()[2]
     )
 

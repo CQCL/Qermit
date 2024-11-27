@@ -20,7 +20,7 @@ class PauliSampler(ABC):
     """
 
     @abstractmethod
-    def sample(self, circ: Circuit) -> List[QermitPauli]:  # pragma: no cover
+    def sample(self, circ: Circuit) -> List[QermitPauli]:
         """Sample checks for given circuit.
 
         :param circ: The circuit for which checks should be sampled.
@@ -62,7 +62,7 @@ class PauliSampler(ABC):
                     )
                 )
             ):
-                clifford_subcircuit = self.decompose_clifford_subcircuit_box(command)
+                clifford_subcircuit = self._decompose_clifford_subcircuit_box(command)
 
                 # List of Paulis to be used as checks before the subcircuit.
                 start_stabiliser_list = self.sample(
@@ -78,6 +78,7 @@ class PauliSampler(ABC):
                 ]
                 ancilla_count += len(start_stabiliser_list)
 
+                # Add ancilla qubits and check gates
                 for start_stabiliser, control_qubit in zip(
                     start_stabiliser_list, control_qubit_list
                 ):
@@ -103,13 +104,15 @@ class PauliSampler(ABC):
                     for start_stabiliser in start_stabiliser_list
                 ]
 
-            # Add command
+            # Add original command
             pauli_check_circuit.add_gate(command.op, command.args)
 
             # Add barriers and checks if appropriate.
             if (command.op.type == OpType.CircBox) and (
                 cast(CircBox, command.op).get_circuit().name == "Clifford Subcircuit"
             ):
+                # For each check, commute the pauli through
+                # the clifford circuit.
                 for end_stabiliser, control_qubit in zip(
                     reversed(end_stabiliser_list), reversed(control_qubit_list)
                 ):
@@ -128,6 +131,7 @@ class PauliSampler(ABC):
 
                     pauli_check_circuit.add_barrier(command.args + [control_qubit])
 
+                    # Add the end check.
                     stabiliser_circuit = end_stabiliser.get_control_circuit(
                         control_qubit=control_qubit
                     )
@@ -156,7 +160,13 @@ class PauliSampler(ABC):
         return pauli_check_circuit, postselect_bits
 
     @staticmethod
-    def decompose_clifford_subcircuit_box(clifford_subcircuit_box: Command) -> Circuit:
+    def _decompose_clifford_subcircuit_box(clifford_subcircuit_box: Command) -> Circuit:
+        """Decompose command by extracting circuit and relabelling qubits to
+        match those of the command.
+
+        :param clifford_subcircuit_box: Command to decompose.
+        :return: Decomposed command.
+        """
         clifford_subcircuit = cast(CircBox, clifford_subcircuit_box.op).get_circuit()
         qubit_map = {
             cast(UnitID, q_subcirc): q_orig
@@ -170,7 +180,14 @@ class PauliSampler(ABC):
 
 
 class DeterministicZPauliSampler(PauliSampler):
+    """Deterministic sampler, always returning Z Pauli string.
+    """
     def sample(self, circ: Circuit) -> List[QermitPauli]:
+        """Return Z Pauli string of length equal to the circuit.
+
+        :param circ: Circuit to sample Pauli for.
+        :return: Z Pauli string of length equal to the circuit.
+        """
         return [
             QermitPauli(
                 Z_list=[1] * circ.n_qubits,
@@ -181,7 +198,14 @@ class DeterministicZPauliSampler(PauliSampler):
 
 
 class DeterministicXPauliSampler(PauliSampler):
+    """Deterministic sampler, always returning X Pauli string.
+    """
     def sample(self, circ: Circuit) -> List[QermitPauli]:
+        """Return X Pauli string of length equal to the circuit.
+
+        :param circ: Circuit to sample Pauli for.
+        :return: X Pauli string of length equal to the circuit.
+        """
         return [
             QermitPauli(
                 Z_list=[0] * circ.n_qubits,
@@ -192,9 +216,16 @@ class DeterministicXPauliSampler(PauliSampler):
 
 
 class RandomPauliSampler(PauliSampler):
+    """Sampler returning random Pauli of appropriate length.
+    """
     def __init__(
         self, n_checks: int, rng: Generator = numpy.random.default_rng()
     ) -> None:
+        """
+        :param n_checks: The number of checks to sample
+        :param rng: Randomness generator,
+            defaults to numpy.random.default_rng()
+        """
         self.rng = rng
         self.n_checks = n_checks
 
@@ -202,6 +233,11 @@ class RandomPauliSampler(PauliSampler):
         self,
         circ: Circuit,
     ) -> List[QermitPauli]:
+        """Sample random Pauli of length equal to the size of the circuit.
+
+        :param circ: Circuit to sample Pauli check for.
+        :return: Random Pauli of length equal to the size of the circuit.
+        """
         # TODO: Make sure sampling is done without replacement
 
         stabiliser_list: List[QermitPauli] = []
@@ -252,7 +288,7 @@ class OptimalPauliSampler(PauliSampler):
             cliff_circ=circ,
         )
 
-        print("effective error distribution", error_counter.distribution)
+        # print("effective error distribution", error_counter.distribution)
 
         total_commute_prob = 0.0
         total_n_pauli = 0
@@ -263,7 +299,7 @@ class OptimalPauliSampler(PauliSampler):
         # TODO: There is probably a better way to search through this space.
         # Here are some ideas:
         #   -   It's better to prioritise checks that require fewer gates.
-        #       Here I am checking I last as it requires the fewerst gates.
+        #       Here I am checking I last as it requires the fewest gates.
         #       However note that IYY is checked after YII so IYY may be
         #       picked even though YII is lighter in the case that they
         #       have the same probability.
@@ -297,18 +333,18 @@ class OptimalPauliSampler(PauliSampler):
             total_commute_prob += commute_prob
             total_n_pauli += 1
 
-        average_commute_prob = total_commute_prob / total_n_pauli
-        print("smallest_commute_prob_pauli_list", smallest_commute_prob_pauli_list)
-        print("smallest_commute_prob", smallest_commute_prob)
-        print("average commute_prob", average_commute_prob)
+        # average_commute_prob = total_commute_prob / total_n_pauli
+        # print("smallest_commute_prob_pauli_list", smallest_commute_prob_pauli_list)
+        # print("smallest_commute_prob", smallest_commute_prob)
+        # print("average commute_prob", average_commute_prob)
 
-        if (average_commute_prob == 0) or (
-            abs(1 - (smallest_commute_prob / average_commute_prob)) < 0.1
-        ):
-            warnings.warn(
-                "The smallest commute probability is close to the average. "
-                + "Random check sampling will probably work just as well."
-            )
+        # if (average_commute_prob == 0) or (
+        #     abs(1 - (smallest_commute_prob / average_commute_prob)) < 0.1
+        # ):
+        #     warnings.warn(
+        #         "The smallest commute probability is close to the average. "
+        #         + "Random check sampling will probably work just as well."
+        #     )
 
         return [
             QermitPauli.from_qubit_pauli_string(smallest_commute_prob_pauli)
