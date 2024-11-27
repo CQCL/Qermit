@@ -41,6 +41,8 @@ class PauliSampler(ABC):
 
         ancilla_count = 0
 
+        postselect_bits = set()
+
         # Add each command in the circuit, wrapped by checks
         # if the command is a circbox named 'Clifford Subcircuit'
         for command in circuit.get_commands():
@@ -135,13 +137,16 @@ class PauliSampler(ABC):
                         name="ancilla_measure",
                         index=control_qubit.index,
                     )
+
+                    postselect_bits.add(measure_bit)
+
                     pauli_check_circuit.add_bit(id=measure_bit)
                     pauli_check_circuit.Measure(
                         qubit=control_qubit,
                         bit=measure_bit,
                     )
 
-        return pauli_check_circuit
+        return pauli_check_circuit, postselect_bits
 
     @staticmethod
     def decompose_clifford_subcircuit_box(clifford_subcircuit_box: Command) -> Circuit:
@@ -236,7 +241,9 @@ class OptimalPauliSampler(PauliSampler):
         """
         # TODO: assert that the registers match in this case
 
-        error_counter = self.noise_model.get_effective_pre_error_distribution(circ)
+        error_counter = self.noise_model.get_effective_pre_error_distribution(
+            cliff_circ=circ,
+        )
 
         print("effective error distribution", error_counter.distribution)
 
