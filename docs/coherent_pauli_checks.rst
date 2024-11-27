@@ -8,5 +8,6 @@ qermit.coherent_pauli_checks
     :members:
     :show-inheritance:
 
-.. autoclass:: qermit.coherent_pauli_checks.clifford_detect.QermitDAGCircuit
+.. autoclass:: qermit.coherent_pauli_checks.pauli_sampler.RandomPauliSampler
     :members:
+    :show-inheritance:
