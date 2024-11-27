@@ -180,8 +180,8 @@ class PauliSampler(ABC):
 
 
 class DeterministicZPauliSampler(PauliSampler):
-    """Deterministic sampler, always returning Z Pauli string.
-    """
+    """Deterministic sampler, always returning Z Pauli string."""
+
     def sample(self, circ: Circuit) -> List[QermitPauli]:
         """Return Z Pauli string of length equal to the circuit.
 
@@ -198,8 +198,8 @@ class DeterministicZPauliSampler(PauliSampler):
 
 
 class DeterministicXPauliSampler(PauliSampler):
-    """Deterministic sampler, always returning X Pauli string.
-    """
+    """Deterministic sampler, always returning X Pauli string."""
+
     def sample(self, circ: Circuit) -> List[QermitPauli]:
         """Return X Pauli string of length equal to the circuit.
 
@@ -216,8 +216,8 @@ class DeterministicXPauliSampler(PauliSampler):
 
 
 class RandomPauliSampler(PauliSampler):
-    """Sampler returning random Pauli of appropriate length.
-    """
+    """Sampler returning random Pauli of appropriate length."""
+
     def __init__(
         self, n_checks: int, rng: Generator = numpy.random.default_rng()
     ) -> None:
