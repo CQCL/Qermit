@@ -65,7 +65,7 @@ def gen_postselect_mgr_gen_task(postselect_mgr: PostselectMgr) -> MitTask:
         return (circ_shots_list, [postselect_mgr for _ in circ_shots_list])
 
     return MitTask(
-        _label="ConstantNode",
+        _label="UniformPostselection",
         _n_in_wires=1,
         _n_out_wires=2,
         _method=task,
@@ -76,6 +76,55 @@ def gen_postselect_mitres(
     backend: Backend, postselect_mgr: PostselectMgr, **kwargs
 ) -> MitRes:
     """Generates MitRes running given circuit and applying postselection.
+
+    In the following example we prepare and measure a Bell state.
+
+    .. jupyter-execute::
+
+        from pytket import Circuit
+        from pytket.circuit.display import render_circuit_jupyter
+
+        circuit = Circuit(2,2).H(0).CX(0,1).measure_all()
+        render_circuit_jupyter(circuit)
+
+    We would like to postselect one measurement outcome based on the
+    other being 0. We prepare a postselect mitres accordingly.
+
+    .. jupyter-execute::
+
+        from qermit.postselection import gen_postselect_mitres
+        from pytket.extensions.quantinuum import QuantinuumBackend, QuantinuumAPIOffline
+        from qermit.postselection import PostselectMgr
+
+        backend = QuantinuumBackend(
+            device_name="H1-1LE",
+            api_handler = QuantinuumAPIOffline()
+        )
+
+        postselect_mgr = PostselectMgr(
+            compute_cbits=[circuit.bits[0]],
+            postselect_cbits=[circuit.bits[1]]
+        )
+
+        mitres = gen_postselect_mitres(
+            backend=backend,
+            postselect_mgr=postselect_mgr,
+        )
+        mitres.get_task_graph()
+
+    We can then construct the experiment we wish to run, and pass it through
+    the postselect mitres.
+
+    .. jupyter-execute::
+
+        from qermit import CircuitShots
+
+        circ_shots = CircuitShots(
+            Circuit=backend.get_compiled_circuit(circuit),
+            Shots=100
+        )
+        result_list = mitres.run([circ_shots])
+        result_list[0].get_counts()
 
     :param backend: Backend on this circuits are run.
     :param postselect_mgr: Postselection manager.
