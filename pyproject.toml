@@ -48,6 +48,9 @@ docs = [
     "jupyter-sphinx"
 ]
 
+[tool.ruff]
+exclude = ["docs/jupyter_execute/"]
+
 [tool.ruff.lint]
 select = ["I001"]
 
