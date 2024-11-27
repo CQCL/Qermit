@@ -8,15 +8,14 @@ from pytket.utils.outcomearray import OutcomeArray
 
 class PostselectMgr:
     """Class for tracking and applying post selection to results.
-    Includes other methods to analyse the results after post selection.
 
     An example use case might be the following. Here a Bell state is
     prepared. We would like to keep one bit of the results, conditioned
-    on the other being 0.
+    on the other being 0. That's to say that the postselected
+    bits should all be 0.
 
     .. jupyter-execute::
 
-        from qermit.postselection import PostselectMgr
         from pytket import Circuit, Bit, Qubit
         from pytket.circuit.display import render_circuit_jupyter
 
@@ -49,6 +48,7 @@ class PostselectMgr:
 
     .. jupyter-execute::
 
+        from qermit.postselection import PostselectMgr
         from pytket.extensions.quantinuum import QuantinuumBackend, QuantinuumAPIOffline
 
         backend = QuantinuumBackend(
