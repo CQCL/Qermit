@@ -44,6 +44,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
     "myst_nb",
+    "jupyter_sphinx",
 ]
 
 intersphinx_mapping = {
@@ -102,4 +103,4 @@ htmlhelp_basename = "Qermitdoc"
 
 exclude_patterns = ["README.md", "jupyter_execute/*"]
 
-autoclass_content = "both"
+autoclass_content = 'both'
