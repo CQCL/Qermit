@@ -50,7 +50,7 @@ class PostselectMgr:
     .. jupyter-execute::
 
         from pytket.extensions.quantinuum import QuantinuumBackend, QuantinuumAPIOffline
-        
+
         backend = QuantinuumBackend(
             device_name="H1-1LE",
             api_handler = QuantinuumAPIOffline(),
