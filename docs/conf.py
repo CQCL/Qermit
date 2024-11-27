@@ -53,6 +53,7 @@ intersphinx_mapping = {
         None,
     ),
     "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
 }
 
 # The suffix(es) of source filenames.
@@ -100,3 +101,5 @@ html_theme_options = {}
 htmlhelp_basename = "Qermitdoc"
 
 exclude_patterns = ["README.md", "jupyter_execute/*"]
+
+autoclass_content = "both"

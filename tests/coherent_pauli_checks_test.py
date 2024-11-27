@@ -5,10 +5,12 @@ import numpy.random
 import pytest
 from pytket import Circuit, OpType
 from pytket.circuit import Bit, CircBox, Qubit
+from pytket.circuit.display import render_circuit_jupyter
 from pytket.extensions.qiskit import AerBackend
 from pytket.passes import DecomposeBoxes
 from pytket.pauli import Pauli, QubitPauliString
 
+from qermit import CircuitShots
 from qermit.coherent_pauli_checks import (
     # CircuitPauliChecker,
     DeterministicXPauliSampler,
@@ -18,6 +20,7 @@ from qermit.coherent_pauli_checks import (
     QermitDAGCircuit,
     RandomPauliSampler,
     cpc_rebase_pass,
+    gen_coherent_pauli_check_mitres,
 )
 from qermit.noise_model import (
     Direction,
@@ -32,6 +35,37 @@ from qermit.postselection import PostselectMgr
 from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
+
+
+def test_coherent_pauli_checks_mitres() -> None:
+    error_distribution = ErrorDistribution(
+        rng=np.random.default_rng(),
+        distribution={
+            (Pauli.X, Pauli.I): 0.1,
+        },
+    )
+
+    noise_model = NoiseModel(
+        noise_model={OpType.CX: error_distribution},
+    )
+
+    transpiler = PauliErrorTranspile(noise_model=noise_model)
+    backend = TranspilerBackend(transpiler=transpiler)
+
+    cliff_circ = Circuit(3).CX(0, 1).CX(1, 2).measure_all()
+
+    pauli_sampler = OptimalPauliSampler(
+        noise_model=noise_model,
+        n_checks=2,
+    )
+
+    mitres = gen_coherent_pauli_check_mitres(
+        backend=backend, pauli_sampler=pauli_sampler
+    )
+
+    result_list = mitres.run([CircuitShots(Circuit=cliff_circ, Shots=1000)])
+
+    assert list(result_list[0].get_counts().keys()) == [(0, 0, 0)]
 
 
 def test_logical_error_coherent_pauli_check_workflow():

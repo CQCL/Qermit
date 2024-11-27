@@ -18,10 +18,8 @@ class TranspilerBackend:
     given compiler pass.
 
     Attributes:
-        transpiler: Compiler pass to apply to simulate noise on a single
-            instance of a circuit.
-        max_batch_size: Shots are simulated in batches. This is the largest
-            shot batch size permitted.
+        transpiler: Compiler pass to apply to simulate noise on a single instance of a circuit.
+        max_batch_size: Shots are simulated in batches. This is the largest shot batch size permitted.
         result_dict: A dictionary mapping handles to results.
         backend: Backend used to simulate compiled circuits.
         n_cores: The number of cores used when simulating shots in parallel.

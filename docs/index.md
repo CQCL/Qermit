@@ -185,12 +185,14 @@ taskgraph.rst
 mitres.rst
 mitex.rst
 utils.rst
+noise_model.rst
 mittask.rst
 measurement_reduction.rst
 spam.rst
 frame_randomisation.rst
 postselection.rst
 leakage_detection.rst
+coherent_pauli_checks.rst
 clifford_noise_characterisation.rst
 zero_noise_extrapolation.rst
 probabilistic_error_cancellation.rst
