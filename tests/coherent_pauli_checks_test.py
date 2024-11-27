@@ -5,14 +5,12 @@ import numpy.random
 import pytest
 from pytket import Circuit, OpType
 from pytket.circuit import Bit, CircBox, Qubit
-from pytket.circuit.display import render_circuit_jupyter
 from pytket.extensions.qiskit import AerBackend
 from pytket.passes import DecomposeBoxes
 from pytket.pauli import Pauli, QubitPauliString
 
 from qermit import CircuitShots
 from qermit.coherent_pauli_checks import (
-    # CircuitPauliChecker,
     DeterministicXPauliSampler,
     DeterministicZPauliSampler,
     OptimalPauliSampler,
@@ -35,6 +33,55 @@ from qermit.postselection import PostselectMgr
 from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
+
+
+def test_two_clifford_boxes() -> None:
+    cx_error_distribution = ErrorDistribution(
+        rng=np.random.default_rng(),
+        distribution={
+            (Pauli.X, Pauli.I): 0.1,
+        },
+    )
+
+    noise_model = NoiseModel(
+        noise_model={
+            OpType.CX: cx_error_distribution,
+        },
+    )
+
+    transpiler = PauliErrorTranspile(noise_model=noise_model)
+    backend = TranspilerBackend(transpiler=transpiler)
+
+    cliff_circ = Circuit(3)
+
+    cliff_subcirc = Circuit(3, name="Clifford Subcircuit").CX(0, 1).CX(1, 2)
+    cliff_circ.add_circbox(circbox=CircBox(circ=cliff_subcirc), args=cliff_circ.qubits)
+
+    cliff_subcirc = Circuit(3, name="Clifford Subcircuit").CX(1, 2).CX(1, 0)
+    cliff_circ.add_circbox(circbox=CircBox(circ=cliff_subcirc), args=cliff_circ.qubits)
+
+    cliff_circ.measure_all()
+
+    pauli_sampler = OptimalPauliSampler(
+        noise_model=noise_model,
+        n_checks=2,
+    )
+
+    pauli_check_circuit, postselect_cbits = pauli_sampler.add_pauli_checks_to_circbox(
+        circuit=cliff_circ
+    )
+
+    postselect_mgr = PostselectMgr(
+        compute_cbits=cliff_circ.bits,
+        postselect_cbits=list(postselect_cbits),
+    )
+
+    DecomposeBoxes().apply(pauli_check_circuit)
+    result = backend.run_circuit(pauli_check_circuit, 1000)
+    postselect_result = postselect_mgr.postselect_result(result)
+    postselect_result.get_counts()
+
+    assert list(postselect_result.get_counts().keys()) == [(0, 0, 0)]
 
 
 def test_coherent_pauli_checks_mitres() -> None:
