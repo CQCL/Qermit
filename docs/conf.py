@@ -103,4 +103,4 @@ htmlhelp_basename = "Qermitdoc"
 
 exclude_patterns = ["README.md", "jupyter_execute/*"]
 
-autoclass_content = 'both'
+autoclass_content = "both"
