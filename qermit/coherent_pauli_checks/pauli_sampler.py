@@ -15,6 +15,10 @@ from qermit.noise_model.qermit_pauli import QermitPauli
 
 
 class PauliSampler(ABC):
+    """Abstract base class for Pauli samplers. Pauli samples should sample
+    Paulis to be used a checks.
+    """
+
     @abstractmethod
     def sample(self, circ: Circuit) -> List[QermitPauli]:  # pragma: no cover
         """Sample checks for given circuit.
@@ -33,6 +37,8 @@ class PauliSampler(ABC):
         :param circuit: Circuit to add checks to.
         :return: Circuit with checks added.
         """
+
+        # Initialise new circuit and add matching qubits.
         pauli_check_circuit = Circuit()
         for qubit in circuit.qubits:
             pauli_check_circuit.add_qubit(qubit)
@@ -58,6 +64,7 @@ class PauliSampler(ABC):
             ):
                 clifford_subcircuit = self.decompose_clifford_subcircuit_box(command)
 
+                # List of Paulis to be used as checks before the subcircuit.
                 start_stabiliser_list = self.sample(
                     circ=clifford_subcircuit,
                 )
