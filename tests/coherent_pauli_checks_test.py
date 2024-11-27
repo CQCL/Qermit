@@ -62,7 +62,7 @@ def test_logical_error_coherent_pauli_check_workflow():
     #     circuit=cliff_circ,
     # )
 
-    checked_cliff_circ = pauli_sampler.add_pauli_checks_to_circbox(
+    checked_cliff_circ, _ = pauli_sampler.add_pauli_checks_to_circbox(
         circuit=cliff_circ,
     )
 
@@ -236,7 +236,7 @@ def test_add_pauli_checks():
     # ).add_pauli_checks_to_circbox(
     #     circuit=boxed_circ,
     # )
-    circuit = DeterministicZPauliSampler().add_pauli_checks_to_circbox(
+    circuit, _ = DeterministicZPauliSampler().add_pauli_checks_to_circbox(
         circuit=boxed_circ,
     )
     DecomposeBoxes().apply(circuit)
@@ -316,7 +316,7 @@ def test_add_pauli_checks():
     # ).add_pauli_checks_to_circbox(
     #     circuit=boxed_circ,
     # )
-    circuit = DeterministicZPauliSampler().add_pauli_checks_to_circbox(
+    circuit, _ = DeterministicZPauliSampler().add_pauli_checks_to_circbox(
         circuit=boxed_circ,
     )
     DecomposeBoxes().apply(circuit)
@@ -412,7 +412,7 @@ def test_CZ_circuit_with_phase():
     # ).add_pauli_checks_to_circbox(
     #     circuit=boxed_original_circuit,
     # )
-    pauli_checks_circuit = pauli_sampler.add_pauli_checks_to_circbox(
+    pauli_checks_circuit, _ = pauli_sampler.add_pauli_checks_to_circbox(
         circuit=boxed_original_circuit,
     )
     DecomposeBoxes().apply(pauli_checks_circuit)
@@ -546,7 +546,7 @@ def test_add_ZX_pauli_checks_to_S():
     #     # n_rand=10000,
     #     # cutoff=10,
     # )
-    pauli_check_circ = pauli_sampler.add_pauli_checks_to_circbox(
+    pauli_check_circ, _ = pauli_sampler.add_pauli_checks_to_circbox(
         circuit=boxed_cliff_circ,
         # n_rand=10000,
         # cutoff=10,
@@ -643,7 +643,7 @@ def test_error_sampler():
     #     # n_rand=n_shots,
     #     # n_checks=1,
     # )
-    checked_circuit = pauli_sampler.add_pauli_checks_to_circbox(
+    checked_circuit, _ = pauli_sampler.add_pauli_checks_to_circbox(
         circuit=circuit,
         # n_rand=n_shots,
         # n_checks=1,
