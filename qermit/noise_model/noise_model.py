@@ -26,8 +26,8 @@ class ErrorDistribution:
     sample from distributions of errors.
 
     Attributes:
-        distribution: Dictionary mapping a string of Pauli errors
-            to the probability that they occur.
+        distribution: Dictionary mapping a string of Pauli errors to the
+        probability that they occur.
         rng: Randomness generator.
     """
 
@@ -39,8 +39,7 @@ class ErrorDistribution:
         distribution: Dict[Tuple[Pauli, ...], float],
         rng: Generator = np.random.default_rng(),
     ):
-        """Initialisation method.
-
+        """
         :param distribution: Dictionary mapping a string of Pauli errors
             to the probability that they occur.
         :param rng: Randomness generator, defaults to np.random.default_rng()
@@ -456,8 +455,7 @@ class NoiseModel:
     noise_model: Dict[OpType, ErrorDistribution]
 
     def __init__(self, noise_model: Dict[OpType, ErrorDistribution]):
-        """Initialisation method.
-
+        """
         :param noise_model: Map from gates to their error models.
         """
 

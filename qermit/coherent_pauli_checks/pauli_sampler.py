@@ -1,7 +1,7 @@
 import warnings
 from abc import ABC, abstractmethod
 from itertools import combinations, product
-from typing import List, cast
+from typing import List, Tuple, cast
 
 import numpy.random
 from numpy.random import Generator
@@ -27,7 +27,7 @@ class PauliSampler(ABC):
     def add_pauli_checks_to_circbox(
         self,
         circuit: Circuit,
-    ) -> Circuit:
+    ) -> Tuple[Circuit, set[Bit]]:
         """Add checks to all subcircuits labeled "Clifford Subcircuit".
 
         :param circuit: Circuit to add checks to.

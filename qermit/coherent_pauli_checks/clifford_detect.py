@@ -233,10 +233,10 @@ class QermitDAGCircuit(nx.DiGraph):
         which it covers.
 
         :param node_sub_circuit: List identifying to which clifford sub circuit
-        each command belongs.
+            each command belongs.
         :type node_sub_circuit: List[Int]
         :return: Dictionary from clifford sub circuit index to the qubits
-        the circuit covers.
+            the circuit covers.
         :rtype: Dict[Int, List[Quibt]]
         """
 
