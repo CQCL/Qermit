@@ -10,10 +10,11 @@ from pytket.passes import DecomposeBoxes
 from pytket.pauli import Pauli, QubitPauliString
 
 from qermit.coherent_pauli_checks import (
-    CircuitPauliChecker,
+    # CircuitPauliChecker,
     DeterministicXPauliSampler,
     DeterministicZPauliSampler,
     OptimalPauliSampler,
+    PauliSampler,
     QermitDAGCircuit,
     RandomPauliSampler,
     cpc_rebase_pass,
@@ -55,9 +56,13 @@ def test_logical_error_coherent_pauli_check_workflow():
     cliff_circ.add_q_register(name="my_reg", size=3)
     cliff_circ.add_circbox(CircBox(circ=cliff_sub_circ), cliff_circ.qubits)
 
-    checked_cliff_circ = CircuitPauliChecker(
-        pauli_sampler=pauli_sampler
-    ).add_pauli_checks_to_circbox(
+    # checked_cliff_circ = CircuitPauliChecker(
+    #     pauli_sampler=pauli_sampler
+    # ).add_pauli_checks_to_circbox(
+    #     circuit=cliff_circ,
+    # )
+
+    checked_cliff_circ = pauli_sampler.add_pauli_checks_to_circbox(
         circuit=cliff_circ,
     )
 
@@ -179,7 +184,10 @@ def test_decompose_clifford_subcircuit_box():
     zzmax_circ.ZZMax(qubits[0], qubits[1]).ZZMax(qubits[2], qubits[3])
     zzmax_circ.add_circbox(cx_circbox, [qubits[1], qubits[0], qubits[3]])
 
-    dag_circ = CircuitPauliChecker.decompose_clifford_subcircuit_box(
+    # dag_circ = CircuitPauliChecker.decompose_clifford_subcircuit_box(
+    #     zzmax_circ.get_commands()[2]
+    # )
+    dag_circ = PauliSampler.decompose_clifford_subcircuit_box(
         zzmax_circ.get_commands()[2]
     )
 
@@ -223,9 +231,12 @@ def test_add_pauli_checks():
     cpc_rebase_pass.apply(circ)
     cliff_circ = QermitDAGCircuit(circ)
     boxed_circ = cliff_circ.to_clifford_subcircuit_boxes()
-    circuit = CircuitPauliChecker(
-        pauli_sampler=DeterministicZPauliSampler()
-    ).add_pauli_checks_to_circbox(
+    # circuit = CircuitPauliChecker(
+    #     pauli_sampler=DeterministicZPauliSampler()
+    # ).add_pauli_checks_to_circbox(
+    #     circuit=boxed_circ,
+    # )
+    circuit = DeterministicZPauliSampler().add_pauli_checks_to_circbox(
         circuit=boxed_circ,
     )
     DecomposeBoxes().apply(circuit)
@@ -300,9 +311,12 @@ def test_add_pauli_checks():
     cpc_rebase_pass.apply(circ)
     cliff_circ = QermitDAGCircuit(circ)
     boxed_circ = cliff_circ.to_clifford_subcircuit_boxes()
-    circuit = CircuitPauliChecker(
-        pauli_sampler=DeterministicZPauliSampler()
-    ).add_pauli_checks_to_circbox(
+    # circuit = CircuitPauliChecker(
+    #     pauli_sampler=DeterministicZPauliSampler()
+    # ).add_pauli_checks_to_circbox(
+    #     circuit=boxed_circ,
+    # )
+    circuit = DeterministicZPauliSampler().add_pauli_checks_to_circbox(
         circuit=boxed_circ,
     )
     DecomposeBoxes().apply(circuit)
@@ -368,9 +382,10 @@ def test_5q_random_clifford():
     dag_circuit = QermitDAGCircuit(clifford_circuit)
     boxed_clifford_circuit = dag_circuit.to_clifford_subcircuit_boxes()
     pauli_sampler = RandomPauliSampler(rng=rng, n_checks=2)
-    CircuitPauliChecker(pauli_sampler=pauli_sampler).add_pauli_checks_to_circbox(
-        circuit=boxed_clifford_circuit
-    )
+    # CircuitPauliChecker(pauli_sampler=pauli_sampler).add_pauli_checks_to_circbox(
+    #     circuit=boxed_clifford_circuit
+    # )
+    pauli_sampler.add_pauli_checks_to_circbox(circuit=boxed_clifford_circuit)
 
 
 @pytest.mark.skip(
@@ -392,9 +407,12 @@ def test_CZ_circuit_with_phase():
     dag_circuit = QermitDAGCircuit(original_circuit)
     boxed_original_circuit = dag_circuit.to_clifford_subcircuit_boxes()
     pauli_sampler = DeterministicXPauliSampler()
-    pauli_checks_circuit = CircuitPauliChecker(
-        pauli_sampler=pauli_sampler
-    ).add_pauli_checks_to_circbox(
+    # pauli_checks_circuit = CircuitPauliChecker(
+    #     pauli_sampler=pauli_sampler
+    # ).add_pauli_checks_to_circbox(
+    #     circuit=boxed_original_circuit,
+    # )
+    pauli_checks_circuit = pauli_sampler.add_pauli_checks_to_circbox(
         circuit=boxed_original_circuit,
     )
     DecomposeBoxes().apply(pauli_checks_circuit)
@@ -494,9 +512,10 @@ def test_optimal_pauli_sampler():
     )
     dag_circ = QermitDAGCircuit(cliff_circ)
     boxed_cliff_circ = dag_circ.to_clifford_subcircuit_boxes()
-    CircuitPauliChecker(pauli_sampler=pauli_sampler).add_pauli_checks_to_circbox(
-        circuit=boxed_cliff_circ
-    )
+    # CircuitPauliChecker(pauli_sampler=pauli_sampler).add_pauli_checks_to_circbox(
+    #     circuit=boxed_cliff_circ
+    # )
+    pauli_sampler.add_pauli_checks_to_circbox(circuit=boxed_cliff_circ)
 
 
 def test_add_ZX_pauli_checks_to_S():
@@ -506,7 +525,7 @@ def test_add_ZX_pauli_checks_to_S():
     cliff_circ.S(qubits[0])
     cliff_circ.measure_all()
 
-    class DeterministicPauliSampler:
+    class DeterministicPauliSampler(PauliSampler):
         def sample(self, circ, **kwargs):
             qubit_list = circ.qubits
             return [
@@ -520,9 +539,14 @@ def test_add_ZX_pauli_checks_to_S():
     dag_circ = QermitDAGCircuit(cliff_circ)
     boxed_cliff_circ = dag_circ.to_clifford_subcircuit_boxes()
     pauli_sampler = DeterministicPauliSampler()
-    pauli_check_circ = CircuitPauliChecker(
-        pauli_sampler=pauli_sampler
-    ).add_pauli_checks_to_circbox(
+    # pauli_check_circ = CircuitPauliChecker(
+    #     pauli_sampler=pauli_sampler
+    # ).add_pauli_checks_to_circbox(
+    #     circuit=boxed_cliff_circ,
+    #     # n_rand=10000,
+    #     # cutoff=10,
+    # )
+    pauli_check_circ = pauli_sampler.add_pauli_checks_to_circbox(
         circuit=boxed_cliff_circ,
         # n_rand=10000,
         # cutoff=10,
@@ -612,9 +636,14 @@ def test_error_sampler():
         noise_model=noise_model,
         n_checks=1,
     )
-    checked_circuit = CircuitPauliChecker(
-        pauli_sampler=pauli_sampler
-    ).add_pauli_checks_to_circbox(
+    # checked_circuit = CircuitPauliChecker(
+    #     pauli_sampler=pauli_sampler
+    # ).add_pauli_checks_to_circbox(
+    #     circuit=circuit,
+    #     # n_rand=n_shots,
+    #     # n_checks=1,
+    # )
+    checked_circuit = pauli_sampler.add_pauli_checks_to_circbox(
         circuit=circuit,
         # n_rand=n_shots,
         # n_checks=1,

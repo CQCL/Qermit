@@ -3,7 +3,7 @@ from .clifford_detect import (  # noqa:F401
     cpc_rebase_pass,
 )
 from .pauli_sampler import (  # noqa:F401
-    CircuitPauliChecker,
+    # CircuitPauliChecker,
     DeterministicXPauliSampler,
     DeterministicZPauliSampler,
     OptimalPauliSampler,
