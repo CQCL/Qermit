@@ -4,12 +4,12 @@ from typing import List, Optional, Union, cast
 import networkx as nx  # type: ignore
 from pytket import Circuit, OpType, Qubit
 from pytket.circuit import CircBox, Command
-from pytket.passes.auto_rebase import auto_rebase_pass
+from pytket.passes import AutoRebase
 
 clifford_ops = [OpType.CZ, OpType.H, OpType.Z, OpType.S, OpType.X]
 non_clifford_ops = [OpType.Rz]
 
-cpc_rebase_pass = auto_rebase_pass(gateset=set(clifford_ops + non_clifford_ops))
+cpc_rebase_pass = AutoRebase(gateset=set(clifford_ops + non_clifford_ops))
 
 
 class DAGCommand:

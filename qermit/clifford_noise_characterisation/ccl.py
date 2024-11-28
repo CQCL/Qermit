@@ -22,7 +22,7 @@ from typing import List, Tuple, cast
 import numpy as np
 from pytket import Circuit, OpType
 from pytket.backends import Backend
-from pytket.passes import DecomposeBoxes, auto_rebase_pass
+from pytket.passes import AutoRebase, DecomposeBoxes
 from pytket.unit_id import UnitID
 from pytket.utils import QubitPauliOperator, get_operator_expectation_value
 
@@ -45,7 +45,7 @@ from .cdr_post import (
 )
 
 ufr_gateset = {OpType.CX, OpType.Rz, OpType.H}
-ufr_rebase = auto_rebase_pass(ufr_gateset)
+ufr_rebase = AutoRebase(ufr_gateset)
 
 
 class LikelihoodFunction(Enum):
