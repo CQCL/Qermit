@@ -2738,13 +2738,13 @@ scipy = ">=1.0"
 
 [[package]]
 name = "qiskit-ibm-provider"
-version = "0.10.0"
+version = "0.11.0"
 description = "Qiskit IBM Quantum Provider for accessing the quantum devices and simulators at IBM"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "qiskit-ibm-provider-0.10.0.tar.gz", hash = "sha256:99dc9fd48bee2e7ed633bc739e0935c91859f1c4b77080a31089ae92e6f110f1"},
-    {file = "qiskit_ibm_provider-0.10.0-py3-none-any.whl", hash = "sha256:2e5c6fedeba1308b009d4733a4e8433a5b4d190aed5981dd7f4512ec04433298"},
+    {file = "qiskit_ibm_provider-0.11.0-py3-none-any.whl", hash = "sha256:3d84aff2df00d0642a9fcb53cf7f7442e62d65d3bbe13e191bc078b2ee474dc6"},
+    {file = "qiskit_ibm_provider-0.11.0.tar.gz", hash = "sha256:31a29701120dd0b27e1d8e691b4e7262580cda6f85b85610697577920d8c2f0c"},
 ]
 
 [package.dependencies]
@@ -3749,4 +3749,4 @@ tests = ["mypy", "pytest", "pytest-cov", "pytket-quantinuum", "qiskit-ibm-provid
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4"
-content-hash = "6c9fe7763d44185ae5670a556ed5950c2db67059e357d067c3627b71873769ea"
+content-hash = "d4ab7b50ad4fb736f67cdf3c041cacfda378ab736d2a84593ee060a07db6826d"
