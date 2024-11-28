@@ -21,7 +21,7 @@ from pytket.backends.backendresult import BackendResult
 from pytket.backends.resulthandle import ResultHandle
 from pytket.extensions.quantinuum import QuantinuumBackend
 from pytket.extensions.quantinuum.backends.quantinuum import _ALL_GATES
-from pytket.passes.auto_rebase import auto_rebase_pass
+from pytket.passes import AutoRebase
 from pytket.predicates import CompilationUnit, GateSetPredicate
 
 from .noisy_aer_backend import NoisyAerBackend
@@ -77,7 +77,7 @@ class MockQuantinuumBackend(QuantinuumBackend):
         cu = CompilationUnit(noisy_circuit)
 
         self.noisy_backend.default_compilation_pass(optimisation_level=0).apply(cu)
-        auto_rebase_pass(gateset=self.noisy_backend.noisy_gate_set).apply(cu)
+        AutoRebase(gateset=self.noisy_backend.noisy_gate_set).apply(cu)
         assert GateSetPredicate(
             self.noisy_backend.noisy_gate_set.union({OpType.Reset, OpType.Barrier})
         ).verify(cu.circuit)
