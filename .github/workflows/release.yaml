@@ -1,0 +1,32 @@
+name: Release
+on:
+  workflow_dispatch: {}
+  # Runs when a version tag is pushed
+  push:
+    tags:
+      - v**
+
+# Safeguard to avoid having multiple deployments running concurrently
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  Release:
+    runs-on: ubuntu-latest
+  
+    steps:
+
+      - name: Checkout Qermit
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Publish Qermit
+        run: poetry publish -u __token__ -p ${{ secrets.PYPI_RELEASE_TOKEN }} --build --skip-existing
