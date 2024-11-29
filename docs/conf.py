@@ -16,7 +16,6 @@
 
 import pkg_resources
 
-
 # -- Project information -----------------------------------------------------
 
 project = "Qermit"
@@ -24,9 +23,9 @@ copyright = "2023 Quantinuum"
 author = "Quantinuum"
 
 # The short X.Y version
-version = str(pkg_resources.get_distribution('Qermit').version)
+version = str(pkg_resources.get_distribution("Qermit").version)
 # The full version, including alpha/beta/rc tags
-release = str(pkg_resources.get_distribution('Qermit').version)
+release = str(pkg_resources.get_distribution("Qermit").version)
 
 
 # -- General configuration ---------------------------------------------------
