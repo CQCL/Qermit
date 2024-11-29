@@ -44,6 +44,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
     "myst_nb",
+    "jupyter_sphinx",
 ]
 
 intersphinx_mapping = {
