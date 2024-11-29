@@ -29,4 +29,4 @@ jobs:
         uses: snok/install-poetry@v1
 
       - name: Publish Qermit
-        run: poetry publish -u __token__ -p ${{ secrets.PYPI_RELEASE_TOKEN }} --build --skip-existing
+        run: poetry publish -u __token__ -p ${{ secrets.PYPI_RELEASE_TOKEN }} --build
