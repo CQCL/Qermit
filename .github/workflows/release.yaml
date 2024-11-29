@@ -36,6 +36,3 @@ jobs:
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-
-      - name: Publish Qermit
-        run: poetry publish -u __token__ -p ${{ secrets.PYPI_RELEASE_TOKEN }} --build
