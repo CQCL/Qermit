@@ -29,6 +29,26 @@ jobs:
         cd tests
         pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
 
+  publish:
+    name: Test publication
+    runs-on: ubuntu-latest
+  
+    steps:
+
+      - name: Checkout Qermit
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Publish Qermit Dry Run
+        run: poetry publish -u __token__ -p ${{ secrets.PYPI_RELEASE_TOKEN }} --build --skip-existing --dry-run
+
   build-docs:
     name: Test documentation build
     runs-on: ubuntu-latest
