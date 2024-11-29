@@ -13,6 +13,7 @@ concurrency:
 
 jobs:
   Release:
+    name: Build and release
     runs-on: ubuntu-latest
     
     permissions:
