@@ -31,7 +31,7 @@ jobs:
 
   publish:
     name: Test publication
-    uns-on: ubuntu-latest
+    runs-on: ubuntu-latest
   
     steps:
 
