@@ -14,6 +14,9 @@ concurrency:
 jobs:
   Release:
     runs-on: ubuntu-latest
+    
+    permissions:
+      id-token: write
   
     steps:
 
@@ -27,6 +30,12 @@ jobs:
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
+      
+      - name: Build Qermit
+        run: poetry build
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
 
       - name: Publish Qermit
         run: poetry publish -u __token__ -p ${{ secrets.PYPI_RELEASE_TOKEN }} --build

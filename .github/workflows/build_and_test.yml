@@ -9,7 +9,7 @@ on:
 jobs:
 
   run-tests:
-    name: Build and test
+    name: Run tests
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12']
@@ -29,8 +29,8 @@ jobs:
         cd tests
         pytest --cov-report term-missing:skip-covered --cov=qermit --durations=10
 
-  publish:
-    name: Test publication
+  build-distribution:
+    name: Build distribution
     runs-on: ubuntu-latest
   
     steps:
@@ -46,8 +46,14 @@ jobs:
       - name: Install Poetry
         uses: snok/install-poetry@v1
 
-      - name: Publish Qermit Dry Run
-        run: poetry publish -u __token__ -p ${{ secrets.PYPI_RELEASE_TOKEN }} --build --skip-existing --dry-run
+      - name: Build Qermit
+        run: poetry build
+
+      - name: Save build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: dist
 
   build-docs:
     name: Test documentation build
