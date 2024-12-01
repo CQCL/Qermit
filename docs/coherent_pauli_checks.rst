@@ -12,4 +12,4 @@ qermit.coherent_pauli_checks
     :members:
     :show-inheritance:
 
-.. autofunction:: qermit.coherent_pauli_checks.qermit.coherent_pauli_checks_mitres.gen_coherent_pauli_check_mitres
+.. autofunction:: qermit.coherent_pauli_checks.coherent_pauli_checks_mitres.gen_coherent_pauli_check_mitres

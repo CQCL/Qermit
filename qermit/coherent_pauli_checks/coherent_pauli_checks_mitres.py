@@ -107,7 +107,7 @@ def gen_coherent_pauli_check_mitres(
     :param backend: Backend to perform perform experiment with.
     :param pauli_sampler: Sampler to use to apply Pauli checks.
     :return: MitRes performing mitigation through
-    Coherent Pauli Checks.
+        Coherent Pauli Checks.
     """
     _mitres = MitRes(backend, _label="PostselectionMitRes")
     _taskgraph = TaskGraph().from_TaskGraph(_mitres)
