@@ -2,58 +2,65 @@
 
 [![PyPI version](https://badge.fury.io/py/qermit.svg)](https://badge.fury.io/py/qermit)
 
-`qermit` is a python module for running error-mitigation protocols on quantum processors using the [pytket](https://docs.quantinuum.com/tket) quantum computing toolkit.
+Qermit is a python module for running error-mitigation protocols on quantum processors.
+It is an extension to the [pytket](https://docs.quantinuum.com/tket) quantum computing toolkit.
 
-This repo contains API documentation, a user manual for getting started with `qermit` and source code.
+This repo contains source code and API documentation.
+For details on building the docs please see `docs/README.md`
 
 ## Getting Started
 
-`qermit` is compatible with the `pytket` 1.0 release and so is available for Python 3.9, 3.10 and 3.11 on Linux, MacOS and Windows.
 To install, run:
-
-``pip install qermit``
-
-API documentation can be found at [cqcl.github.io/Qermit](https://cqcl.github.io/Qermit).
-
-To get a more in depth explanation of Qermit and its features including how to construct custom methods see the [manual](https://cqcl.github.io/Qermit/manual/) which includes examples.
-
-
+```
+pip install qermit
+```
+API documentation can be found at [qerm.it](https://qerm.it).
 
 ## Bugs
 
 Please file bugs on the Github
 [issue tracker](https://github.com/CQCL/Qermit/issues).
 
-## How to cite
-
-If you wish to cite Qermit in any academic publications, we generally recommend citing our [benchmarking paper](https://doi.org/10.48550/arXiv.2204.09725) for most cases.
-
 ## Contributing
 
-Pull requests or feature suggestions are very welcome. To make a PR, first fork the repo, make your proposed
-changes on the `main` branch, and open a PR from your fork. If it passes
-tests and is accepted after review, it will be merged in.
+Pull requests or feature suggestions are very welcome.
+To make a PR, first fork the repo, make your proposed changes on the `main` branch, and open a PR from your fork.
 
-### Code style
+## Code style
 
-#### Formatting
+To install the dependencies required for the following run:
+```
+pip install qermit[tests]
+```
 
-All code should adhere to [flake8](https://flake8.pycqa.org/en/latest/)
-formatting, ignoring only E501 and W503
+### Formatting
 
-#### Type annotation
+This repository uses [ruff](https://docs.astral.sh/ruff/) for formatting and linting.
+To check if your changes meet these standards run:
+```
+ruff check
+ruff format --check
+```
 
-On the CI, [mypy](https://mypy.readthedocs.io/en/stable/) is used as a static
-type checker and all submissions must pass its checks. You should therefore run
-`mypy` locally on any changed files before submitting a PR. 
+### Type annotation
 
-### Tests
+On the CI, [mypy](https://mypy.readthedocs.io/en/stable/) is used as a static type checker.
+To check these checks would pass please run:
+```
+mypy -p qermit
+```
 
-To run the tests:
+## Tests
 
-1. `cd` into the `tests` directory;
-2. ensure you have installed `pytest`;
-3. run `pytest`.
+To run tests use:
+```
+cd tests
+pytest
+```
 
-When adding a new feature, please add a test for it. When fixing a bug, please
-add a test that demonstrates the fix.
+When adding a new feature, please add a test for it.
+When fixing a bug, please add a test that demonstrates the fix.
+
+## How to cite
+
+If you wish to cite Qermit, we recommend citing our [benchmarking paper](https://quantum-journal.org/papers/q-2023-07-13-1059/) where possible.
