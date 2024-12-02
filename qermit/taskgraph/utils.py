@@ -19,7 +19,7 @@ from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 from numpy import ndarray
 from pytket.backends.backendresult import BackendResult
-from pytket.circuit import Bit, Circuit, Qubit
+from pytket.circuit import Bit, Circuit
 from pytket.pauli import QubitPauliString
 from pytket.utils import (
     QubitPauliOperator,
