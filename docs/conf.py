@@ -46,6 +46,14 @@ extensions = [
     "sphinx_autodoc_typehints",
     "myst_nb",
     "jupyter_sphinx",
+    "autodoc2",
+]
+
+autodoc2_packages = [
+    {
+        "path": "../qermit",
+        "auto_mode": False,
+    },
 ]
 
 intersphinx_mapping = {

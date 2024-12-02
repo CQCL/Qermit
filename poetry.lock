@@ -34,6 +34,20 @@ files = [
 ]
 
 [[package]]
+name = "astroid"
+version = "3.3.5"
+description = "An abstract syntax tree for Python with inference support."
+optional = false
+python-versions = ">=3.9.0"
+files = [
+    {file = "astroid-3.3.5-py3-none-any.whl", hash = "sha256:a9d1c946ada25098d790e079ba2a1b112157278f3fb7e718ae6a9252f5835dc8"},
+    {file = "astroid-3.3.5.tar.gz", hash = "sha256:5cfc40ae9f68311075d27ef68a4841bdc5cc7f6cf86671b49f00607d30188e2d"},
+]
+
+[package.dependencies]
+typing-extensions = {version = ">=4.0.0", markers = "python_version < \"3.11\""}
+
+[[package]]
 name = "asttokens"
 version = "2.4.1"
 description = "Annotate AST trees with source code positions"
@@ -3639,6 +3653,28 @@ numpy = ["nptyping (>=2.5)"]
 testing = ["covdefaults (>=2.3)", "coverage (>=7.6.1)", "defusedxml (>=0.7.1)", "diff-cover (>=9.1.1)", "pytest (>=8.3.2)", "pytest-cov (>=5)", "sphobjinv (>=2.3.1.1)", "typing-extensions (>=4.12.2)"]
 
 [[package]]
+name = "sphinx-autodoc2"
+version = "0.5.0"
+description = "Analyse a python project and create documentation for it."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "sphinx_autodoc2-0.5.0-py3-none-any.whl", hash = "sha256:e867013b1512f9d6d7e6f6799f8b537d6884462acd118ef361f3f619a60b5c9e"},
+    {file = "sphinx_autodoc2-0.5.0.tar.gz", hash = "sha256:7d76044aa81d6af74447080182b6868c7eb066874edc835e8ddf810735b6565a"},
+]
+
+[package.dependencies]
+astroid = ">=2.7,<4"
+tomli = {version = "*", markers = "python_version < \"3.11\""}
+typing-extensions = "*"
+
+[package.extras]
+cli = ["typer[all]"]
+docs = ["furo", "myst-parser", "sphinx (>=4.0.0)"]
+sphinx = ["sphinx (>=4.0.0)"]
+testing = ["pytest", "pytest-cov", "pytest-regressions", "sphinx (>=4.0.0,<7)"]
+
+[[package]]
 name = "sphinx-basic-ng"
 version = "1.0.0b2"
 description = "A modern skeleton for Sphinx themes."
@@ -4026,7 +4062,7 @@ test = ["pytest", "ruff"]
 name = "tomli"
 version = "2.2.1"
 description = "A lil' TOML parser"
-optional = true
+optional = false
 python-versions = ">=3.8"
 files = [
     {file = "tomli-2.2.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:678e4fa69e4575eb77d103de3df8a895e1591b48e740211bd1067378c69e8249"},
@@ -4315,4 +4351,4 @@ tests = ["mypy", "pytest", "pytest-cov", "pytket-quantinuum", "qiskit-ibm-provid
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.14"
-content-hash = "518fb4ebd0da46487bbb8279c79d26e244c3459d43ab11e8506fbd7ab91095f6"
+content-hash = "0b403d91abc97b09787fe2d8081bf498e85afaa287644c55c69926e514666db2"
