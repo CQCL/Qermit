@@ -5,7 +5,7 @@
 Qermit is a python module for running error-mitigation protocols on quantum processors.
 It is an extension to the [pytket](https://docs.quantinuum.com/tket) quantum computing toolkit.
 
-This repo contains source code and API documentation.
+This repository contains source code and API documentation.
 For details on building the docs please see `docs/README.md`
 
 ## Getting Started
@@ -14,6 +14,12 @@ To install, run:
 ```
 pip install qermit
 ```
+You may also wish to install the package from source:
+```
+pip install -e .
+```
+A `poetry.lock` file is included for use with [poetry](https://python-poetry.org/docs/cli/#install).
+
 API documentation can be found at [qerm.it](https://qerm.it).
 
 ## Bugs
@@ -24,11 +30,12 @@ Please file bugs on the Github
 ## Contributing
 
 Pull requests or feature suggestions are very welcome.
-To make a PR, first fork the repo, make your proposed changes on the `main` branch, and open a PR from your fork.
+To make a PR, first fork the repository, make your proposed changes, and open a PR from your fork.
 
 ## Code style
 
-To install the dependencies required for the following run:
+Style checks are run by continuous integration.
+To install the dependencies required to run them locally run:
 ```
 pip install qermit[tests]
 ```
@@ -44,13 +51,18 @@ ruff format --check
 
 ### Type annotation
 
-On the CI, [mypy](https://mypy.readthedocs.io/en/stable/) is used as a static type checker.
-To check these checks would pass please run:
+[mypy](https://mypy.readthedocs.io/en/stable/) is used as a static type checker.
 ```
 mypy -p qermit
 ```
 
 ## Tests
+
+Tests are run by continuous integration.
+To install the dependencies required to run them locally run:
+```
+pip install qermit[tests]
+```
 
 To run tests use:
 ```
