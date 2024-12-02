@@ -171,6 +171,13 @@ mitex.get_task_graph()
 ## Contents
 
 ```{toctree}
+:caption: Overview:
+:maxdepth: 2
+
+tutorial.md
+```
+
+```{toctree}
 :hidden:
 
 manual/manual_index.rst
