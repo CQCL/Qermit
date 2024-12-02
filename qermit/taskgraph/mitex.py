@@ -139,7 +139,8 @@ def filter_observable_tracker_task_gen() -> MitTask:
                     set(circuit.qubits)
                 )
             )
-            # TODO: This check should be done inside ansatz_circuit.
+            # TODO: In a future refactor, this check should be done
+            # inside ObservableExperiment.
             if len(non_existant_qubits) > 0:
                 raise Exception(
                     f"ObservableTracker qubits {non_existant_qubits} are not found in circuit."

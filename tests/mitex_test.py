@@ -45,7 +45,6 @@ def test_valid_observable():
     circuit = Circuit()
     q_reg = circuit.add_q_register(name="my_quibts", size=2)
     circuit.CX(q_reg[0], q_reg[1])
-    compiled_circuit = backend.get_compiled_circuit(circuit)
 
     qps_one = QubitPauliString(
         [Qubit(name="my_quibts", index=0), Qubit(name="my_quibts", index=1)],
@@ -54,7 +53,7 @@ def test_valid_observable():
     qps_two = QubitPauliString([Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z])
 
     obs_exp = ObservableExperiment(
-        AnsatzCircuit(compiled_circuit, 2, SymbolsDict()),
+        AnsatzCircuit(circuit, 2, SymbolsDict()),
         ObservableTracker(
             QubitPauliOperator(
                 {
@@ -67,7 +66,7 @@ def test_valid_observable():
     assert mitex.run([obs_exp])[0]._dict[qps_one] == 1.0
 
     obs_exp = ObservableExperiment(
-        AnsatzCircuit(compiled_circuit, 2, SymbolsDict()),
+        AnsatzCircuit(circuit, 2, SymbolsDict()),
         ObservableTracker(QubitPauliOperator({qps_one: 1, qps_two: 1})),
     )
     with pytest.raises(
