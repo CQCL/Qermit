@@ -19,7 +19,7 @@ from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 from numpy import ndarray
 from pytket.backends.backendresult import BackendResult
-from pytket.circuit import Bit, Circuit
+from pytket.circuit import Bit, Circuit, Qubit
 from pytket.pauli import QubitPauliString
 from pytket.utils import (
     QubitPauliOperator,
@@ -397,6 +397,23 @@ class ObservableTracker:
         :return: All measurement circuits held in ObservableTracker self._measurement_circuits attirbute.
         """
         return self._measurement_circuits
+
+    def contained_in_qubits(self, qubit_list: List[Qubit]) -> bool:
+        """Returns true if the qubits of this observable are contained in
+        the given list of qubits. Returns False otherwise.
+        This can be used to check of this observable
+        is contained in the qubits features in a circuit, for example.
+
+        :param qubit_list: The list of qubits to check. It will be checked
+            if the qubits of this observable are contained in this list.
+        :return: True if the observable qubits are contained in the given list.
+            False otherwise.
+        """
+
+        return all(
+            observable_quibts in qubit_list
+            for observable_quibts in self.qubit_pauli_operator.all_qubits
+        )
 
     def get_expectations(self, results: List[BackendResult]) -> QubitPauliOperator:
         """

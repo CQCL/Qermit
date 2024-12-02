@@ -134,6 +134,10 @@ def filter_observable_tracker_task_gen() -> MitTask:
             symbols = ansatz_circuit[2]
             observable_tracker = measurement_wire[1]
 
+            # TODO: This check should be done inside ansatz_circuit.
+            if not observable_tracker.contained_in_qubits(qubit_list=circuit.qubits):
+                raise Exception("ObservableTracker qubits are not found in circuit.")
+
             # first make sure all observable has some measurement circuit
             strings_for_circuits = observable_tracker.get_empty_strings()
             for string in strings_for_circuits:
