@@ -15,6 +15,7 @@
 
 import copy
 
+import pytest
 from pytket.circuit import Circuit, OpType, Qubit, fresh_symbol  # type: ignore
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
@@ -35,6 +36,44 @@ from qermit.taskgraph.mitex import (  # type: ignore
     get_expectations_task_gen,
     split_results_task_gen,
 )
+
+
+def test_valid_observable():
+    backend = AerBackend(n_qubits=2)
+    mitex = MitEx(backend=backend)
+
+    circuit = Circuit()
+    q_reg = circuit.add_q_register(name="my_quibts", size=2)
+    circuit.CX(q_reg[0], q_reg[1])
+
+    qps_one = QubitPauliString(
+        [Qubit(name="my_quibts", index=0), Qubit(name="my_quibts", index=1)],
+        [Pauli.Z, Pauli.Z],
+    )
+    qps_two = QubitPauliString([Qubit(1), Qubit(2)], [Pauli.Z, Pauli.Z])
+
+    obs_exp = ObservableExperiment(
+        AnsatzCircuit(circuit, 2, SymbolsDict()),
+        ObservableTracker(
+            QubitPauliOperator(
+                {
+                    qps_one: 1,
+                }
+            )
+        ),
+    )
+
+    assert mitex.run([obs_exp])[0]._dict[qps_one] == 1.0
+
+    obs_exp = ObservableExperiment(
+        AnsatzCircuit(circuit, 2, SymbolsDict()),
+        ObservableTracker(QubitPauliOperator({qps_one: 1, qps_two: 1})),
+    )
+    with pytest.raises(
+        Exception,
+        match="ObservableTracker qubits \{q\[2\], q\[1\]\} are not found in circuit.",
+    ):
+        mitex.run([obs_exp])
 
 
 def test_mitex_cache():

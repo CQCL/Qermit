@@ -134,6 +134,18 @@ def filter_observable_tracker_task_gen() -> MitTask:
             symbols = ansatz_circuit[2]
             observable_tracker = measurement_wire[1]
 
+            non_existant_qubits = (
+                observable_tracker.qubit_pauli_operator.all_qubits.difference(
+                    set(circuit.qubits)
+                )
+            )
+            # TODO: In a future refactor, this check should be done
+            # inside ObservableExperiment.
+            if len(non_existant_qubits) > 0:
+                raise Exception(
+                    f"ObservableTracker qubits {non_existant_qubits} are not found in circuit."
+                )
+
             # first make sure all observable has some measurement circuit
             strings_for_circuits = observable_tracker.get_empty_strings()
             for string in strings_for_circuits:
