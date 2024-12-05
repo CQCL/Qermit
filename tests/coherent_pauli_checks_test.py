@@ -295,7 +295,7 @@ def test_get_clifford_subcircuits():
         .CZ(1, 2)
     )
     cliff_circ = QermitDAGCircuit(circ)
-    assert cliff_circ.get_clifford_subcircuits() == [0, 1, 0, 2, 2, 3, 4, 4, 4]
+    assert cliff_circ.get_clifford_subcircuits() == [0, 1, 0, 3, 3, 2, 6, 6, 6]
 
 
 def test_add_pauli_checks():
@@ -311,66 +311,56 @@ def test_add_pauli_checks():
     ideal_circ = Circuit(3)
 
     ancilla_0 = Qubit(name="ancilla", index=0)
-    ancilla_1 = Qubit(name="ancilla", index=1)
+    ideal_circ.add_qubit(ancilla_0)
 
     ancilla_measure_0 = Bit(name="ancilla_measure", index=0)
-    ancilla_measure_1 = Bit(name="ancilla_measure", index=1)
-
-    ideal_circ.add_qubit(ancilla_0)
-    ideal_circ.add_qubit(ancilla_1)
-
     ideal_circ.add_bit(id=ancilla_measure_0)
-    ideal_circ.add_bit(id=ancilla_measure_1)
 
-    ideal_circ.add_barrier([ideal_circ.qubits[3], ancilla_0])
+    ideal_circ.add_barrier([ideal_circ.qubits[2], ideal_circ.qubits[1], ancilla_0])
     ideal_circ.H(ancilla_0, opgroup="ancilla superposition")
     ideal_circ.CZ(
         control_qubit=ancilla_0,
-        target_qubit=ideal_circ.qubits[3],
+        target_qubit=ideal_circ.qubits[1],
         opgroup="pauli check",
     )
-    ideal_circ.add_barrier([ideal_circ.qubits[3], ancilla_0])
+    ideal_circ.CZ(
+        control_qubit=ancilla_0,
+        target_qubit=ideal_circ.qubits[2],
+        opgroup="pauli check",
+    )
+    ideal_circ.add_barrier([ideal_circ.qubits[2], ideal_circ.qubits[1], ancilla_0])
 
-    ideal_circ.H(ideal_circ.qubits[3])
+    ideal_circ.H(ideal_circ.qubits[2])
 
-    ideal_circ.add_barrier([ideal_circ.qubits[3], ancilla_0])
+    ideal_circ.H(ideal_circ.qubits[1])
+    ideal_circ.CZ(control_qubit=ideal_circ.qubits[2], target_qubit=ideal_circ.qubits[1])
+    ideal_circ.H(ideal_circ.qubits[1])
+
+    ideal_circ.add_barrier([ideal_circ.qubits[2], ideal_circ.qubits[1], ancilla_0])
+    ideal_circ.CZ(
+        control_qubit=ancilla_0,
+        target_qubit=ideal_circ.qubits[1],
+        opgroup="pauli check",
+    )
     ideal_circ.CX(
         control_qubit=ancilla_0,
-        target_qubit=ideal_circ.qubits[3],
+        target_qubit=ideal_circ.qubits[1],
+        opgroup="pauli check",
+    )
+    ideal_circ.CZ(
+        control_qubit=ancilla_0,
+        target_qubit=ideal_circ.qubits[2],
+        opgroup="pauli check",
+    )
+    ideal_circ.CX(
+        control_qubit=ancilla_0,
+        target_qubit=ideal_circ.qubits[2],
         opgroup="pauli check",
     )
     ideal_circ.H(ancilla_0, opgroup="ancilla superposition")
-    ideal_circ.add_barrier([ideal_circ.qubits[3], ancilla_0])
-
-    ideal_circ.add_barrier([ideal_circ.qubits[3], ideal_circ.qubits[2], ancilla_1])
-    ideal_circ.H(ancilla_1, opgroup="ancilla superposition")
-    ideal_circ.CZ(
-        control_qubit=ancilla_1,
-        target_qubit=ideal_circ.qubits[2],
-        opgroup="pauli check",
-    )
-    ideal_circ.CZ(
-        control_qubit=ancilla_1,
-        target_qubit=ideal_circ.qubits[3],
-        opgroup="pauli check",
-    )
-    ideal_circ.add_barrier([ideal_circ.qubits[3], ideal_circ.qubits[2], ancilla_1])
-
-    ideal_circ.H(ideal_circ.qubits[2])
-    ideal_circ.CZ(control_qubit=ideal_circ.qubits[3], target_qubit=ideal_circ.qubits[2])
-    ideal_circ.H(ideal_circ.qubits[2])
-
-    ideal_circ.add_barrier([ideal_circ.qubits[3], ideal_circ.qubits[2], ancilla_1])
-    ideal_circ.CZ(
-        control_qubit=ancilla_1,
-        target_qubit=ideal_circ.qubits[2],
-        opgroup="pauli check",
-    )
-    ideal_circ.H(ancilla_1, opgroup="ancilla superposition")
-    ideal_circ.add_barrier([ideal_circ.qubits[3], ideal_circ.qubits[2], ancilla_1])
+    ideal_circ.add_barrier([ideal_circ.qubits[2], ideal_circ.qubits[1], ancilla_0])
 
     ideal_circ.Measure(ancilla_0, ancilla_measure_0)
-    ideal_circ.Measure(ancilla_1, ancilla_measure_1)
 
     assert ideal_circ == circuit
 
@@ -427,14 +417,10 @@ def test_add_pauli_checks():
     assert ideal_circ == circuit
 
 
-def test_simple_non_minimal_example():
-    # Note that this is a simple example of where the current implementation
-    # is not minimal. The whole think is a relatively easy to identify
-    # Clifford circuit.
-
+def test_simple_example():
     clifford_circuit = Circuit(3).CZ(0, 1).X(2).X(0).CZ(0, 2).CZ(1, 2)
     dag_circuit = QermitDAGCircuit(clifford_circuit)
-    assert dag_circuit.get_clifford_subcircuits() == [0, 1, 0, 1, 1]
+    assert dag_circuit.get_clifford_subcircuits() == [0, 0, 0, 0, 0]
 
 
 def test_5q_random_clifford():
