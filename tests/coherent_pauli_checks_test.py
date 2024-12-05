@@ -1,5 +1,6 @@
 from collections import Counter
 
+import networkx as nx
 import numpy as np
 import numpy.random
 import pytest
@@ -20,6 +21,9 @@ from qermit.coherent_pauli_checks import (
     cpc_rebase_pass,
     gen_coherent_pauli_check_mitres,
 )
+from qermit.coherent_pauli_checks.monochromatic_convex_subdag import (
+    MonochromaticConvexSubDAG,
+)
 from qermit.noise_model import (
     Direction,
     ErrorDistribution,
@@ -33,6 +37,58 @@ from qermit.postselection import PostselectMgr
 from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
+
+
+def test_monochromatic_convex_subdag():
+    dag = nx.DiGraph()
+    dag.add_edges_from([(1, 2), (1, 3), (2, 4)])
+
+    nx.draw(dag, with_labels=True)
+
+    convex_subdag = MonochromaticConvexSubDAG(
+        dag=dag, node_coloured={1: True, 2: True, 3: False, 4: False}
+    )
+
+    node_subdag = {1: 0, 2: 1, 3: 2, 4: 3}
+
+    assert convex_subdag._can_merge(subdag_one=1, subdag_two=0, node_subdag=node_subdag)
+    assert convex_subdag._can_merge(subdag_one=0, subdag_two=1, node_subdag=node_subdag)
+    assert convex_subdag._can_merge(subdag_one=2, subdag_two=1, node_subdag=node_subdag)
+    assert not convex_subdag._can_merge(
+        subdag_one=0, subdag_two=3, node_subdag=node_subdag
+    )
+
+    assert convex_subdag._subdag_successors(
+        subdag=0, node_subdag={1: 0, 2: 0, 3: 0, 4: 3}
+    ) == [4]
+    assert (
+        convex_subdag._subdag_successors(subdag=3, node_subdag={1: 0, 2: 0, 3: 0, 4: 3})
+        == []
+    )
+    assert (
+        convex_subdag._subdag_predecessors(
+            subdag=0, node_subdag={1: 0, 2: 0, 3: 0, 4: 3}
+        )
+        == []
+    )
+    assert convex_subdag._subdag_predecessors(
+        subdag=3, node_subdag={1: 0, 2: 0, 3: 0, 4: 3}
+    ) == [2]
+    assert convex_subdag._can_merge(
+        subdag_one=0, subdag_two=3, node_subdag={1: 0, 2: 0, 3: 0, 4: 3}
+    )
+
+    assert convex_subdag.greedy_merge() == {1: 0, 2: 0}
+
+    convex_subdag = MonochromaticConvexSubDAG(
+        dag=dag, node_coloured={1: True, 2: False, 3: False, 4: True}
+    )
+    assert convex_subdag.greedy_merge() == {1: 0, 4: 3}
+
+    convex_subdag = MonochromaticConvexSubDAG(
+        dag=dag, node_coloured={1: False, 2: True, 3: True, 4: False}
+    )
+    assert convex_subdag.greedy_merge() == {2: 1, 3: 1}
 
 
 def test_two_clifford_boxes() -> None:
