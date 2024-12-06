@@ -37,6 +37,88 @@ from qermit.postselection import PostselectMgr
 from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
+from qermit.coherent_pauli_checks.clifford_detect import command_is_clifford
+
+
+def test_command_is_clifford():
+
+    qubit_0 = Qubit(name='my_qubit_0', index=0)
+    qubit_1 = Qubit(name='my_qubit_0', index=2)
+    qubit_2 = Qubit(name='my_qubit_1', index=0)
+    qubit_3 = Qubit(name='my_qubit_1', index=1)
+
+    bit_0 = Bit(name='my_bit_0', index=0)
+    bit_1 = Bit(name='my_bit_0', index=2)
+    bit_2 = Bit(name='my_bit_1', index=0)
+
+    circuit = Circuit()
+
+    circuit.add_qubit(qubit_0)
+    circuit.add_qubit(qubit_1)
+    circuit.add_qubit(qubit_2)
+    circuit.add_qubit(qubit_3)
+
+    circuit.add_bit(bit_0)
+    circuit.add_bit(bit_1)
+    circuit.add_bit(bit_2)
+
+    circuit.CZ(qubit_0, qubit_1)
+    circuit.X(qubit_2, condition=bit_2)
+    circuit.Y(qubit_3)
+    circuit.PhasedX(0.5, 0.5, qubit_1)
+    circuit.CX(qubit_2, qubit_0, condition=bit_1)
+    circuit.add_c_and(arg0_in=bit_0, arg1_in=bit_2, arg_out=bit_1)
+    circuit.Z(qubit_1, condition=bit_0)
+    circuit.Rz(0.5, qubit_2)
+    circuit.PhasedX(0.5, 0.5, qubit_2, condition=bit_0)
+    circuit.Rz(0.5, qubit_2, condition=bit_2)
+    circuit.H(qubit_1)
+    circuit.Rz(0.55, qubit_2)
+    circuit.PhasedX(0.5, 0.55, qubit_2)
+
+    dag_circuit = QermitDAGCircuit(circuit=circuit)
+    nx.draw(dag_circuit.dag, with_labels=True)
+
+    command_list = circuit.get_commands()
+
+    assert command_list[0].op.type == OpType.CZ
+    assert command_is_clifford(command_list[0])
+
+    assert command_list[1].op.type == OpType.Conditional
+    assert not command_is_clifford(command_list[1])
+
+    assert command_list[2].op.type == OpType.Y
+    assert command_is_clifford(command_list[2])
+
+    assert command_list[3].op.type == OpType.Conditional
+    assert not command_is_clifford(command_list[3])
+
+    assert command_list[4].op.type == OpType.PhasedX
+    assert command_is_clifford(command_list[4])
+
+    assert command_list[5].op.type == OpType.ExplicitPredicate
+    assert not command_is_clifford(command_list[5])
+
+    assert command_list[6].op.type == OpType.Conditional
+    assert not command_is_clifford(command_list[6])
+
+    assert command_list[7].op.type == OpType.Rz
+    assert command_is_clifford(command_list[7])
+
+    assert command_list[8].op.type == OpType.H
+    assert command_is_clifford(command_list[8])
+
+    assert command_list[9].op.type == OpType.Conditional
+    assert not command_is_clifford(command_list[9])
+
+    assert command_list[10].op.type == OpType.Conditional
+    assert not command_is_clifford(command_list[10])
+
+    assert command_list[11].op.type == OpType.Rz
+    assert not command_is_clifford(command_list[11])
+
+    assert command_list[12].op.type == OpType.PhasedX
+    assert not command_is_clifford(command_list[12])
 
 
 def test_monochromatic_convex_subdag():
@@ -46,7 +128,7 @@ def test_monochromatic_convex_subdag():
     nx.draw(dag, with_labels=True)
 
     convex_subdag = MonochromaticConvexSubDAG(
-        dag=dag, node_coloured={1: True, 2: True, 3: False, 4: False}
+        dag=dag, coloured_nodes=[1,2]
     )
 
     node_subdag = {1: 0, 2: 1, 3: 2, 4: 3}
@@ -81,14 +163,14 @@ def test_monochromatic_convex_subdag():
     assert convex_subdag.greedy_merge() == {1: 0, 2: 0}
 
     convex_subdag = MonochromaticConvexSubDAG(
-        dag=dag, node_coloured={1: True, 2: False, 3: False, 4: True}
+        dag=dag, coloured_nodes=[1,4]
     )
-    assert convex_subdag.greedy_merge() == {1: 0, 4: 3}
+    assert convex_subdag.greedy_merge() == {1: 0, 4: 1}
 
     convex_subdag = MonochromaticConvexSubDAG(
-        dag=dag, node_coloured={1: False, 2: True, 3: True, 4: False}
+        dag=dag, coloured_nodes=[2, 3]
     )
-    assert convex_subdag.greedy_merge() == {2: 1, 3: 1}
+    assert convex_subdag.greedy_merge() == {2: 0, 3: 0}
 
 
 def test_two_clifford_boxes() -> None:
@@ -351,7 +433,7 @@ def test_get_clifford_subcircuits():
         .CZ(1, 2)
     )
     cliff_circ = QermitDAGCircuit(circ)
-    assert cliff_circ.get_clifford_subcircuits() == [0, 1, 0, 3, 3, 2, 6, 6, 6]
+    assert cliff_circ.get_clifford_subcircuits() == [0, 1, 0, 2, 2, 3, 4, 4, 4]
 
 
 def test_add_pauli_checks():

@@ -2,8 +2,8 @@ import math
 from typing import List, Optional, Union, cast
 
 import networkx as nx  # type: ignore
-from pytket import Circuit, OpType, Qubit
-from pytket.circuit import CircBox, Command
+from pytket.unit_id import Qubit
+from pytket.circuit import CircBox, Circuit, Command, OpType
 from pytket.passes import AutoRebase
 
 from .monochromatic_convex_subdag import MonochromaticConvexSubDAG
@@ -13,30 +13,26 @@ non_clifford_ops = [OpType.Rz]
 
 cpc_rebase_pass = AutoRebase(gateset=set(clifford_ops + non_clifford_ops))
 
+def command_is_clifford(command: Command) -> bool:
 
-class DAGCommand:
-    def __init__(self, command: Command) -> None:
-        self.command = command
-
-    @property
-    def clifford(self) -> bool:
-        if self.command.op.is_clifford_type():
+    if command.op.is_clifford_type():
+        return True
+    
+    if command.op.type == OpType.Rz:
+        if command.op.params == [0.5]:
+            return True
+        
+    if command.op.type == OpType.PhasedX:
+        if command.op.params == [0.5, 0.5]:
             return True
 
-        if self.command.op.type in [OpType.PhasedX, OpType.Rz]:
-            return all(
-                math.isclose(param % 0.5, 0) or math.isclose(param % 0.5, 0.5)
-                for param in self.command.op.params
-            )
-
-        return False
-
+    return False
 
 class QermitDAGCircuit:
     def __init__(self, circuit: Circuit) -> None:
         # TODO: There are other things to be saved, like the phase.
 
-        self.node_command = [command for command in circuit.get_commands()]
+        self.node_command = circuit.get_commands()
         self.qubits = circuit.qubits
         self.bits = circuit.bits
 
@@ -48,6 +44,7 @@ class QermitDAGCircuit:
         current_node: dict[Qubit, int] = {}
         self.dag = nx.DiGraph()
         for node, command in enumerate(self.node_command):
+            print("node: ", node, "command: ", command)
             self.dag.add_node(node)
             for qubit in command.qubits:
                 # This if statement is used in case the qubit has not been
@@ -56,33 +53,20 @@ class QermitDAGCircuit:
                     self.dag.add_edge(current_node[qubit], node)
                 current_node[qubit] = node
 
-        def command_is_clifford(command):
-            if command.op.is_clifford_type():
-                return True
-
-            if command.op.type in [OpType.PhasedX, OpType.Rz]:
-                return all(
-                    math.isclose(param % 0.5, 0) or math.isclose(param % 0.5, 0.5)
-                    for param in command.op.params
-                )
-
-            return False
-
-        self.node_clifford = {
-            node: command_is_clifford(command)
+        self.clifford_nodes = {
+            node
             for node, command in enumerate(self.node_command)
+            if command_is_clifford(command)
         }
 
-        self.monochromatic_convex_subdag = MonochromaticConvexSubDAG(
-            dag=self.dag,
-            node_coloured=self.node_clifford,
-        )
-
     def get_clifford_subcircuits(self) -> List[int]:
-        node_subdag = self.monochromatic_convex_subdag.greedy_merge()
+        node_subdag = MonochromaticConvexSubDAG(
+            dag=self.dag,
+            coloured_nodes=self.clifford_nodes,
+        ).greedy_merge()
         node_sub_circuit_list = []
         sub_circuit_index = 0
-        for node, command in enumerate(self.node_command):
+        for node in range(len(self.node_command)):
             if node in node_subdag.keys():
                 node_sub_circuit_list.append(node_subdag[node])
             else:
@@ -105,7 +89,7 @@ class QermitDAGCircuit:
         sub_circuit_qubits = self.get_sub_circuit_qubits(node_sub_circuit_list)
 
         # List indicating if a command has been implemented
-        implemented_commands = [False for _ in self.dag.nodes]
+        implemented_commands = [False] * len(self.node_command)
 
         # Initialise new circuit
         clifford_box_circuit = Circuit()
@@ -136,14 +120,13 @@ class QermitDAGCircuit:
             # List the nodes in the chosen sub circuit
             node_to_implement_list = [
                 node
-                for node, _ in enumerate(self.dag.nodes)
+                for node in range(len(self.node_command))
                 if node_sub_circuit_list[node] == sub_circuit_to_implement
             ]
             assert len(node_to_implement_list) > 0
 
             # If the circuit is clifford add it as a circbox
-            # if self.node_command[node_to_implement_list[0]].clifford:
-            if self.node_clifford[node_to_implement_list[0]]:
+            if node_to_implement_list[0] in self.clifford_nodes:
                 # Empty circuit to contain clifford subcircuit
                 clifford_subcircuit = Circuit(
                     n_qubits=len(sub_circuit_qubits[sub_circuit_to_implement]),
@@ -218,7 +201,7 @@ class QermitDAGCircuit:
         implemented_commands: List[bool],
     ) -> bool:
         can_implement = True
-        for node, _ in enumerate(self.dag.nodes):
+        for node in range(len(self.node_command)):
             if not node_sub_circuit_list[node] == sub_circuit:
                 continue
 

@@ -1,16 +1,16 @@
 from itertools import permutations
 
 import networkx as nx  # type: ignore
+from typing import Any
 
 
 class MonochromaticConvexSubDAG:
-    def __init__(self, dag, node_coloured):
-        assert all(dag_node in node_coloured.keys() for dag_node in dag.nodes)
-        assert all(dag_node in dag.nodes for dag_node in node_coloured.keys())
+    def __init__(self, dag:nx.DiGraph, coloured_nodes:list[Any]) -> None:
+        assert all(coloured_node in dag.nodes for coloured_node in coloured_nodes)
         assert nx.is_directed_acyclic_graph(dag)
 
         self.dag = dag
-        self.node_coloured = node_coloured
+        self.coloured_nodes = coloured_nodes
 
         self.node_descendants = {
             node: nx.descendants(self.dag, node) for node in self.dag.nodes
@@ -18,10 +18,10 @@ class MonochromaticConvexSubDAG:
         for node in self.node_descendants.keys():
             self.node_descendants[node].add(node)
 
-    def _subdag_nodes(self, subdag, node_subdag):
+    def _subdag_nodes(self, subdag: int, node_subdag: dict[Any, int]) -> list[Any]:
         return [node for node, s in node_subdag.items() if s == subdag]
 
-    def _subdag_predecessors(self, subdag, node_subdag):
+    def _subdag_predecessors(self, subdag: int, node_subdag: dict[Any, int]) -> list[Any]:
         subdag_nodes = self._subdag_nodes(subdag=subdag, node_subdag=node_subdag)
         return sum(
             [
@@ -35,7 +35,7 @@ class MonochromaticConvexSubDAG:
             start=[],
         )
 
-    def _subdag_successors(self, subdag, node_subdag):
+    def _subdag_successors(self, subdag: int, node_subdag: dict[Any, int]) -> list[Any]:
         subdag_nodes = self._subdag_nodes(subdag=subdag, node_subdag=node_subdag)
         return sum(
             [
@@ -49,7 +49,7 @@ class MonochromaticConvexSubDAG:
             start=[],
         )
 
-    def _can_merge(self, subdag_one, subdag_two, node_subdag):
+    def _can_merge(self, subdag_one: int, subdag_two: int, node_subdag: dict[Any, int]) -> bool:
         subdag_two_pred = self._subdag_predecessors(
             subdag=subdag_two, node_subdag=node_subdag
         )
@@ -76,11 +76,10 @@ class MonochromaticConvexSubDAG:
 
         return True
 
-    def greedy_merge(self):
+    def greedy_merge(self) -> dict[Any, int]:
         node_subdag = {
             node: i
-            for i, node in enumerate(self.node_coloured)
-            if self.node_coloured[node]
+            for i, node in enumerate(self.coloured_nodes)
         }
 
         subgraph_merged = True
