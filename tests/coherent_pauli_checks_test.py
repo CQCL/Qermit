@@ -25,7 +25,7 @@ from qermit.coherent_pauli_checks.box_clifford_subcircuits import (
     circuit_to_graph,
     command_is_clifford,
     get_clifford_commands,
-    get_clifford_subcircuits,
+    give_nodes_subdag,
 )
 from qermit.coherent_pauli_checks.monochromatic_convex_subdag import (
     MonochromaticConvexSubDAG,
@@ -406,21 +406,28 @@ def test_decompose_clifford_subcircuit_box():
     assert dag_circ == ideal_circ
 
 
-def test_get_clifford_subcircuits():
+def test_give_nodes_subdag():
     circ = Circuit(3).CZ(0, 1).H(1).Z(1).CZ(1, 0)
     dag, node_command = circuit_to_graph(circuit=circ)
     clifford_nodes = get_clifford_commands(node_command)
-    assert get_clifford_subcircuits(dag=dag, clifford_nodes=clifford_nodes) == [
-        0,
-        0,
-        0,
-        0,
-    ]
+
+    node_subdag = MonochromaticConvexSubDAG(
+        dag=dag,
+        coloured_nodes=clifford_nodes,
+    ).greedy_merge()
+
+    assert give_nodes_subdag(dag=dag, node_subdag=node_subdag) == [0, 0, 0, 0]
 
     circ = Circuit(3).CZ(1, 2).H(2).Z(1).CZ(0, 1).H(1).CZ(1, 0).Z(1).CZ(1, 2)
     dag, node_command = circuit_to_graph(circuit=circ)
     clifford_nodes = get_clifford_commands(node_command)
-    assert get_clifford_subcircuits(dag=dag, clifford_nodes=clifford_nodes) == [
+
+    node_subdag = MonochromaticConvexSubDAG(
+        dag=dag,
+        coloured_nodes=clifford_nodes,
+    ).greedy_merge()
+
+    assert give_nodes_subdag(dag=dag, node_subdag=node_subdag) == [
         0,
         0,
         0,
@@ -445,7 +452,13 @@ def test_get_clifford_subcircuits():
     )
     dag, node_command = circuit_to_graph(circuit=circ)
     clifford_nodes = get_clifford_commands(node_command)
-    assert get_clifford_subcircuits(dag=dag, clifford_nodes=clifford_nodes) == [
+
+    node_subdag = MonochromaticConvexSubDAG(
+        dag=dag,
+        coloured_nodes=clifford_nodes,
+    ).greedy_merge()
+
+    assert give_nodes_subdag(dag=dag, node_subdag=node_subdag) == [
         0,
         1,
         0,
@@ -581,13 +594,13 @@ def test_simple_example():
     clifford_circuit = Circuit(3).CZ(0, 1).X(2).X(0).CZ(0, 2).CZ(1, 2)
     dag, node_command = circuit_to_graph(circuit=clifford_circuit)
     clifford_nodes = get_clifford_commands(node_command)
-    assert get_clifford_subcircuits(dag=dag, clifford_nodes=clifford_nodes) == [
-        0,
-        0,
-        0,
-        0,
-        0,
-    ]
+
+    node_subdag = MonochromaticConvexSubDAG(
+        dag=dag,
+        coloured_nodes=clifford_nodes,
+    ).greedy_merge()
+
+    assert give_nodes_subdag(dag=dag, node_subdag=node_subdag) == [0, 0, 0, 0, 0]
 
 
 def test_5q_random_clifford():

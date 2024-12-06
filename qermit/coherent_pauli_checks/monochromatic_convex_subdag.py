@@ -5,7 +5,7 @@ import networkx as nx  # type: ignore
 
 
 class MonochromaticConvexSubDAG:
-    def __init__(self, dag: nx.DiGraph, coloured_nodes: list[Any]) -> None:
+    def __init__(self, dag: nx.DiGraph, coloured_nodes: set[Any]) -> None:
         assert all(coloured_node in dag.nodes for coloured_node in coloured_nodes)
         assert nx.is_directed_acyclic_graph(dag)
 

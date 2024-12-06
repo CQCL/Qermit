@@ -13,7 +13,8 @@ def command_is_clifford(command: Command) -> bool:
     :return: Boolean value indicating if given command is clifford.
     """
 
-    # This is only a limited set of gates. This should be expanded.
+    # This is only a limited set of gates.
+    # TODO: This should be expanded.
 
     if command.op.is_clifford_type():
         return True
@@ -30,7 +31,7 @@ def command_is_clifford(command: Command) -> bool:
 
 
 def get_clifford_commands(command_list: list[Command]) -> set[int]:
-    """Given a list of command, return a set of indexes of that list
+    """Given a list of commands, return a set of indexes of that list
     corresponding to those commands which are Clifford gates.
 
     :param command_list: List of commands in which to search for
@@ -41,24 +42,34 @@ def get_clifford_commands(command_list: list[Command]) -> set[int]:
     return {i for i, command in enumerate(command_list) if command_is_clifford(command)}
 
 
-def get_clifford_subcircuits(dag, clifford_nodes) -> list[int]:
-    node_subdag = MonochromaticConvexSubDAG(
-        dag=dag,
-        coloured_nodes=clifford_nodes,
-    ).greedy_merge()
-    node_sub_circuit_list = []
-    sub_circuit_index = 0
+def give_nodes_subdag(dag: nx.DiGraph, node_subdag: dict[int, int]) -> list[int]:
+    """Assign a sub-DAG to all nodes in given dag. Some may already have
+    an assigned sub-DAG as given and these are preserved. Nodes without an
+    assigned sub-DAG are given a unique sub-DAG of their own.
+
+    :param dag: Directed acyclic graph.
+    :param node_subdag: Map from node to sub-DAG for those nodes with
+        an existing assignment.
+    :raises Exception: Raised if nodes are not sequential integers.
+    :return: List of sub-DAGs. List is indexed by node.
+    """
+
+    if not sorted(list(dag.nodes)) == [i for i in range(dag.number_of_nodes())]:
+        raise Exception("The nodes of the given dag must be sequential integers.")
+
+    node_subdag_list = []
+    subdag_index = 0
     for node in range(dag.number_of_nodes()):
         if node in node_subdag.keys():
-            node_sub_circuit_list.append(node_subdag[node])
+            node_subdag_list.append(node_subdag[node])
         else:
-            while (sub_circuit_index in node_subdag.values()) or (
-                sub_circuit_index in node_sub_circuit_list
+            while (subdag_index in node_subdag.values()) or (
+                subdag_index in node_subdag_list
             ):
-                sub_circuit_index += 1
-            node_sub_circuit_list.append(sub_circuit_index)
+                subdag_index += 1
+            node_subdag_list.append(subdag_index)
 
-    return node_sub_circuit_list
+    return node_subdag_list
 
 
 def circuit_to_graph(circuit: Circuit) -> tuple[nx.DiGraph, list[Command]]:
@@ -114,31 +125,55 @@ def get_sub_circuit_qubits(
 
 def can_implement(
     sub_circuit: int,
-    node_sub_circuit_list: list[int],
-    implemented_commands: list[bool],
-    dag,
-    node_command,
+    command_sub_circuit: list[int],
+    command_implemented: list[bool],
+    dag: nx.DiGraph,
+    node_command: list[Command],
 ) -> bool:
+    """True if it is safe to implement a subcircuit. False otherwise.
+    This will be true if all predecessors of commands in the sub circuit
+    have been implemented.
+
+    :param sub_circuit: Subcircuit to check.
+    :param command_sub_circuit: The subcircuit of each command.
+    :param command_implemented: List with entry for each command indicating if
+        it has been implemented.
+    :param dag: Graph giving dependencies between commands.
+    :param node_command: Command corresponding to each node in the graph.
+    :return: True if it is safe to implement a subcircuit. False otherwise.
+    """
     can_implement = True
     for node in range(len(node_command)):
-        if not node_sub_circuit_list[node] == sub_circuit:
+        if not command_sub_circuit[node] == sub_circuit:
             continue
 
         for predecessor in dag.predecessors(node):
-            if node_sub_circuit_list[predecessor] == sub_circuit:
+            if command_sub_circuit[predecessor] == sub_circuit:
                 continue
-            if not implemented_commands[predecessor]:
+            if not command_implemented[predecessor]:
                 can_implement = False
 
     return can_implement
 
 
 def box_clifford_transform(circuit: Circuit) -> Circuit:
+    """Replace Clifford subcircuits with boxes containing those circuit.
+    These boxes will have the name "Clifford Subcircuit".
+
+    :param circuit: Circuit whose Clifford subcircuits should be boxed.
+    :return: Equivalent circuit with subcircuits boxed.
+    :rtype: Circuit
+    """
     dag, node_command = circuit_to_graph(circuit=circuit)
     clifford_nodes = get_clifford_commands(node_command)
-    node_sub_circuit_list = get_clifford_subcircuits(
-        dag=dag, clifford_nodes=clifford_nodes
-    )
+
+    node_subdag = MonochromaticConvexSubDAG(
+        dag=dag,
+        coloured_nodes=clifford_nodes,
+    ).greedy_merge()
+
+    node_sub_circuit_list = give_nodes_subdag(dag=dag, node_subdag=node_subdag)
+
     sub_circuit_qubits = get_sub_circuit_qubits(
         command_list=node_command,
         command_subcircuit=node_sub_circuit_list,
@@ -167,14 +202,15 @@ def box_clifford_transform(circuit: Circuit) -> Circuit:
         sub_circuit_to_implement = None
         for sub_circuit in set(not_implemented):
             if can_implement(
-                sub_circuit,
-                node_sub_circuit_list,
-                implemented_commands,
-                dag,
-                node_command,
+                sub_circuit=sub_circuit,
+                command_sub_circuit=node_sub_circuit_list,
+                command_implemented=implemented_commands,
+                dag=dag,
+                node_command=node_command,
             ):
                 sub_circuit_to_implement = sub_circuit
                 break
+
         assert sub_circuit_to_implement is not None
 
         # List the nodes in the chosen sub circuit
@@ -187,6 +223,11 @@ def box_clifford_transform(circuit: Circuit) -> Circuit:
 
         # If the circuit is clifford add it as a circbox
         if node_to_implement_list[0] in clifford_nodes:
+            assert all(
+                node_to_implement in clifford_nodes
+                for node_to_implement in node_to_implement_list
+            )
+
             # Empty circuit to contain clifford subcircuit
             clifford_subcircuit = Circuit(
                 n_qubits=len(sub_circuit_qubits[sub_circuit_to_implement]),
@@ -202,9 +243,17 @@ def box_clifford_transform(circuit: Circuit) -> Circuit:
 
             # Add all gates to new circuit
             for node in node_to_implement_list:
+
+                # It is assumed that the commands have no classical bits.
+                if node_command[node].args != node_command[node].qubits:
+                    raise Exception(
+                        "This Clifford subcircuit contains classical bits."
+                        "This is a bug and should bre reported to the developers."
+                    )
+
                 clifford_subcircuit.add_gate(
                     node_command[node].op,
-                    [qubit_to_index[qubit] for qubit in node_command[node].args],
+                    [qubit_to_index[qubit] for qubit in node_command[node].qubits],
                 )
                 implemented_commands[node] = True
 
@@ -216,12 +265,12 @@ def box_clifford_transform(circuit: Circuit) -> Circuit:
 
         # Otherwise, add the gates straight to the circuit
         else:
-            for node in node_to_implement_list:
-                clifford_box_circuit.add_gate(
-                    node_command[node].op,
-                    node_command[node].args,
-                )
-                implemented_commands[node] = True
+            assert len(node_to_implement_list) == 1
+            clifford_box_circuit.add_gate(
+                node_command[node_to_implement_list[0]].op,
+                node_command[node_to_implement_list[0]].args,
+            )
+            implemented_commands[node_to_implement_list[0]] = True
 
     return clifford_box_circuit
 
