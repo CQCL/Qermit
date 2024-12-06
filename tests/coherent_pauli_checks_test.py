@@ -16,10 +16,16 @@ from qermit.coherent_pauli_checks import (
     DeterministicZPauliSampler,
     OptimalPauliSampler,
     PauliSampler,
-    QermitDAGCircuit,
     RandomPauliSampler,
     cpc_rebase_pass,
     gen_coherent_pauli_check_mitres,
+)
+from qermit.coherent_pauli_checks.box_clifford_subcircuits import (
+    BoxClifford,
+    circuit_to_graph,
+    command_is_clifford,
+    get_clifford_nodes,
+    get_clifford_subcircuits,
 )
 from qermit.coherent_pauli_checks.monochromatic_convex_subdag import (
     MonochromaticConvexSubDAG,
@@ -37,19 +43,17 @@ from qermit.postselection import PostselectMgr
 from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
-from qermit.coherent_pauli_checks.clifford_detect import command_is_clifford
 
 
 def test_command_is_clifford():
+    qubit_0 = Qubit(name="my_qubit_0", index=0)
+    qubit_1 = Qubit(name="my_qubit_0", index=2)
+    qubit_2 = Qubit(name="my_qubit_1", index=0)
+    qubit_3 = Qubit(name="my_qubit_1", index=1)
 
-    qubit_0 = Qubit(name='my_qubit_0', index=0)
-    qubit_1 = Qubit(name='my_qubit_0', index=2)
-    qubit_2 = Qubit(name='my_qubit_1', index=0)
-    qubit_3 = Qubit(name='my_qubit_1', index=1)
-
-    bit_0 = Bit(name='my_bit_0', index=0)
-    bit_1 = Bit(name='my_bit_0', index=2)
-    bit_2 = Bit(name='my_bit_1', index=0)
+    bit_0 = Bit(name="my_bit_0", index=0)
+    bit_1 = Bit(name="my_bit_0", index=2)
+    bit_2 = Bit(name="my_bit_1", index=0)
 
     circuit = Circuit()
 
@@ -75,9 +79,6 @@ def test_command_is_clifford():
     circuit.H(qubit_1)
     circuit.Rz(0.55, qubit_2)
     circuit.PhasedX(0.5, 0.55, qubit_2)
-
-    dag_circuit = QermitDAGCircuit(circuit=circuit)
-    nx.draw(dag_circuit.dag, with_labels=True)
 
     command_list = circuit.get_commands()
 
@@ -127,9 +128,7 @@ def test_monochromatic_convex_subdag():
 
     nx.draw(dag, with_labels=True)
 
-    convex_subdag = MonochromaticConvexSubDAG(
-        dag=dag, coloured_nodes=[1,2]
-    )
+    convex_subdag = MonochromaticConvexSubDAG(dag=dag, coloured_nodes=[1, 2])
 
     node_subdag = {1: 0, 2: 1, 3: 2, 4: 3}
 
@@ -162,14 +161,10 @@ def test_monochromatic_convex_subdag():
 
     assert convex_subdag.greedy_merge() == {1: 0, 2: 0}
 
-    convex_subdag = MonochromaticConvexSubDAG(
-        dag=dag, coloured_nodes=[1,4]
-    )
+    convex_subdag = MonochromaticConvexSubDAG(dag=dag, coloured_nodes=[1, 4])
     assert convex_subdag.greedy_merge() == {1: 0, 4: 1}
 
-    convex_subdag = MonochromaticConvexSubDAG(
-        dag=dag, coloured_nodes=[2, 3]
-    )
+    convex_subdag = MonochromaticConvexSubDAG(dag=dag, coloured_nodes=[2, 3])
     assert convex_subdag.greedy_merge() == {2: 0, 3: 0}
 
 
@@ -413,12 +408,28 @@ def test_decompose_clifford_subcircuit_box():
 
 def test_get_clifford_subcircuits():
     circ = Circuit(3).CZ(0, 1).H(1).Z(1).CZ(1, 0)
-    cliff_circ = QermitDAGCircuit(circ)
-    assert cliff_circ.get_clifford_subcircuits() == [0, 0, 0, 0]
+    dag, node_command = circuit_to_graph(circuit=circ)
+    clifford_nodes = get_clifford_nodes(node_command)
+    assert get_clifford_subcircuits(dag=dag, clifford_nodes=clifford_nodes) == [
+        0,
+        0,
+        0,
+        0,
+    ]
 
     circ = Circuit(3).CZ(1, 2).H(2).Z(1).CZ(0, 1).H(1).CZ(1, 0).Z(1).CZ(1, 2)
-    cliff_circ = QermitDAGCircuit(circ)
-    assert cliff_circ.get_clifford_subcircuits() == [0, 0, 0, 0, 0, 0, 0, 0]
+    dag, node_command = circuit_to_graph(circuit=circ)
+    clifford_nodes = get_clifford_nodes(node_command)
+    assert get_clifford_subcircuits(dag=dag, clifford_nodes=clifford_nodes) == [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ]
 
     circ = (
         Circuit(3)
@@ -432,15 +443,26 @@ def test_get_clifford_subcircuits():
         .Z(1)
         .CZ(1, 2)
     )
-    cliff_circ = QermitDAGCircuit(circ)
-    assert cliff_circ.get_clifford_subcircuits() == [0, 1, 0, 2, 2, 3, 4, 4, 4]
+    dag, node_command = circuit_to_graph(circuit=circ)
+    clifford_nodes = get_clifford_nodes(node_command)
+    assert get_clifford_subcircuits(dag=dag, clifford_nodes=clifford_nodes) == [
+        0,
+        1,
+        0,
+        2,
+        2,
+        3,
+        4,
+        4,
+        4,
+    ]
 
 
 def test_add_pauli_checks():
-    circ = Circuit(3).H(1).CX(1, 0)
-    cpc_rebase_pass.apply(circ)
-    cliff_circ = QermitDAGCircuit(circ)
-    boxed_circ = cliff_circ.to_clifford_subcircuit_boxes()
+    boxed_circ = Circuit(3).H(1).CX(1, 0)
+    cpc_rebase_pass.apply(boxed_circ)
+    BoxClifford().apply(boxed_circ)
+
     circuit, _ = DeterministicZPauliSampler().add_pauli_checks_to_circbox(
         circuit=boxed_circ,
     )
@@ -502,10 +524,10 @@ def test_add_pauli_checks():
 
     assert ideal_circ == circuit
 
-    circ = Circuit(2).H(0).CX(1, 0).X(1).CX(1, 0)
-    cpc_rebase_pass.apply(circ)
-    cliff_circ = QermitDAGCircuit(circ)
-    boxed_circ = cliff_circ.to_clifford_subcircuit_boxes()
+    boxed_circ = Circuit(2).H(0).CX(1, 0).X(1).CX(1, 0)
+    cpc_rebase_pass.apply(boxed_circ)
+    BoxClifford().apply(boxed_circ)
+
     circuit, _ = DeterministicZPauliSampler().add_pauli_checks_to_circbox(
         circuit=boxed_circ,
     )
@@ -557,38 +579,32 @@ def test_add_pauli_checks():
 
 def test_simple_example():
     clifford_circuit = Circuit(3).CZ(0, 1).X(2).X(0).CZ(0, 2).CZ(1, 2)
-    dag_circuit = QermitDAGCircuit(clifford_circuit)
-    assert dag_circuit.get_clifford_subcircuits() == [0, 0, 0, 0, 0]
+    dag, node_command = circuit_to_graph(circuit=clifford_circuit)
+    clifford_nodes = get_clifford_nodes(node_command)
+    assert get_clifford_subcircuits(dag=dag, clifford_nodes=clifford_nodes) == [
+        0,
+        0,
+        0,
+        0,
+        0,
+    ]
 
 
 def test_5q_random_clifford():
     rng = numpy.random.default_rng(seed=0)
-    clifford_circuit = random_clifford_circ(n_qubits=5, rng=rng)
-    cpc_rebase_pass.apply(clifford_circuit)
-    dag_circuit = QermitDAGCircuit(clifford_circuit)
-    boxed_clifford_circuit = dag_circuit.to_clifford_subcircuit_boxes()
+    boxed_clifford_circuit = random_clifford_circ(n_qubits=5, rng=rng)
+    cpc_rebase_pass.apply(boxed_clifford_circuit)
+    BoxClifford().apply(boxed_clifford_circuit)
     pauli_sampler = RandomPauliSampler(rng=rng, n_checks=2)
     pauli_sampler.add_pauli_checks_to_circbox(circuit=boxed_clifford_circuit)
-
-
-@pytest.mark.skip(
-    reason="This test passes, but the functionality is incorrect. In particular there is a H in the middle which is identified as Clifford but which has no checks added."
-)
-def test_2q_random_clifford():
-    clifford_circuit = random_clifford_circ(n_qubits=5, seed=0)
-    cpc_rebase_pass.apply(clifford_circuit)
-    dag_circuit = QermitDAGCircuit(clifford_circuit)
-    pauli_sampler = RandomPauliSampler(seed=0)
-    dag_circuit.add_pauli_checks(pauli_sampler=pauli_sampler)
 
 
 def test_CZ_circuit_with_phase():
     # This test is a case where the pauli circuit to be controlled has a
     # global phase which needs to be bumped to the control.
 
-    original_circuit = Circuit(2).CZ(0, 1).measure_all()
-    dag_circuit = QermitDAGCircuit(original_circuit)
-    boxed_original_circuit = dag_circuit.to_clifford_subcircuit_boxes()
+    boxed_original_circuit = Circuit(2).CZ(0, 1).measure_all()
+    BoxClifford().apply(boxed_original_circuit)
     pauli_sampler = DeterministicXPauliSampler()
     pauli_checks_circuit, _ = pauli_sampler.add_pauli_checks_to_circbox(
         circuit=boxed_original_circuit,
@@ -640,18 +656,20 @@ def test_to_clifford_subcircuits():
         .Z(1)
         .CZ(1, 2)
     )
-    dag_circuit = QermitDAGCircuit(orig_circuit)
-    clifford_box_circuit = dag_circuit.to_clifford_subcircuit_boxes()
+    # dag_circuit = QermitDAGCircuit(orig_circuit)
+    # clifford_box_circuit = dag_circuit.to_clifford_subcircuit_boxes()
+    clifford_box_circuit = orig_circuit.copy()
+    BoxClifford().apply(clifford_box_circuit)
     DecomposeBoxes().apply(clifford_box_circuit)
     assert clifford_box_circuit == orig_circuit
 
 
 def test_optimal_pauli_sampler():
     # TODO: add a measure and barrier to this circuit, just to check
-    cliff_circ = Circuit()
-    cliff_circ.add_q_register(name="my_reg", size=3)
-    qubits = cliff_circ.qubits
-    cliff_circ.CZ(qubits[0], qubits[1]).CZ(qubits[1], qubits[2])
+    boxed_cliff_circ = Circuit()
+    boxed_cliff_circ.add_q_register(name="my_reg", size=3)
+    qubits = boxed_cliff_circ.qubits
+    boxed_cliff_circ.CZ(qubits[0], qubits[1]).CZ(qubits[1], qubits[2])
 
     error_distribution_dict = {}
     error_distribution_dict[(Pauli.X, Pauli.I)] = 0.3
@@ -669,7 +687,7 @@ def test_optimal_pauli_sampler():
         n_checks=1,
     )
     stab = pauli_sampler.sample(
-        circ=cliff_circ,
+        circ=boxed_cliff_circ,
     )
 
     assert stab[0] == QermitPauli(
@@ -685,17 +703,16 @@ def test_optimal_pauli_sampler():
         noise_model=noise_model,
         n_checks=2,
     )
-    dag_circ = QermitDAGCircuit(cliff_circ)
-    boxed_cliff_circ = dag_circ.to_clifford_subcircuit_boxes()
+    BoxClifford().apply(boxed_cliff_circ)
     pauli_sampler.add_pauli_checks_to_circbox(circuit=boxed_cliff_circ)
 
 
 def test_add_ZX_pauli_checks_to_S():
-    cliff_circ = Circuit()
-    cliff_circ.add_q_register(name="my_reg", size=1)
-    qubits = cliff_circ.qubits
-    cliff_circ.S(qubits[0])
-    cliff_circ.measure_all()
+    boxed_cliff_circ = Circuit()
+    boxed_cliff_circ.add_q_register(name="my_reg", size=1)
+    qubits = boxed_cliff_circ.qubits
+    boxed_cliff_circ.S(qubits[0])
+    boxed_cliff_circ.measure_all()
 
     class DeterministicPauliSampler(PauliSampler):
         def sample(self, circ, **kwargs):
@@ -708,8 +725,7 @@ def test_add_ZX_pauli_checks_to_S():
                 )
             ]
 
-    dag_circ = QermitDAGCircuit(cliff_circ)
-    boxed_cliff_circ = dag_circ.to_clifford_subcircuit_boxes()
+    BoxClifford().apply(boxed_cliff_circ)
     pauli_sampler = DeterministicPauliSampler()
     pauli_check_circ, _ = pauli_sampler.add_pauli_checks_to_circbox(
         circuit=boxed_cliff_circ,

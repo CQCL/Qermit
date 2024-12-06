@@ -4,7 +4,7 @@ from pytket.backends import Backend
 from pytket.passes import DecomposeBoxes
 
 from qermit import CircuitShots, MitRes, MitTask, TaskGraph
-from qermit.coherent_pauli_checks.clifford_detect import QermitDAGCircuit
+from qermit.coherent_pauli_checks.box_clifford_subcircuits import BoxClifford
 from qermit.postselection.postselect_manager import PostselectMgr
 from qermit.postselection.postselect_mitres import gen_postselect_task
 
@@ -29,8 +29,8 @@ def gen_find_cliffords_task() -> MitTask:
         cliff_circ_shots_list = []
 
         for circ_shots in circ_shots_list:
-            dag_circuit = QermitDAGCircuit(circuit=circ_shots.Circuit)
-            cliff_circ = dag_circuit.to_clifford_subcircuit_boxes()
+            cliff_circ = circ_shots.Circuit.copy()
+            BoxClifford().apply(cliff_circ)
             cliff_circ_shots_list.append(
                 CircuitShots(
                     Circuit=cliff_circ,
