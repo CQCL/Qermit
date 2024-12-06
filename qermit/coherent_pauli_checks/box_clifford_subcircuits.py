@@ -3,10 +3,10 @@ from pytket import Circuit, Qubit
 from pytket.circuit import CircBox, Circuit, Command, OpType
 from pytket.passes import BasePass, CustomPass
 
-from .monochromatic_convex_subdag import MonochromaticConvexSubDAG
+from .monochromatic_convex_subdag import get_monochromatic_convex_subdag
 
 
-def command_is_clifford(command: Command) -> bool:
+def _command_is_clifford(command: Command) -> bool:
     """Check if the given command is clifford.
 
     :param command: Command to check.
@@ -30,7 +30,7 @@ def command_is_clifford(command: Command) -> bool:
     return False
 
 
-def get_clifford_commands(command_list: list[Command]) -> set[int]:
+def _get_clifford_commands(command_list: list[Command]) -> set[int]:
     """Given a list of commands, return a set of indexes of that list
     corresponding to those commands which are Clifford gates.
 
@@ -39,10 +39,12 @@ def get_clifford_commands(command_list: list[Command]) -> set[int]:
     :return: Indexes in the list which correspond to commands in the
         list which are Clifford.
     """
-    return {i for i, command in enumerate(command_list) if command_is_clifford(command)}
+    return {
+        i for i, command in enumerate(command_list) if _command_is_clifford(command)
+    }
 
 
-def give_nodes_subdag(dag: nx.DiGraph, node_subdag: dict[int, int]) -> list[int]:
+def _give_nodes_subdag(dag: nx.DiGraph, node_subdag: dict[int, int]) -> list[int]:
     """Assign a sub-DAG to all nodes in given dag. Some may already have
     an assigned sub-DAG as given and these are preserved. Nodes without an
     assigned sub-DAG are given a unique sub-DAG of their own.
@@ -72,7 +74,7 @@ def give_nodes_subdag(dag: nx.DiGraph, node_subdag: dict[int, int]) -> list[int]
     return node_subdag_list
 
 
-def circuit_to_graph(circuit: Circuit) -> tuple[nx.DiGraph, list[Command]]:
+def _circuit_to_graph(circuit: Circuit) -> tuple[nx.DiGraph, list[Command]]:
     """Convert circuit to graph. Nodes correspond to commands,
     edges indicate a dependence between the outputs and inputs of
     two commands. Node values corresponds to indexes in the returned
@@ -102,7 +104,7 @@ def circuit_to_graph(circuit: Circuit) -> tuple[nx.DiGraph, list[Command]]:
     return dag, node_command
 
 
-def get_sub_circuit_qubits(
+def _get_sub_circuit_qubits(
     command_list: list[Command],
     command_subcircuit: list[int],
 ) -> dict[int, set[Qubit]]:
@@ -123,7 +125,7 @@ def get_sub_circuit_qubits(
     return sub_circuit_qubits
 
 
-def can_implement(
+def _can_implement(
     sub_circuit: int,
     command_sub_circuit: list[int],
     command_implemented: list[bool],
@@ -142,7 +144,7 @@ def can_implement(
     :param node_command: Command corresponding to each node in the graph.
     :return: True if it is safe to implement a subcircuit. False otherwise.
     """
-    can_implement = True
+    _can_implement = True
     for node in range(len(node_command)):
         if not command_sub_circuit[node] == sub_circuit:
             continue
@@ -151,12 +153,12 @@ def can_implement(
             if command_sub_circuit[predecessor] == sub_circuit:
                 continue
             if not command_implemented[predecessor]:
-                can_implement = False
+                _can_implement = False
 
-    return can_implement
+    return _can_implement
 
 
-def box_clifford_transform(circuit: Circuit) -> Circuit:
+def _box_clifford_transform(circuit: Circuit) -> Circuit:
     """Replace Clifford subcircuits with boxes containing those circuit.
     These boxes will have the name "Clifford Subcircuit".
 
@@ -164,17 +166,17 @@ def box_clifford_transform(circuit: Circuit) -> Circuit:
     :return: Equivalent circuit with subcircuits boxed.
     :rtype: Circuit
     """
-    dag, node_command = circuit_to_graph(circuit=circuit)
-    clifford_nodes = get_clifford_commands(node_command)
+    dag, node_command = _circuit_to_graph(circuit=circuit)
+    clifford_nodes = _get_clifford_commands(node_command)
 
-    node_subdag = MonochromaticConvexSubDAG(
+    node_subdag = get_monochromatic_convex_subdag(
         dag=dag,
         coloured_nodes=clifford_nodes,
-    ).greedy_merge()
+    )
 
-    node_sub_circuit_list = give_nodes_subdag(dag=dag, node_subdag=node_subdag)
+    node_sub_circuit_list = _give_nodes_subdag(dag=dag, node_subdag=node_subdag)
 
-    sub_circuit_qubits = get_sub_circuit_qubits(
+    sub_circuit_qubits = _get_sub_circuit_qubits(
         command_list=node_command,
         command_subcircuit=node_sub_circuit_list,
     )
@@ -201,7 +203,7 @@ def box_clifford_transform(circuit: Circuit) -> Circuit:
         ]
         sub_circuit_to_implement = None
         for sub_circuit in set(not_implemented):
-            if can_implement(
+            if _can_implement(
                 sub_circuit=sub_circuit,
                 command_sub_circuit=node_sub_circuit_list,
                 command_implemented=implemented_commands,
@@ -243,7 +245,6 @@ def box_clifford_transform(circuit: Circuit) -> Circuit:
 
             # Add all gates to new circuit
             for node in node_to_implement_list:
-
                 # It is assumed that the commands have no classical bits.
                 if node_command[node].args != node_command[node].qubits:
                     raise Exception(
@@ -276,4 +277,4 @@ def box_clifford_transform(circuit: Circuit) -> Circuit:
 
 
 def BoxClifford() -> BasePass:
-    return CustomPass(transform=box_clifford_transform)
+    return CustomPass(transform=_box_clifford_transform)
