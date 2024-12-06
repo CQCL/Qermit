@@ -7,6 +7,14 @@ from .monochromatic_convex_subdag import MonochromaticConvexSubDAG
 
 
 def command_is_clifford(command: Command) -> bool:
+    """Check if the given command is clifford.
+
+    :param command: Command to check.
+    :return: Boolean value indicating if given command is clifford.
+    """
+
+    # This is only a limited set of gates. This should be expanded.
+
     if command.op.is_clifford_type():
         return True
 
@@ -19,6 +27,18 @@ def command_is_clifford(command: Command) -> bool:
             return True
 
     return False
+
+
+def get_clifford_commands(command_list: list[Command]) -> set[int]:
+    """Given a list of command, return a set of indexes of that list
+    corresponding to those commands which are Clifford gates.
+
+    :param command_list: List of commands in which to search for
+        Clifford commends.
+    :return: Indexes in the list which correspond to commands in the
+        list which are Clifford.
+    """
+    return {i for i, command in enumerate(command_list) if command_is_clifford(command)}
 
 
 def get_clifford_subcircuits(dag, clifford_nodes) -> list[int]:
@@ -41,7 +61,16 @@ def get_clifford_subcircuits(dag, clifford_nodes) -> list[int]:
     return node_sub_circuit_list
 
 
-def circuit_to_graph(circuit: Circuit) -> nx.DiGraph:
+def circuit_to_graph(circuit: Circuit) -> tuple[nx.DiGraph, list[Command]]:
+    """Convert circuit to graph. Nodes correspond to commands,
+    edges indicate a dependence between the outputs and inputs of
+    two commands. Node values corresponds to indexes in the returned
+    list of commands.
+
+    :param circuit: Circuit to convert to a graph.
+    :return: Tuple of graph and list of commands. Nodes are indexes
+        in the list of commands.
+    """
     # Lists the most recent node to act on a particular qubits. If a
     # new gate is found to act on that qubit then an edge between the
     # node which corresponds to the new gate and the node which
@@ -63,14 +92,21 @@ def circuit_to_graph(circuit: Circuit) -> nx.DiGraph:
 
 
 def get_sub_circuit_qubits(
-    node_sub_circuit: list[int], node_command
+    command_list: list[Command],
+    command_subcircuit: list[int],
 ) -> dict[int, set[Qubit]]:
-    sub_circuit_list = list(set(node_sub_circuit))
+    """For each subcircuit, get the qubits on which it acts.
+
+    :param command_list: A list of commands.
+    :param command_subcircuit: The subcircuit to which each command belongs.
+    :return: A map from the subcircuit to the qubits it act on.
+    """
+    sub_circuit_list = list(set(command_subcircuit))
     sub_circuit_qubits: dict[int, set[Qubit]] = {
         sub_circuit: set() for sub_circuit in sub_circuit_list
     }
-    for node, sub_circuit in enumerate(node_sub_circuit):
-        for qubit in node_command[node].qubits:
+    for node, sub_circuit in enumerate(command_subcircuit):
+        for qubit in command_list[node].qubits:
             sub_circuit_qubits[sub_circuit].add(qubit)
 
     return sub_circuit_qubits
@@ -97,22 +133,15 @@ def can_implement(
     return can_implement
 
 
-def get_clifford_nodes(node_command):
-    return {
-        node
-        for node, command in enumerate(node_command)
-        if command_is_clifford(command)
-    }
-
-
 def box_clifford_transform(circuit: Circuit) -> Circuit:
     dag, node_command = circuit_to_graph(circuit=circuit)
-    clifford_nodes = get_clifford_nodes(node_command)
+    clifford_nodes = get_clifford_commands(node_command)
     node_sub_circuit_list = get_clifford_subcircuits(
         dag=dag, clifford_nodes=clifford_nodes
     )
     sub_circuit_qubits = get_sub_circuit_qubits(
-        node_sub_circuit=node_sub_circuit_list, node_command=node_command
+        command_list=node_command,
+        command_subcircuit=node_sub_circuit_list,
     )
 
     # List indicating if a command has been implemented

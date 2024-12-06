@@ -1,11 +1,11 @@
 from .coherent_pauli_checks_mitres import gen_coherent_pauli_check_mitres
-from .pauli_sampler import (  # noqa:F401
+from .pauli_sampler import (
     DeterministicXPauliSampler,
     DeterministicZPauliSampler,
     OptimalPauliSampler,
     PauliSampler,
     RandomPauliSampler,
 )
-from .utils import (  # noqa:F401
+from .utils import (
     cpc_rebase_pass,
 )
