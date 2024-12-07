@@ -28,7 +28,6 @@ from qermit.coherent_pauli_checks.box_clifford_subcircuits import (
     _give_nodes_subdag,
 )
 from qermit.coherent_pauli_checks.monochromatic_convex_subdag import (
-    _can_merge,
     _subdag_predecessors,
     _subdag_successors,
     get_monochromatic_convex_subdag,
@@ -129,44 +128,9 @@ def test_monochromatic_convex_subdag():
     dag = nx.DiGraph()
     dag.add_edges_from([(1, 2), (1, 3), (2, 4)])
 
-    nx.draw(dag, with_labels=True)
-
-    # convex_subdag = MonochromaticConvexSubDAGFinder(dag=dag, coloured_nodes=[1, 2])
-
-    node_subdag = {1: 0, 2: 1, 3: 2, 4: 3}
-
     node_descendants = {node: nx.descendants(dag, node) for node in dag.nodes}
     for node in node_descendants.keys():
         node_descendants[node].add(node)
-
-    assert _can_merge(
-        dag=dag,
-        subdag_one=1,
-        subdag_two=0,
-        node_subdag=node_subdag,
-        node_descendants=node_descendants,
-    )
-    assert _can_merge(
-        dag=dag,
-        subdag_one=0,
-        subdag_two=1,
-        node_subdag=node_subdag,
-        node_descendants=node_descendants,
-    )
-    assert _can_merge(
-        dag=dag,
-        subdag_one=2,
-        subdag_two=1,
-        node_subdag=node_subdag,
-        node_descendants=node_descendants,
-    )
-    assert not _can_merge(
-        dag=dag,
-        subdag_one=0,
-        subdag_two=3,
-        node_subdag=node_subdag,
-        node_descendants=node_descendants,
-    )
 
     assert _subdag_successors(
         dag=dag, subdag=0, node_subdag={1: 0, 2: 0, 3: 0, 4: 3}
@@ -182,13 +146,6 @@ def test_monochromatic_convex_subdag():
     assert _subdag_predecessors(
         dag=dag, subdag=3, node_subdag={1: 0, 2: 0, 3: 0, 4: 3}
     ) == [2]
-    assert _can_merge(
-        dag=dag,
-        subdag_one=0,
-        subdag_two=3,
-        node_subdag={1: 0, 2: 0, 3: 0, 4: 3},
-        node_descendants=node_descendants,
-    )
 
     assert get_monochromatic_convex_subdag(
         dag=dag,

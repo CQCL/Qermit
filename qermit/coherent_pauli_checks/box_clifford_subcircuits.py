@@ -291,4 +291,11 @@ def _box_clifford_transform(circuit: Circuit) -> Circuit:
 
 
 def BoxClifford() -> BasePass:
+    """
+    Pass finding clifford subcircuits and wrapping them
+    in circuit boxed called "Clifford Subcircuit".
+
+    :return: Pass finding clifford subcircuits and wrapping them
+        in circuit boxed called "Clifford Subcircuit".
+    """
     return CustomPass(transform=_box_clifford_transform)
