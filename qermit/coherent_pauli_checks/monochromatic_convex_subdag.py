@@ -47,7 +47,7 @@ def _can_merge(
     subdag_one: int,
     subdag_two: int,
     node_subdag: dict[Any, int],
-    node_descendants,
+    node_descendants: dict[int, set[int]],
 ) -> bool:
     subdag_two_pred = _subdag_predecessors(
         dag=dag, subdag=subdag_two, node_subdag=node_subdag

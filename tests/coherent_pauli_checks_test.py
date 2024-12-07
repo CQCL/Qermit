@@ -510,9 +510,15 @@ def test__give_nodes_subdag():
 
 
 def test_add_pauli_checks():
-    boxed_circ = Circuit(3).H(1).CX(1, 0)
-    cpc_rebase_pass.apply(boxed_circ)
+    original_circuit = Circuit(3).H(1).CX(1, 0)
+    cpc_rebase_pass.apply(original_circuit)
+    boxed_circ = original_circuit.copy()
     BoxClifford().apply(boxed_circ)
+
+    boxed_circ_copy = boxed_circ.copy()
+
+    DecomposeBoxes().apply(boxed_circ_copy)
+    assert boxed_circ_copy == original_circuit
 
     circuit, _ = DeterministicZPauliSampler().add_pauli_checks_to_circbox(
         circuit=boxed_circ,
@@ -575,9 +581,14 @@ def test_add_pauli_checks():
 
     assert ideal_circ == circuit
 
-    boxed_circ = Circuit(2).H(0).CX(1, 0).X(1).CX(1, 0)
-    cpc_rebase_pass.apply(boxed_circ)
+    original_circuit = Circuit(2).H(0).CX(1, 0).X(1).CX(1, 0)
+    cpc_rebase_pass.apply(original_circuit)
+    boxed_circ = original_circuit.copy()
     BoxClifford().apply(boxed_circ)
+
+    decomposed_boxed_circ = boxed_circ.copy()
+    DecomposeBoxes().apply(decomposed_boxed_circ)
+    assert decomposed_boxed_circ == original_circuit
 
     circuit, _ = DeterministicZPauliSampler().add_pauli_checks_to_circbox(
         circuit=boxed_circ,
@@ -643,9 +654,17 @@ def test_simple_example():
 
 def test_5q_random_clifford():
     rng = numpy.random.default_rng(seed=0)
-    boxed_clifford_circuit = random_clifford_circ(n_qubits=5, rng=rng)
-    cpc_rebase_pass.apply(boxed_clifford_circuit)
+
+    clifford_circuit = random_clifford_circ(n_qubits=5, rng=rng)
+    cpc_rebase_pass.apply(clifford_circuit)
+    boxed_clifford_circuit = clifford_circuit.copy()
     BoxClifford().apply(boxed_clifford_circuit)
+
+    decomposed_boxed_clifford_circuit = boxed_clifford_circuit.copy()
+    DecomposeBoxes().apply(decomposed_boxed_clifford_circuit)
+
+    assert decomposed_boxed_clifford_circuit == clifford_circuit
+
     pauli_sampler = RandomPauliSampler(rng=rng, n_checks=2)
     pauli_sampler.add_pauli_checks_to_circbox(circuit=boxed_clifford_circuit)
 
@@ -654,8 +673,15 @@ def test_CZ_circuit_with_phase():
     # This test is a case where the pauli circuit to be controlled has a
     # global phase which needs to be bumped to the control.
 
-    boxed_original_circuit = Circuit(2).CZ(0, 1).measure_all()
+    original_circuit = Circuit(2).CZ(0, 1).measure_all()
+    boxed_original_circuit = original_circuit.copy()
     BoxClifford().apply(boxed_original_circuit)
+
+    decomposed_boxed_original_circuit = boxed_original_circuit.copy()
+    DecomposeBoxes().apply(decomposed_boxed_original_circuit)
+
+    assert decomposed_boxed_original_circuit == original_circuit
+
     pauli_sampler = DeterministicXPauliSampler()
     pauli_checks_circuit, _ = pauli_sampler.add_pauli_checks_to_circbox(
         circuit=boxed_original_circuit,
@@ -717,10 +743,10 @@ def test_to_clifford_subcircuits():
 
 def test_optimal_pauli_sampler():
     # TODO: add a measure and barrier to this circuit, just to check
-    boxed_cliff_circ = Circuit()
-    boxed_cliff_circ.add_q_register(name="my_reg", size=3)
-    qubits = boxed_cliff_circ.qubits
-    boxed_cliff_circ.CZ(qubits[0], qubits[1]).CZ(qubits[1], qubits[2])
+    cliff_circ = Circuit()
+    cliff_circ.add_q_register(name="my_reg", size=3)
+    qubits = cliff_circ.qubits
+    cliff_circ.CZ(qubits[0], qubits[1]).CZ(qubits[1], qubits[2])
 
     error_distribution_dict = {}
     error_distribution_dict[(Pauli.X, Pauli.I)] = 0.3
@@ -738,7 +764,7 @@ def test_optimal_pauli_sampler():
         n_checks=1,
     )
     stab = pauli_sampler.sample(
-        circ=boxed_cliff_circ,
+        circ=cliff_circ,
     )
 
     assert stab[0] == QermitPauli(
@@ -754,16 +780,22 @@ def test_optimal_pauli_sampler():
         noise_model=noise_model,
         n_checks=2,
     )
+    boxed_cliff_circ = cliff_circ.copy()
     BoxClifford().apply(boxed_cliff_circ)
+
+    decomposed_boxed_cliff_circ = boxed_cliff_circ.copy()
+    DecomposeBoxes().apply(decomposed_boxed_cliff_circ)
+    assert decomposed_boxed_cliff_circ == cliff_circ
+
     pauli_sampler.add_pauli_checks_to_circbox(circuit=boxed_cliff_circ)
 
 
 def test_add_ZX_pauli_checks_to_S():
-    boxed_cliff_circ = Circuit()
-    boxed_cliff_circ.add_q_register(name="my_reg", size=1)
-    qubits = boxed_cliff_circ.qubits
-    boxed_cliff_circ.S(qubits[0])
-    boxed_cliff_circ.measure_all()
+    cliff_circ = Circuit()
+    cliff_circ.add_q_register(name="my_reg", size=1)
+    qubits = cliff_circ.qubits
+    cliff_circ.S(qubits[0])
+    cliff_circ.measure_all()
 
     class DeterministicPauliSampler(PauliSampler):
         def sample(self, circ, **kwargs):
@@ -776,7 +808,13 @@ def test_add_ZX_pauli_checks_to_S():
                 )
             ]
 
+    boxed_cliff_circ = cliff_circ.copy()
     BoxClifford().apply(boxed_cliff_circ)
+
+    decomposed_boxed_cliff_circ = boxed_cliff_circ.copy()
+    DecomposeBoxes().apply(decomposed_boxed_cliff_circ)
+    assert decomposed_boxed_cliff_circ == cliff_circ
+
     pauli_sampler = DeterministicPauliSampler()
     pauli_check_circ, _ = pauli_sampler.add_pauli_checks_to_circbox(
         circuit=boxed_cliff_circ,

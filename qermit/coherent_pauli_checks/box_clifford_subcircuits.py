@@ -1,5 +1,5 @@
 import networkx as nx  # type: ignore
-from pytket import Circuit, Qubit
+from pytket._tket.unit_id import Qubit
 from pytket.circuit import CircBox, Circuit, Command, OpType
 from pytket.passes import BasePass, CustomPass
 
@@ -190,6 +190,7 @@ def _box_clifford_transform(circuit: Circuit) -> Circuit:
         clifford_box_circuit.add_qubit(qubit)
     for bit in circuit.bits:
         clifford_box_circuit.add_bit(bit)
+    clifford_box_circuit.add_phase(circuit.phase)
 
     while not all(implemented_commands):
         # Search for a subcircuit that it is safe to implement, and
@@ -252,10 +253,23 @@ def _box_clifford_transform(circuit: Circuit) -> Circuit:
                         "This is a bug and should bre reported to the developers."
                     )
 
-                clifford_subcircuit.add_gate(
-                    node_command[node].op,
-                    [qubit_to_index[qubit] for qubit in node_command[node].qubits],
-                )
+                if node_command[node].opgroup is not None:
+                    clifford_subcircuit.add_gate(
+                        Op=node_command[node].op,
+                        args=[
+                            qubit_to_index[qubit] for qubit in node_command[node].qubits
+                        ],
+                        opgroup=node_command[node].opgroup,
+                    )
+
+                else:
+                    clifford_subcircuit.add_gate(
+                        Op=node_command[node].op,
+                        args=[
+                            qubit_to_index[qubit] for qubit in node_command[node].qubits
+                        ],
+                    )
+
                 implemented_commands[node] = True
 
             clifford_circ_box = CircBox(clifford_subcircuit)
