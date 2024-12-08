@@ -190,7 +190,7 @@ mittask.rst
 measurement_reduction.rst
 spam.rst
 frame_randomisation.rst
-postselection.rst
+postselection.md
 leakage_detection.md
 coherent_pauli_checks.rst
 clifford_noise_characterisation.rst
