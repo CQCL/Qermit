@@ -14,13 +14,13 @@
 
 
 from pytket import Circuit
-from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.extensions.qiskit import AerBackend
 
-from qermit.frame_randomisation import (  # type: ignore
+from qermit.frame_randomisation import (
     FrameRandomisation,
     gen_Frame_Randomisation_MitRes,
 )
-from qermit.frame_randomisation.frame_randomisation import (  # type: ignore
+from qermit.frame_randomisation.frame_randomisation import (
     frame_randomisation_circuits_task_gen,
 )
 

@@ -16,11 +16,11 @@
 import networkx as nx  # type: ignore
 import pytest
 
-from qermit import (  # type: ignore
+from qermit import (
     MitTask,
     TaskGraph,
 )
-from qermit.taskgraph import (  # type: ignore
+from qermit.taskgraph import (
     IOTask,
     duplicate_wire_task_gen,
 )

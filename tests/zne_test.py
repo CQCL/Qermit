@@ -16,23 +16,23 @@ import math
 import multiprocessing as mp
 from itertools import product
 
-import numpy as np  # type: ignore
+import numpy as np
 import pytest
 import qiskit_aer.noise as noise  # type: ignore
-from numpy.polynomial.polynomial import polyval  # type: ignore
+from numpy.polynomial.polynomial import polyval
 from pytket import Circuit, Qubit
 from pytket.circuit import (
     CircBox,
-    Node,  # type: ignore
-    OpType,  # type: ignore
+    Node,
+    OpType,
 )
-from pytket.extensions.qiskit import AerBackend, IBMQEmulatorBackend  # type: ignore
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
-from pytket.predicates import GateSetPredicate  # type: ignore
+from pytket.extensions.qiskit import AerBackend, IBMQEmulatorBackend
+from pytket.pauli import Pauli, QubitPauliString
+from pytket.predicates import GateSetPredicate
 from pytket.utils import QubitPauliOperator
-from qiskit_ibm_provider import IBMProvider
+from qiskit_ibm_provider import IBMProvider  # type: ignore
 
-from qermit import (  # type: ignore  # type: ignore
+from qermit import (
     AnsatzCircuit,
     ObservableExperiment,
     ObservableTracker,
@@ -40,18 +40,18 @@ from qermit import (  # type: ignore  # type: ignore
 )
 from qermit.noise_model import (
     ErrorDistribution,
-    MockQuantinuumBackend,  # type: ignore
+    MockQuantinuumBackend,
     NoiseModel,
     PauliErrorTranspile,
     TranspilerBackend,
 )
 from qermit.taskgraph import gen_MeasurementReduction_MitEx
-from qermit.zero_noise_extrapolation import (  # type: ignore
+from qermit.zero_noise_extrapolation import (
     Fit,
     Folding,
     gen_ZNE_MitEx,
 )
-from qermit.zero_noise_extrapolation.zne import (  # type: ignore
+from qermit.zero_noise_extrapolation.zne import (
     digital_folding_task_gen,
     extrapolation_task_gen,
     gen_duplication_task,

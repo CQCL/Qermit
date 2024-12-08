@@ -91,7 +91,7 @@ jobs:
         pip install .[tests]
         cd tests
     - name: Run mypy
-      run: mypy -p qermit --warn-unused-ignores
+      run: mypy qermit tests --warn-unused-ignores
     - name: Linting check
       run: ruff check
     - name: Format check

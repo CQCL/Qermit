@@ -15,13 +15,13 @@
 
 from typing import cast
 
-import numpy as np  # type: ignore
+import numpy as np
 from pytket import Qubit
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.extensions.qiskit import AerBackend
+from pytket.pauli import Pauli, QubitPauliString
 from pytket.utils import QubitPauliOperator
 
-from qermit.clifford_noise_characterisation.cdr_post import (  # type: ignore
+from qermit.clifford_noise_characterisation.cdr_post import (
     _PolyCDRCorrect,
     cdr_calibration_task_gen,
     cdr_correction_task_gen,

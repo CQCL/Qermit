@@ -14,13 +14,13 @@
 
 
 from pytket import Circuit, Qubit
-from pytket.architecture import Architecture  # type: ignore
-from pytket.circuit import Node  # type: ignore
-from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.architecture import Architecture
+from pytket.circuit import Node
+from pytket.extensions.qiskit import AerBackend
 
 from qermit import CircuitShots
-from qermit.noise_model import MockQuantinuumBackend  # type: ignore
-from qermit.spam import (  # type: ignore
+from qermit.noise_model import MockQuantinuumBackend
+from qermit.spam import (
     CorrectionMethod,
     gen_FullyCorrelated_SPAM_MitRes,
     gen_UnCorrelated_SPAM_MitRes,

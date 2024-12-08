@@ -14,13 +14,13 @@
 
 
 from pytket import Circuit
-from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.extensions.qiskit import AerBackend
 
-from qermit import (  # type: ignore
+from qermit import (
     CircuitShots,
     MitRes,
 )
-from qermit.taskgraph.mitres import (  # type: ignore
+from qermit.taskgraph.mitres import (
     backend_handle_task_gen,
     backend_res_task_gen,
     gen_shot_split_MitRes,

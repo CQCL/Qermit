@@ -18,24 +18,24 @@ import math
 import pytest
 from pytket import Circuit, OpType, Qubit
 from pytket.extensions.qiskit import (
-    AerBackend,  # type: ignore
-    IBMQEmulatorBackend,  # type: ignore
+    AerBackend,
+    IBMQEmulatorBackend,
 )
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
-from pytket.predicates import CliffordCircuitPredicate, GateSetPredicate  # type: ignore
+from pytket.pauli import Pauli, QubitPauliString
+from pytket.predicates import CliffordCircuitPredicate, GateSetPredicate
 from pytket.utils import QubitPauliOperator
-from qiskit_ibm_provider import IBMProvider
+from qiskit_ibm_provider import IBMProvider  # type: ignore
 
-from qermit import (  # type: ignore
+from qermit import (
     AnsatzCircuit,
     ObservableExperiment,
     ObservableTracker,
     SymbolsDict,
 )
-from qermit.probabilistic_error_cancellation import (  # type: ignore
+from qermit.probabilistic_error_cancellation import (
     gen_PEC_learning_based_MitEx,
 )
-from qermit.probabilistic_error_cancellation.pec_learning_based import (  # type: ignore
+from qermit.probabilistic_error_cancellation.pec_learning_based import (
     collate_results_task_gen,
     gen_get_clifford_training_set,
     gen_get_noisy_circuits,

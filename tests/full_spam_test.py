@@ -13,14 +13,14 @@
 # limitations under the License.
 
 
-import numpy as np  # type: ignore
+import numpy as np
 from pytket import Bit, Circuit, Qubit
-from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.extensions.qiskit import AerBackend
 
-from qermit.spam import (  # type: ignore
+from qermit.spam import (
     CorrectionMethod,
 )
-from qermit.spam.full_spam_correction import (  # type: ignore
+from qermit.spam.full_spam_correction import (
     gen_full_tomography_spam_characterisation_task,
     gen_full_tomography_spam_circuits_task,
     gen_full_tomography_spam_correction_task,
