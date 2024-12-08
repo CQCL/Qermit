@@ -12,7 +12,6 @@ from pytket.pauli import Pauli, QubitPauliString
 
 from qermit import CircuitShots
 from qermit.coherent_pauli_checks import (
-    CoherentPauliChecksRebase,
     DeterministicXPauliSampler,
     DeterministicZPauliSampler,
     OptimalPauliSampler,
@@ -45,6 +44,89 @@ from qermit.postselection import PostselectMgr
 from qermit.probabilistic_error_cancellation.cliff_circuit_gen import (
     random_clifford_circ,
 )
+
+
+def test_boxing_barrier_and_circbox():
+    circuit = Circuit(3, 3)
+    circuit.X(0)
+    circuit.Z(1)
+
+    circuit.CCX(0, 2, 1)
+
+    circ_box_circuit = Circuit(3).X(0).Z(1).Y(2)
+    circ_box = CircBox(circ_box_circuit)
+    circuit.add_circbox(
+        circ_box,
+        circuit.qubits,
+    )
+
+    circuit.X(2, condition=circuit.bits[0] & circuit.bits[1])
+
+    circuit.add_barrier(
+        [circuit.qubits[0]] + [circuit.qubits[2]] + circuit.bits,
+        data="my data",
+    )
+    circuit.Y(2)
+
+    circ_box_circuit = Circuit(2).X(0).Rx(0.1, 0)
+    circ_box = CircBox(circ_box_circuit)
+    circuit.add_circbox(
+        circ_box,
+        [circuit.qubits[0], circuit.qubits[1]],
+    )
+
+    circuit.Z(0)
+
+    circuit.add_barrier([circuit.qubits[1]] + circuit.bits)
+
+    circuit.measure_all()
+
+    BoxClifford().apply(circuit)
+
+    ideal_circuit = Circuit(3, 3)
+
+    circ_box_circuit = Circuit(2, name="Clifford Subcircuit").X(1).Z(0)
+    circ_box = CircBox(circ_box_circuit)
+    ideal_circuit.add_circbox(
+        circ_box,
+        [ideal_circuit.qubits[1], ideal_circuit.qubits[0]],
+    )
+
+    ideal_circuit.CCX(0, 2, 1)
+
+    circ_box_circuit = Circuit(3).X(0).Z(1).Y(2)
+    circ_box = CircBox(circ_box_circuit)
+    ideal_circuit.add_circbox(
+        circ_box,
+        ideal_circuit.qubits,
+    )
+
+    ideal_circuit.X(2, condition=ideal_circuit.bits[0] & ideal_circuit.bits[1])
+
+    ideal_circuit.add_barrier(
+        [ideal_circuit.qubits[0]] + [ideal_circuit.qubits[2]] + ideal_circuit.bits,
+        data="my data",
+    )
+
+    circ_box_circuit = Circuit(2).X(0).Rx(0.1, 0)
+    circ_box = CircBox(circ_box_circuit)
+    ideal_circuit.add_circbox(
+        circ_box,
+        [ideal_circuit.qubits[0], ideal_circuit.qubits[1]],
+    )
+
+    circ_box_circuit = Circuit(2, name="Clifford Subcircuit").Z(1).Y(0)
+    circ_box = CircBox(circ_box_circuit)
+    ideal_circuit.add_circbox(
+        circ_box,
+        [ideal_circuit.qubits[2], ideal_circuit.qubits[0]],
+    )
+
+    ideal_circuit.add_barrier([ideal_circuit.qubits[1]] + ideal_circuit.bits)
+
+    ideal_circuit.measure_all()
+
+    assert ideal_circuit == circuit
 
 
 def test__command_is_clifford():
@@ -467,8 +549,7 @@ def test__give_nodes_subdag():
 
 
 def test_add_pauli_checks():
-    original_circuit = Circuit(3).H(1).CX(1, 0)
-    CoherentPauliChecksRebase().apply(original_circuit)
+    original_circuit = Circuit(3).H(1).H(0).CZ(1, 0).H(0)
     boxed_circ = original_circuit.copy()
     BoxClifford().apply(boxed_circ)
 
@@ -538,8 +619,7 @@ def test_add_pauli_checks():
 
     assert ideal_circ == circuit
 
-    original_circuit = Circuit(2).H(0).CX(1, 0).X(1).CX(1, 0)
-    CoherentPauliChecksRebase().apply(original_circuit)
+    original_circuit = Circuit(2).H(0).H(0).CZ(1, 0).H(0).X(1).H(0).CZ(1, 0).H(0)
     boxed_circ = original_circuit.copy()
     BoxClifford().apply(boxed_circ)
 
@@ -613,7 +693,6 @@ def test_5q_random_clifford():
     rng = numpy.random.default_rng(seed=0)
 
     clifford_circuit = random_clifford_circ(n_qubits=5, rng=rng)
-    CoherentPauliChecksRebase().apply(clifford_circuit)
     boxed_clifford_circuit = clifford_circuit.copy()
     BoxClifford().apply(boxed_clifford_circuit)
 

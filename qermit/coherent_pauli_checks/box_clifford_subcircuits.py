@@ -1,23 +1,9 @@
 import networkx as nx  # type: ignore
 from pytket._tket.unit_id import Qubit
 from pytket.circuit import CircBox, Circuit, Command, OpType
-from pytket.passes import AutoRebase, BasePass, CustomPass
+from pytket.passes import BasePass, CustomPass
 
 from .monochromatic_convex_subdag import get_monochromatic_convex_subdag
-
-
-def CoherentPauliChecksRebase() -> BasePass:
-    """Pass transforming gates into Clifford gates recognised by
-    the Coherent Pauli Checks module, and non-Clifford gates.
-
-    :return: Pass transforming gates into Clifford gates recognised by
-        the Coherent Pauli Checks module, and non-Clifford gates.
-    :rtype: BasePass
-    """
-    clifford_ops = [OpType.CZ, OpType.H, OpType.Z, OpType.S, OpType.X]
-    non_clifford_ops = [OpType.Rz]
-
-    return AutoRebase(gateset=set(clifford_ops + non_clifford_ops))
 
 
 def _command_is_clifford(command: Command) -> bool:
@@ -267,6 +253,12 @@ def _box_clifford_transform(circuit: Circuit) -> Circuit:
                         "This is a bug and should bre reported to the developers."
                     )
 
+                if node_command[node].op.type == OpType.Barrier:
+                    raise Exception(
+                        "This Clifford subcircuit contains a barrier."
+                        "This is a bug and should bre reported to the developers."
+                    )
+
                 if node_command[node].opgroup is not None:
                     clifford_subcircuit.add_gate(
                         Op=node_command[node].op,
@@ -295,10 +287,19 @@ def _box_clifford_transform(circuit: Circuit) -> Circuit:
         # Otherwise, add the gates straight to the circuit
         else:
             assert len(node_to_implement_list) == 1
-            clifford_box_circuit.add_gate(
-                node_command[node_to_implement_list[0]].op,
-                node_command[node_to_implement_list[0]].args,
-            )
+
+            if node_command[node_to_implement_list[0]].op.type == OpType.Barrier:
+                clifford_box_circuit.add_barrier(
+                    units=node_command[node_to_implement_list[0]].args,
+                    data=node_command[node_to_implement_list[0]].op.data,  # type: ignore
+                )
+
+            else:
+                clifford_box_circuit.add_gate(
+                    node_command[node_to_implement_list[0]].op,
+                    node_command[node_to_implement_list[0]].args,
+                )
+
             implemented_commands[node_to_implement_list[0]] = True
 
     return clifford_box_circuit
