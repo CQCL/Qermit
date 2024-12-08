@@ -7,10 +7,10 @@ from .monochromatic_convex_subdag import get_monochromatic_convex_subdag
 
 
 def _command_is_clifford(command: Command) -> bool:
-    """Check if the given command is clifford.
+    """Check if the given command is Clifford.
 
     :param command: Command to check.
-    :return: Boolean value indicating if given command is clifford.
+    :return: Boolean value indicating if given command is Clifford.
     """
 
     # This is only a limited set of gates.
