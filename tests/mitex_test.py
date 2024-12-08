@@ -16,12 +16,12 @@
 import copy
 
 import pytest
-from pytket.circuit import Circuit, OpType, Qubit, fresh_symbol  # type: ignore
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+from pytket.circuit import Circuit, OpType, Qubit, fresh_symbol
+from pytket.extensions.qiskit import AerBackend
+from pytket.pauli import Pauli, QubitPauliString
 from pytket.utils import QubitPauliOperator
 
-from qermit import (  # type: ignore
+from qermit import (
     AnsatzCircuit,
     CircuitShots,
     MitEx,
@@ -29,7 +29,7 @@ from qermit import (  # type: ignore
     ObservableTracker,
     SymbolsDict,
 )
-from qermit.taskgraph.mitex import (  # type: ignore
+from qermit.taskgraph.mitex import (
     collate_circuit_shots_task_gen,
     filter_observable_tracker_task_gen,
     gen_compiled_shot_split_MitRes,

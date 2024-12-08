@@ -13,17 +13,19 @@
 # limitations under the License.
 
 
-import pytest  # type: ignore
-from pytket.circuit import Bit, Circuit, Qubit, fresh_symbol  # type: ignore
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
+import pytest
+from pytket.circuit import Bit, Circuit, Qubit, fresh_symbol
+from pytket.extensions.qiskit import AerBackend
+from pytket.pauli import Pauli, QubitPauliString
 from pytket.utils import QubitPauliOperator
+from typing import Any
 
-from qermit import (  # type: ignore
+from qermit import (
     MeasurementCircuit,
     ObservableTracker,
     SymbolsDict,
 )
+import numpy as np
 
 
 # tests for SymbolsDict class in utils
@@ -46,9 +48,9 @@ def test_SymbolsDict_circuit_constructor() -> None:
 
 
 def test_SymbolsDict_dict_constructor() -> None:
-    symbols_dict = dict()
+    symbols_dict: dict[Any, float | None] = dict()
     for i in range(4):
-        symbols_dict[fresh_symbol("a" + str(i))] = i
+        symbols_dict[fresh_symbol("a" + str(i))] = float(i)
     sd = SymbolsDict.symbols_from_dict(symbols_dict)
     assert sd._symbolic_map == symbols_dict
 
@@ -89,14 +91,14 @@ def test_basic_MeasurementCircuit_constructor() -> None:
 
 
 def test_MeasurementCircuit_constructor() -> None:
-    symbols_dict = dict()
+    symbols_dict: dict[Any, float | None] = dict()
     test_circuit = Circuit(4)
     comparison_circuit = Circuit(4)
     for i in range(4):
         sym = fresh_symbol("d" + str(i))
         test_circuit.Ry(sym, i)
         comparison_circuit.Ry(i, i)
-        symbols_dict[sym] = i
+        symbols_dict[sym] = float(i)
     sd = SymbolsDict.symbols_from_dict(symbols_dict)
     mc = MeasurementCircuit(test_circuit, sd)
 
@@ -144,8 +146,8 @@ def test_ObservableTracker_measurement_circuits_methods() -> None:
     # make measurement circuits for addition
     circuit_0 = Circuit(5)
     circuit_1 = Circuit(5)
-    symbols_dict_0 = dict()
-    symbols_dict_1 = dict()
+    symbols_dict_0: dict[Any, float | None] = dict()
+    symbols_dict_1: dict[Any, float | None] = dict()
 
     for i in range(5):
         # new symbol
@@ -157,8 +159,8 @@ def test_ObservableTracker_measurement_circuits_methods() -> None:
         circuit_1.Ry(sym_1, i)
         circuit_1.add_bit(Bit(i))
         # update symbols dict
-        symbols_dict_0[sym_0] = i
-        symbols_dict_1[sym_1] = i
+        symbols_dict_0[sym_0] = float(i)
+        symbols_dict_1[sym_1] = float(i)
 
     circuit_0.H(Qubit(0))
     circuit_0.Rx(0.5, Qubit(1))

@@ -15,12 +15,12 @@
 import math
 
 import numpy as np
-import scipy.fft
+import scipy.fft  # type: ignore
 from pytket import Circuit, Qubit
 from pytket.extensions.qiskit import AerBackend
 from pytket.pauli import Pauli, QubitPauliString
 from pytket.utils import QubitPauliOperator
-from sympy import Symbol
+from sympy import Symbol  # type: ignore
 
 from qermit import AnsatzCircuit, ObservableExperiment, ObservableTracker, SymbolsDict
 from qermit.spectral_filtering import SmallCoefficientSignalFilter

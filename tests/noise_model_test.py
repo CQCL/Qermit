@@ -57,7 +57,7 @@ def test_to_ptm() -> None:
 
 def test_from_ptm() -> None:
     # Test that the error distribution to and from ptm is the same as the initial
-    distribution = {
+    distribution: dict[tuple[Pauli, ...], float] = {
         (Pauli.X, Pauli.X): 0.1,
         (Pauli.Y, Pauli.Z): 0.2,
         (Pauli.Z, Pauli.X): 0.3,
@@ -150,7 +150,7 @@ def test_qermit_pauli_commute_coeff() -> None:
 def test_noise_model_logical_error_propagation() -> None:
     pytket_ciruit = Circuit(2).H(0).CX(0, 1).measure_all()
 
-    error_distribution_dict = {
+    error_distribution_dict: dict[tuple[Pauli, ...], float] = {
         (Pauli.X, Pauli.I): 0.1,
     }
     error_distribution = ErrorDistribution(
@@ -163,23 +163,23 @@ def test_noise_model_logical_error_propagation() -> None:
         pytket_ciruit, n_rand=10000
     )
 
-    ideal_error = QubitPauliString(map={Qubit(0): Pauli.Z, Qubit(1): Pauli.X})
-    assert list(logical_distribution.distribution.keys()) == [ideal_error]
-    assert abs(logical_distribution.distribution[ideal_error] - 0.1) <= 0.01
+    ideal_error_one = QubitPauliString(map={Qubit(0): Pauli.Z, Qubit(1): Pauli.X})
+    assert list(logical_distribution.distribution.keys()) == [ideal_error_one]
+    assert abs(logical_distribution.distribution[ideal_error_one] - 0.1) <= 0.01
 
-    logical_distribution = noise_model.counter_propagate(
+    error_counter = noise_model.counter_propagate(
         pytket_ciruit, n_counts=10000, direction=Direction.forward
     )
-    ideal_error = QermitPauli.from_qubit_pauli_string(
+    ideal_error_two = QermitPauli.from_qubit_pauli_string(
         QubitPauliString(map={Qubit(0): Pauli.X, Qubit(1): Pauli.I})
     )
-    assert list(logical_distribution.keys()) == [ideal_error]
-    assert abs(logical_distribution[ideal_error] - 1000) <= 1
+    assert list(error_counter.keys()) == [ideal_error_two]
+    assert abs(error_counter[ideal_error_two] - 1000) <= 1
 
 
 def test_error_distribution_utilities(tmp_path_factory) -> None:
     # Test that the probabilities must be less than 1.
-    error_distribution_dict = {(Pauli.X, Pauli.I): 1.1}
+    error_distribution_dict: dict[tuple[Pauli, ...], float] = {(Pauli.X, Pauli.I): 1.1}
     with pytest.raises(Exception):
         error_distribution = ErrorDistribution(
             distribution=error_distribution_dict,
@@ -290,12 +290,12 @@ def test_error_distribution_post_select() -> None:
 
 
 def test_to_dict(tmpdir_factory) -> None:
-    error_distribution_dict_zzmax = {}
+    error_distribution_dict_zzmax: dict[tuple[Pauli, ...], float] = {}
     error_distribution_dict_zzmax[(Pauli.X, Pauli.I)] = 0.0002
     error_distribution_dict_zzmax[(Pauli.I, Pauli.X)] = 0.0002
     error_distribution_dict_zzmax[(Pauli.I, Pauli.I)] = 0.9996
 
-    error_distribution_dict_cz = {}
+    error_distribution_dict_cz: dict[tuple[Pauli, ...], float] = {}
     error_distribution_dict_cz[(Pauli.Z, Pauli.Z)] = 0.002
     error_distribution_dict_cz[(Pauli.I, Pauli.Z)] = 0.002
     error_distribution_dict_cz[(Pauli.I, Pauli.I)] = 0.996
@@ -339,7 +339,7 @@ def test_transpiler_backend() -> None:
         circuit.ZZMax(0, 1).ZZMax(1, 2)
     circuit.measure_all()
 
-    error_distribution_dict = {}
+    error_distribution_dict: dict[tuple[Pauli, ...], float] = {}
     error_distribution_dict[(Pauli.X, Pauli.I)] = 0.002
     error_distribution_dict[(Pauli.I, Pauli.X)] = 0.002
 
@@ -363,14 +363,13 @@ def test_transpiler_backend() -> None:
 
 def test_pauli_error_transpile() -> None:
     error_distribution_dict = {
-        error: 0 for error in product([Pauli.I, Pauli.X, Pauli.Y, Pauli.Z], repeat=2)
+        error: 0.0 for error in product([Pauli.I, Pauli.X, Pauli.Y, Pauli.Z], repeat=2)
     }
 
     error_rate = 0.5
     error_distribution_dict[(Pauli.X, Pauli.I)] = error_rate
     error_distribution_dict[(Pauli.I, Pauli.X)] = error_rate
     error_distribution_dict[(Pauli.I, Pauli.I)] = 1 - 2 * error_rate
-    # error_distribution_dict[(Pauli.I, Pauli.I)] = 1 - 2*error_rate
 
     error_distribution = ErrorDistribution(
         error_distribution_dict, rng=np.random.default_rng(seed=2)
@@ -389,7 +388,7 @@ def test_pauli_error_transpile() -> None:
 def test_noise_model() -> None:
     mp.set_start_method("spawn", force=True)
 
-    error_distribution_dict = {}
+    error_distribution_dict: dict[tuple[Pauli, ...], float] = {}
     error_rate = 0.5
     error_distribution_dict[(Pauli.X, Pauli.I)] = error_rate
     error_distribution_dict[(Pauli.I, Pauli.X)] = error_rate
@@ -454,7 +453,7 @@ def test_back_propagate_random_error() -> None:
     qubit_list = cliff_circ.qubits
 
     error_rate = 0.5
-    error_distribution_dict = {}
+    error_distribution_dict: dict[tuple[Pauli, ...], float] = {}
     error_distribution_dict[(Pauli.X, Pauli.I)] = error_rate
     error_distribution_dict[(Pauli.I, Pauli.X)] = error_rate
     error_distribution_dict[(Pauli.I, Pauli.I)] = 1 - 2 * error_rate
@@ -483,7 +482,7 @@ def test_effective_error_distribution() -> None:
     qubits = cliff_circ.qubits
 
     error_rate = 0.5
-    error_distribution_dict = {}
+    error_distribution_dict: dict[tuple[Pauli, ...], float] = {}
     error_distribution_dict[(Pauli.X, Pauli.I)] = error_rate
     error_distribution_dict[(Pauli.I, Pauli.X)] = error_rate
 
@@ -493,13 +492,13 @@ def test_effective_error_distribution() -> None:
     )
     noise_model = NoiseModel({OpType.CZ: error_distribution})
 
-    error_distribution = noise_model.get_effective_pre_error_distribution(
+    logical_error_distribution = noise_model.get_effective_pre_error_distribution(
         cliff_circ, n_rand=10000
     )
 
     assert all(
         abs(count - 2500) < 100
-        for count in error_distribution.pauli_error_counter.values()
+        for count in logical_error_distribution.pauli_error_counter.values()
     )
 
     cliff_circ = Circuit()

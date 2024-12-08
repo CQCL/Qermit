@@ -14,20 +14,20 @@
 
 
 from pytket import Bit, Circuit, Qubit
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from pytket.partition import (  # type: ignore
+from pytket.extensions.qiskit import AerBackend
+from pytket.partition import (
     GraphColourMethod,
     PauliPartitionStrat,
 )
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
-from pytket.transform import CXConfigType  # type: ignore
+from pytket.pauli import Pauli, QubitPauliString
+from pytket.transform import CXConfigType
 from pytket.utils import QubitPauliOperator
 
-from qermit import (  # type: ignore
+from qermit import (
     ObservableTracker,
     SymbolsDict,
 )
-from qermit.taskgraph.measurement_reduction import (  # type: ignore
+from qermit.taskgraph.measurement_reduction import (
     gen_MeasurementReduction_MitEx,
     measurement_reduction_task_gen,
 )

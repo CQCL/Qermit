@@ -12,24 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np  # type: ignore
+import numpy as np
 from pytket import Circuit, OpType, Qubit
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
-from pytket.predicates import CliffordCircuitPredicate  # type: ignore
+from pytket.extensions.qiskit import AerBackend
+from pytket.pauli import Pauli, QubitPauliString
+from pytket.predicates import CliffordCircuitPredicate
 from pytket.utils import QubitPauliOperator
 
-from qermit import (  # type: ignore
+from qermit import (
     AnsatzCircuit,
     MitEx,
     ObservableExperiment,
     ObservableTracker,
     SymbolsDict,
 )
-from qermit.clifford_noise_characterisation import (  # type: ignore
+from qermit.clifford_noise_characterisation import (
     gen_CDR_MitEx,
 )
-from qermit.clifford_noise_characterisation.ccl import (  # type: ignore
+from qermit.clifford_noise_characterisation.ccl import (
     ccl_likelihood_filtering_task_gen,
     ccl_result_batching_task_gen,
     ccl_state_task_gen,

@@ -16,23 +16,23 @@
 import copy
 
 from pytket import Circuit, Qubit
-from pytket.circuit import fresh_symbol  # type: ignore
-from pytket.extensions.qiskit import AerBackend  # type: ignore
-from pytket.pauli import Pauli, QubitPauliString  # type: ignore
-from pytket.transform import Transform  # type: ignore
+from pytket.circuit import fresh_symbol
+from pytket.extensions.qiskit import AerBackend
+from pytket.pauli import Pauli, QubitPauliString
+from pytket.transform import Transform
 from pytket.utils import QubitPauliOperator
 
-from qermit import (  # type: ignore
+from qermit import (
     MeasurementCircuit,
     MitEx,
     ObservableExperiment,
     ObservableTracker,
     SymbolsDict,
 )
-from qermit.clifford_noise_characterisation import (  # type: ignore
+from qermit.clifford_noise_characterisation import (
     gen_DFSC_MitEx,
 )
-from qermit.clifford_noise_characterisation.dfsc import (  # type: ignore
+from qermit.clifford_noise_characterisation.dfsc import (
     DFSC_characterisation_task_gen,
     DFSC_circuit_task_gen,
     DFSC_collater_task_gen,
@@ -40,7 +40,7 @@ from qermit.clifford_noise_characterisation.dfsc import (  # type: ignore
     get_clifford_mcs,
     preparation_circuit_for_partition,
 )
-from qermit.taskgraph.mitex import get_basic_measurement_circuit  # type: ignore
+from qermit.taskgraph.mitex import get_basic_measurement_circuit
 
 sym_0 = fresh_symbol("alpha")
 sym_1 = fresh_symbol("beta")

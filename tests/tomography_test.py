@@ -13,12 +13,12 @@
 # limitations under the License.
 
 
-import numpy as np  # type: ignore
+import numpy as np
 import qiskit_aer.noise as noise  # type: ignore
 from pytket import Bit, Circuit, Qubit
-from pytket.extensions.qiskit import AerBackend  # type: ignore
+from pytket.extensions.qiskit import AerBackend
 
-from qermit.spam.full_transition_tomography import (  # type: ignore
+from qermit.spam.full_transition_tomography import (
     CorrectionMethod,
     binary_to_int,
     calculate_correlation_matrices,
