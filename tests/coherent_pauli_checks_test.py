@@ -12,12 +12,12 @@ from pytket.pauli import Pauli, QubitPauliString
 
 from qermit import CircuitShots
 from qermit.coherent_pauli_checks import (
+    CoherentPauliChecksRebase,
     DeterministicXPauliSampler,
     DeterministicZPauliSampler,
     OptimalPauliSampler,
     PauliSampler,
     RandomPauliSampler,
-    cpc_rebase_pass,
     gen_coherent_pauli_check_mitres,
 )
 from qermit.coherent_pauli_checks.box_clifford_subcircuits import (
@@ -468,7 +468,7 @@ def test__give_nodes_subdag():
 
 def test_add_pauli_checks():
     original_circuit = Circuit(3).H(1).CX(1, 0)
-    cpc_rebase_pass.apply(original_circuit)
+    CoherentPauliChecksRebase().apply(original_circuit)
     boxed_circ = original_circuit.copy()
     BoxClifford().apply(boxed_circ)
 
@@ -539,7 +539,7 @@ def test_add_pauli_checks():
     assert ideal_circ == circuit
 
     original_circuit = Circuit(2).H(0).CX(1, 0).X(1).CX(1, 0)
-    cpc_rebase_pass.apply(original_circuit)
+    CoherentPauliChecksRebase().apply(original_circuit)
     boxed_circ = original_circuit.copy()
     BoxClifford().apply(boxed_circ)
 
@@ -613,7 +613,7 @@ def test_5q_random_clifford():
     rng = numpy.random.default_rng(seed=0)
 
     clifford_circuit = random_clifford_circ(n_qubits=5, rng=rng)
-    cpc_rebase_pass.apply(clifford_circuit)
+    CoherentPauliChecksRebase().apply(clifford_circuit)
     boxed_clifford_circuit = clifford_circuit.copy()
     BoxClifford().apply(boxed_clifford_circuit)
 

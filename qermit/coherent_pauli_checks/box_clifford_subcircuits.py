@@ -1,9 +1,23 @@
 import networkx as nx  # type: ignore
 from pytket._tket.unit_id import Qubit
 from pytket.circuit import CircBox, Circuit, Command, OpType
-from pytket.passes import BasePass, CustomPass
+from pytket.passes import AutoRebase, BasePass, CustomPass
 
 from .monochromatic_convex_subdag import get_monochromatic_convex_subdag
+
+
+def CoherentPauliChecksRebase() -> BasePass:
+    """Pass transforming gates into Clifford gates recognised by
+    the Coherent Pauli Checks module, and non-Clifford gates.
+
+    :return: Pass transforming gates into Clifford gates recognised by
+        the Coherent Pauli Checks module, and non-Clifford gates.
+    :rtype: BasePass
+    """
+    clifford_ops = [OpType.CZ, OpType.H, OpType.Z, OpType.S, OpType.X]
+    non_clifford_ops = [OpType.Rz]
+
+    return AutoRebase(gateset=set(clifford_ops + non_clifford_ops))
 
 
 def _command_is_clifford(command: Command) -> bool:
