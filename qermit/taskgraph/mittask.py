@@ -22,7 +22,6 @@ from pytket import Bit, Circuit, Qubit
 from pytket.backends import ResultHandle
 from pytket.backends.backendresult import BackendResult
 from pytket.utils import QubitPauliOperator
-from qermit.postselection.postselect_manager import PostselectMgr
 
 
 class IOTask(Enum):
@@ -41,7 +40,6 @@ ObservableExperiment = namedtuple(
 )
 
 Wire = Union[
-    PostselectMgr,
     CircuitShots,
     Circuit,
     BackendResult,
@@ -58,7 +56,6 @@ Wire = Union[
 ]
 
 WireList = Union[
-    List[PostselectMgr],
     List[CircuitShots],
     List[Circuit],
     List[BackendResult],
