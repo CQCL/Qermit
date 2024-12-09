@@ -4,10 +4,9 @@ from typing import Dict, List, Tuple
 from pytket.backends.backendresult import BackendResult
 from pytket.circuit import Bit
 from pytket.utils.outcomearray import OutcomeArray
-from qermit.taskgraph.mittask import PostselectMgrType
 
 
-class PostselectMgr[PostselectMgrType]:
+class PostselectMgr:
     """Class for tracking and applying post selection to results.
 
     An example use case might be the following. Here a Bell state is

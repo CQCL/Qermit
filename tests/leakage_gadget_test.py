@@ -77,7 +77,7 @@ def test_compare_with_prune() -> None:
     qermit_result_list = postselection_task(
         (
             result_list,
-            postselect_mgr_list,
+            postselect_mgr_list,  # type: ignore
         )
     )
     pytket_result_list = [
