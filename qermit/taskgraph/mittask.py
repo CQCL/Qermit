@@ -16,7 +16,7 @@
 from collections import namedtuple
 from enum import Enum
 from types import MethodType
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from pytket import Bit, Circuit, Qubit
 from pytket.backends import ResultHandle
