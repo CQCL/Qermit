@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import cast
+
 from pytket import Circuit
 from pytket.extensions.quantinuum.backends.leakage_gadget import (
     prune_shots_detected_as_leaky,
@@ -25,8 +27,6 @@ from qermit.leakage_detection.leakage_detection import (
 from qermit.noise_model import MockQuantinuumBackend
 from qermit.postselection.postselect_mitres import gen_postselect_task
 from qermit.taskgraph import gen_compiled_MitRes
-
-from typing import cast
 
 
 def test_leakage_gadget() -> None:
@@ -71,7 +71,9 @@ def test_compare_with_prune() -> None:
             ),
             n_shots=detection_circuit_shots.Shots,
         )
-        for detection_circuit_shots in cast(list[CircuitShots], detection_circuit_shots_list)
+        for detection_circuit_shots in cast(
+            list[CircuitShots], detection_circuit_shots_list
+        )
     ]
 
     qermit_result_list = postselection_task(
