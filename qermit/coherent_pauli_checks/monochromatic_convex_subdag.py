@@ -1,4 +1,4 @@
-from itertools import permutations
+from itertools import combinations
 from typing import Any
 
 import networkx as nx  # type: ignore
@@ -66,7 +66,7 @@ def _subdag_successors(
 
 
 def get_monochromatic_convex_subdag(
-    dag: nx.DiGraph, coloured_nodes: set[Any]
+    dag: nx.DiGraph, coloured_nodes: list[Any]
 ) -> dict[Any, int]:
     """Retrieve assignment of coloured nodes to sub-DAGs.
     The assignment aims to minimise the number of sub-DAGs.
@@ -75,7 +75,6 @@ def get_monochromatic_convex_subdag(
     :param coloured_nodes: The nodes which are coloured.
     :return: Map from node to the sub-DAG to which it belongs.
     """
-    node_subdag = {node: i for i, node in enumerate(coloured_nodes)}
 
     node_descendants = {node: nx.descendants(dag, node) for node in dag.nodes}
     for node in node_descendants.keys():
@@ -124,15 +123,14 @@ def get_monochromatic_convex_subdag(
 
         return True
 
+    node_subdag = {node: i for i, node in enumerate(coloured_nodes)}
+
     subgraph_merged = True
     while subgraph_merged:
         subgraph_merged = False
 
         # Try to merge all pairs of sub-DAGs
-        for subdag_one, subdag_two in permutations(node_subdag.values(), 2):
-            if subdag_one == subdag_two:
-                continue
-
+        for subdag_one, subdag_two in combinations(set(node_subdag.values()), 2):
             if _can_merge(
                 dag=dag,
                 subdag_one=subdag_one,

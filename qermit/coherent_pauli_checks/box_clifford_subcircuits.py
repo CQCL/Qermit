@@ -30,7 +30,7 @@ def _command_is_clifford(command: Command) -> bool:
     return False
 
 
-def _get_clifford_commands(command_list: list[Command]) -> set[int]:
+def _get_clifford_commands(command_list: list[Command]) -> list[int]:
     """Given a list of commands, return a set of indexes of that list
     corresponding to those commands which are Clifford gates.
 
@@ -39,9 +39,9 @@ def _get_clifford_commands(command_list: list[Command]) -> set[int]:
     :return: Indexes in the list which correspond to commands in the
         list which are Clifford.
     """
-    return {
+    return [
         i for i, command in enumerate(command_list) if _command_is_clifford(command)
-    }
+    ]
 
 
 def _give_nodes_subdag(dag: nx.DiGraph, node_subdag: dict[int, int]) -> list[int]:
