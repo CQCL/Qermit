@@ -27,7 +27,6 @@ from qermit.postselection.postselect_mitres import gen_postselect_task
 from qermit.taskgraph import gen_compiled_MitRes
 
 from typing import cast
-from qermit.postselection import PostselectMgr
 
 
 def test_leakage_gadget() -> None:
@@ -78,7 +77,7 @@ def test_compare_with_prune() -> None:
     qermit_result_list = postselection_task(
         (
             result_list,
-            postselect_mgr_list,  # type: ignore
+            postselect_mgr_list,
         )
     )
     pytket_result_list = [

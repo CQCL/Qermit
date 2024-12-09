@@ -22,6 +22,7 @@ from pytket import Bit, Circuit, Qubit
 from pytket.backends import ResultHandle
 from pytket.backends.backendresult import BackendResult
 from pytket.utils import QubitPauliOperator
+from typing import TypeVar
 
 
 class IOTask(Enum):
@@ -39,7 +40,10 @@ ObservableExperiment = namedtuple(
     "ObservableExperiment", ["AnsatzCircuit", "ObservableTracker"]
 )
 
+PostselectMgrType = TypeVar('PostselectMgrType')
+
 Wire = Union[
+    PostselectMgrType,
     CircuitShots,
     Circuit,
     BackendResult,
@@ -56,6 +60,7 @@ Wire = Union[
 ]
 
 WireList = Union[
+    List[PostselectMgrType],
     List[CircuitShots],
     List[Circuit],
     List[BackendResult],
