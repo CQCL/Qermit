@@ -159,7 +159,7 @@ def _can_implement(
 
 
 def _box_clifford_transform(circuit: Circuit) -> Circuit:
-    """Replace Clifford subcircuits with boxes containing those circuit.
+    """Replace Clifford subcircuits with boxes containing those circuits.
     These boxes will have the name "Clifford Subcircuit".
 
     :param circuit: Circuit whose Clifford subcircuits should be boxed.
@@ -250,13 +250,13 @@ def _box_clifford_transform(circuit: Circuit) -> Circuit:
                 if node_command[node].args != node_command[node].qubits:
                     raise Exception(
                         "This Clifford subcircuit contains classical bits."
-                        "This is a bug and should bre reported to the developers."
+                        "This is a bug and should be reported to the developers."
                     )
 
                 if node_command[node].op.type == OpType.Barrier:
                     raise Exception(
                         "This Clifford subcircuit contains a barrier."
-                        "This is a bug and should bre reported to the developers."
+                        "This is a bug and should be reported to the developers."
                     )
 
                 if node_command[node].opgroup is not None:
