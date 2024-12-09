@@ -26,6 +26,9 @@ from qermit.noise_model import MockQuantinuumBackend
 from qermit.postselection.postselect_mitres import gen_postselect_task
 from qermit.taskgraph import gen_compiled_MitRes
 
+from typing import cast
+from qermit.postselection import PostselectMgr
+
 
 def test_leakage_gadget() -> None:
     backend = MockQuantinuumBackend()
@@ -69,13 +72,13 @@ def test_compare_with_prune() -> None:
             ),
             n_shots=detection_circuit_shots.Shots,
         )
-        for detection_circuit_shots in detection_circuit_shots_list
+        for detection_circuit_shots in cast(list[CircuitShots], detection_circuit_shots_list)
     ]
 
     qermit_result_list = postselection_task(
         (
             result_list,
-            postselect_mgr_list,
+            cast(list[PostselectMgr], postselect_mgr_list),
         )
     )
     pytket_result_list = [

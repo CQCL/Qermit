@@ -22,6 +22,7 @@ from pytket import Bit, Circuit, Qubit
 from pytket.backends import ResultHandle
 from pytket.backends.backendresult import BackendResult
 from pytket.utils import QubitPauliOperator
+from qermit.postselection.postselect_manager import PostselectMgr
 
 
 class IOTask(Enum):
@@ -40,6 +41,7 @@ ObservableExperiment = namedtuple(
 )
 
 Wire = Union[
+    PostselectMgr,
     CircuitShots,
     Circuit,
     BackendResult,
@@ -98,7 +100,7 @@ class MitTask:
     def n_out_wires(self):
         return self._n_out_wires
 
-    def __call__(self, input_wires: Tuple[List[Wire]]) -> Tuple[List[Wire]]:
+    def __call__(self, input_wires: Tuple[List[Wire], ...]) -> Tuple[List[Wire], ...]:
         return self.run(*input_wires)
 
     def __str__(self):
