@@ -142,13 +142,7 @@ class QermitPauli:
         )
 
     def __hash__(self):
-        key = (
-            *list(self.Z_list.values()),
-            *list(self.X_list.values()),
-            *self.qubit_list,
-            self.phase,
-        )
-        return hash(key)
+        return self.qubit_pauli_tensor.__hash__()
 
     def __str__(self) -> str:
         return str(self.qubit_pauli_tensor.string) + str(self.qubit_pauli_tensor.coeff)
