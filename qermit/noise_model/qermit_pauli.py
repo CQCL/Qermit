@@ -59,9 +59,12 @@ class QermitPauli:
         :return: True if at least one Pauli on the given
             qubits anticommutes with Z. False otherwise.
         """
-        if not all(qubit in self.qubit_list for qubit in qubit_list):
-            raise Exception(f"{qubit_list} is not a subset of {self.qubit_list}.")
-        return any(self.X_list[qubit] == 1 for qubit in qubit_list)
+        return any(
+            not self.qubit_pauli_tensor.commutes_with(
+                QubitPauliTensor(qubit=qubit, pauli=Pauli.Z)
+            )
+            for qubit in qubit_list
+        )
 
     def reduce_qubits(self, qubit_list: List[Qubit]) -> QermitPauli:
         """Reduces Pauli onto given list of qubits. A new reduced
