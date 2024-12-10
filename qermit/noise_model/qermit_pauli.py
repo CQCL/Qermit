@@ -144,7 +144,7 @@ class QermitPauli:
     def __hash__(self):
         return self.qubit_pauli_tensor.__hash__()
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         return str(self.qubit_pauli_tensor.string) + str(self.qubit_pauli_tensor.coeff)
 
     def __eq__(self, other: object) -> bool:
@@ -307,20 +307,6 @@ class QermitPauli:
         self.Z_list[control_qubit] %= 2
         self.X_list[target_qubit] += self.X_list[control_qubit]
         self.X_list[target_qubit] %= 2
-
-    def pre_multiply(self, pauli: QermitPauli):
-        """Pre-multiply by a Pauli.
-
-        :param pauli: Pauli to pre multiply by.
-        """
-
-        for qubit in self.qubit_list:
-            if pauli.X_list[qubit]:
-                self.pre_apply_X(qubit)
-            if pauli.Z_list[qubit]:
-                self.pre_apply_Z(qubit)
-            self.phase += pauli.phase
-            self.phase %= 4
 
     def pre_apply_pauli(self, pauli: Union[Pauli, OpType], qubit: Qubit):
         """Pre apply by a pauli on a particular qubit.
