@@ -111,23 +111,11 @@ class QermitPauli:
         :return: Conjugate transpose of the Pauli.
         """
 
-        # the phase is the conjugate of the original
-        phase = self.phase
-        phase += 2 * (self.phase % 2)
-
-        Z_list = list(self.Z_list.values())
-        X_list = list(self.X_list.values())
-        # The phase is altered here as the order Z and X is reversed by
-        # the inversion.
-        for Z, X in zip(Z_list, X_list):
-            phase += 2 * Z * X
-        phase %= 4
-
-        return QermitPauli(
-            Z_list=Z_list,
-            X_list=X_list,
-            qubit_list=self.qubit_list,
-            phase=phase,
+        return QermitPauli.from_qubit_pauli_tensor(
+            qpt=QubitPauliTensor(
+                string=self.qubit_pauli_tensor.string,
+                coeff=self.qubit_pauli_tensor.coeff.conjugate(),
+            )
         )
 
     @classmethod
