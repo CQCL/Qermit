@@ -205,22 +205,7 @@ class QermitPauli:
         if not isinstance(other, QermitPauli):
             return False
 
-        if sorted(list(self.X_list.keys())) != sorted(list(other.X_list.keys())):
-            return False
-        if not all(
-            self.X_list[quibt] == other.X_list[quibt] for quibt in self.X_list.keys()
-        ):
-            return False
-        if sorted(list(self.Z_list.keys())) != sorted(list(other.Z_list.keys())):
-            return False
-        if not all(
-            self.Z_list[quibt] == other.Z_list[quibt] for quibt in self.X_list.keys()
-        ):
-            return False
-        if self.phase != other.phase:
-            return False
-
-        return True
+        return self.qubit_pauli_tensor == other.qubit_pauli_tensor
 
     def apply_circuit(self, circuit: Circuit):
         """Apply a circuit to a pauli. This is to say commute tha Pauli
