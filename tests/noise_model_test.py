@@ -104,8 +104,8 @@ def test_qermit_pauli_from_iterable() -> None:
         qubits=[Qubit(i) for i in range(5)],
         paulis=[Pauli.X, Pauli.Y, Pauli.Z, Pauli.Y, Pauli.Z],
     )
-    pauli = QermitPauli.from_pauli_iterable(
-        pauli_iterable=qubit_pauli_string.map.values(),
+    pauli = QermitPauli.from_pauli_list(
+        pauli_list=list(qubit_pauli_string.map.values()),
         qubit_list=list(qubit_pauli_string.map.keys()),
     )
     pauli.qubit_pauli_tensor.string == qubit_pauli_string

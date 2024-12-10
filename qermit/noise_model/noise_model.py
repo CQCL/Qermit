@@ -99,8 +99,8 @@ class ErrorDistribution:
         # PTM entry as a sum pf error weights multiplied by +/-1
         # Depending on commutation relations.
         for pauli_tuple, index in pauli_index.items():
-            pauli = QermitPauli.from_pauli_iterable(
-                pauli_iterable=pauli_tuple,
+            pauli = QermitPauli.from_pauli_list(
+                pauli_list=list(pauli_tuple),
                 qubit_list=[Qubit(i) for i in range(self.n_qubits)],
             )
 
@@ -111,8 +111,8 @@ class ErrorDistribution:
             ptm[index][index] += self.identity_error_rate
 
             for error, error_rate in self.distribution.items():
-                error_pauli = QermitPauli.from_pauli_iterable(
-                    pauli_iterable=error,
+                error_pauli = QermitPauli.from_pauli_list(
+                    pauli_list=list(error),
                     qubit_list=[Qubit(i) for i in range(self.n_qubits)],
                 )
                 commute_coeff = (
@@ -185,13 +185,13 @@ class ErrorDistribution:
         # is the matrix of commutation values.
         commutation_matrix = np.zeros(ptm.shape)
         for pauli_one_tuple, index_one in pauli_index.items():
-            pauli_one = QermitPauli.from_pauli_iterable(
-                pauli_iterable=pauli_one_tuple,
+            pauli_one = QermitPauli.from_pauli_list(
+                pauli_list=list(pauli_one_tuple),
                 qubit_list=[Qubit(i) for i in range(len(pauli_one_tuple))],
             )
             for pauli_two_tuple, index_two in pauli_index.items():
-                pauli_two = QermitPauli.from_pauli_iterable(
-                    pauli_iterable=pauli_two_tuple,
+                pauli_two = QermitPauli.from_pauli_list(
+                    pauli_list=list(pauli_two_tuple),
                     qubit_list=[Qubit(i) for i in range(len(pauli_two_tuple))],
                 )
                 commutation_matrix[index_one][index_two] = (

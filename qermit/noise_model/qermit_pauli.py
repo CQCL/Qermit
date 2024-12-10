@@ -472,8 +472,8 @@ class QermitPauli:
         )
 
     @classmethod
-    def from_pauli_iterable(
-        cls, pauli_iterable: Iterable[Pauli], qubit_list: List[Qubit]
+    def from_pauli_list(
+        cls, pauli_list: List[Pauli], qubit_list: List[Qubit]
     ) -> QermitPauli:
         """Create a QermitPauli from a Pauli iterable.
 
@@ -481,9 +481,12 @@ class QermitPauli:
         :param qubit_list: The qubits on which the resulting pauli will act.
         :return: The pauli corresponding to the given iterable.
         """
-        return cls(
-            Z_list=[int(pauli in (Pauli.Z, Pauli.Y)) for pauli in pauli_iterable],
-            X_list=[int(pauli in (Pauli.X, Pauli.Y)) for pauli in pauli_iterable],
-            qubit_list=qubit_list,
-            phase=sum(int(pauli == Pauli.Y) for pauli in pauli_iterable) % 4,
+        return cls.from_qubit_pauli_tensor(
+            qpt=QubitPauliTensor(
+                string=QubitPauliString(
+                    qubits=qubit_list,
+                    paulis=pauli_list,
+                ),
+                coeff=1,
+            ),
         )
