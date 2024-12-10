@@ -443,12 +443,22 @@ class QermitPauli:
         """
 
         circ = Circuit()
-        for qubit in self.qubit_list:
+
+        phase = self.coeff_to_phase[self.qubit_pauli_tensor.coeff]
+
+        for qubit, pauli in self.qubit_pauli_tensor.string.map.items():
             circ.add_qubit(id=qubit)
-            if self.Z_list[qubit] == 1:
+
+            if pauli == Pauli.Z or pauli == Pauli.Y:
                 circ.Z(qubit)
-            if self.X_list[qubit] == 1:
+
+            if pauli == Pauli.X or pauli == Pauli.Y:
                 circ.X(qubit)
+
+            if pauli == Pauli.Y:
+                phase += 2
+                phase %= 4
+
         circ.add_phase(a=self.phase / 2)
 
         return circ
