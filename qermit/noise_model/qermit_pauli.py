@@ -265,33 +265,33 @@ class QermitPauli:
         """
 
         if op_type == OpType.H:
-            self.H(qubit=qubits[0])
+            self._H(qubit=qubits[0])
         elif op_type == OpType.S:
-            self.S(qubit=qubits[0])
+            self._S(qubit=qubits[0])
         elif op_type == OpType.CX:
-            self.CX(control_qubit=qubits[0], target_qubit=qubits[1])
+            self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
         elif op_type == OpType.Z:
-            self.S(qubit=qubits[0])
-            self.S(qubit=qubits[0])
+            self._S(qubit=qubits[0])
+            self._S(qubit=qubits[0])
         elif op_type == OpType.Sdg:
-            self.S(qubit=qubits[0])
-            self.S(qubit=qubits[0])
-            self.S(qubit=qubits[0])
+            self._S(qubit=qubits[0])
+            self._S(qubit=qubits[0])
+            self._S(qubit=qubits[0])
         elif op_type == OpType.X:
-            self.H(qubit=qubits[0])
+            self._H(qubit=qubits[0])
             self.apply_gate(op_type=OpType.Z, qubits=qubits)
-            self.H(qubit=qubits[0])
+            self._H(qubit=qubits[0])
         elif op_type == OpType.Y:
             self.apply_gate(op_type=OpType.Z, qubits=qubits)
             self.apply_gate(op_type=OpType.X, qubits=qubits)
         elif op_type == OpType.CZ:
-            self.H(qubit=qubits[1])
-            self.CX(control_qubit=qubits[0], target_qubit=qubits[1])
-            self.H(qubit=qubits[1])
+            self._H(qubit=qubits[1])
+            self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
+            self._H(qubit=qubits[1])
         elif op_type == OpType.SWAP:
-            self.CX(control_qubit=qubits[0], target_qubit=qubits[1])
-            self.CX(control_qubit=qubits[1], target_qubit=qubits[0])
-            self.CX(control_qubit=qubits[0], target_qubit=qubits[1])
+            self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
+            self._CX(control_qubit=qubits[1], target_qubit=qubits[0])
+            self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
         elif op_type == OpType.PhasedX:
             params = kwargs.get("params", None)
             if all(
@@ -309,7 +309,7 @@ class QermitPauli:
             if math.isclose(angle % 0.5, 0) or math.isclose(angle % 0.5, 0.5):
                 angle = round(angle, 1)
                 for _ in range(int((angle % 2) // 0.5)):
-                    self.S(qubit=qubits[0])
+                    self._S(qubit=qubits[0])
             else:
                 raise Exception(f"{angle} is not a clifford angle.")
         elif op_type == OpType.Rx:
@@ -317,16 +317,16 @@ class QermitPauli:
             angle = params[0]
             if math.isclose(angle % 0.5, 0) or math.isclose(angle % 0.5, 0.5):
                 angle = round(angle, 1)
-                self.H(qubit=qubits[0])
+                self._H(qubit=qubits[0])
                 for _ in range(int((angle % 2) // 0.5)):
-                    self.S(qubit=qubits[0])
-                self.H(qubit=qubits[0])
+                    self._S(qubit=qubits[0])
+                self._H(qubit=qubits[0])
             else:
                 raise Exception(f"{angle} is not a clifford angle.")
         elif op_type == OpType.ZZMax:
-            self.CX(control_qubit=qubits[0], target_qubit=qubits[1])
-            self.S(qubit=qubits[1])
-            self.CX(control_qubit=qubits[0], target_qubit=qubits[1])
+            self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
+            self._S(qubit=qubits[1])
+            self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
         elif op_type == OpType.ZZPhase:
             params = kwargs.get("params", None)
             angle = params[0]
@@ -344,7 +344,7 @@ class QermitPauli:
                 + "Please use only Clifford gates."
             )
 
-    def S(self, qubit: Qubit):
+    def _S(self, qubit: Qubit):
         """Act S operation on the pauli. In particular this transforms
         the pauli (i)^{phase}X^{X_liist}Z^{Z_list} to
         (i)^{phase}SX^{X_liist}Z^{Z_list}S^{dagger}.
@@ -357,7 +357,7 @@ class QermitPauli:
         self.phase += self.X_list[qubit]
         self.phase %= 4
 
-    def H(self, qubit: Qubit):
+    def _H(self, qubit: Qubit):
         """Act H operation. In particular this transforms
         the Pauli (i)^{phase}X^{X_liist}Z^{Z_list} to
         H(i)^{phase}X^{X_liist}Z^{Z_list}H^{dagger}.
@@ -372,7 +372,7 @@ class QermitPauli:
         self.X_list[qubit] = self.Z_list[qubit]
         self.Z_list[qubit] = temp_X
 
-    def CX(self, control_qubit: Qubit, target_qubit: Qubit):
+    def _CX(self, control_qubit: Qubit, target_qubit: Qubit):
         """Act CX operation. In particular this transforms
         the Pauli (i)^{phase}X^{X_liist}Z^{Z_list} to
         CX(i)^{phase}X^{X_liist}Z^{Z_list}CX^{dagger}.

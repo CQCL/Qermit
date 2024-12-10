@@ -617,13 +617,13 @@ def test_H() -> None:
     qubit_list = [Qubit(0)]
     pauli = QermitPauli(Z_list=[1], X_list=[0], qubit_list=qubit_list)
 
-    pauli.H(qubit=qubit_list[0])
+    pauli.apply_gate(op_type=OpType.H, qubits=[qubit_list[0]])
     assert pauli.qubit_pauli_tensor.string == QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X]
     )
     assert pauli.qubit_pauli_tensor.coeff == 1
 
-    pauli.H(qubit=qubit_list[0])
+    pauli.apply_gate(op_type=OpType.H, qubits=[qubit_list[0]])
     assert pauli.qubit_pauli_tensor.string == QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.Z]
     )
@@ -697,8 +697,8 @@ def test_qubit_pauli_string() -> None:
     assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
     assert pauli.qubit_pauli_tensor.coeff == 1
 
-    pauli.H(qubit_list[0])
-    pauli.S(qubit_list[0])
+    pauli.apply_gate(op_type=OpType.H, qubits=[qubit_list[0]])
+    pauli.apply_gate(op_type=OpType.S, qubits=[qubit_list[0]])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.Y, Pauli.Z, Pauli.Z]
@@ -706,7 +706,7 @@ def test_qubit_pauli_string() -> None:
     assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
     assert pauli.qubit_pauli_tensor.coeff == 1
 
-    pauli.CX(qubit_list[0], qubit_list[1])
+    pauli.apply_gate(op_type=OpType.CX, qubits=[qubit_list[0], qubit_list[1]])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.Y, Pauli.Z]
@@ -714,7 +714,7 @@ def test_qubit_pauli_string() -> None:
     assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
     assert pauli.qubit_pauli_tensor.coeff == 1
 
-    pauli.S(qubit_list[1])
+    pauli.apply_gate(op_type=OpType.S, qubits=[qubit_list[1]])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.X, Pauli.Z]
@@ -722,8 +722,8 @@ def test_qubit_pauli_string() -> None:
     assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
     assert pauli.qubit_pauli_tensor.coeff == -1
 
-    pauli.S(qubit_list[0])
-    pauli.CX(qubit_list[0], qubit_list[2])
+    pauli.apply_gate(op_type=OpType.S, qubits=[qubit_list[0]])
+    pauli.apply_gate(op_type=OpType.CX, qubits=[qubit_list[0], qubit_list[2]])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.X, Pauli.Y]
@@ -740,47 +740,47 @@ def test_clifford_incremental() -> None:
         qubit_list=qubit_list,
     )
 
-    pauli.H(qubit_list[0])
+    pauli.apply_gate(op_type=OpType.H, qubits=[qubit_list[0]])
     assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
     assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 1}
     assert pauli.phase == 0
 
-    pauli.CX(qubit_list[1], qubit_list[2])
+    pauli.apply_gate(op_type=OpType.CX, qubits=[qubit_list[1], qubit_list[2]])
     assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
     assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 1}
     assert pauli.phase == 0
 
-    pauli.H(qubit_list[1])
+    pauli.apply_gate(op_type=OpType.H, qubits=[qubit_list[1]])
     assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 0}
     assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 1}
     assert pauli.phase == 0
 
-    pauli.S(qubit_list[1])
+    pauli.apply_gate(op_type=OpType.S, qubits=[qubit_list[1]])
     assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 0}
     assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 1}
     assert pauli.phase == 1
 
-    pauli.CX(qubit_list[1], qubit_list[2])
+    pauli.apply_gate(op_type=OpType.CX, qubits=[qubit_list[1], qubit_list[2]])
     assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 1}
     assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 1}
     assert pauli.phase == 1
 
-    pauli.S(qubit_list[2])
+    pauli.apply_gate(op_type=OpType.S, qubits=[qubit_list[2]])
     assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 1}
     assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
     assert pauli.phase == 2
 
-    pauli.CX(qubit_list[1], qubit_list[0])
+    pauli.apply_gate(op_type=OpType.CX, qubits=[qubit_list[1], qubit_list[0]])
     assert pauli.X_list == {qubit_list[0]: 1, qubit_list[1]: 1, qubit_list[2]: 1}
     assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
     assert pauli.phase == 2
 
-    pauli.S(qubit_list[0])
+    pauli.apply_gate(op_type=OpType.S, qubits=[qubit_list[0]])
     assert pauli.X_list == {qubit_list[0]: 1, qubit_list[1]: 1, qubit_list[2]: 1}
     assert pauli.Z_list == {qubit_list[0]: 1, qubit_list[1]: 0, qubit_list[2]: 0}
     assert pauli.phase == 3
 
-    pauli.H(qubit_list[0])
+    pauli.apply_gate(op_type=OpType.H, qubits=[qubit_list[0]])
     assert pauli.X_list == {qubit_list[0]: 1, qubit_list[1]: 1, qubit_list[2]: 1}
     assert pauli.Z_list == {qubit_list[0]: 1, qubit_list[1]: 0, qubit_list[2]: 0}
     assert pauli.phase == 1
