@@ -336,12 +336,11 @@ def test_logical_error_coherent_pauli_check_workflow():
     )
 
     pauli_sampler = OptimalPauliSampler(noise_model=noise_model, n_checks=1)
-    assert pauli_sampler.sample(circ=cliff_sub_circ)[0].qubit_pauli_string == (
-        QubitPauliString(
-            qubits=[Qubit(0), Qubit(1), Qubit(2)], paulis=[Pauli.I, Pauli.I, Pauli.Z]
-        ),
-        1,
+    pauli = pauli_sampler.sample(circ=cliff_sub_circ)[0]
+    assert pauli.qubit_pauli_tensor.string == QubitPauliString(
+        qubits=[Qubit(0), Qubit(1), Qubit(2)], paulis=[Pauli.I, Pauli.I, Pauli.Z]
     )
+    assert pauli.qubit_pauli_tensor.coeff == 1
 
     cliff_circ = Circuit()
     cliff_circ.add_q_register(name="my_reg", size=3)

@@ -108,7 +108,8 @@ def test_qermit_pauli_from_iterable() -> None:
         pauli_iterable=qubit_pauli_string.map.values(),
         qubit_list=list(qubit_pauli_string.map.keys()),
     )
-    pauli.qubit_pauli_string == (qubit_pauli_string, 1 + 0j)
+    pauli.qubit_pauli_tensor.string == qubit_pauli_string
+    pauli.qubit_pauli_tensor.coeff == 1 + 0j
 
 
 def test_qermit_pauli_commute_coeff() -> None:
@@ -606,11 +607,10 @@ def test_identity_clifford() -> None:
     )
     pauli.apply_circuit(circ)
 
-    qubit_pauli_string, phase = pauli.qubit_pauli_string
-    assert qubit_pauli_string == QubitPauliString(
+    assert pauli.qubit_pauli_tensor.string == QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.Z, Pauli.Z]
     )
-    assert phase == 1
+    assert pauli.qubit_pauli_tensor.coeff == 1
 
 
 def test_H() -> None:
@@ -618,14 +618,16 @@ def test_H() -> None:
     pauli = QermitPauli(Z_list=[1], X_list=[0], qubit_list=qubit_list)
 
     pauli.H(qubit=qubit_list[0])
-    qubit_pauli_string, phase = pauli.qubit_pauli_string
-    assert qubit_pauli_string == QubitPauliString(qubits=qubit_list, paulis=[Pauli.X])
-    assert phase == 1
+    assert pauli.qubit_pauli_tensor.string == QubitPauliString(
+        qubits=qubit_list, paulis=[Pauli.X]
+    )
+    assert pauli.qubit_pauli_tensor.coeff == 1
 
     pauli.H(qubit=qubit_list[0])
-    qubit_pauli_string, phase = pauli.qubit_pauli_string
-    assert qubit_pauli_string == QubitPauliString(qubits=qubit_list, paulis=[Pauli.Z])
-    assert phase == 1
+    assert pauli.qubit_pauli_tensor.string == QubitPauliString(
+        qubits=qubit_list, paulis=[Pauli.Z]
+    )
+    assert pauli.qubit_pauli_tensor.coeff == 1
 
 
 def test_h_series_gates() -> None:
@@ -643,11 +645,10 @@ def test_apply_circuit() -> None:
 
     pauli.apply_circuit(circ)
 
-    qubit_pauli_string, phase = pauli.qubit_pauli_string
-    assert qubit_pauli_string == QubitPauliString(
+    assert pauli.qubit_pauli_tensor.string == QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.Y]
     )
-    assert phase == 1
+    assert pauli.qubit_pauli_tensor.coeff == 1
 
 
 def test_apply_gate() -> None:
@@ -660,11 +661,10 @@ def test_apply_gate() -> None:
 
     pauli.apply_gate(op_type=OpType.H, qubits=[qubit_list[0]])
 
-    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
-    assert qermit_qubit_pauli_string == QubitPauliString(
+    assert pauli.qubit_pauli_tensor.string == QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.Z, Pauli.Z]
     )
-    assert phase == 1
+    assert pauli.qubit_pauli_tensor.coeff == 1
 
     pauli.apply_gate(
         op_type=OpType.CX,
@@ -674,15 +674,13 @@ def test_apply_gate() -> None:
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.I, Pauli.Z]
     )
-    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
-    assert qermit_qubit_pauli_string == qubit_pauli_string
-    assert phase == 1
+    assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
+    assert pauli.qubit_pauli_tensor.coeff == 1
 
     pauli.apply_gate(op_type=OpType.S, qubits=[qubit_list[1]])
-    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
 
-    assert qermit_qubit_pauli_string == qubit_pauli_string
-    assert phase == 1
+    assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
+    assert pauli.qubit_pauli_tensor.coeff == 1
 
 
 def test_qubit_pauli_string() -> None:
@@ -696,9 +694,8 @@ def test_qubit_pauli_string() -> None:
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.Z, Pauli.Z, Pauli.Z]
     )
-    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
-    assert qermit_qubit_pauli_string == qubit_pauli_string
-    assert phase == 1
+    assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
+    assert pauli.qubit_pauli_tensor.coeff == 1
 
     pauli.H(qubit_list[0])
     pauli.S(qubit_list[0])
@@ -706,27 +703,24 @@ def test_qubit_pauli_string() -> None:
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.Y, Pauli.Z, Pauli.Z]
     )
-    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
-    assert qermit_qubit_pauli_string == qubit_pauli_string
-    assert phase == 1
+    assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
+    assert pauli.qubit_pauli_tensor.coeff == 1
 
     pauli.CX(qubit_list[0], qubit_list[1])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.Y, Pauli.Z]
     )
-    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
-    assert qermit_qubit_pauli_string == qubit_pauli_string
-    assert phase == 1
+    assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
+    assert pauli.qubit_pauli_tensor.coeff == 1
 
     pauli.S(qubit_list[1])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.X, Pauli.Z]
     )
-    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
-    assert qermit_qubit_pauli_string == qubit_pauli_string
-    assert phase == -1
+    assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
+    assert pauli.qubit_pauli_tensor.coeff == -1
 
     pauli.S(qubit_list[0])
     pauli.CX(qubit_list[0], qubit_list[2])
@@ -734,9 +728,8 @@ def test_qubit_pauli_string() -> None:
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.X, Pauli.Y]
     )
-    qermit_qubit_pauli_string, phase = pauli.qubit_pauli_string
-    assert qermit_qubit_pauli_string == qubit_pauli_string
-    assert phase == -1
+    assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
+    assert pauli.qubit_pauli_tensor.coeff == -1
 
 
 def test_clifford_incremental() -> None:
@@ -801,9 +794,8 @@ def test_to_from_qps() -> None:
         paulis=paulis,
     )
     stab = QermitPauli.from_qubit_pauli_string(qubit_pauli_string)
-    stab_qps, stab_phase = stab.qubit_pauli_string
-    assert stab_qps == qubit_pauli_string
-    assert stab_phase == 1 + 0j
+    assert stab.qubit_pauli_tensor.string == qubit_pauli_string
+    assert stab.qubit_pauli_tensor.coeff == 1 + 0j
 
 
 def test_is_measureable() -> None:
