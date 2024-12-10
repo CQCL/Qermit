@@ -112,42 +112,6 @@ def test_qermit_pauli_from_iterable() -> None:
     pauli.qubit_pauli_tensor.coeff == 1 + 0j
 
 
-def test_qermit_pauli_commute_coeff() -> None:
-    # This tests a few commutation coefficients
-    # which have been verified by hand.
-    verified_list = [
-        # Single qubit Paulis
-        ((([0], [1]), ([1], [0])), -1),
-        ((([1], [1]), ([1], [1])), 1),
-        ((([1], [0]), ([0], [1])), -1),
-        ((([0], [0]), ([0], [1])), 1),
-        ((([1], [0]), ([0], [0])), 1),
-        ((([1], [1]), ([0], [1])), -1),
-        # Two qubit Paulis
-        ((([0, 1], [1, 0]), ([1, 0], [0, 1])), 1),
-        ((([0, 1], [1, 0]), ([0, 0], [1, 1])), -1),
-        ((([0, 0], [0, 0]), ([0, 0], [1, 1])), 1),
-    ]
-
-    for verified in verified_list:
-        n_qubits = len(verified[0][0][0])
-
-        pauli_one = QermitPauli(
-            Z_list=verified[0][0][0],
-            X_list=verified[0][0][1],
-            qubit_list=[Qubit(i) for i in range(n_qubits)],
-        )
-        pauli_two = QermitPauli(
-            Z_list=verified[0][1][0],
-            X_list=verified[0][1][1],
-            qubit_list=[Qubit(i) for i in range(n_qubits)],
-        )
-        assert (
-            QermitPauli.commute_coeff(pauli_one=pauli_one, pauli_two=pauli_two)
-            == verified[1]
-        )
-
-
 def test_noise_model_logical_error_propagation() -> None:
     pytket_ciruit = Circuit(2).H(0).CX(0, 1).measure_all()
 

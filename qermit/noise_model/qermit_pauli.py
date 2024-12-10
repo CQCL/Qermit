@@ -48,34 +48,6 @@ class QermitPauli:
         self.phase = phase
         self.qubit_list = qubit_list
 
-    @staticmethod
-    def commute_coeff(pauli_one: QermitPauli, pauli_two: QermitPauli) -> int:
-        """Calculate the coefficient which result from commuting pauli_one
-        past pauli_two. That is to say P_2 P_1 = c P_1 P_2 where c is the
-        coefficient returned by this function.
-
-        :param pauli_one: First Pauli
-        :param pauli_two: Second Pauli
-        :raises Exception: Raised if the Paulis do not act
-            on matching qubits.
-        :return: Coefficient resulting from commuting the two Paulis.
-        """
-        if not pauli_one.qubit_list == pauli_two.qubit_list:
-            raise Exception(
-                "The given Paulis must act on the same qubits. "
-                + f"In this case the qubits acted on by pauli_one {pauli_one.qubit_list} "
-                + f"differ from those of pauli_two {pauli_two.qubit_list}."
-            )
-        power = sum(
-            pauli_one.X_list[qubit] * pauli_two.Z_list[qubit]
-            for qubit in pauli_one.qubit_list
-        )
-        power += sum(
-            pauli_one.Z_list[qubit] * pauli_two.X_list[qubit]
-            for qubit in pauli_one.qubit_list
-        )
-        return (-1) ** power
-
     def is_measureable(self, qubit_list: List[Qubit]) -> bool:
         """Checks if this Pauli would be measurable on the given qubits in the
         computational bases. That is to say if at least one  Pauli on the given
@@ -208,7 +180,7 @@ class QermitPauli:
         return hash(key)
 
     def __str__(self) -> str:
-        return str(self.qubit_pauli_tensor)
+        return str(self.qubit_pauli_tensor.string) + str(self.qubit_pauli_tensor.coeff)
 
     def __eq__(self, other: object) -> bool:
         """Checks for equality by checking all qubits match, and that all
