@@ -86,25 +86,6 @@ class QermitPauli:
             )
         )
 
-    @classmethod
-    def random_pauli(
-        cls,
-        qubit_list: List[Qubit],
-        rng: Generator = np.random.default_rng(),
-    ) -> QermitPauli:
-        """Generates a uniformly random Pauli.
-
-        :param qubit_list: Qubits on which the Pauli acts.
-        :param rng: Randomness generator, defaults to np.random.default_rng()
-        :return: Random pauli.
-        """
-
-        return cls(
-            Z_list=list(rng.integers(2, size=len(qubit_list))),
-            X_list=list(rng.integers(2, size=len(qubit_list))),
-            qubit_list=qubit_list,
-        )
-
     def dagger(self) -> QermitPauli:
         """Generates the inverse of the Pauli.
 
