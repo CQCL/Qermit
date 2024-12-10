@@ -67,17 +67,23 @@ class QermitPauli:
         )
 
     def reduce_qubits(self, qubit_list: List[Qubit]) -> QermitPauli:
-        """Reduces Pauli onto given list of qubits. A new reduced
-        Pauli is created.
+        """Reduces Pauli by removing terms acting on qubits
+        in the given list. A new reduced Pauli is created.
 
-        :param qubit_list: Qubits onto which pauli should be reduced.
+        :param qubit_list: Qubits in Pauli which should be removed.
         :return: Reduced Pauli.
         """
-        return QermitPauli(
-            Z_list=[Z for qubit, Z in self.Z_list.items() if qubit not in qubit_list],
-            X_list=[X for qubit, X in self.X_list.items() if qubit not in qubit_list],
-            qubit_list=[qubit for qubit in self.qubit_list if qubit not in qubit_list],
-            phase=self.phase,
+        return self.from_qubit_pauli_tensor(
+            QubitPauliTensor(
+                string=QubitPauliString(
+                    map={
+                        qubit: pauli
+                        for qubit, pauli in self.qubit_pauli_tensor.string.map.items()
+                        if qubit not in qubit_list
+                    }
+                ),
+                coeff=self.qubit_pauli_tensor.coeff,
+            )
         )
 
     @property
