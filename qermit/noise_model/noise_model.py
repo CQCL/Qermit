@@ -615,7 +615,8 @@ class NoiseModel:
         for _ in range(n_counts):
             pauli_error = self.random_propagate(cliff_circ, **kwargs)
 
-            if not pauli_error.is_identity:
+            # Check if the error is the identity.
+            if pauli_error.qubit_pauli_tensor.string != QubitPauliString():
                 error_counter.update([pauli_error])
 
         return error_counter

@@ -86,16 +86,6 @@ class QermitPauli:
             )
         )
 
-    @property
-    def is_identity(self) -> bool:
-        """True is the pauli represents the all I string.
-
-        :return: True is the pauli represents the all I string.
-        """
-        return all(Z == 0 for Z in self.Z_list.values()) and all(
-            X == 0 for X in self.X_list.values()
-        )
-
     @classmethod
     def random_pauli(
         cls,
