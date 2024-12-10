@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple, Union
 import numpy as np
 from numpy.random import Generator
 from pytket.circuit import Circuit, OpType, Qubit
-from pytket.pauli import Pauli, QubitPauliString
+from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor
 
 
 class QermitPauli:
@@ -208,8 +208,7 @@ class QermitPauli:
         return hash(key)
 
     def __str__(self) -> str:
-        qubit_pauli_string, operator_phase = self.qubit_pauli_string
-        return f"{qubit_pauli_string}, {operator_phase}"
+        return str(self.qubit_pauli_tensor)
 
     def __eq__(self, other: object) -> bool:
         """Checks for equality by checking all qubits match, and that all
@@ -538,10 +537,10 @@ class QermitPauli:
         return circ
 
     @property
-    def pauli_string(self) -> Tuple[List[Pauli], complex]:
-        """List of Paulis which correspond to Pauli, and the phase.
+    def qubit_pauli_tensor(self) -> QubitPauliTensor:
+        """Return QubitPauliTensor describing Pauli.
 
-        :return: [description]
+        :return: QubitPauliTensor describing Pauli.
         """
 
         operator_phase = self.phase
@@ -558,21 +557,11 @@ class QermitPauli:
                 operator_phase += 3
                 operator_phase %= 4
 
-        return paulis, self.phase_dict[operator_phase]
-
-    @property
-    def qubit_pauli_string(self) -> Tuple[QubitPauliString, complex]:
-        """Qubit pauli string corresponding to Pauli,
-        along with the appropriate phase.
-
-        :return: Pauli string and phase corresponding to Pauli.
-        """
-
-        paulis, operator_phase = self.pauli_string
-
-        qubit_pauli_string = QubitPauliString(qubits=self.qubit_list, paulis=paulis)
-
-        return qubit_pauli_string, operator_phase
+        return QubitPauliTensor(
+            qubits=self.qubit_list,
+            paulis=paulis,
+            coeff=self.phase_dict[operator_phase],
+        )
 
     @classmethod
     def from_pauli_iterable(

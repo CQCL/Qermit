@@ -409,7 +409,7 @@ class LogicalErrorDistribution:
         distribution: Dict[QubitPauliString, float] = {}
         for stab, count in dict(self.pauli_error_counter).items():
             # Note that the phase is ignored here
-            pauli_string, _ = stab.qubit_pauli_string
+            pauli_string = stab.qubit_pauli_tensor.string
             distribution[pauli_string] = (
                 distribution.get(pauli_string, 0) + count / self.total
             )
