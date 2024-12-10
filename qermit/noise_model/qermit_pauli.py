@@ -73,7 +73,6 @@ class QermitPauli:
         :param qubit_list: Qubits onto which pauli should be reduced.
         :return: Reduced Pauli.
         """
-
         return QermitPauli(
             Z_list=[Z for qubit, Z in self.Z_list.items() if qubit not in qubit_list],
             X_list=[X for qubit, X in self.X_list.items() if qubit not in qubit_list],
@@ -136,17 +135,21 @@ class QermitPauli:
         )
 
     @classmethod
-    def from_qubit_pauli_string(cls, qps: QubitPauliString) -> QermitPauli:
+    def from_qubit_pauli_tensor(cls, qpt: QubitPauliTensor) -> QermitPauli:
         """Create a Pauli from a qubit pauli string.
 
         :param qps: Qubit pauli string to be converted to a Pauli.
         :return: Pauli created from qubit pauli string.
         """
 
+        coeff_to_phase = {1 + 0j: 0, 0 + 1j: 1, -1 + 0j: 2, 0 - 1j: 3}
+
         Z_list = []
         X_list = []
-        phase = 0
+        phase = coeff_to_phase[qpt.coeff]
         qubit_list = []
+
+        qps = qpt.string
 
         for pauli in qps.to_list():
             qubit = Qubit(name=pauli[0][0], index=pauli[0][1])

@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 from pytket import Circuit, OpType
 from pytket.circuit import Qubit
-from pytket.pauli import Pauli, QubitPauliString
+from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor
 
 from qermit.noise_model import (
     ErrorDistribution,
@@ -135,8 +135,10 @@ def test_noise_model_logical_error_propagation() -> None:
     logical_distribution = noise_model.counter_propagate(
         pytket_ciruit, n_counts=10000, direction=Direction.forward
     )
-    ideal_error = QermitPauli.from_qubit_pauli_string(
-        QubitPauliString(map={Qubit(0): Pauli.X, Qubit(1): Pauli.I})
+    ideal_error = QermitPauli.from_qubit_pauli_tensor(
+        QubitPauliTensor(
+            string=QubitPauliString(map={Qubit(0): Pauli.X, Qubit(1): Pauli.I}), coeff=1
+        )
     )
     assert list(logical_distribution.keys()) == [ideal_error]
     assert abs(logical_distribution[ideal_error] - 1000) <= 1
@@ -239,8 +241,12 @@ def test_error_distribution_post_select() -> None:
     )
     pauli_error_counter = Counter(
         {
-            QermitPauli.from_qubit_pauli_string(qps_remove): 50,
-            QermitPauli.from_qubit_pauli_string(qps_keep): 50,
+            QermitPauli.from_qubit_pauli_tensor(
+                QubitPauliTensor(string=qps_remove, coeff=1)
+            ): 50,
+            QermitPauli.from_qubit_pauli_tensor(
+                QubitPauliTensor(string=qps_keep, coeff=1)
+            ): 50,
         }
     )
     error_distribution = LogicalErrorDistribution(
@@ -487,8 +493,13 @@ def test_effective_error_distribution() -> None:
     assert (
         abs(
             effective_error_dist.pauli_error_counter[
-                QermitPauli.from_qubit_pauli_string(
-                    QubitPauliString(qubits=qubits, paulis=[Pauli.X, Pauli.I, Pauli.X])
+                QermitPauli.from_qubit_pauli_tensor(
+                    QubitPauliTensor(
+                        string=QubitPauliString(
+                            qubits=qubits, paulis=[Pauli.X, Pauli.I, Pauli.X]
+                        ),
+                        coeff=1,
+                    )
                 )
             ]
             - 2100
@@ -499,8 +510,13 @@ def test_effective_error_distribution() -> None:
     assert (
         abs(
             effective_error_dist.pauli_error_counter[
-                QermitPauli.from_qubit_pauli_string(
-                    QubitPauliString(qubits=qubits, paulis=[Pauli.Y, Pauli.Y, Pauli.Z])
+                QermitPauli.from_qubit_pauli_tensor(
+                    QubitPauliTensor(
+                        string=QubitPauliString(
+                            qubits=qubits, paulis=[Pauli.Y, Pauli.Y, Pauli.Z]
+                        ),
+                        coeff=1,
+                    )
                 )
             ]
             - 900
@@ -511,8 +527,13 @@ def test_effective_error_distribution() -> None:
     assert (
         abs(
             effective_error_dist.pauli_error_counter[
-                QermitPauli.from_qubit_pauli_string(
-                    QubitPauliString(qubits=qubits, paulis=[Pauli.I, Pauli.I, Pauli.Z])
+                QermitPauli.from_qubit_pauli_tensor(
+                    QubitPauliTensor(
+                        string=QubitPauliString(
+                            qubits=qubits, paulis=[Pauli.I, Pauli.I, Pauli.Z]
+                        ),
+                        coeff=1,
+                    )
                 )
             ]
             - 2100
@@ -520,8 +541,11 @@ def test_effective_error_distribution() -> None:
         < 100
     )
 
-    pauli_error = QermitPauli.from_qubit_pauli_string(
-        QubitPauliString(qubits=qubits, paulis=[Pauli.Z, Pauli.Y, Pauli.X])
+    pauli_error = QermitPauli.from_qubit_pauli_tensor(
+        QubitPauliTensor(
+            string=QubitPauliString(qubits=qubits, paulis=[Pauli.Z, Pauli.Y, Pauli.X]),
+            coeff=1,
+        )
     )
     pauli_error.phase = 2
     assert abs(effective_error_dist.pauli_error_counter[pauli_error] - 4900) < 100
@@ -757,7 +781,12 @@ def test_to_from_qps() -> None:
         qubits=qubits,
         paulis=paulis,
     )
-    stab = QermitPauli.from_qubit_pauli_string(qubit_pauli_string)
+    stab = QermitPauli.from_qubit_pauli_tensor(
+        QubitPauliTensor(
+            string=qubit_pauli_string,
+            coeff=1,
+        )
+    )
     assert stab.qubit_pauli_tensor.string == qubit_pauli_string
     assert stab.qubit_pauli_tensor.coeff == 1 + 0j
 

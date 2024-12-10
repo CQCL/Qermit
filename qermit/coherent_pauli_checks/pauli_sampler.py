@@ -8,7 +8,7 @@ from numpy.random import Generator
 from pytket import Circuit
 from pytket._tket.unit_id import UnitID
 from pytket.circuit import Bit, CircBox, Command, OpType, Qubit
-from pytket.pauli import Pauli, QubitPauliString
+from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor
 
 from qermit.noise_model.noise_model import NoiseModel
 from qermit.noise_model.qermit_pauli import QermitPauli
@@ -347,6 +347,8 @@ class OptimalPauliSampler(PauliSampler):
         #     )
 
         return [
-            QermitPauli.from_qubit_pauli_string(smallest_commute_prob_pauli)
+            QermitPauli.from_qubit_pauli_tensor(
+                QubitPauliTensor(string=smallest_commute_prob_pauli, coeff=1)
+            )
             for smallest_commute_prob_pauli in smallest_commute_prob_pauli_list
         ]
