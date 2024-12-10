@@ -24,6 +24,8 @@ class QermitPauli:
         3: 0 - 1j,
     }
 
+    coeff_to_phase = {1 + 0j: 0, 0 + 1j: 1, -1 + 0j: 2, 0 - 1j: 3}
+
     def __init__(
         self,
         Z_list: List[int],
@@ -107,11 +109,11 @@ class QermitPauli:
         :return: Pauli created from qubit pauli string.
         """
 
-        coeff_to_phase = {1 + 0j: 0, 0 + 1j: 1, -1 + 0j: 2, 0 - 1j: 3}
+        # coeff_to_phase = {1 + 0j: 0, 0 + 1j: 1, -1 + 0j: 2, 0 - 1j: 3}
 
         Z_list = []
         X_list = []
-        phase = coeff_to_phase[qpt.coeff]
+        phase = cls.coeff_to_phase[qpt.coeff]
         qubit_list = []
 
         qps = qpt.string
@@ -403,20 +405,27 @@ class QermitPauli:
         # TODO: in the case that this is secretly a controlled Y a controlled
         # Y should be applied. Otherwise there is additional noise added in
         # the case of a CY.
-        for qubit in self.qubit_list:
+        phase = self.coeff_to_phase[self.qubit_pauli_tensor.coeff]
+        for qubit, pauli in self.qubit_pauli_tensor.string.map.items():
             circ.add_qubit(id=qubit)
-            if self.Z_list[qubit] == 1:
+
+            if pauli == Pauli.Z or pauli == Pauli.Y:
                 circ.CZ(
                     control_qubit=control_qubit,
                     target_qubit=qubit,
                     opgroup="pauli check",
                 )
-            if self.X_list[qubit] == 1:
+
+            if pauli == Pauli.X or pauli == Pauli.Y:
                 circ.CX(
                     control_qubit=control_qubit,
                     target_qubit=qubit,
                     opgroup="pauli check",
                 )
+
+            if pauli == Pauli.Y:
+                phase += 2
+                phase %= 4
 
         for _ in range(self.phase):
             circ.S(
