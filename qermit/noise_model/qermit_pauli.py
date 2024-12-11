@@ -29,27 +29,38 @@ class QermitPauli:
 
     def __init__(
         self,
-        Z_list: List[int],
-        X_list: List[int],
-        qubit_list: List[Qubit],
+        Z_list: list[int],
+        X_list: list[int],
+        qubit_list: list[Qubit],
         phase: int = 0,
     ):
-        """Initialisation is by a list of qubits, and lists of 0, 1
-        values indicating that a Z or X operator acts there.
+        coeff = self.phase_dict[phase]
 
-        :param Z_list: 0 indicates no Z, 1 indicates Z.
-        :param X_list: 0 indicates no X, 1 indicates X.
-        :param qubit_list: List of qubits on which the Pauli acts.
-        :param phase: Phase as a power of i
-        """
-
-        assert all([Z in {0, 1} for Z in Z_list])
-        assert len(Z_list) == len(qubit_list)
-
-        self.Z_list = {qubit: Z for qubit, Z in zip(qubit_list, Z_list)}
-        self.X_list = {qubit: X for qubit, X in zip(qubit_list, X_list)}
-        self.phase = phase
         self.qubit_list = qubit_list
+
+        self.unitary_tableau = UnitaryTableau(nqb=len(qubit_list))
+
+        self.qubit_index = {qubit: Qubit(i) for i, qubit in enumerate(qubit_list)}
+        self.index_qubit = {Qubit(i): qubit for i, qubit in enumerate(qubit_list)}
+
+        paulis = []
+
+        for Z, X in zip(Z_list, X_list):
+            if X and Z:
+                paulis.append(Pauli.Y)
+                coeff *= -1j
+            elif X:
+                paulis.append(Pauli.X)
+            elif Z:
+                paulis.append(Pauli.Z)
+            else:
+                paulis.append(Pauli.I)
+
+        self.input_pauli_tensor = QubitPauliTensor(
+            qubits=[qubit_index for qubit_index in self.qubit_index.values()],
+            paulis=paulis,
+            coeff=coeff,
+        )
 
     def is_measureable(self, qubit_list: List[Qubit]) -> bool:
         """Checks if this Pauli would be measurable on the given qubits in the
@@ -108,8 +119,6 @@ class QermitPauli:
         :param qps: Qubit pauli string to be converted to a Pauli.
         :return: Pauli created from qubit pauli string.
         """
-
-        # coeff_to_phase = {1 + 0j: 0, 0 + 1j: 1, -1 + 0j: 2, 0 - 1j: 3}
 
         Z_list = []
         X_list = []
@@ -184,226 +193,83 @@ class QermitPauli:
                 qubits=command.qubits,
             )
 
-    def apply_gate(self, op: Op, qubits: List[Qubit]):
-        """Apply operation of given type to given qubit in the pauli. At
-        present the recognised operation types are H, S, CX, Z, Sdg,
-        X, Y, CZ, SWAP, and Barrier.
+    def apply_gate(self, op: Op, qubits: list[Qubit]):
+        if not op.is_clifford():
+            raise Exception(f"{op} is not a Clifford operation.")
 
-        :param op_type: Type of operator to be applied.
-        :param qubits: Qubits to which operator is applied.
-        :raises Exception: Raised if operator is not recognised.
-        """
-
-        if op.type == OpType.H:
-            self._H(qubit=qubits[0])
-        elif op.type == OpType.S:
-            self._S(qubit=qubits[0])
-        elif op.type == OpType.CX:
-            self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
-        elif op.type == OpType.Z:
-            self._S(qubit=qubits[0])
-            self._S(qubit=qubits[0])
-        elif op.type == OpType.Sdg:
-            self._S(qubit=qubits[0])
-            self._S(qubit=qubits[0])
-            self._S(qubit=qubits[0])
-        elif op.type == OpType.X:
-            self._H(qubit=qubits[0])
-            self.apply_gate(op=Op.create(OpType.Z), qubits=qubits)
-            self._H(qubit=qubits[0])
-        elif op.type == OpType.Y:
-            self.apply_gate(op=Op.create(OpType.Z), qubits=qubits)
-            self.apply_gate(op=Op.create(OpType.X), qubits=qubits)
-        elif op.type == OpType.CZ:
-            self._H(qubit=qubits[1])
-            self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
-            self._H(qubit=qubits[1])
-        elif op.type == OpType.SWAP:
-            self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
-            self._CX(control_qubit=qubits[1], target_qubit=qubits[0])
-            self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
-        elif op.type == OpType.PhasedX:
-            if all(
-                math.isclose(param % 0.5, 0) or math.isclose(param % 0.5, 0.5)
-                for param in op.params
-            ):
-                self.apply_gate(op=Op.create(OpType.Rz, [-op.params[1]]), qubits=qubits)
-                self.apply_gate(op=Op.create(OpType.Rx, [op.params[0]]), qubits=qubits)
-                self.apply_gate(op=Op.create(OpType.Rz, [op.params[1]]), qubits=qubits)
-            else:
-                raise Exception(
-                    f"{op.params} are not clifford angles for " + "PhasedX."
-                )
-        elif op.type == OpType.Rz:
-            angle = op.params[0]
-            if math.isclose(angle % 0.5, 0) or math.isclose(angle % 0.5, 0.5):
-                angle = round(angle, 1)
-                for _ in range(int((angle % 2) // 0.5)):
-                    self._S(qubit=qubits[0])
-            else:
-                raise Exception(f"{angle} is not a clifford angle.")
-        elif op.type == OpType.Rx:
-            angle = op.params[0]
-            if math.isclose(angle % 0.5, 0) or math.isclose(angle % 0.5, 0.5):
-                angle = round(angle, 1)
-                self._H(qubit=qubits[0])
-                for _ in range(int((angle % 2) // 0.5)):
-                    self._S(qubit=qubits[0])
-                self._H(qubit=qubits[0])
-            else:
-                raise Exception(f"{angle} is not a clifford angle.")
-        elif op.type == OpType.ZZMax:
-            self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
-            self._S(qubit=qubits[1])
-            self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
-        elif op.type == OpType.ZZPhase:
-            angle = op.params[0]
-            if math.isclose(angle % 0.5, 0) or math.isclose(angle % 0.5, 0.5):
-                angle = round(angle, 1)
-                for _ in range(int((angle % 2) // 0.5)):
-                    self.apply_gate(op=Op.create(OpType.ZZMax), qubits=qubits)
-            else:
-                raise Exception(f"{angle} is not a clifford angle.")
-        elif op.type == OpType.Barrier:
-            pass
-        else:
-            raise Exception(
-                f"{op.type} is an unrecognised gate type. "
-                + "Please use only Clifford gates."
+        if op.is_clifford_type():
+            self.unitary_tableau.apply_gate_at_end(
+                type=op.type,
+                qbs=[self.qubit_index[qubit] for qubit in qubits],
             )
 
-    def _S(self, qubit: Qubit):
-        """Act S operation on the pauli. In particular this transforms
-        the pauli (i)^{phase}X^{X_liist}Z^{Z_list} to
-        (i)^{phase}SX^{X_liist}Z^{Z_list}S^{dagger}.
+        elif op.type == OpType.Rz:
+            for _ in range(int((op.params[0] % 2) // 0.5)):
+                self.apply_gate(op=Op.create(OpType.S), qubits=qubits)
 
-        :param qubit: Qubit in Pauli onto which S is acted.
-        """
+        elif op.type == OpType.Rx:
+            self.apply_gate(op=Op.create(OpType.H), qubits=qubits)
+            for _ in range(int((op.params[0] % 2) // 0.5)):
+                self.apply_gate(op=Op.create(OpType.S), qubits=qubits)
+            self.apply_gate(op=Op.create(OpType.H), qubits=qubits)
 
-        self.Z_list[qubit] += self.X_list[qubit]
-        self.Z_list[qubit] %= 2
-        self.phase += self.X_list[qubit]
-        self.phase %= 4
+        elif op.type == OpType.PhasedX:
+            self.apply_gate(op=Op.create(OpType.Rz, [-op.params[1]]), qubits=qubits)
+            self.apply_gate(op=Op.create(OpType.Rx, [op.params[0]]), qubits=qubits)
+            self.apply_gate(op=Op.create(OpType.Rz, [op.params[1]]), qubits=qubits)
 
-    def _H(self, qubit: Qubit):
-        """Act H operation. In particular this transforms
-        the Pauli (i)^{phase}X^{X_liist}Z^{Z_list} to
-        H(i)^{phase}X^{X_liist}Z^{Z_list}H^{dagger}.
+        elif op.type == OpType.ZZMax:
+            self.apply_gate(op=Op.create(OpType.CX), qubits=qubits)
+            self.apply_gate(op=Op.create(OpType.S), qubits=[qubits[1]])
+            self.apply_gate(op=Op.create(OpType.CX), qubits=qubits)
 
-        :param qubit: Qubit in Pauli on which H is acted.
-        """
+        elif op.type == OpType.ZZPhase:
+            for _ in range(int((op.params[0] % 2) // 0.5)):
+                self.apply_gate(op=Op.create(OpType.ZZMax), qubits=qubits)
 
-        self.phase += 2 * self.X_list[qubit] * self.Z_list[qubit]
-        self.phase %= 4
-
-        temp_X = self.X_list[qubit]
-        self.X_list[qubit] = self.Z_list[qubit]
-        self.Z_list[qubit] = temp_X
-
-    def _CX(self, control_qubit: Qubit, target_qubit: Qubit):
-        """Act CX operation. In particular this transforms
-        the Pauli (i)^{phase}X^{X_liist}Z^{Z_list} to
-        CX(i)^{phase}X^{X_liist}Z^{Z_list}CX^{dagger}.
-
-        :param control_qubit: Control qubit of CX gate.
-        :param target_qubit: Target qubit of CX gate.
-        """
-
-        self.Z_list[control_qubit] += self.Z_list[target_qubit]
-        self.Z_list[control_qubit] %= 2
-        self.X_list[target_qubit] += self.X_list[control_qubit]
-        self.X_list[target_qubit] %= 2
-
-    def pre_apply_pauli(self, pauli: Union[Pauli, OpType], qubit: Qubit):
-        """Pre apply by a pauli on a particular qubit.
-
-        :param pauli: Pauli to pre-apply.
-        :param qubit: Qubit to apply Pauli to.
-        :raises Exception: Raised if pauli is not a pauli operation.
-        """
-
-        if pauli in [Pauli.X, OpType.X]:
-            self.pre_apply_X(qubit)
-        elif pauli in [Pauli.Z, OpType.Z]:
-            self.pre_apply_Z(qubit)
-        elif pauli in [Pauli.Y, OpType.Y]:
-            self.pre_apply_X(qubit)
-            self.pre_apply_Z(qubit)
-            self.phase += 1
-            self.phase %= 4
-        elif pauli == Pauli.I:
-            pass
         else:
-            raise Exception(f"{pauli} is not a Pauli.")
+            raise NotImplementedError(
+                f"{op} if clifford but is not supported. "
+                "Please request the developers support this operation."
+            )
 
-    def pre_apply_X(self, qubit: Qubit):
-        """Pre-apply X Pauli ito qubit.
+    def pre_apply_pauli(self, pauli, qubit):
+        mult_string, mult_coeff = pauli_string_mult(
+            qubitpaulistring1=self.qubit_pauli_tensor.string,
+            qubitpaulistring2=QubitPauliString(qubit=qubit, pauli=pauli),
+        )
+        mult_string_map = {
+            self.qubit_index[qubit]: pauli for qubit, pauli in mult_string.map.items()
+        }
+        mult_string = QubitPauliString(map=mult_string_map)
 
-        :param qubit: Qubit to which X is pre-applied.
-        """
+        self.input_pauli_tensor = QubitPauliTensor(
+            string=mult_string, coeff=self.qubit_pauli_tensor.coeff * mult_coeff
+        )
 
-        self.X_list[qubit] += 1
-        self.X_list[qubit] %= 2
-        self.phase += 2 * self.Z_list[qubit]
-        self.phase %= 4
+        self.unitary_tableau = UnitaryTableau(nqb=len(self.qubit_list))
 
-    def pre_apply_Z(self, qubit: Qubit):
-        """Pre-apply Z Pauli ito qubit.
+    def post_apply_pauli(self, pauli, qubit):
+        mult_string, mult_coeff = pauli_string_mult(
+            qubitpaulistring1=QubitPauliString(qubit=qubit, pauli=pauli),
+            qubitpaulistring2=self.qubit_pauli_tensor.string,
+        )
+        mult_string_map = {
+            self.qubit_index[qubit]: pauli for qubit, pauli in mult_string.map.items()
+        }
+        mult_string = QubitPauliString(map=mult_string_map)
 
-        :param qubit: Qubit to which Z is pre-applied.
-        """
+        self.input_pauli_tensor = QubitPauliTensor(
+            string=mult_string, coeff=self.qubit_pauli_tensor.coeff * mult_coeff
+        )
 
-        self.Z_list[qubit] += 1
-        self.Z_list[qubit] %= 2
-
-    def post_apply_pauli(self, pauli: Union[Pauli, OpType], qubit: Qubit):
-        """Post apply a Pauli operation.
-
-        :param pauli: Pauli to post-apply.
-        :param qubit: Qubit to post-apply pauli to.
-        :raises Exception: Raised if pauli is not a Pauli operation.
-        """
-
-        if pauli in [Pauli.X, OpType.X]:
-            self.post_apply_X(qubit)
-        elif pauli in [Pauli.Z, OpType.Z]:
-            self.post_apply_Z(qubit)
-        elif pauli in [Pauli.Y, OpType.Y]:
-            self.post_apply_Z(qubit)
-            self.post_apply_X(qubit)
-            self.phase += 1
-            self.phase %= 4
-        elif pauli == Pauli.I:
-            pass
-        else:
-            raise Exception(f"{pauli} is not a Pauli.")
-
-    def post_apply_X(self, qubit: Qubit):
-        """Post-apply X Pauli ito qubit.
-
-        :param qubit: Qubit to which X is post-applied.
-        """
-
-        self.X_list[qubit] += 1
-        self.X_list[qubit] %= 2
-
-    def post_apply_Z(self, qubit: Qubit):
-        """Post-apply Z Pauli ito qubit.
-
-        :param qubit: Qubit to which Z is post-applied.
-        """
-
-        self.Z_list[qubit] += 1
-        self.Z_list[qubit] %= 2
-        self.phase += 2 * self.X_list[qubit]
-        self.phase %= 4
+        self.unitary_tableau = UnitaryTableau(nqb=len(self.qubit_list))
 
     def get_control_circuit(self, control_qubit: Qubit) -> Circuit:
         """Controlled circuit which acts Pauli.
 
         :return: Controlled circuit acting Paulii.
         """
-
         circ = Circuit()
         circ.add_qubit(control_qubit)
         # TODO: in the case that this is secretly a controlled Y a controlled
@@ -445,7 +311,6 @@ class QermitPauli:
 
         :return: Circuit acting Pauli.
         """
-
         circ = Circuit()
 
         phase = self.coeff_to_phase[self.qubit_pauli_tensor.coeff]
@@ -468,30 +333,19 @@ class QermitPauli:
         return circ
 
     @property
-    def qubit_pauli_tensor(self) -> QubitPauliTensor:
-        """Return QubitPauliTensor describing Pauli.
-
-        :return: QubitPauliTensor describing Pauli.
-        """
-
-        operator_phase = self.phase
-        paulis = []
-        for X, Z in zip(self.X_list.values(), self.Z_list.values()):
-            if X == 0 and Z == 0:
-                paulis.append(Pauli.I)
-            elif X == 1 and Z == 0:
-                paulis.append(Pauli.X)
-            elif X == 0 and Z == 1:
-                paulis.append(Pauli.Z)
-            elif X == 1 and Z == 1:
-                paulis.append(Pauli.Y)
-                operator_phase += 3
-                operator_phase %= 4
-
+    def qubit_pauli_tensor(self):
+        mislabled_qpt = self.unitary_tableau.get_row_product(
+            paulis=self.input_pauli_tensor
+        )
+        correct_map = {
+            qubit: mislabled_qpt.string.map.get(index, Pauli.I)
+            for index, qubit in self.index_qubit.items()
+        }
         return QubitPauliTensor(
-            qubits=self.qubit_list,
-            paulis=paulis,
-            coeff=self.phase_dict[operator_phase],
+            string=QubitPauliString(
+                map=correct_map,
+            ),
+            coeff=mislabled_qpt.coeff,
         )
 
     @classmethod
