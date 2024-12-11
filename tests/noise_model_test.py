@@ -558,7 +558,7 @@ def test_qermit_pauli_circuit() -> None:
     L = QermitPauli(Z_list=[1, 1, 1], X_list=[0, 0, 0], qubit_list=circ.qubits)
     L_circ = L.circuit
 
-    R = deepcopy(L)
+    R = QermitPauli(Z_list=[1, 1, 1], X_list=[0, 0, 0], qubit_list=circ.qubits)
     R.apply_circuit(circ)
     R_circ = R.circuit
 
@@ -580,9 +580,12 @@ def test_initialisation() -> None:
         X_list=[0, 0, 0],
         qubit_list=qubit_list,
     )
-    assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 1}
-    assert pauli.phase == 0
+    assert pauli.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={Qubit(0): Pauli.I, Qubit(1): Pauli.I, Qubit(2): Pauli.Z}
+        ),
+        coeff=1,
+    )
 
 
 def test_identity_clifford() -> None:

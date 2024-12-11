@@ -238,7 +238,6 @@ class RandomPauliSampler(PauliSampler):
         :return: Random Pauli of length equal to the size of the circuit.
         """
         # TODO: Make sure sampling is done without replacement
-
         stabiliser_list: List[QermitPauli] = []
         while len(stabiliser_list) < self.n_checks:
             Z_list = [self.rng.integers(2) for _ in circ.qubits]

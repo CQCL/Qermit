@@ -7,7 +7,8 @@ from typing import Dict, List, Tuple, Union
 import numpy as np
 from numpy.random import Generator
 from pytket.circuit import Circuit, Op, OpType, Qubit
-from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor
+from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor, pauli_string_mult
+from pytket.tableau import UnitaryTableau
 
 
 class QermitPauli:
@@ -93,7 +94,6 @@ class QermitPauli:
 
         :return: Conjugate transpose of the Pauli.
         """
-
         return QermitPauli.from_qubit_pauli_tensor(
             qpt=QubitPauliTensor(
                 string=self.qubit_pauli_tensor.string,
@@ -428,10 +428,10 @@ class QermitPauli:
                 )
 
             if pauli == Pauli.Y:
-                phase += 2
+                phase += 1
                 phase %= 4
 
-        for _ in range(self.phase):
+        for _ in range(phase):
             circ.S(
                 control_qubit,
                 opgroup="phase correction",
@@ -460,10 +460,10 @@ class QermitPauli:
                 circ.X(qubit)
 
             if pauli == Pauli.Y:
-                phase += 2
+                phase += 1
                 phase %= 4
 
-        circ.add_phase(a=self.phase / 2)
+        circ.add_phase(a=phase / 2)
 
         return circ
 
