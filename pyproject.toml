@@ -18,6 +18,7 @@ python = ">=3.10,<3.14"
 pytket-qiskit = "^0.60.0"
 matplotlib = "^3.8.3"
 qulacs = "^0.6.11"
+projectq = "^0.7.0"
 
 pytest = { version = "^8.1.1", optional = true }
 mypy = { version = "^1.9.0", optional = true }
@@ -30,7 +31,6 @@ furo = { version = "^2024.8.6", optional = true }
 myst-nb = { version = "^1.1.2", optional = true}
 sphinx-autodoc-typehints = { version = "^2.5.0", optional = true }
 jupyter-sphinx = { version = "^0.5.3", optional = true}
-projectq = "^0.8.0"
 
 [tool.poetry.extras]
 tests = [
