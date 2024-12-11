@@ -665,9 +665,8 @@ class NoiseModel:
             if direction == Direction.forward:
                 # Apply gate to total error.
                 pauli_error.apply_gate(
-                    op_type=command.op.type,
+                    op=command.op,
                     qubits=cast(List[Qubit], command.args),
-                    params=command.op.params,
                 )
             # Add noise operation if appropriate.
             if command.op.type in self.noisy_gates:
@@ -694,9 +693,8 @@ class NoiseModel:
                 # which has the same effect on the pauli as pushing through the
                 # dagger.
                 pauli_error.apply_gate(
-                    op_type=command.op.dagger.type,
+                    op=command.op.dagger,
                     qubits=cast(List[Qubit], command.args),
-                    params=command.op.dagger.params,
                 )
 
         return pauli_error

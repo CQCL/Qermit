@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple, Union
 
 import numpy as np
 from numpy.random import Generator
-from pytket.circuit import Circuit, OpType, Qubit
+from pytket.circuit import Circuit, Op, OpType, Qubit
 from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor
 
 
@@ -172,13 +172,19 @@ class QermitPauli:
         for command in circuit.get_commands():
             if command.op.type == OpType.Barrier:
                 continue
+
+            if command.qubits != command.args:
+                raise Exception(
+                    "Circuit must be purely quantum."
+                    f"The given circuit acts on bits {command.bits}"
+                )
+
             self.apply_gate(
-                op_type=command.op.type,
+                op=command.op,
                 qubits=command.qubits,
-                params=command.op.params,
             )
 
-    def apply_gate(self, op_type: OpType, qubits: List[Qubit], **kwargs):
+    def apply_gate(self, op: Op, qubits: List[Qubit]):
         """Apply operation of given type to given qubit in the pauli. At
         present the recognised operation types are H, S, CX, Z, Sdg,
         X, Y, CZ, SWAP, and Barrier.
@@ -188,57 +194,56 @@ class QermitPauli:
         :raises Exception: Raised if operator is not recognised.
         """
 
-        if op_type == OpType.H:
+        if op.type == OpType.H:
             self._H(qubit=qubits[0])
-        elif op_type == OpType.S:
+        elif op.type == OpType.S:
             self._S(qubit=qubits[0])
-        elif op_type == OpType.CX:
+        elif op.type == OpType.CX:
             self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
-        elif op_type == OpType.Z:
+        elif op.type == OpType.Z:
             self._S(qubit=qubits[0])
             self._S(qubit=qubits[0])
-        elif op_type == OpType.Sdg:
+        elif op.type == OpType.Sdg:
             self._S(qubit=qubits[0])
             self._S(qubit=qubits[0])
             self._S(qubit=qubits[0])
-        elif op_type == OpType.X:
+        elif op.type == OpType.X:
             self._H(qubit=qubits[0])
-            self.apply_gate(op_type=OpType.Z, qubits=qubits)
+            self.apply_gate(op=Op.create(OpType.Z), qubits=qubits)
             self._H(qubit=qubits[0])
-        elif op_type == OpType.Y:
-            self.apply_gate(op_type=OpType.Z, qubits=qubits)
-            self.apply_gate(op_type=OpType.X, qubits=qubits)
-        elif op_type == OpType.CZ:
+        elif op.type == OpType.Y:
+            self.apply_gate(op=Op.create(OpType.Z), qubits=qubits)
+            self.apply_gate(op=Op.create(OpType.X), qubits=qubits)
+        elif op.type == OpType.CZ:
             self._H(qubit=qubits[1])
             self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
             self._H(qubit=qubits[1])
-        elif op_type == OpType.SWAP:
+        elif op.type == OpType.SWAP:
             self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
             self._CX(control_qubit=qubits[1], target_qubit=qubits[0])
             self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
-        elif op_type == OpType.PhasedX:
-            params = kwargs.get("params", None)
+        elif op.type == OpType.PhasedX:
             if all(
                 math.isclose(param % 0.5, 0) or math.isclose(param % 0.5, 0.5)
-                for param in params
+                for param in op.params
             ):
-                self.apply_gate(OpType.Rz, qubits=qubits, params=[-params[1]])
-                self.apply_gate(OpType.Rx, qubits=qubits, params=[params[0]])
-                self.apply_gate(OpType.Rz, qubits=qubits, params=[params[1]])
+                self.apply_gate(op=Op.create(OpType.Rz, [-op.params[1]]), qubits=qubits)
+                self.apply_gate(op=Op.create(OpType.Rx, [op.params[0]]), qubits=qubits)
+                self.apply_gate(op=Op.create(OpType.Rz, [op.params[1]]), qubits=qubits)
             else:
-                raise Exception(f"{params} are not clifford angles for " + "PhasedX.")
-        elif op_type == OpType.Rz:
-            params = kwargs.get("params", None)
-            angle = params[0]
+                raise Exception(
+                    f"{op.params} are not clifford angles for " + "PhasedX."
+                )
+        elif op.type == OpType.Rz:
+            angle = op.params[0]
             if math.isclose(angle % 0.5, 0) or math.isclose(angle % 0.5, 0.5):
                 angle = round(angle, 1)
                 for _ in range(int((angle % 2) // 0.5)):
                     self._S(qubit=qubits[0])
             else:
                 raise Exception(f"{angle} is not a clifford angle.")
-        elif op_type == OpType.Rx:
-            params = kwargs.get("params", None)
-            angle = params[0]
+        elif op.type == OpType.Rx:
+            angle = op.params[0]
             if math.isclose(angle % 0.5, 0) or math.isclose(angle % 0.5, 0.5):
                 angle = round(angle, 1)
                 self._H(qubit=qubits[0])
@@ -247,24 +252,23 @@ class QermitPauli:
                 self._H(qubit=qubits[0])
             else:
                 raise Exception(f"{angle} is not a clifford angle.")
-        elif op_type == OpType.ZZMax:
+        elif op.type == OpType.ZZMax:
             self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
             self._S(qubit=qubits[1])
             self._CX(control_qubit=qubits[0], target_qubit=qubits[1])
-        elif op_type == OpType.ZZPhase:
-            params = kwargs.get("params", None)
-            angle = params[0]
+        elif op.type == OpType.ZZPhase:
+            angle = op.params[0]
             if math.isclose(angle % 0.5, 0) or math.isclose(angle % 0.5, 0.5):
                 angle = round(angle, 1)
                 for _ in range(int((angle % 2) // 0.5)):
-                    self.apply_gate(op_type=OpType.ZZMax, qubits=qubits)
+                    self.apply_gate(op=Op.create(OpType.ZZMax), qubits=qubits)
             else:
                 raise Exception(f"{angle} is not a clifford angle.")
-        elif op_type == OpType.Barrier:
+        elif op.type == OpType.Barrier:
             pass
         else:
             raise Exception(
-                f"{op_type} is an unrecognised gate type. "
+                f"{op.type} is an unrecognised gate type. "
                 + "Please use only Clifford gates."
             )
 

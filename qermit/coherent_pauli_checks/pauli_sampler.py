@@ -124,9 +124,8 @@ class PauliSampler(ABC):
                         # is not Clifford. It could be worth raising a clearer
                         # error.
                         end_stabiliser.apply_gate(
-                            clifford_command.op.type,
-                            clifford_command.qubits,
-                            params=clifford_command.op.params,
+                            op=clifford_command.op,
+                            qubits=clifford_command.qubits,
                         )
 
                     pauli_check_circuit.add_barrier(command.args + [control_qubit])
