@@ -1,11 +1,7 @@
 from __future__ import annotations
 
-import math
-from collections.abc import Iterable
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List
 
-import numpy as np
-from numpy.random import Generator
 from pytket.circuit import Circuit, Op, OpType, Qubit
 from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor, pauli_string_mult
 from pytket.tableau import UnitaryTableau
