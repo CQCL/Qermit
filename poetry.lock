@@ -2253,6 +2253,30 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "projectq"
+version = "0.8.0"
+description = "ProjectQ - An open source software framework for quantum computing"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "projectq-0.8.0.tar.gz", hash = "sha256:0bcd242afabe947ac4737dffab1de62628b84125ee6ccb3ec23bd4f1d082ec60"},
+]
+
+[package.dependencies]
+matplotlib = ">=2.2.3"
+networkx = ">=2"
+numpy = "*"
+requests = "*"
+scipy = "*"
+
+[package.extras]
+azure-quantum = ["azure-quantum"]
+braket = ["boto3"]
+docs = ["sphinx", "sphinx_rtd_theme"]
+revkit = ["dormouse", "revkit (==3.0a2.dev2)"]
+test = ["flaky", "mock", "pytest (>=6.0)", "pytest-cov", "pytest-mock"]
+
+[[package]]
 name = "prompt-toolkit"
 version = "3.0.48"
 description = "Library for building powerful interactive command lines in Python"
@@ -4245,4 +4269,4 @@ tests = ["mypy", "pytest", "pytest-cov", "pytket-quantinuum", "qiskit-ibm-provid
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.14"
-content-hash = "15c0d2722625025e8e8290f48766f172a993fdb89dd4c4f83b05e7a0dec3d27a"
+content-hash = "b3da9668630723c6def5e311d38009bd63b1a9f488469e9bfc142113e1dffad8"
