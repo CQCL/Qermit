@@ -1,7 +1,6 @@
 import json
 import multiprocessing as mp
 from collections import Counter
-from copy import deepcopy
 from itertools import product
 
 import numpy as np
@@ -560,10 +559,9 @@ def test_effective_error_distribution() -> None:
     pauli_error = QermitPauli.from_qubit_pauli_tensor(
         QubitPauliTensor(
             string=QubitPauliString(qubits=qubits, paulis=[Pauli.Z, Pauli.Y, Pauli.X]),
-            coeff=1,
+            coeff=1j,
         )
     )
-    pauli_error.phase = 2
     assert abs(effective_error_dist.pauli_error_counter[pauli_error] - 4900) < 100
 
 
