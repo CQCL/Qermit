@@ -8,7 +8,7 @@ from pytket import Circuit, OpType
 from pytket.circuit import Bit, CircBox, Qubit
 from pytket.extensions.qiskit import AerBackend
 from pytket.passes import DecomposeBoxes
-from pytket.pauli import Pauli, QubitPauliString
+from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor
 
 from qermit import CircuitShots
 from qermit.coherent_pauli_checks import (
@@ -802,11 +802,11 @@ def test_optimal_pauli_sampler():
         circ=cliff_circ,
     )
 
-    assert stab[0] == QermitPauli(
-        Z_list=[0, 0, 1],
-        X_list=[0, 0, 1],
-        qubit_list=qubits,
-        phase=1,
+    assert stab[0] == QermitPauli.from_qubit_pauli_tensor(
+        QubitPauliTensor(
+            string=QubitPauliString(qubits=qubits, paulis=[Pauli.I, Pauli.I, Pauli.Y]),
+            coeff=1,
+        )
     )
 
     # TODO: an assert is needed for this last part
@@ -836,10 +836,14 @@ def test_add_ZX_pauli_checks_to_S():
         def sample(self, circ, **kwargs):
             qubit_list = circ.qubits
             return [
-                QermitPauli(
-                    Z_list=[1],
-                    X_list=[1],
-                    qubit_list=qubit_list,
+                QermitPauli.from_qubit_pauli_tensor(
+                    QubitPauliTensor(
+                        string=QubitPauliString(
+                            pauli=Pauli.Y,
+                            qubit=qubit_list[0],
+                        ),
+                        coeff=-1j,
+                    )
                 )
             ]
 
@@ -970,32 +974,41 @@ def test_error_sampler():
     )
     ideal = Counter(
         {
-            QermitPauli(
-                Z_list=[0, 0, 0],
-                X_list=[1, 1, 0],
-                qubit_list=[
-                    Qubit(name="ancilla", index=0),
-                    Qubit(name="my_reg", index=0),
-                    Qubit(name="my_reg", index=1),
-                ],
+            QermitPauli.from_qubit_pauli_tensor(
+                QubitPauliTensor(
+                    string=QubitPauliString(
+                        map={
+                            Qubit(name="ancilla", index=0): Pauli.X,
+                            Qubit(name="my_reg", index=0): Pauli.X,
+                            Qubit(name="my_reg", index=1): Pauli.I,
+                        }
+                    ),
+                    coeff=1,
+                )
             ): 190,
-            QermitPauli(
-                Z_list=[0, 0, 0],
-                X_list=[1, 0, 1],
-                qubit_list=[
-                    Qubit(name="ancilla", index=0),
-                    Qubit(name="my_reg", index=0),
-                    Qubit(name="my_reg", index=1),
-                ],
+            QermitPauli.from_qubit_pauli_tensor(
+                QubitPauliTensor(
+                    string=QubitPauliString(
+                        map={
+                            Qubit(name="ancilla", index=0): Pauli.X,
+                            Qubit(name="my_reg", index=0): Pauli.I,
+                            Qubit(name="my_reg", index=1): Pauli.X,
+                        }
+                    ),
+                    coeff=1,
+                )
             ): 164,
-            QermitPauli(
-                Z_list=[0, 0, 0],
-                X_list=[0, 1, 1],
-                qubit_list=[
-                    Qubit(name="ancilla", index=0),
-                    Qubit(name="my_reg", index=0),
-                    Qubit(name="my_reg", index=1),
-                ],
+            QermitPauli.from_qubit_pauli_tensor(
+                QubitPauliTensor(
+                    string=QubitPauliString(
+                        map={
+                            Qubit(name="ancilla", index=0): Pauli.X,
+                            Qubit(name="my_reg", index=0): Pauli.X,
+                            Qubit(name="my_reg", index=1): Pauli.X,
+                        }
+                    ),
+                    coeff=1,
+                )
             ): 81,
         }
     )

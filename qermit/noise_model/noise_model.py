@@ -12,7 +12,7 @@ from numpy.random import Generator
 from numpy.typing import NDArray
 from pytket import Circuit, Qubit
 from pytket.circuit import OpType
-from pytket.pauli import Pauli, QubitPauliString
+from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor
 from scipy.linalg import fractional_matrix_power  # type: ignore
 
 from .qermit_pauli import QermitPauli
@@ -636,13 +636,13 @@ class NoiseModel:
         :raises Exception: Raised if direction is invalid.
         :return: Resulting logical error.
         """
-
-        # Create identity error.
-        qubit_list = cliff_circ.qubits
-        pauli_error = QermitPauli(
-            Z_list=[0] * len(qubit_list),
-            X_list=[0] * len(qubit_list),
-            qubit_list=qubit_list,
+        pauli_error = QermitPauli.from_qubit_pauli_tensor(
+            QubitPauliTensor(
+                string=QubitPauliString(
+                    map={qubit: Pauli.I for qubit in cliff_circ.qubits}
+                ),
+                coeff=1,
+            )
         )
 
         # Commands are ordered in reverse or original order depending on which

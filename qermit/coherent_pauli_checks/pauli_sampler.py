@@ -188,10 +188,13 @@ class DeterministicZPauliSampler(PauliSampler):
         :return: Z Pauli string of length equal to the circuit.
         """
         return [
-            QermitPauli(
-                Z_list=[1] * circ.n_qubits,
-                X_list=[0] * circ.n_qubits,
-                qubit_list=circ.qubits,
+            QermitPauli.from_qubit_pauli_tensor(
+                QubitPauliTensor(
+                    string=QubitPauliString(
+                        map={qubit: Pauli.Z for qubit in circ.qubits}
+                    ),
+                    coeff=1,
+                )
             )
         ]
 
@@ -206,10 +209,13 @@ class DeterministicXPauliSampler(PauliSampler):
         :return: X Pauli string of length equal to the circuit.
         """
         return [
-            QermitPauli(
-                Z_list=[0] * circ.n_qubits,
-                X_list=[1] * circ.n_qubits,
-                qubit_list=circ.qubits,
+            QermitPauli.from_qubit_pauli_tensor(
+                QubitPauliTensor(
+                    string=QubitPauliString(
+                        map={qubit: Pauli.X for qubit in circ.qubits}
+                    ),
+                    coeff=1,
+                )
             )
         ]
 
@@ -240,18 +246,19 @@ class RandomPauliSampler(PauliSampler):
         # TODO: Make sure sampling is done without replacement
         stabiliser_list: List[QermitPauli] = []
         while len(stabiliser_list) < self.n_checks:
-            Z_list = [self.rng.integers(2) for _ in circ.qubits]
-            X_list = [self.rng.integers(2) for _ in circ.qubits]
-
-            # Avoids using the identity string as it commutes with all errors
-            if any(Z == 1 for Z in Z_list) or any(X == 1 for X in X_list):
-                stabiliser_list.append(
-                    QermitPauli(
-                        Z_list=Z_list,
-                        X_list=X_list,
-                        qubit_list=circ.qubits,
-                    )
-                )
+            qpt = QubitPauliTensor(
+                string=QubitPauliString(
+                    map={
+                        qubit: self.rng.choice(
+                            numpy.array([Pauli.X, Pauli.Y, Pauli.Z, Pauli.I])
+                        )
+                        for qubit in circ.qubits
+                    }
+                ),
+                coeff=1,
+            )
+            if qpt != QubitPauliTensor():
+                stabiliser_list.append(QermitPauli.from_qubit_pauli_tensor(qpt))
 
         return stabiliser_list
 
