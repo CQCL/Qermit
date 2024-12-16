@@ -8,7 +8,7 @@ from numpy.random import Generator
 from pytket import Circuit
 from pytket._tket.unit_id import UnitID
 from pytket.circuit import Bit, CircBox, Command, OpType, Qubit
-from pytket.pauli import Pauli, QubitPauliString
+from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor
 
 from qermit.noise_model.noise_model import NoiseModel
 from qermit.noise_model.qermit_pauli import QermitPauli
@@ -100,7 +100,7 @@ class PauliSampler(ABC):
                     pauli_check_circuit.add_barrier(command.args + [control_qubit])
 
                 end_stabiliser_list = [
-                    start_stabiliser.dagger()
+                    start_stabiliser.dagger
                     for start_stabiliser in start_stabiliser_list
                 ]
 
@@ -124,9 +124,8 @@ class PauliSampler(ABC):
                         # is not Clifford. It could be worth raising a clearer
                         # error.
                         end_stabiliser.apply_gate(
-                            clifford_command.op.type,
-                            clifford_command.qubits,
-                            params=clifford_command.op.params,
+                            op=clifford_command.op,
+                            qubits=clifford_command.qubits,
                         )
 
                     pauli_check_circuit.add_barrier(command.args + [control_qubit])
@@ -190,9 +189,12 @@ class DeterministicZPauliSampler(PauliSampler):
         """
         return [
             QermitPauli(
-                Z_list=[1] * circ.n_qubits,
-                X_list=[0] * circ.n_qubits,
-                qubit_list=circ.qubits,
+                QubitPauliTensor(
+                    string=QubitPauliString(
+                        map={qubit: Pauli.Z for qubit in circ.qubits}
+                    ),
+                    coeff=1,
+                )
             )
         ]
 
@@ -208,9 +210,12 @@ class DeterministicXPauliSampler(PauliSampler):
         """
         return [
             QermitPauli(
-                Z_list=[0] * circ.n_qubits,
-                X_list=[1] * circ.n_qubits,
-                qubit_list=circ.qubits,
+                QubitPauliTensor(
+                    string=QubitPauliString(
+                        map={qubit: Pauli.X for qubit in circ.qubits}
+                    ),
+                    coeff=1,
+                )
             )
         ]
 
@@ -239,21 +244,21 @@ class RandomPauliSampler(PauliSampler):
         :return: Random Pauli of length equal to the size of the circuit.
         """
         # TODO: Make sure sampling is done without replacement
-
         stabiliser_list: List[QermitPauli] = []
         while len(stabiliser_list) < self.n_checks:
-            Z_list = [self.rng.integers(2) for _ in circ.qubits]
-            X_list = [self.rng.integers(2) for _ in circ.qubits]
-
-            # Avoids using the identity string as it commutes with all errors
-            if any(Z == 1 for Z in Z_list) or any(X == 1 for X in X_list):
-                stabiliser_list.append(
-                    QermitPauli(
-                        Z_list=Z_list,
-                        X_list=X_list,
-                        qubit_list=circ.qubits,
-                    )
-                )
+            qpt = QubitPauliTensor(
+                string=QubitPauliString(
+                    map={
+                        qubit: self.rng.choice(
+                            numpy.array([Pauli.X, Pauli.Y, Pauli.Z, Pauli.I])
+                        )
+                        for qubit in circ.qubits
+                    }
+                ),
+                coeff=1,
+            )
+            if qpt != QubitPauliTensor():
+                stabiliser_list.append(QermitPauli(qpt))
 
         return stabiliser_list
 
@@ -347,6 +352,6 @@ class OptimalPauliSampler(PauliSampler):
         #     )
 
         return [
-            QermitPauli.from_qubit_pauli_string(smallest_commute_prob_pauli)
+            QermitPauli(QubitPauliTensor(string=smallest_commute_prob_pauli, coeff=1))
             for smallest_commute_prob_pauli in smallest_commute_prob_pauli_list
         ]

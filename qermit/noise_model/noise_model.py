@@ -12,7 +12,7 @@ from numpy.random import Generator
 from numpy.typing import NDArray
 from pytket import Circuit, Qubit
 from pytket.circuit import OpType
-from pytket.pauli import Pauli, QubitPauliString
+from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor
 from scipy.linalg import fractional_matrix_power  # type: ignore
 
 from .qermit_pauli import QermitPauli
@@ -99,9 +99,14 @@ class ErrorDistribution:
         # PTM entry as a sum pf error weights multiplied by +/-1
         # Depending on commutation relations.
         for pauli_tuple, index in pauli_index.items():
-            pauli = QermitPauli.from_pauli_iterable(
-                pauli_iterable=pauli_tuple,
-                qubit_list=[Qubit(i) for i in range(self.n_qubits)],
+            pauli = QermitPauli(
+                QubitPauliTensor(
+                    string=QubitPauliString(
+                        paulis=list(pauli_tuple),
+                        qubits=[Qubit(i) for i in range(self.n_qubits)],
+                    ),
+                    coeff=1,
+                )
             )
 
             # Can add the identity error rate.
@@ -111,14 +116,23 @@ class ErrorDistribution:
             ptm[index][index] += self.identity_error_rate
 
             for error, error_rate in self.distribution.items():
-                error_pauli = QermitPauli.from_pauli_iterable(
-                    pauli_iterable=error,
-                    qubit_list=[Qubit(i) for i in range(self.n_qubits)],
+                error_pauli = QermitPauli(
+                    QubitPauliTensor(
+                        string=QubitPauliString(
+                            paulis=list(error),
+                            qubits=[Qubit(i) for i in range(self.n_qubits)],
+                        ),
+                        coeff=1,
+                    )
                 )
-
-                ptm[index][index] += error_rate * QermitPauli.commute_coeff(
-                    pauli_one=pauli, pauli_two=error_pauli
+                commute_coeff = (
+                    1
+                    if pauli.qubit_pauli_tensor.commutes_with(
+                        error_pauli.qubit_pauli_tensor
+                    )
+                    else -1
                 )
+                ptm[index][index] += error_rate * commute_coeff
 
         # Some checks that the form of the PTM is correct.
         identity = tuple(Pauli.I for _ in range(self.n_qubits))
@@ -181,17 +195,32 @@ class ErrorDistribution:
         # is the matrix of commutation values.
         commutation_matrix = np.zeros(ptm.shape)
         for pauli_one_tuple, index_one in pauli_index.items():
-            pauli_one = QermitPauli.from_pauli_iterable(
-                pauli_iterable=pauli_one_tuple,
-                qubit_list=[Qubit(i) for i in range(len(pauli_one_tuple))],
+            pauli_one = QermitPauli(
+                QubitPauliTensor(
+                    string=QubitPauliString(
+                        paulis=list(pauli_one_tuple),
+                        qubits=[Qubit(i) for i in range(len(pauli_one_tuple))],
+                    ),
+                    coeff=1,
+                )
             )
             for pauli_two_tuple, index_two in pauli_index.items():
-                pauli_two = QermitPauli.from_pauli_iterable(
-                    pauli_iterable=pauli_two_tuple,
-                    qubit_list=[Qubit(i) for i in range(len(pauli_two_tuple))],
+                pauli_two = QermitPauli(
+                    QubitPauliTensor(
+                        string=QubitPauliString(
+                            paulis=list(pauli_two_tuple),
+                            qubits=[Qubit(i) for i in range(len(pauli_two_tuple))],
+                        ),
+                        coeff=1,
+                    )
                 )
-                commutation_matrix[index_one][index_two] = QermitPauli.commute_coeff(
-                    pauli_one=pauli_one, pauli_two=pauli_two
+
+                commutation_matrix[index_one][index_two] = (
+                    1
+                    if pauli_one.qubit_pauli_tensor.commutes_with(
+                        pauli_two.qubit_pauli_tensor
+                    )
+                    else -1
                 )
 
         error_rate_list = np.matmul(ptm.diagonal(), np.linalg.inv(commutation_matrix))
@@ -607,7 +636,8 @@ class NoiseModel:
         for _ in range(n_counts):
             pauli_error = self.random_propagate(cliff_circ, **kwargs)
 
-            if not pauli_error.is_identity:
+            # Check if the error is the identity.
+            if pauli_error.qubit_pauli_tensor.string != QubitPauliString():
                 error_counter.update([pauli_error])
 
         return error_counter
@@ -627,13 +657,13 @@ class NoiseModel:
         :raises Exception: Raised if direction is invalid.
         :return: Resulting logical error.
         """
-
-        # Create identity error.
-        qubit_list = cliff_circ.qubits
         pauli_error = QermitPauli(
-            Z_list=[0] * len(qubit_list),
-            X_list=[0] * len(qubit_list),
-            qubit_list=qubit_list,
+            QubitPauliTensor(
+                string=QubitPauliString(
+                    map={qubit: Pauli.I for qubit in cliff_circ.qubits}
+                ),
+                coeff=1,
+            )
         )
 
         # Commands are ordered in reverse or original order depending on which
@@ -656,9 +686,8 @@ class NoiseModel:
             if direction == Direction.forward:
                 # Apply gate to total error.
                 pauli_error.apply_gate(
-                    op_type=command.op.type,
+                    op=command.op,
                     qubits=cast(List[Qubit], command.args),
-                    params=command.op.params,
                 )
             # Add noise operation if appropriate.
             if command.op.type in self.noisy_gates:
@@ -685,9 +714,8 @@ class NoiseModel:
                 # which has the same effect on the pauli as pushing through the
                 # dagger.
                 pauli_error.apply_gate(
-                    op_type=command.op.dagger.type,
+                    op=command.op.dagger,
                     qubits=cast(List[Qubit], command.args),
-                    params=command.op.dagger.params,
                 )
 
         return pauli_error

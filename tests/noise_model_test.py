@@ -1,14 +1,13 @@
 import json
 import multiprocessing as mp
 from collections import Counter
-from copy import deepcopy
 from itertools import product
 
 import numpy as np
 import pytest
 from pytket import Circuit, OpType
-from pytket.circuit import Qubit
-from pytket.pauli import Pauli, QubitPauliString
+from pytket.circuit import Op, Qubit
+from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor
 
 from qermit.noise_model import (
     ErrorDistribution,
@@ -99,55 +98,6 @@ def test_from_ptm() -> None:
         ) < 10 ** (-6)
 
 
-def test_qermit_pauli_from_iterable() -> None:
-    qubit_pauli_string = QubitPauliString(
-        qubits=[Qubit(i) for i in range(5)],
-        paulis=[Pauli.X, Pauli.Y, Pauli.Z, Pauli.Y, Pauli.Z],
-    )
-    pauli = QermitPauli.from_pauli_iterable(
-        pauli_iterable=qubit_pauli_string.map.values(),
-        qubit_list=list(qubit_pauli_string.map.keys()),
-    )
-    pauli.qubit_pauli_tensor.string == qubit_pauli_string
-    pauli.qubit_pauli_tensor.coeff == 1 + 0j
-
-
-def test_qermit_pauli_commute_coeff() -> None:
-    # This tests a few commutation coefficients
-    # which have been verified by hand.
-    verified_list = [
-        # Single qubit Paulis
-        ((([0], [1]), ([1], [0])), -1),
-        ((([1], [1]), ([1], [1])), 1),
-        ((([1], [0]), ([0], [1])), -1),
-        ((([0], [0]), ([0], [1])), 1),
-        ((([1], [0]), ([0], [0])), 1),
-        ((([1], [1]), ([0], [1])), -1),
-        # Two qubit Paulis
-        ((([0, 1], [1, 0]), ([1, 0], [0, 1])), 1),
-        ((([0, 1], [1, 0]), ([0, 0], [1, 1])), -1),
-        ((([0, 0], [0, 0]), ([0, 0], [1, 1])), 1),
-    ]
-
-    for verified in verified_list:
-        n_qubits = len(verified[0][0][0])
-
-        pauli_one = QermitPauli(
-            Z_list=verified[0][0][0],
-            X_list=verified[0][0][1],
-            qubit_list=[Qubit(i) for i in range(n_qubits)],
-        )
-        pauli_two = QermitPauli(
-            Z_list=verified[0][1][0],
-            X_list=verified[0][1][1],
-            qubit_list=[Qubit(i) for i in range(n_qubits)],
-        )
-        assert (
-            QermitPauli.commute_coeff(pauli_one=pauli_one, pauli_two=pauli_two)
-            == verified[1]
-        )
-
-
 def test_noise_model_logical_error_propagation() -> None:
     pytket_ciruit = Circuit(2).H(0).CX(0, 1).measure_all()
 
@@ -171,8 +121,10 @@ def test_noise_model_logical_error_propagation() -> None:
     logical_distribution = noise_model.counter_propagate(
         pytket_ciruit, n_counts=10000, direction=Direction.forward
     )
-    ideal_error = QermitPauli.from_qubit_pauli_string(
-        QubitPauliString(map={Qubit(0): Pauli.X, Qubit(1): Pauli.I})
+    ideal_error = QermitPauli(
+        QubitPauliTensor(
+            string=QubitPauliString(map={Qubit(0): Pauli.X, Qubit(1): Pauli.I}), coeff=1
+        )
     )
     assert list(logical_distribution.keys()) == [ideal_error]
     assert abs(logical_distribution[ideal_error] - 1000) <= 1
@@ -275,8 +227,8 @@ def test_error_distribution_post_select() -> None:
     )
     pauli_error_counter = Counter(
         {
-            QermitPauli.from_qubit_pauli_string(qps_remove): 50,
-            QermitPauli.from_qubit_pauli_string(qps_keep): 50,
+            QermitPauli(QubitPauliTensor(string=qps_remove, coeff=1)): 50,
+            QermitPauli(QubitPauliTensor(string=qps_keep, coeff=1)): 50,
         }
     )
     error_distribution = LogicalErrorDistribution(
@@ -419,40 +371,53 @@ def test_error_backpropagation() -> None:
     qubit_list = [Qubit(name=name, index=0), Qubit(name=name, index=1)]
 
     stabilise = QermitPauli(
-        Z_list=[0] * len(qubit_list),
-        X_list=[0] * len(qubit_list),
-        qubit_list=qubit_list,
+        QubitPauliTensor(
+            string=QubitPauliString(map={qubit: Pauli.I for qubit in qubit_list}),
+            coeff=1,
+        )
     )
 
     stabilise.pre_apply_pauli(pauli=Pauli.X, qubit=qubit_list[1])
-    stabilise.apply_gate(op_type=OpType.CZ, qubits=qubit_list)
+    stabilise.apply_gate(op=Op.create(OpType.CZ), qubits=qubit_list)
     stabilise.pre_apply_pauli(pauli=Pauli.X, qubit=qubit_list[0])
-    stabilise.apply_gate(op_type=OpType.CZ, qubits=[qubit_list[1], qubit_list[0]])
+    stabilise.apply_gate(op=Op.create(OpType.CZ), qubits=[qubit_list[1], qubit_list[0]])
 
-    assert stabilise.Z_list == {qubit_list[0]: 0, qubit_list[1]: 1}
-    assert stabilise.X_list == {qubit_list[0]: 1, qubit_list[1]: 1}
-    assert stabilise.phase == 0
+    assert stabilise.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={
+                qubit_list[0]: Pauli.X,
+                qubit_list[1]: Pauli.Y,
+            }
+        ),
+        coeff=-1j,
+    )
 
     stabilise = QermitPauli(
-        Z_list=[0] * len(qubit_list),
-        X_list=[0] * len(qubit_list),
-        qubit_list=qubit_list,
+        QubitPauliTensor(
+            string=QubitPauliString(map={qubit: Pauli.I for qubit in qubit_list}),
+            coeff=1,
+        )
     )
 
     stabilise.pre_apply_pauli(pauli=Pauli.X, qubit=qubit_list[1])
-    stabilise.apply_gate(op_type=OpType.CZ, qubits=qubit_list)
-    stabilise.apply_gate(op_type=OpType.X, qubits=[qubit_list[1]])
+    stabilise.apply_gate(op=Op.create(OpType.CZ), qubits=qubit_list)
+    stabilise.apply_gate(op=Op.create(OpType.X), qubits=[qubit_list[1]])
     stabilise.pre_apply_pauli(pauli=Pauli.Y, qubit=qubit_list[0])
-    stabilise.apply_gate(op_type=OpType.CZ, qubits=[qubit_list[1], qubit_list[0]])
+    stabilise.apply_gate(op=Op.create(OpType.CZ), qubits=[qubit_list[1], qubit_list[0]])
 
-    assert stabilise.Z_list == {qubit_list[0]: 1, qubit_list[1]: 1}
-    assert stabilise.X_list == {qubit_list[0]: 1, qubit_list[1]: 1}
-    assert stabilise.phase == 1
+    assert stabilise.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={
+                qubit_list[0]: Pauli.Y,
+                qubit_list[1]: Pauli.Y,
+            }
+        ),
+        coeff=-1j,
+    )
 
 
 def test_back_propagate_random_error() -> None:
     cliff_circ = Circuit(2).CZ(0, 1).X(1).CZ(1, 0)
-    qubit_list = cliff_circ.qubits
 
     error_rate = 0.5
     error_distribution_dict = {}
@@ -465,13 +430,17 @@ def test_back_propagate_random_error() -> None:
     )
     noise_model = NoiseModel({OpType.CZ: error_distribution})
 
-    # error_sampler = ErrorSampler(noise_model=noise_model)
-
     pauli_error = noise_model.random_propagate(cliff_circ)
 
-    assert pauli_error.Z_list == {qubit_list[0]: 0, qubit_list[1]: 1}
-    assert pauli_error.X_list == {qubit_list[0]: 0, qubit_list[1]: 0}
-    assert pauli_error.phase == 2
+    assert pauli_error.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={
+                Qubit(0): Pauli.I,
+                Qubit(1): Pauli.Z,
+            }
+        ),
+        coeff=-1,
+    )
 
 
 # TODO: check this test by hand. It also takes a long time to run, which
@@ -523,8 +492,13 @@ def test_effective_error_distribution() -> None:
     assert (
         abs(
             effective_error_dist.pauli_error_counter[
-                QermitPauli.from_qubit_pauli_string(
-                    QubitPauliString(qubits=qubits, paulis=[Pauli.X, Pauli.I, Pauli.X])
+                QermitPauli(
+                    QubitPauliTensor(
+                        string=QubitPauliString(
+                            qubits=qubits, paulis=[Pauli.X, Pauli.I, Pauli.X]
+                        ),
+                        coeff=1,
+                    )
                 )
             ]
             - 2100
@@ -535,8 +509,13 @@ def test_effective_error_distribution() -> None:
     assert (
         abs(
             effective_error_dist.pauli_error_counter[
-                QermitPauli.from_qubit_pauli_string(
-                    QubitPauliString(qubits=qubits, paulis=[Pauli.Y, Pauli.Y, Pauli.Z])
+                QermitPauli(
+                    QubitPauliTensor(
+                        string=QubitPauliString(
+                            qubits=qubits, paulis=[Pauli.Y, Pauli.Y, Pauli.Z]
+                        ),
+                        coeff=1,
+                    )
                 )
             ]
             - 900
@@ -547,8 +526,13 @@ def test_effective_error_distribution() -> None:
     assert (
         abs(
             effective_error_dist.pauli_error_counter[
-                QermitPauli.from_qubit_pauli_string(
-                    QubitPauliString(qubits=qubits, paulis=[Pauli.I, Pauli.I, Pauli.Z])
+                QermitPauli(
+                    QubitPauliTensor(
+                        string=QubitPauliString(
+                            qubits=qubits, paulis=[Pauli.I, Pauli.I, Pauli.Z]
+                        ),
+                        coeff=1,
+                    )
                 )
             ]
             - 2100
@@ -556,10 +540,12 @@ def test_effective_error_distribution() -> None:
         < 100
     )
 
-    pauli_error = QermitPauli.from_qubit_pauli_string(
-        QubitPauliString(qubits=qubits, paulis=[Pauli.Z, Pauli.Y, Pauli.X])
+    pauli_error = QermitPauli(
+        QubitPauliTensor(
+            string=QubitPauliString(qubits=qubits, paulis=[Pauli.Z, Pauli.Y, Pauli.X]),
+            coeff=1j,
+        )
     )
-    pauli_error.phase = 2
     assert abs(effective_error_dist.pauli_error_counter[pauli_error] - 4900) < 100
 
 
@@ -567,10 +553,24 @@ def test_qermit_pauli_circuit() -> None:
     circ = Circuit(3)
     circ.CZ(0, 1).add_barrier([0, 2]).H(1).H(2).SWAP(1, 2).S(1).Y(0)
 
-    L = QermitPauli(Z_list=[1, 1, 1], X_list=[0, 0, 0], qubit_list=circ.qubits)
+    L = QermitPauli(
+        QubitPauliTensor(
+            string=QubitPauliString(
+                paulis=[Pauli.Z, Pauli.Z, Pauli.Z],
+                qubits=circ.qubits,
+            )
+        )
+    )
     L_circ = L.circuit
 
-    R = deepcopy(L)
+    R = QermitPauli(
+        QubitPauliTensor(
+            string=QubitPauliString(
+                paulis=[Pauli.Z, Pauli.Z, Pauli.Z],
+                qubits=circ.qubits,
+            )
+        )
+    )
     R.apply_circuit(circ)
     R_circ = R.circuit
 
@@ -586,15 +586,20 @@ def test_qermit_pauli_circuit() -> None:
 
 
 def test_initialisation() -> None:
-    qubit_list = [Qubit(0), Qubit(1), Qubit(2)]
     pauli = QermitPauli(
-        Z_list=[0, 0, 1],
-        X_list=[0, 0, 0],
-        qubit_list=qubit_list,
+        QubitPauliTensor(
+            string=QubitPauliString(
+                map={Qubit(0): Pauli.I, Qubit(1): Pauli.I, Qubit(2): Pauli.Z}
+            ),
+            coeff=1,
+        )
     )
-    assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 1}
-    assert pauli.phase == 0
+    assert pauli.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={Qubit(0): Pauli.I, Qubit(1): Pauli.I, Qubit(2): Pauli.Z}
+        ),
+        coeff=1,
+    )
 
 
 def test_identity_clifford() -> None:
@@ -603,7 +608,10 @@ def test_identity_clifford() -> None:
 
     qubit_list = circ.qubits
     pauli = QermitPauli(
-        Z_list=circ.n_qubits * [1], X_list=circ.n_qubits * [0], qubit_list=qubit_list
+        QubitPauliTensor(
+            string=QubitPauliString(map={qubit: Pauli.Z for qubit in qubit_list}),
+            coeff=1,
+        )
     )
     pauli.apply_circuit(circ)
 
@@ -615,15 +623,19 @@ def test_identity_clifford() -> None:
 
 def test_H() -> None:
     qubit_list = [Qubit(0)]
-    pauli = QermitPauli(Z_list=[1], X_list=[0], qubit_list=qubit_list)
+    pauli = QermitPauli(
+        QubitPauliTensor(
+            string=QubitPauliString(qubit=Qubit(0), pauli=Pauli.Z), coeff=1
+        )
+    )
 
-    pauli.H(qubit=qubit_list[0])
+    pauli.apply_gate(op=Op.create(OpType.H), qubits=[qubit_list[0]])
     assert pauli.qubit_pauli_tensor.string == QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X]
     )
     assert pauli.qubit_pauli_tensor.coeff == 1
 
-    pauli.H(qubit=qubit_list[0])
+    pauli.apply_gate(op=Op.create(OpType.H), qubits=[qubit_list[0]])
     assert pauli.qubit_pauli_tensor.string == QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.Z]
     )
@@ -632,7 +644,12 @@ def test_H() -> None:
 
 def test_h_series_gates() -> None:
     circ = Circuit(2).ZZPhase(3.5, 0, 1).PhasedX(1.5, 0.5, 0)
-    stab = QermitPauli(Z_list=[1, 1], X_list=[1, 1], qubit_list=circ.qubits)
+    stab = QermitPauli(
+        QubitPauliTensor(
+            string=QubitPauliString(map={qubit: Pauli.Y for qubit in circ.qubits}),
+            coeff=-1,
+        )
+    )
     stab.apply_circuit(circ)
 
 
@@ -640,7 +657,10 @@ def test_apply_circuit() -> None:
     circ = Circuit(2).H(0).S(0).CX(0, 1)
     qubit_list = circ.qubits
     pauli = QermitPauli(
-        Z_list=circ.n_qubits * [1], X_list=circ.n_qubits * [0], qubit_list=qubit_list
+        QubitPauliTensor(
+            string=QubitPauliString(map={qubit: Pauli.Z for qubit in circ.qubits}),
+            coeff=1,
+        )
     )
 
     pauli.apply_circuit(circ)
@@ -653,13 +673,20 @@ def test_apply_circuit() -> None:
 
 def test_apply_gate() -> None:
     qubit_list = [Qubit(0), Qubit(1), Qubit(2)]
+
     pauli = QermitPauli(
-        Z_list=[1, 1, 1],
-        X_list=[0, 0, 0],
-        qubit_list=qubit_list,
+        QubitPauliTensor(
+            string=QubitPauliString(
+                map={
+                    Qubit(0): Pauli.Z,
+                    Qubit(1): Pauli.Z,
+                    Qubit(2): Pauli.Z,
+                }
+            )
+        )
     )
 
-    pauli.apply_gate(op_type=OpType.H, qubits=[qubit_list[0]])
+    pauli.apply_gate(op=Op.create(OpType.H), qubits=[qubit_list[0]])
 
     assert pauli.qubit_pauli_tensor.string == QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.Z, Pauli.Z]
@@ -667,7 +694,7 @@ def test_apply_gate() -> None:
     assert pauli.qubit_pauli_tensor.coeff == 1
 
     pauli.apply_gate(
-        op_type=OpType.CX,
+        op=Op.create(OpType.CX),
         qubits=[qubit_list[1], qubit_list[2]],
     )
 
@@ -677,7 +704,7 @@ def test_apply_gate() -> None:
     assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
     assert pauli.qubit_pauli_tensor.coeff == 1
 
-    pauli.apply_gate(op_type=OpType.S, qubits=[qubit_list[1]])
+    pauli.apply_gate(op=Op.create(OpType.S), qubits=[qubit_list[1]])
 
     assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
     assert pauli.qubit_pauli_tensor.coeff == 1
@@ -685,10 +712,17 @@ def test_apply_gate() -> None:
 
 def test_qubit_pauli_string() -> None:
     qubit_list = [Qubit(0), Qubit(1), Qubit(2)]
+
     pauli = QermitPauli(
-        Z_list=[1, 1, 1],
-        X_list=[0, 0, 0],
-        qubit_list=qubit_list,
+        QubitPauliTensor(
+            string=QubitPauliString(
+                map={
+                    Qubit(0): Pauli.Z,
+                    Qubit(1): Pauli.Z,
+                    Qubit(2): Pauli.Z,
+                }
+            )
+        )
     )
 
     qubit_pauli_string = QubitPauliString(
@@ -697,8 +731,8 @@ def test_qubit_pauli_string() -> None:
     assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
     assert pauli.qubit_pauli_tensor.coeff == 1
 
-    pauli.H(qubit_list[0])
-    pauli.S(qubit_list[0])
+    pauli.apply_gate(op=Op.create(OpType.H), qubits=[qubit_list[0]])
+    pauli.apply_gate(op=Op.create(OpType.S), qubits=[qubit_list[0]])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.Y, Pauli.Z, Pauli.Z]
@@ -706,7 +740,7 @@ def test_qubit_pauli_string() -> None:
     assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
     assert pauli.qubit_pauli_tensor.coeff == 1
 
-    pauli.CX(qubit_list[0], qubit_list[1])
+    pauli.apply_gate(op=Op.create(OpType.CX), qubits=[qubit_list[0], qubit_list[1]])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.Y, Pauli.Z]
@@ -714,7 +748,7 @@ def test_qubit_pauli_string() -> None:
     assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
     assert pauli.qubit_pauli_tensor.coeff == 1
 
-    pauli.S(qubit_list[1])
+    pauli.apply_gate(op=Op.create(OpType.S), qubits=[qubit_list[1]])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.X, Pauli.Z]
@@ -722,8 +756,8 @@ def test_qubit_pauli_string() -> None:
     assert pauli.qubit_pauli_tensor.string == qubit_pauli_string
     assert pauli.qubit_pauli_tensor.coeff == -1
 
-    pauli.S(qubit_list[0])
-    pauli.CX(qubit_list[0], qubit_list[2])
+    pauli.apply_gate(op=Op.create(OpType.S), qubits=[qubit_list[0]])
+    pauli.apply_gate(op=Op.create(OpType.CX), qubits=[qubit_list[0], qubit_list[2]])
 
     qubit_pauli_string = QubitPauliString(
         qubits=qubit_list, paulis=[Pauli.X, Pauli.X, Pauli.Y]
@@ -734,56 +768,127 @@ def test_qubit_pauli_string() -> None:
 
 def test_clifford_incremental() -> None:
     qubit_list = [Qubit(0), Qubit(1), Qubit(2)]
+
     pauli = QermitPauli(
-        Z_list=[0, 0, 1],
-        X_list=[0, 0, 0],
-        qubit_list=qubit_list,
+        QubitPauliTensor(
+            string=QubitPauliString(
+                map={
+                    Qubit(0): Pauli.I,
+                    Qubit(1): Pauli.I,
+                    Qubit(2): Pauli.Z,
+                }
+            ),
+            coeff=1,
+        )
     )
 
-    pauli.H(qubit_list[0])
-    assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 1}
-    assert pauli.phase == 0
+    pauli.apply_gate(op=Op.create(OpType.H), qubits=[qubit_list[0]])
+    assert pauli.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={
+                Qubit(0): Pauli.I,
+                Qubit(1): Pauli.I,
+                Qubit(2): Pauli.Z,
+            }
+        ),
+        coeff=1,
+    )
 
-    pauli.CX(qubit_list[1], qubit_list[2])
-    assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert pauli.phase == 0
+    pauli.apply_gate(op=Op.create(OpType.CX), qubits=[qubit_list[1], qubit_list[2]])
+    assert pauli.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={
+                Qubit(0): Pauli.I,
+                Qubit(1): Pauli.Z,
+                Qubit(2): Pauli.Z,
+            }
+        ),
+        coeff=1,
+    )
 
-    pauli.H(qubit_list[1])
-    assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 0}
-    assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 1}
-    assert pauli.phase == 0
+    pauli.apply_gate(op=Op.create(OpType.H), qubits=[qubit_list[1]])
+    assert pauli.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={
+                Qubit(0): Pauli.I,
+                Qubit(1): Pauli.X,
+                Qubit(2): Pauli.Z,
+            }
+        ),
+        coeff=1,
+    )
 
-    pauli.S(qubit_list[1])
-    assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 0}
-    assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert pauli.phase == 1
+    pauli.apply_gate(op=Op.create(OpType.S), qubits=[qubit_list[1]])
+    assert pauli.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={
+                Qubit(0): Pauli.I,
+                Qubit(1): Pauli.Y,
+                Qubit(2): Pauli.Z,
+            }
+        ),
+        coeff=1,
+    )
 
-    pauli.CX(qubit_list[1], qubit_list[2])
-    assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 1}
-    assert pauli.phase == 1
+    pauli.apply_gate(op=Op.create(OpType.CX), qubits=[qubit_list[1], qubit_list[2]])
+    assert pauli.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={
+                Qubit(0): Pauli.I,
+                Qubit(1): Pauli.X,
+                Qubit(2): Pauli.Y,
+            }
+        ),
+        coeff=1,
+    )
 
-    pauli.S(qubit_list[2])
-    assert pauli.X_list == {qubit_list[0]: 0, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert pauli.phase == 2
+    pauli.apply_gate(op=Op.create(OpType.S), qubits=[qubit_list[2]])
+    assert pauli.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={
+                Qubit(0): Pauli.I,
+                Qubit(1): Pauli.X,
+                Qubit(2): Pauli.X,
+            }
+        ),
+        coeff=-1,
+    )
 
-    pauli.CX(qubit_list[1], qubit_list[0])
-    assert pauli.X_list == {qubit_list[0]: 1, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert pauli.Z_list == {qubit_list[0]: 0, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert pauli.phase == 2
+    pauli.apply_gate(op=Op.create(OpType.CX), qubits=[qubit_list[1], qubit_list[0]])
+    assert pauli.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={
+                Qubit(0): Pauli.X,
+                Qubit(1): Pauli.X,
+                Qubit(2): Pauli.X,
+            }
+        ),
+        coeff=-1,
+    )
 
-    pauli.S(qubit_list[0])
-    assert pauli.X_list == {qubit_list[0]: 1, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert pauli.Z_list == {qubit_list[0]: 1, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert pauli.phase == 3
+    pauli.apply_gate(op=Op.create(OpType.S), qubits=[qubit_list[0]])
+    assert pauli.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={
+                Qubit(0): Pauli.Y,
+                Qubit(1): Pauli.X,
+                Qubit(2): Pauli.X,
+            }
+        ),
+        coeff=-1,
+    )
 
-    pauli.H(qubit_list[0])
-    assert pauli.X_list == {qubit_list[0]: 1, qubit_list[1]: 1, qubit_list[2]: 1}
-    assert pauli.Z_list == {qubit_list[0]: 1, qubit_list[1]: 0, qubit_list[2]: 0}
-    assert pauli.phase == 1
+    pauli.apply_gate(op=Op.create(OpType.H), qubits=[qubit_list[0]])
+    assert pauli.qubit_pauli_tensor == QubitPauliTensor(
+        string=QubitPauliString(
+            map={
+                Qubit(0): Pauli.Y,
+                Qubit(1): Pauli.X,
+                Qubit(2): Pauli.X,
+            }
+        ),
+        coeff=1,
+    )
 
 
 def test_to_from_qps() -> None:
@@ -793,20 +898,28 @@ def test_to_from_qps() -> None:
         qubits=qubits,
         paulis=paulis,
     )
-    stab = QermitPauli.from_qubit_pauli_string(qubit_pauli_string)
+    stab = QermitPauli(
+        QubitPauliTensor(
+            string=qubit_pauli_string,
+            coeff=1,
+        )
+    )
     assert stab.qubit_pauli_tensor.string == qubit_pauli_string
     assert stab.qubit_pauli_tensor.coeff == 1 + 0j
 
 
 def test_is_measureable() -> None:
     stab = QermitPauli(
-        Z_list=[1, 0, 0],
-        X_list=[1, 0, 1],
-        qubit_list=[
-            Qubit(name="A", index=0),
-            Qubit(name="B", index=0),
-            Qubit(name="A", index=1),
-        ],
+        QubitPauliTensor(
+            string=QubitPauliString(
+                map={
+                    Qubit(name="A", index=0): Pauli.Y,
+                    Qubit(name="B", index=0): Pauli.I,
+                    Qubit(name="A", index=1): Pauli.X,
+                }
+            ),
+            coeff=-1j,
+        )
     )
     assert stab.is_measureable(qubit_list=[Qubit(name="A", index=1)])
     assert stab.is_measureable(qubit_list=[Qubit(name="A", index=0)])
