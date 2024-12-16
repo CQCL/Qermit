@@ -75,6 +75,7 @@ class QermitPauli:
             )
         )
 
+    @property
     def dagger(self) -> QermitPauli:
         """Generates the inverse of the Pauli.
 
@@ -87,7 +88,7 @@ class QermitPauli:
             )
         )
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return self.qubit_pauli_tensor.__hash__()
 
     def __str__(self) -> str:  # pragma: no cover
@@ -106,7 +107,7 @@ class QermitPauli:
 
         return self.qubit_pauli_tensor == other.qubit_pauli_tensor
 
-    def apply_circuit(self, circuit: Circuit):
+    def apply_circuit(self, circuit: Circuit) -> None:
         """Commute the Pauli through the circuit.
         Given a Clifford circuit C, transform the Pauli P to Q
         such that PC = CQ.
@@ -129,7 +130,7 @@ class QermitPauli:
                 qubits=command.qubits,
             )
 
-    def apply_gate(self, op: Op, qubits: List[Qubit]):
+    def apply_gate(self, op: Op, qubits: List[Qubit]) -> None:
         """Commute the Pauli through the gate.
         Given a Clifford gate G, transform the Pauli P to Q
         such that PG = GQ.
@@ -222,7 +223,8 @@ class QermitPauli:
     def get_control_circuit(self, control_qubit: Qubit) -> Circuit:
         """Controlled circuit which acts Pauli.
 
-        :return: Controlled circuit acting Paulii.
+        :param control_qubit: Qubit on which circuit is controlled.
+        :return: Controlled circuit acting Pauli.
         """
         circ = Circuit()
         circ.add_qubit(control_qubit)
@@ -287,7 +289,12 @@ class QermitPauli:
         return circ
 
     @property
-    def qubit_pauli_tensor(self):
+    def qubit_pauli_tensor(self) -> QubitPauliTensor:
+        """Current state of the Pauli, following any operations
+        which may have been acted upon it until now.
+
+        :return: Current state of the Pauli.
+        """
         mislabled_qpt = self.unitary_tableau.get_row_product(
             paulis=self.input_pauli_tensor
         )
