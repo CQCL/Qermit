@@ -69,8 +69,6 @@ class PauliSampler(ABC):
                     circ=clifford_subcircuit,
                 )
 
-                print("start_stabiliser_list: ", start_stabiliser_list[0])
-
                 # TODO: check that register names do not already exist
                 control_qubit_list = [
                     Qubit(name="ancilla", index=i)
