@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.7.0](https://github.com/CQCL/Qermit/compare/v0.6.0...v0.7.0) (2024-12-16)
+
+
+### Features
+
+* Add convex subgraph finding class ([#189](https://github.com/CQCL/Qermit/issues/189)) ([ac0d858](https://github.com/CQCL/Qermit/commit/ac0d85832227c44f805166e519a08e0df04a95a9))
+* Replace `QermitPauli` internals with `UnitaryTableau` ([#201](https://github.com/CQCL/Qermit/issues/201)) ([9dcfa70](https://github.com/CQCL/Qermit/commit/9dcfa700f621e573f87ee0ef53b6e95d4f7b64ed))
+
+
+### Documentation
+
+* Refresh readme ([#177](https://github.com/CQCL/Qermit/issues/177)) ([e5169f7](https://github.com/CQCL/Qermit/commit/e5169f79fcc29c8ec0d0d034d2379ff8ad8b18b7))
+
 ## [0.6.0](https://github.com/CQCL/Qermit/compare/v0.5.0...v0.6.0) (2024-11-29)
 
 
