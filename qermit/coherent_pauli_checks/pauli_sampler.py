@@ -102,7 +102,7 @@ class PauliSampler(ABC):
                     pauli_check_circuit.add_barrier(command.args + [control_qubit])
 
                 end_stabiliser_list = [
-                    start_stabiliser.dagger()
+                    start_stabiliser.dagger
                     for start_stabiliser in start_stabiliser_list
                 ]
 
