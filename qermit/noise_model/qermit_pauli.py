@@ -23,39 +23,22 @@ class QermitPauli:
 
     coeff_to_phase = {1 + 0j: 0, 0 + 1j: 1, -1 + 0j: 2, 0 - 1j: 3}
 
-    def __init__(
-        self,
-        Z_list: list[int],
-        X_list: list[int],
-        qubit_list: list[Qubit],
-        phase: int = 0,
-    ):
-        coeff = self.phase_dict[phase]
+    def __init__(self, qpt: QubitPauliTensor) -> None:
+        self.qubit_list = list(qpt.string.map.keys())
 
-        self.qubit_list = qubit_list
+        self.unitary_tableau = UnitaryTableau(nqb=len(self.qubit_list))
 
-        self.unitary_tableau = UnitaryTableau(nqb=len(qubit_list))
-
-        self.qubit_index = {qubit: Qubit(i) for i, qubit in enumerate(qubit_list)}
-        self.index_qubit = {Qubit(i): qubit for i, qubit in enumerate(qubit_list)}
-
-        paulis = []
-
-        for Z, X in zip(Z_list, X_list):
-            if X and Z:
-                paulis.append(Pauli.Y)
-                coeff *= -1j
-            elif X:
-                paulis.append(Pauli.X)
-            elif Z:
-                paulis.append(Pauli.Z)
-            else:
-                paulis.append(Pauli.I)
+        self.qubit_index = {qubit: Qubit(i) for i, qubit in enumerate(self.qubit_list)}
+        self.index_qubit = {Qubit(i): qubit for i, qubit in enumerate(self.qubit_list)}
 
         self.input_pauli_tensor = QubitPauliTensor(
-            qubits=[qubit_index for qubit_index in self.qubit_index.values()],
-            paulis=paulis,
-            coeff=coeff,
+            string=QubitPauliString(
+                map={
+                    self.qubit_index[qubit]: pauli
+                    for qubit, pauli in qpt.string.map.items()
+                }
+            ),
+            coeff=qpt.coeff,
         )
 
     def is_measureable(self, qubit_list: List[Qubit]) -> bool:
@@ -83,7 +66,7 @@ class QermitPauli:
         :param qubit_list: Qubits in Pauli which should be removed.
         :return: Reduced Pauli.
         """
-        return self.from_qubit_pauli_tensor(
+        return QermitPauli(
             QubitPauliTensor(
                 string=QubitPauliString(
                     map={
@@ -101,52 +84,52 @@ class QermitPauli:
 
         :return: Conjugate transpose of the Pauli.
         """
-        return QermitPauli.from_qubit_pauli_tensor(
+        return QermitPauli(
             qpt=QubitPauliTensor(
                 string=self.qubit_pauli_tensor.string,
                 coeff=self.qubit_pauli_tensor.coeff.conjugate(),
             )
         )
 
-    @classmethod
-    def from_qubit_pauli_tensor(cls, qpt: QubitPauliTensor) -> QermitPauli:
-        """Create a Pauli from a qubit pauli string.
+    # @classmethod
+    # def from_qubit_pauli_tensor(cls, qpt: QubitPauliTensor) -> QermitPauli:
+    #     """Create a Pauli from a qubit pauli string.
 
-        :param qps: Qubit pauli string to be converted to a Pauli.
-        :return: Pauli created from qubit pauli string.
-        """
+    #     :param qps: Qubit pauli string to be converted to a Pauli.
+    #     :return: Pauli created from qubit pauli string.
+    #     """
 
-        Z_list = []
-        X_list = []
-        phase = cls.coeff_to_phase[qpt.coeff]
-        qubit_list = []
+    #     Z_list = []
+    #     X_list = []
+    #     phase = cls.coeff_to_phase[qpt.coeff]
+    #     qubit_list = []
 
-        qps = qpt.string
+    #     qps = qpt.string
 
-        for pauli in qps.to_list():
-            qubit = Qubit(name=pauli[0][0], index=pauli[0][1])
-            qubit_list.append(qubit)
+    #     for pauli in qps.to_list():
+    #         qubit = Qubit(name=pauli[0][0], index=pauli[0][1])
+    #         qubit_list.append(qubit)
 
-            if pauli[1] in ["Z", "Y"]:
-                Z_list.append(1)
-            else:
-                Z_list.append(0)
+    #         if pauli[1] in ["Z", "Y"]:
+    #             Z_list.append(1)
+    #         else:
+    #             Z_list.append(0)
 
-            if pauli[1] in ["X", "Y"]:
-                X_list.append(1)
-            else:
-                X_list.append(0)
+    #         if pauli[1] in ["X", "Y"]:
+    #             X_list.append(1)
+    #         else:
+    #             X_list.append(0)
 
-            if pauli[1] == "Y":
-                phase += 1
-                phase %= 4
+    #         if pauli[1] == "Y":
+    #             phase += 1
+    #             phase %= 4
 
-        return cls(
-            Z_list=Z_list,
-            X_list=X_list,
-            qubit_list=qubit_list,
-            phase=phase,
-        )
+    #     return cls(
+    #         Z_list=Z_list,
+    #         X_list=X_list,
+    #         qubit_list=qubit_list,
+    #         phase=phase,
+    #     )
 
     def __hash__(self):
         return self.qubit_pauli_tensor.__hash__()
@@ -354,7 +337,7 @@ class QermitPauli:
         :param qubit_list: The qubits on which the resulting pauli will act.
         :return: The pauli corresponding to the given iterable.
         """
-        return cls.from_qubit_pauli_tensor(
+        return cls(
             qpt=QubitPauliTensor(
                 string=QubitPauliString(
                     qubits=qubit_list,

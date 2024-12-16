@@ -636,7 +636,7 @@ class NoiseModel:
         :raises Exception: Raised if direction is invalid.
         :return: Resulting logical error.
         """
-        pauli_error = QermitPauli.from_qubit_pauli_tensor(
+        pauli_error = QermitPauli(
             QubitPauliTensor(
                 string=QubitPauliString(
                     map={qubit: Pauli.I for qubit in cliff_circ.qubits}

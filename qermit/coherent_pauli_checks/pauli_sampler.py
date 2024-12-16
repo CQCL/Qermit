@@ -69,6 +69,8 @@ class PauliSampler(ABC):
                     circ=clifford_subcircuit,
                 )
 
+                print("start_stabiliser_list: ", start_stabiliser_list[0])
+
                 # TODO: check that register names do not already exist
                 control_qubit_list = [
                     Qubit(name="ancilla", index=i)
@@ -188,7 +190,7 @@ class DeterministicZPauliSampler(PauliSampler):
         :return: Z Pauli string of length equal to the circuit.
         """
         return [
-            QermitPauli.from_qubit_pauli_tensor(
+            QermitPauli(
                 QubitPauliTensor(
                     string=QubitPauliString(
                         map={qubit: Pauli.Z for qubit in circ.qubits}
@@ -209,7 +211,7 @@ class DeterministicXPauliSampler(PauliSampler):
         :return: X Pauli string of length equal to the circuit.
         """
         return [
-            QermitPauli.from_qubit_pauli_tensor(
+            QermitPauli(
                 QubitPauliTensor(
                     string=QubitPauliString(
                         map={qubit: Pauli.X for qubit in circ.qubits}
@@ -258,7 +260,7 @@ class RandomPauliSampler(PauliSampler):
                 coeff=1,
             )
             if qpt != QubitPauliTensor():
-                stabiliser_list.append(QermitPauli.from_qubit_pauli_tensor(qpt))
+                stabiliser_list.append(QermitPauli(qpt))
 
         return stabiliser_list
 
@@ -352,8 +354,6 @@ class OptimalPauliSampler(PauliSampler):
         #     )
 
         return [
-            QermitPauli.from_qubit_pauli_tensor(
-                QubitPauliTensor(string=smallest_commute_prob_pauli, coeff=1)
-            )
+            QermitPauli(QubitPauliTensor(string=smallest_commute_prob_pauli, coeff=1))
             for smallest_commute_prob_pauli in smallest_commute_prob_pauli_list
         ]

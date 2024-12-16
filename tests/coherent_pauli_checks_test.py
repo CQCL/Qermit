@@ -802,7 +802,7 @@ def test_optimal_pauli_sampler():
         circ=cliff_circ,
     )
 
-    assert stab[0] == QermitPauli.from_qubit_pauli_tensor(
+    assert stab[0] == QermitPauli(
         QubitPauliTensor(
             string=QubitPauliString(qubits=qubits, paulis=[Pauli.I, Pauli.I, Pauli.Y]),
             coeff=1,
@@ -836,7 +836,7 @@ def test_add_ZX_pauli_checks_to_S():
         def sample(self, circ, **kwargs):
             qubit_list = circ.qubits
             return [
-                QermitPauli.from_qubit_pauli_tensor(
+                QermitPauli(
                     QubitPauliTensor(
                         string=QubitPauliString(
                             pauli=Pauli.Y,
@@ -974,7 +974,7 @@ def test_error_sampler():
     )
     ideal = Counter(
         {
-            QermitPauli.from_qubit_pauli_tensor(
+            QermitPauli(
                 QubitPauliTensor(
                     string=QubitPauliString(
                         map={
@@ -986,7 +986,7 @@ def test_error_sampler():
                     coeff=1,
                 )
             ): 190,
-            QermitPauli.from_qubit_pauli_tensor(
+            QermitPauli(
                 QubitPauliTensor(
                     string=QubitPauliString(
                         map={
@@ -998,11 +998,11 @@ def test_error_sampler():
                     coeff=1,
                 )
             ): 164,
-            QermitPauli.from_qubit_pauli_tensor(
+            QermitPauli(
                 QubitPauliTensor(
                     string=QubitPauliString(
                         map={
-                            Qubit(name="ancilla", index=0): Pauli.X,
+                            Qubit(name="ancilla", index=0): Pauli.I,
                             Qubit(name="my_reg", index=0): Pauli.X,
                             Qubit(name="my_reg", index=1): Pauli.X,
                         }
