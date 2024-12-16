@@ -98,19 +98,6 @@ def test_from_ptm() -> None:
         ) < 10 ** (-6)
 
 
-def test_qermit_pauli_from_iterable() -> None:
-    qubit_pauli_string = QubitPauliString(
-        qubits=[Qubit(i) for i in range(5)],
-        paulis=[Pauli.X, Pauli.Y, Pauli.Z, Pauli.Y, Pauli.Z],
-    )
-    pauli = QermitPauli.from_pauli_list(
-        pauli_list=list(qubit_pauli_string.map.values()),
-        qubit_list=list(qubit_pauli_string.map.keys()),
-    )
-    pauli.qubit_pauli_tensor.string == qubit_pauli_string
-    pauli.qubit_pauli_tensor.coeff == 1 + 0j
-
-
 def test_noise_model_logical_error_propagation() -> None:
     pytket_ciruit = Circuit(2).H(0).CX(0, 1).measure_all()
 

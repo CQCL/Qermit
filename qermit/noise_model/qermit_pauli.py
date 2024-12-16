@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import List
 
 from pytket.circuit import Circuit, Op, OpType, Qubit
 from pytket.pauli import Pauli, QubitPauliString, QubitPauliTensor, pauli_string_mult
@@ -9,21 +9,17 @@ from pytket.tableau import UnitaryTableau
 
 class QermitPauli:
     """For the manipulation of Pauli strings. In particular, how they are
-    changed by the action of Clifford circuits. Note that each term in the
-    tensor product of the Paulis should be thought of as:
-    (i)^{phase}X^{X_list}Z^{Z_list}
+    changed by the action of Clifford circuits.
     """
-
-    phase_dict: Dict[int, complex] = {
-        0: 1 + 0j,
-        1: 0 + 1j,
-        2: -1 + 0j,
-        3: 0 - 1j,
-    }
 
     coeff_to_phase = {1 + 0j: 0, 0 + 1j: 1, -1 + 0j: 2, 0 - 1j: 3}
 
     def __init__(self, qpt: QubitPauliTensor) -> None:
+        """Initialised with an initial qubit pauli tensor. Other methods will
+        modify this Qubit Pauli Tensor.
+
+        :param qpt: Initial Qubit Pauli Tensor.
+        """
         self.qubit_list = list(qpt.string.map.keys())
 
         self.unitary_tableau = UnitaryTableau(nqb=len(self.qubit_list))
@@ -91,46 +87,6 @@ class QermitPauli:
             )
         )
 
-    # @classmethod
-    # def from_qubit_pauli_tensor(cls, qpt: QubitPauliTensor) -> QermitPauli:
-    #     """Create a Pauli from a qubit pauli string.
-
-    #     :param qps: Qubit pauli string to be converted to a Pauli.
-    #     :return: Pauli created from qubit pauli string.
-    #     """
-
-    #     Z_list = []
-    #     X_list = []
-    #     phase = cls.coeff_to_phase[qpt.coeff]
-    #     qubit_list = []
-
-    #     qps = qpt.string
-
-    #     for pauli in qps.to_list():
-    #         qubit = Qubit(name=pauli[0][0], index=pauli[0][1])
-    #         qubit_list.append(qubit)
-
-    #         if pauli[1] in ["Z", "Y"]:
-    #             Z_list.append(1)
-    #         else:
-    #             Z_list.append(0)
-
-    #         if pauli[1] in ["X", "Y"]:
-    #             X_list.append(1)
-    #         else:
-    #             X_list.append(0)
-
-    #         if pauli[1] == "Y":
-    #             phase += 1
-    #             phase %= 4
-
-    #     return cls(
-    #         Z_list=Z_list,
-    #         X_list=X_list,
-    #         qubit_list=qubit_list,
-    #         phase=phase,
-    #     )
-
     def __hash__(self):
         return self.qubit_pauli_tensor.__hash__()
 
@@ -151,8 +107,9 @@ class QermitPauli:
         return self.qubit_pauli_tensor == other.qubit_pauli_tensor
 
     def apply_circuit(self, circuit: Circuit):
-        """Apply a circuit to a pauli. This is to say commute tha Pauli
-        through the circuit. The circuit should be a Clifford circuit.
+        """Commute the Pauli through the circuit.
+        Given a Clifford circuit C, transform the Pauli P to Q
+        such that PC = CQ.
 
         :param circuit: Circuit to be applied.
         """
@@ -172,7 +129,15 @@ class QermitPauli:
                 qubits=command.qubits,
             )
 
-    def apply_gate(self, op: Op, qubits: list[Qubit]):
+    def apply_gate(self, op: Op, qubits: List[Qubit]):
+        """Commute the Pauli through the gate.
+        Given a Clifford gate G, transform the Pauli P to Q
+        such that PG = GQ.
+
+        :param op: Operation to commute through.
+        :param qubits: Qubit on which the operation acts.
+        :raises Exception: Raised if the given gate is not Clifford.
+        """
         if not op.is_clifford():
             raise Exception(f"{op} is not a Clifford operation.")
 
@@ -212,7 +177,12 @@ class QermitPauli:
                 "Please request the developers support this operation."
             )
 
-    def pre_apply_pauli(self, pauli, qubit):
+    def pre_apply_pauli(self, pauli: Pauli, qubit: Qubit) -> None:
+        """Transform Pauli P into PQ, where Q is the give pauli.
+
+        :param pauli: Pauli to multiply by.
+        :param qubit: Qubit on which pauli to multiply by should act.
+        """
         mult_string, mult_coeff = pauli_string_mult(
             qubitpaulistring1=self.qubit_pauli_tensor.string,
             qubitpaulistring2=QubitPauliString(qubit=qubit, pauli=pauli),
@@ -228,7 +198,12 @@ class QermitPauli:
 
         self.unitary_tableau = UnitaryTableau(nqb=len(self.qubit_list))
 
-    def post_apply_pauli(self, pauli, qubit):
+    def post_apply_pauli(self, pauli: Pauli, qubit: Qubit) -> None:
+        """Transform Pauli P into QP, where Q is the give pauli.
+
+        :param pauli: Pauli to multiply by.
+        :param qubit: Qubit on which pauli to multiply by should act.
+        """
         mult_string, mult_coeff = pauli_string_mult(
             qubitpaulistring1=QubitPauliString(qubit=qubit, pauli=pauli),
             qubitpaulistring2=self.qubit_pauli_tensor.string,
@@ -325,24 +300,4 @@ class QermitPauli:
                 map=correct_map,
             ),
             coeff=mislabled_qpt.coeff,
-        )
-
-    @classmethod
-    def from_pauli_list(
-        cls, pauli_list: List[Pauli], qubit_list: List[Qubit]
-    ) -> QermitPauli:
-        """Create a QermitPauli from a Pauli iterable.
-
-        :param pauli_iterable: The Pauli iterable to convert.
-        :param qubit_list: The qubits on which the resulting pauli will act.
-        :return: The pauli corresponding to the given iterable.
-        """
-        return cls(
-            qpt=QubitPauliTensor(
-                string=QubitPauliString(
-                    qubits=qubit_list,
-                    paulis=pauli_list,
-                ),
-                coeff=1,
-            ),
         )

@@ -99,9 +99,14 @@ class ErrorDistribution:
         # PTM entry as a sum pf error weights multiplied by +/-1
         # Depending on commutation relations.
         for pauli_tuple, index in pauli_index.items():
-            pauli = QermitPauli.from_pauli_list(
-                pauli_list=list(pauli_tuple),
-                qubit_list=[Qubit(i) for i in range(self.n_qubits)],
+            pauli = QermitPauli(
+                QubitPauliTensor(
+                    string=QubitPauliString(
+                        paulis=list(pauli_tuple),
+                        qubits=[Qubit(i) for i in range(self.n_qubits)],
+                    ),
+                    coeff=1,
+                )
             )
 
             # Can add the identity error rate.
@@ -111,9 +116,14 @@ class ErrorDistribution:
             ptm[index][index] += self.identity_error_rate
 
             for error, error_rate in self.distribution.items():
-                error_pauli = QermitPauli.from_pauli_list(
-                    pauli_list=list(error),
-                    qubit_list=[Qubit(i) for i in range(self.n_qubits)],
+                error_pauli = QermitPauli(
+                    QubitPauliTensor(
+                        string=QubitPauliString(
+                            paulis=list(error),
+                            qubits=[Qubit(i) for i in range(self.n_qubits)],
+                        ),
+                        coeff=1,
+                    )
                 )
                 commute_coeff = (
                     1
@@ -185,15 +195,26 @@ class ErrorDistribution:
         # is the matrix of commutation values.
         commutation_matrix = np.zeros(ptm.shape)
         for pauli_one_tuple, index_one in pauli_index.items():
-            pauli_one = QermitPauli.from_pauli_list(
-                pauli_list=list(pauli_one_tuple),
-                qubit_list=[Qubit(i) for i in range(len(pauli_one_tuple))],
+            pauli_one = QermitPauli(
+                QubitPauliTensor(
+                    string=QubitPauliString(
+                        paulis=list(pauli_one_tuple),
+                        qubits=[Qubit(i) for i in range(len(pauli_one_tuple))],
+                    ),
+                    coeff=1,
+                )
             )
             for pauli_two_tuple, index_two in pauli_index.items():
-                pauli_two = QermitPauli.from_pauli_list(
-                    pauli_list=list(pauli_two_tuple),
-                    qubit_list=[Qubit(i) for i in range(len(pauli_two_tuple))],
+                pauli_two = QermitPauli(
+                    QubitPauliTensor(
+                        string=QubitPauliString(
+                            paulis=list(pauli_two_tuple),
+                            qubits=[Qubit(i) for i in range(len(pauli_two_tuple))],
+                        ),
+                        coeff=1,
+                    )
                 )
+
                 commutation_matrix[index_one][index_two] = (
                     1
                     if pauli_one.qubit_pauli_tensor.commutes_with(
