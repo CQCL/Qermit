@@ -47,7 +47,7 @@ class _PolyCDRCorrect(_BaseExCorrectModel):
         if params:
             if len(params) != degree + 1:
                 raise ValueError(
-                    f"Degree {degree} polynomial requires {degree+1} parameters, "
+                    f"Degree {degree} polynomial requires {degree + 1} parameters, "
                     f"{len(params)} were provided."
                 )
         self.degree = degree
