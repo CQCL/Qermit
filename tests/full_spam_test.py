@@ -17,6 +17,8 @@ import numpy as np  # type: ignore
 from pytket import Bit, Circuit, Qubit
 from pytket.extensions.qiskit import AerBackend  # type: ignore
 
+from qermit import CircuitShots
+
 from qermit.spam import (  # type: ignore
     CorrectionMethod,
 )
@@ -90,7 +92,7 @@ def test_gen_get_bit_maps_task():
 
     c0 = Circuit(3).CX(0, 1).X(2).measure_all()
     c1 = Circuit(2, 2).X(0).Measure(0, 0).X(1).SWAP(0, 1).Measure(0, 1)
-    wire = [(c0, 10), (c1, 50)]
+    wire = [CircuitShots(c0, 10), CircuitShots(c1, 50)]
     res = task([wire])
     assert len(res) == 2
     assert res[0] == wire
