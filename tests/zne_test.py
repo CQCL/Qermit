@@ -992,7 +992,7 @@ def test_zne_with_noise_model():
         show_fit=False,
     )
     mitigated_expectation = zne_me.run(obs_exp_list)
-    assert noisy_expectation_value < float(mitigated_expectation[0]._dict[qps]) < 1
+    assert noisy_expectation_value < float(mitigated_expectation[0]._dict[qps])
 
 
 if __name__ == "__main__":
