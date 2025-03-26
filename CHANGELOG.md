@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/CQCL/Qermit/compare/v0.7.0...v0.7.1) (2025-03-26)
+
+
+### Bug Fixes
+
+* Bump pytket-qiskit ([#244](https://github.com/CQCL/Qermit/issues/244)) ([6ad5882](https://github.com/CQCL/Qermit/commit/6ad58822dfb87fab52b267546ba92ac103fc14ba))
+
 ## [0.7.0](https://github.com/CQCL/Qermit/compare/v0.6.0...v0.7.0) (2024-12-16)
 
 
