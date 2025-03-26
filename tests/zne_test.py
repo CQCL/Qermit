@@ -34,6 +34,7 @@ from qiskit_ibm_provider import IBMProvider
 
 from qermit import (  # type: ignore  # type: ignore
     AnsatzCircuit,
+    MitEx,
     ObservableExperiment,
     ObservableTracker,
     SymbolsDict,
@@ -964,6 +965,36 @@ def test_merge_experiments_task_gen():
     assert merged_qpo_list[0][1]._dict[qps_two] == -1
 
 
+def test_zne_with_noise_model():
+    rand_circ = Circuit(2).H(0).CX(0, 1)
+
+    qps = QubitPauliString([Qubit(i) for i in range(2)], [Pauli.Z for i in range(2)])
+    obs_exp = ObservableExperiment(
+        AnsatzCircuit(rand_circ, 1000, SymbolsDict()),
+        ObservableTracker(QubitPauliOperator({qps: 1})),
+    )
+    obs_exp_list = [obs_exp]
+
+    ideal_mitex = MitEx(AerBackend())
+    ideal_expectation = ideal_mitex.run(obs_exp_list)
+    assert float(ideal_expectation[0]._dict[qps]) == 1
+
+    noisy_mitex = MitEx(noisy_backend)
+    noisy_expectation = noisy_mitex.run(obs_exp_list)
+    noisy_expectation_value = float(noisy_expectation[0]._dict[qps])
+    assert noisy_expectation_value < 1
+
+    zne_me = gen_ZNE_MitEx(
+        backend=noisy_backend,
+        noise_scaling_list=[9, 7, 5, 3, 1],
+        fit_type=Fit.exponential,
+        folding_type=Folding.circuit,
+        show_fit=False,
+    )
+    mitigated_expectation = zne_me.run(obs_exp_list)
+    assert noisy_expectation_value < float(mitigated_expectation[0]._dict[qps])
+
+
 if __name__ == "__main__":
     test_no_qubit_relabel()
     test_extrapolation_task_gen()
@@ -982,3 +1013,4 @@ if __name__ == "__main__":
     test_end_to_end_noise_aware_zne_mitex_starting_from_ptm()
     test_merge_experiments_task_gen()
     test_noise_aware_folding()
+    test_zne_with_noise_model()
