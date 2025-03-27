@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/CQCL/Qermit/compare/v0.7.1...v0.7.2) (2025-03-27)
+
+
+### Bug Fixes
+
+* Use tighter version bounds ([#243](https://github.com/CQCL/Qermit/issues/243)) ([9414fe6](https://github.com/CQCL/Qermit/commit/9414fe68835a605b81a58a4320a347463c833335))
+
 ## [0.7.1](https://github.com/CQCL/Qermit/compare/v0.7.0...v0.7.1) (2025-03-26)
 
 
