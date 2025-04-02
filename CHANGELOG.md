@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.2](https://github.com/CQCL/Qermit/compare/v0.7.1...v0.7.2) (2025-04-02)
+
+
+### Bug Fixes
+
+* Make pytket-quantinuum a default dependancy ([#249](https://github.com/CQCL/Qermit/issues/249)) ([d4b161b](https://github.com/CQCL/Qermit/commit/d4b161bfa985df95fdfe064e1d233bfa0566d338))
+* Use tighter version bounds ([#243](https://github.com/CQCL/Qermit/issues/243)) ([9414fe6](https://github.com/CQCL/Qermit/commit/9414fe68835a605b81a58a4320a347463c833335))
+
 ## [0.7.1](https://github.com/CQCL/Qermit/compare/v0.7.0...v0.7.1) (2025-03-26)
 
 
