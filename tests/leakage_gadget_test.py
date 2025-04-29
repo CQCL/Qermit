@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import cast
+
 from pytket import Circuit
 from pytket.extensions.quantinuum.backends.leakage_gadget import (
     prune_shots_detected_as_leaky,
@@ -69,13 +71,15 @@ def test_compare_with_prune() -> None:
             ),
             n_shots=detection_circuit_shots.Shots,
         )
-        for detection_circuit_shots in detection_circuit_shots_list
+        for detection_circuit_shots in cast(
+            list[CircuitShots], detection_circuit_shots_list
+        )
     ]
 
     qermit_result_list = postselection_task(
         (
             result_list,
-            postselect_mgr_list,
+            postselect_mgr_list,  # type: ignore
         )
     )
     pytket_result_list = [

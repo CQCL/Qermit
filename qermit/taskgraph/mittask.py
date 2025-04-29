@@ -16,7 +16,7 @@
 from collections import namedtuple
 from enum import Enum
 from types import MethodType
-from typing import Callable, Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 from pytket import Bit, Circuit, Qubit
 from pytket.backends import ResultHandle
@@ -53,6 +53,22 @@ Wire = Union[
     QubitPauliOperator,
     Dict[Qubit, Bit],
     Dict,
+]
+
+WireList = Union[
+    List[CircuitShots],
+    List[Circuit],
+    List[BackendResult],
+    List[ResultHandle],
+    List[AnsatzCircuit],
+    List[ObservableExperiment],
+    List[int],
+    List[float],
+    List[bool],
+    List[str],
+    List[QubitPauliOperator],
+    List[Dict[Qubit, Bit]],
+    List[Dict],
 ]
 
 
@@ -98,7 +114,7 @@ class MitTask:
     def n_out_wires(self):
         return self._n_out_wires
 
-    def __call__(self, input_wires: List[Wire]) -> List[Wire]:
+    def __call__(self, input_wires: Tuple[WireList, ...]) -> Tuple[WireList, ...]:
         return self.run(*input_wires)
 
     def __str__(self):
