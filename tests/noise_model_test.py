@@ -992,11 +992,13 @@ def test_noise_model_scaling() -> None:
         - 0.0178
     ) < 10 ** (-6)
 
-    assert list(two_scaled_noise_model.noise_model[OpType.CX].distribution.keys()) == [
-        (Pauli.X, Pauli.Y),
-        (Pauli.Y, Pauli.Z),
-        (Pauli.Z, Pauli.X),
-    ]
+    assert list(two_scaled_noise_model.noise_model[OpType.CX].distribution.keys()) == set(
+        [
+            (Pauli.X, Pauli.Y),
+            (Pauli.Y, Pauli.Z),
+            (Pauli.Z, Pauli.X),
+        ]
+    )
     assert abs(
         two_scaled_noise_model.noise_model[OpType.CX].distribution[(Pauli.X, Pauli.Y)]
         - 0.2
