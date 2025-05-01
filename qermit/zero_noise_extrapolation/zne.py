@@ -913,13 +913,6 @@ def gen_duplication_task(duplicates: int, **kwargs) -> MitTask:
     )
 
 
-def unitid_to_quibt(unitid):
-    if unitid.type == UnitType.qubit:
-        return Qubit(name=unitid.reg_name, index=unitid.index)
-
-    raise Exception(f"Cannot convert to qubit. UnitID is of type {unitid.type}")
-
-
 def qpo_node_relabel(
     qpo: QubitPauliOperator,
     node_map: Dict[Union[UnitID, Qubit, Node], Union[UnitID, Qubit, Node]],
@@ -937,7 +930,7 @@ def qpo_node_relabel(
         orig_qps_dict = orig_qps.map
         new_qps_dict = {}
         for q in orig_qps_dict:
-            new_qps_dict[unitid_to_quibt(node_map[q])] = orig_qps_dict[q]
+            new_qps_dict[node_map[q]] = orig_qps_dict[q]
         new_qps = QubitPauliString(cast(Dict[Qubit, Pauli], new_qps_dict))
         new_qpo_dict[new_qps] = orig_qpo_dict[orig_qps]
 
