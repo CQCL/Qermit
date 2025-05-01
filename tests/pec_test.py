@@ -46,7 +46,7 @@ from qermit.probabilistic_error_cancellation.pec_learning_based import (  # type
     learn_quasi_probs_task_gen,
 )
 
-skip_remote_tests: bool = not QiskitRuntimeService().saved_accounts()
+skip_remote_tests: bool = not QiskitRuntimeService.saved_accounts()
 REASON = "IBMQ account not configured"
 
 

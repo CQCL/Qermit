@@ -82,7 +82,7 @@ for node in [i for i in range(n_qubits)]:
 noisy_backend = AerBackend(noise_model)
 
 
-skip_remote_tests: bool = not QiskitRuntimeService().saved_accounts()
+skip_remote_tests: bool = not QiskitRuntimeService.saved_accounts()
 REASON = "IBMQ account not configured"
 
 
