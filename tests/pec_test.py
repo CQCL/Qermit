@@ -24,7 +24,7 @@ from pytket.extensions.qiskit import (
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.predicates import CliffordCircuitPredicate, GateSetPredicate  # type: ignore
 from pytket.utils import QubitPauliOperator
-from qiskit_ibm_provider import IBMProvider
+from qiskit_ibm_runtime import QiskitRuntimeService
 
 from qermit import (  # type: ignore
     AnsatzCircuit,
@@ -46,7 +46,7 @@ from qermit.probabilistic_error_cancellation.pec_learning_based import (  # type
     learn_quasi_probs_task_gen,
 )
 
-skip_remote_tests: bool = not IBMProvider.saved_accounts()
+skip_remote_tests: bool = not QiskitRuntimeService().saved_accounts()
 REASON = "IBMQ account not configured"
 
 

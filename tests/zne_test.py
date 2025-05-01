@@ -30,7 +30,7 @@ from pytket.extensions.qiskit import AerBackend, IBMQEmulatorBackend  # type: ig
 from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.predicates import GateSetPredicate  # type: ignore
 from pytket.utils import QubitPauliOperator
-from qiskit_ibm_provider import IBMProvider
+from qiskit_ibm_runtime import QiskitRuntimeService
 
 from qermit import (  # type: ignore  # type: ignore
     AnsatzCircuit,
@@ -82,7 +82,7 @@ for node in [i for i in range(n_qubits)]:
 noisy_backend = AerBackend(noise_model)
 
 
-skip_remote_tests: bool = not IBMProvider.saved_accounts()
+skip_remote_tests: bool = not QiskitRuntimeService().saved_accounts()
 REASON = "IBMQ account not configured"
 
 

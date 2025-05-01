@@ -958,20 +958,27 @@ def test_noise_model_scaling() -> None:
         [Pauli.I, Pauli.X, Pauli.Y, Pauli.Z], [1, 0.98**2, 0.78**2, 0.8**2]
     ):
         assert all(
-            ptm[pauli_index[(pauli_one, pauli_two)]][
-                pauli_index[(pauli_one, pauli_two)]
-            ]
-            == ptm_entry
+            abs(
+                ptm[pauli_index[(pauli_one, pauli_two)]][
+                    pauli_index[(pauli_one, pauli_two)]
+                ]
+                - ptm_entry
+            )
+            < 10 ** (-6)
             for pauli_two in [Pauli.I, Pauli.X, Pauli.Y, Pauli.Z]
         )
 
     # Here we work through pre computed values for the
     # error rates.
-    assert list(two_scaled_noise_model.noise_model[OpType.CZ].distribution.keys()) == [
-        (Pauli.X, Pauli.I),
-        (Pauli.Y, Pauli.I),
-        (Pauli.Z, Pauli.I),
-    ]
+    assert set(
+        two_scaled_noise_model.noise_model[OpType.CZ].distribution.keys()
+    ) == set(
+        [
+            (Pauli.X, Pauli.I),
+            (Pauli.Y, Pauli.I),
+            (Pauli.Z, Pauli.I),
+        ]
+    )
     assert abs(
         two_scaled_noise_model.noise_model[OpType.CZ].distribution[(Pauli.X, Pauli.I)]
         - 0.178

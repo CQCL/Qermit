@@ -16,7 +16,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.10,<3.14"
 matplotlib = ">=3.8,<3.11"
-pytket-qiskit = ">=0.66,<0.67"
+pytket-qiskit = ">=0.66,<0.68"
 pytket-quantinuum = { extras = ["pecos"], version = ">=0.41,<0.47"}
 
 pytest = { version = ">=8.1,<8.4", optional = true }
