@@ -24,7 +24,7 @@ from pytket.backends import Backend
 from pytket.circuit import Node
 from pytket.pauli import Pauli, QubitPauliString
 from pytket.predicates import CompilationUnit
-from pytket.unit_id import UnitID
+from pytket.unit_id import UnitID, UnitType
 from pytket.utils import QubitPauliOperator
 from pytket.utils.operators import CoeffTypeAccepted
 from scipy.optimize import curve_fit  # type: ignore
