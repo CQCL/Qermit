@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/CQCL/Qermit/compare/v0.7.2...v0.8.0) (2025-05-13)
+
+
+### Features
+
+* Update qiskit ([#258](https://github.com/CQCL/Qermit/issues/258)) ([47b05f3](https://github.com/CQCL/Qermit/commit/47b05f321e2723ce41534e9cb17e03564a6b80f8))
+
 ## [0.7.2](https://github.com/CQCL/Qermit/compare/v0.7.1...v0.7.2) (2025-04-02)
 
 
