@@ -2842,13 +2842,13 @@ pytket = ">=2.4.1"
 
 [[package]]
 name = "pytket-qiskit"
-version = "0.69.0"
+version = "0.70.0"
 description = "Extension for pytket, providing translation to and from the Qiskit framework"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "pytket_qiskit-0.69.0-py3-none-any.whl", hash = "sha256:0a9f7c6dcb09c7e882d89871638da3621f63b3fff5f80f59b40ce62072da28d0"},
+    {file = "pytket_qiskit-0.70.0-py3-none-any.whl", hash = "sha256:73bf7d9c90e5f4346d8959ae4815fbf6e262492ce6ed64620337b367f7493050"},
 ]
 
 [package.dependencies]
@@ -4449,4 +4449,4 @@ tests = ["mypy", "pytest", "pytest-cov", "qiskit-ibm-provider", "ruff"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "199d32c9663c211c1def62568e6a22eca07a4de46508a9e42cb313a737b68ecc"
+content-hash = "cc79658d27597a661c31b296b032b747c9561ac4c00050248ebd7400a1569b1d"
