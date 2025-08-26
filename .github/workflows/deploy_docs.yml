@@ -44,7 +44,7 @@ jobs:
           name: docs_html
           path: docs/build
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: 'docs/build'
       - name: Deploy to GitHub Pages
