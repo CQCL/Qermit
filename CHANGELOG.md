@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.3](https://github.com/CQCL/Qermit/compare/v0.8.2...v0.8.3) (2025-09-30)
+
+
+### Miscellaneous Chores
+
+* release 0.8.3 ([8dd7a70](https://github.com/CQCL/Qermit/commit/8dd7a70e1edb610871aa2cfd2fd0c193f6d4c53c))
+
 ## [0.8.2](https://github.com/CQCL/Qermit/compare/v0.8.1...v0.8.2) (2025-06-24)
 
 
