@@ -2831,21 +2831,21 @@ pytket = ">=2.4.1"
 
 [[package]]
 name = "pytket-qiskit"
-version = "0.71.0"
+version = "0.71.1"
 description = "Extension for pytket, providing translation to and from the Qiskit framework"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "pytket_qiskit-0.71.0-py3-none-any.whl", hash = "sha256:4e64f44fdc1cbd4c1f94d4f9de59c7b393ff1cda639c06de5cad01c770fc3000"},
+    {file = "pytket_qiskit-0.71.1-py3-none-any.whl", hash = "sha256:4867ad289e13b0943c9f8f8ca1ab05a37cf704d6d403621beef07334df409036"},
 ]
 
 [package.dependencies]
 numpy = ">=1.26.4"
 pytket = ">=2.8.0"
-qiskit = ">=2.1.1"
+qiskit = "2.1.1"
 qiskit-aer = ">=0.17.1"
-qiskit-ibm-runtime = ">=0.40.1"
+qiskit-ibm-runtime = "0.41.1"
 symengine = ">=0.11"
 
 [[package]]
@@ -3193,14 +3193,14 @@ visualization = ["ipython (>=5.0.0)", "ipyvue (>=1.8.5)", "ipyvuetify (>=1.1)", 
 
 [[package]]
 name = "qiskit-ibm-runtime"
-version = "0.40.1"
+version = "0.41.1"
 description = "IBM Quantum client for Qiskit Runtime."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "qiskit_ibm_runtime-0.40.1-py3-none-any.whl", hash = "sha256:5a67e4c55b6e0a2bc9041c1ec7b8c5adc43a50f7dfb8a2521a0c2f3ed4aaa712"},
-    {file = "qiskit_ibm_runtime-0.40.1.tar.gz", hash = "sha256:83fd172357a28d69b3289009a724ec14d70c4367dbb5aa140ffd63aa101c3ae1"},
+    {file = "qiskit_ibm_runtime-0.41.1-py3-none-any.whl", hash = "sha256:30673c532324b343924e860b2b67ea39f2cf26bff15a552ac5ff6cc3fdb5f296"},
+    {file = "qiskit_ibm_runtime-0.41.1.tar.gz", hash = "sha256:e9831956d316a7bd589f4a7a1a0da1e76c95083fbc38746884c3598443babacb"},
 ]
 
 [package.dependencies]
