@@ -59,6 +59,8 @@ def gen_full_tomography_spam_circuits_task(
                 == qubit_subsets
             ):
                 return (wire, [], [])
+            
+        print("qubit_subsets: ", qubit_subsets)
 
         process_circuit = Circuit(
             len([qb for subset in qubit_subsets for qb in subset])
@@ -179,7 +181,7 @@ def get_mid_circuit_measure_map(
 
 def gen_get_bit_maps_task() -> MitTask:
     """
-    Returns a task that takes a list of circuits and returns the circuits, and a map betwen
+    Returns a task that takes a list of circuits and returns the circuits, and a map between
     each circuit bit and the qubit it is measured on.
     """
 
@@ -193,12 +195,12 @@ def gen_get_bit_maps_task() -> MitTask:
         """
         bq_maps = []
         for c in circuit_shots:
-            qb_map = c[0].qubit_to_bit_map
-            # if condition met, implies that mid circuit measurement has ocurred and not accounted for
+            qb_map = c.Circuit.qubit_to_bit_map
+            # if condition met, implies that mid circuit measurement has occurred and not accounted for
             # in this case, iterate through circuit commands to get Qubits for all Bits
-            if len(qb_map) != len(c[0].bits):
+            if len(qb_map) != len(c.Circuit.bits):
                 bq_maps.append(
-                    (qb_map, get_mid_circuit_measure_map(c[0], set(qb_map.values())))
+                    (qb_map, get_mid_circuit_measure_map(c.Circuit, set(qb_map.values())))
                 )
             else:
                 # else, just invert map for later correction
