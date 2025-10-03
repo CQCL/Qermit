@@ -16,18 +16,18 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.10,<3.14"
 matplotlib = ">=3.8,<3.11"
-pytket-qiskit = ">=0.66,<0.72"
+pytket-qiskit = ">=0.66,<0.73"
 pytket-quantinuum = { extras = ["pecos"], version = ">=0.41,<0.54"}
 
 pytest = { version = ">=8.1,<8.5", optional = true }
 mypy = { version = ">=1.9,<1.19", optional = true }
-sphinx = { version = ">=8.1,<8.2", optional = true }
+sphinx = { version = ">=8.1,<8.3", optional = true }
 pytest-cov = { version = ">=6.0,<7.1", optional = true }
 qiskit-ibm-provider = { version = ">=0.11,<0.12", optional = true }
 ruff = { version = ">=0.8,<0.14", optional = true }
-furo = { version = ">=2024.8,<2025.8", optional = true }
+furo = { version = ">=2024.8,<2025.10", optional = true }
 myst-nb = { version = ">=1.1,<1.4", optional = true }
-sphinx-autodoc-typehints = { version = ">=2.5,<3.2", optional = true }
+sphinx-autodoc-typehints = { version = ">=2.5,<3.3", optional = true }
 jupyter-sphinx = { version = ">=0.5,<0.6", optional = true}
 
 [tool.poetry.extras]
