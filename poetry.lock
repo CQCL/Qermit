@@ -2953,18 +2953,18 @@ phirc = ["projectq (>=0.8.0)", "quantum-pecos (>=0.6.0.dev2)"]
 
 [[package]]
 name = "pytket-qir"
-version = "0.24.1"
+version = "0.25.0"
 description = "Extension for pytket, providing functions for conversion into to qir"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "pytket_qir-0.24.1-py3-none-any.whl", hash = "sha256:082a1ba2f9b6ba0f860303f2b6f02adb7a5272a49bbe0a76e11ce8c39d188ee7"},
+    {file = "pytket_qir-0.25.0-py3-none-any.whl", hash = "sha256:9955cd9fea785681642ba442bedbe91c7b23a9a8eae7619ab9c52ae0763296f2"},
 ]
 
 [package.dependencies]
 pyqir = ">=0.10.9,<0.11.0"
-pytket = ">=2.4.1"
+pytket = ">=2.9.3"
 
 [[package]]
 name = "pytket-qiskit"
@@ -2987,13 +2987,13 @@ symengine = ">=0.11"
 
 [[package]]
 name = "pytket-quantinuum"
-version = "0.53.0"
+version = "0.54.0"
 description = "Extension for pytket, providing access to Quantinuum backends"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "pytket_quantinuum-0.53.0-py3-none-any.whl", hash = "sha256:9266d422d7f81252a7738d80af3db25f0a6fc1e9c1526276a4800319fd98338f"},
+    {file = "pytket_quantinuum-0.54.0-py3-none-any.whl", hash = "sha256:7451982dc0820b7ae280c7d5b3e5e392a44a132dd750292a710d847c6db950a9"},
 ]
 
 [package.dependencies]
@@ -3001,9 +3001,9 @@ msal = ">=1.18,<2.0"
 nest_asyncio = ">=1.2"
 numpy = ">=1.26.4"
 pyjwt = ">=2.4,<3.0"
-pytket = ">=2.9.1"
+pytket = ">=2.9.3"
 pytket-pecos = {version = ">=0.2.1,<0.3.0", optional = true, markers = "extra == \"pecos\""}
-pytket-qir = ">=0.24.1"
+pytket-qir = ">=0.25.0"
 requests = ">=2.32.2"
 types-requests = "*"
 websockets = ">=13.1"
@@ -4661,4 +4661,4 @@ tests = ["mypy", "pytest", "pytest-cov", "qiskit-ibm-provider", "ruff"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "7bdea34c34fe700d672f3205d5cb45a9f70969b51428de2a90c1cad659d75d93"
+content-hash = "489472d00d213b5998667f6b9fc0cbf2d0e2d64929d81a4d60f3a5e310ad0fa1"
