@@ -970,7 +970,7 @@ def gen_initial_compilation_task(
 
             cu = CompilationUnit(compiled_circ)
             print(type(backend))
-            print(dir(backend.backendinfo))
+            print(dir(backend.backend_info))
             raise ValueError("STOP")
             backend.default_compilation_pass(
                 optimisation_level=optimisation_level,
