@@ -969,7 +969,7 @@ def gen_initial_compilation_task(
             compiled_circ = obs_exp.AnsatzCircuit.Circuit.copy()
 
             cu = CompilationUnit(compiled_circ)
-            backend.default_compilation_pass(
+            backend.default_compilation_pass(  # type: ignore
                 optimisation_level=optimisation_level, allow_symbolic=True,
             ).apply(cu)
             node_map = cu.final_map
