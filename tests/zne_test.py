@@ -31,6 +31,7 @@ from pytket.pauli import Pauli, QubitPauliString  # type: ignore
 from pytket.predicates import GateSetPredicate  # type: ignore
 from pytket.utils import QubitPauliOperator
 from qiskit_ibm_runtime import QiskitRuntimeService
+from sympy import Symbol, pi
 
 from qermit import (  # type: ignore  # type: ignore
     AnsatzCircuit,
@@ -46,6 +47,7 @@ from qermit.noise_model import (
     PauliErrorTranspile,
     TranspilerBackend,
 )
+from qermit.noise_model.noisy_aer_backend import NoisyAerBackend
 from qermit.taskgraph import gen_MeasurementReduction_MitEx
 from qermit.zero_noise_extrapolation import (  # type: ignore
     Fit,
@@ -993,6 +995,37 @@ def test_zne_with_noise_model():
     )
     mitigated_expectation = zne_me.run(obs_exp_list)
     assert noisy_expectation_value < float(mitigated_expectation[0]._dict[qps])
+
+
+def test_zne_with_symbols() -> None:
+    backend = NoisyAerBackend(n_qubits=2, prob_1=0.001, prob_2=0.01, prob_ro=0.01)
+    zne_mitex = gen_ZNE_MitEx(backend=backend, noise_scaling_list=[1, 3])
+
+    circ = Circuit(2)
+    circ.Ry(-2 * Symbol("a") / pi, 0)
+    circ.CX(0, 1)
+    circ.Rz(-2 * Symbol("b") / pi, 1)
+    circ.Rx(-2 * Symbol("c") / pi, 1)
+    circ.CX(1, 0)
+    circ.Ry(-2 * Symbol("d") / pi, 0)
+
+    ansatz_circuit = AnsatzCircuit(
+        circ,
+        2000,
+        SymbolsDict.symbols_from_dict(
+            {Symbol("a"): 0.5, Symbol("b"): 1, Symbol("c"): 1.5, Symbol("d"): 2}
+        ),
+    )
+
+    qubit_pauli_string = QubitPauliString([Qubit(0), Qubit(1)], [Pauli.Z, Pauli.Z])
+    exp = [
+        ObservableExperiment(
+            ansatz_circuit,
+            ObservableTracker(QubitPauliOperator({qubit_pauli_string: 1.0})),
+        )
+    ]
+
+    zne_mitex.run(exp)
 
 
 if __name__ == "__main__":
