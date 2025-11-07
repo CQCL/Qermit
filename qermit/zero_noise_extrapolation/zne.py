@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import inspect
 from copy import copy, deepcopy
 from enum import Enum
 from math import isclose
@@ -969,9 +970,21 @@ def gen_initial_compilation_task(
             compiled_circ = obs_exp.AnsatzCircuit.Circuit.copy()
 
             cu = CompilationUnit(compiled_circ)
-            backend.default_compilation_pass(
-                optimisation_level=optimisation_level
-            ).apply(cu)
+
+            if (
+                len(inspect.signature(backend.default_compilation_pass).parameters) > 2
+            ) and (
+                list(inspect.signature(backend.default_compilation_pass).parameters)[2]
+                == "allow_symbolic"
+            ):
+                backend.default_compilation_pass(  # type: ignore
+                    optimisation_level=optimisation_level,
+                    allow_symbolic=True,
+                ).apply(cu)
+            else:
+                backend.default_compilation_pass(
+                    optimisation_level=optimisation_level
+                ).apply(cu)
             node_map = cu.final_map
             node_map_list.append(node_map)
 
