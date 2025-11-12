@@ -971,12 +971,7 @@ def gen_initial_compilation_task(
 
             cu = CompilationUnit(compiled_circ)
 
-            if (
-                len(inspect.signature(backend.default_compilation_pass).parameters) > 2
-            ) and (
-                list(inspect.signature(backend.default_compilation_pass).parameters)[2]
-                == "allow_symbolic"
-            ):
+            if backend._uses_lightsabre():
                 backend.default_compilation_pass(  # type: ignore
                     optimisation_level=optimisation_level,
                     allow_symbolic=True,
