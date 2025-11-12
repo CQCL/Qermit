@@ -971,7 +971,7 @@ def gen_initial_compilation_task(
 
             cu = CompilationUnit(compiled_circ)
 
-            if backend._uses_lightsabre():
+            if backend._uses_lightsabre:
                 backend.default_compilation_pass(  # type: ignore
                     optimisation_level=optimisation_level,
                     allow_symbolic=True,
