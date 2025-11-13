@@ -58,6 +58,11 @@ class TranspilerBackend:
         self.result_dict = result_dict
         self.n_cores = n_cores
 
+    @property
+    def _uses_lightsabre(self) -> bool:
+        # lightsaber is a routing method used by pytket-qiskit
+        return False
+
     def default_compilation_pass(self, **kwargs) -> BasePass:
         """Return a compiler pass which has no affect on the circuit."""
         return CustomPass(transform=lambda circuit: circuit)
@@ -65,6 +70,8 @@ class TranspilerBackend:
     def rebase_pass(self) -> BasePass:
         """Return a compiler pass which has no affect on the circuit."""
         return CustomPass(transform=lambda circuit: circuit)
+
+
 
     def run_circuit(
         self,
