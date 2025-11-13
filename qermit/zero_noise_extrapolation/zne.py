@@ -969,9 +969,16 @@ def gen_initial_compilation_task(
             compiled_circ = obs_exp.AnsatzCircuit.Circuit.copy()
 
             cu = CompilationUnit(compiled_circ)
-            backend.default_compilation_pass(
-                optimisation_level=optimisation_level
-            ).apply(cu)
+
+            if backend._uses_lightsabre:
+                backend.default_compilation_pass(  # type: ignore
+                    optimisation_level=optimisation_level,
+                    allow_symbolic=True,
+                ).apply(cu)
+            else:
+                backend.default_compilation_pass(
+                    optimisation_level=optimisation_level
+                ).apply(cu)
             node_map = cu.final_map
             node_map_list.append(node_map)
 
