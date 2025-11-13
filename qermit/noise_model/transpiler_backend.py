@@ -71,8 +71,6 @@ class TranspilerBackend:
         """Return a compiler pass which has no affect on the circuit."""
         return CustomPass(transform=lambda circuit: circuit)
 
-
-
     def run_circuit(
         self,
         circuit: Circuit,
